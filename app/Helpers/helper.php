@@ -1,0 +1,131 @@
+<?php
+
+use App\Models\User;
+use App\Models\Language;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+if (!function_exists('getBaseURL')) {
+    function getBaseURL()
+    {
+        $root = '//' . $_SERVER['HTTP_HOST'];
+        $root .= str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+
+        return $root;
+    }
+}
+
+
+//highlights the selected navigation on admin panel
+if (!function_exists('areActiveRoutes')) {
+    function areActiveRoutes(array $routes, $output = "!text-[#B68A35] py-2 px-4 rounded-lg !bg-[#F9F7ED]")
+    {
+        foreach ($routes as $route) {
+            if (Route::currentRouteName() == $route) return $output;
+        }
+    }
+}
+
+//highlights the selected navigation on frontend
+if (!function_exists('areActiveWebRoutes')) {
+    function areActiveWebRoutes(array $routes, $output = "side-active")
+    {
+        foreach ($routes as $route) {
+            if (Route::currentRouteName() == $route) return $output;
+        }
+    }
+}
+function getAllActiveLanguages(){
+    $languages = Language::where('status', 1)->orderBy('id')->get();
+    return $languages;
+}
+
+function getActiveLanguage()
+{
+    if (Session::exists('locale')) {
+        return Session::get('locale');
+    }
+    return 'en';
+}
+
+function uploadImage($type, $imageUrl, $filename = null){
+    $data_url = '';
+    $ext = $imageUrl->getClientOriginalExtension();
+    
+    $path = $type.'/';
+    
+    $filename = $path . $filename.'_'.time().'_'.rand(10, 9999) . '.' . $ext;
+
+    $imageContents = file_get_contents($imageUrl);
+
+    // Save the original image in the storage folder
+    Storage::disk('public')->put($filename, $imageContents);
+    $data_url = Storage::url($filename);
+    
+    return $data_url;
+}
+
+function getUploadedImage(?string $path, string $default = 'assets/img/default_image.png'): string
+{
+    if ($path) {
+        $relativePath = str_replace('/storage/', '', $path);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return asset($path);
+        }
+    }
+
+    return asset($default);
+}
+
+function formatFilePathsWithFullUrl(array $files): array
+{
+     return array_values(array_filter(array_map(function ($path) {
+        // Strip starting slash to match disk paths
+        $cleanPath = ltrim($path, '/');
+
+        // Check existence in storage
+        if (Storage::disk('public')->exists(str_replace('storage/', '', $cleanPath))) {
+            return asset($path); // Or use asset($path)
+        }
+
+        return null;
+    }, $files)));
+}
+
+
+function getUnreadNotifications()
+{
+    if (!Auth::check()) {
+        return collect(); // return empty collection if not logged in
+    }
+
+    return Auth::user()->unreadNotifications;
+}
+
+function getUsersWithPermissions(array $permissions, string $guard = 'web')
+{
+    $users =  User::where(function ($query) use ($permissions, $guard) {
+                        $query->whereHas('permissions', function ($q) use ($permissions, $guard) {
+                            $q->whereIn('name', $permissions)->where('guard_name', $guard);
+                        })->orWhereHas('roles.permissions', function ($q) use ($permissions, $guard) {
+                            $q->whereIn('name', $permissions)->where('guard_name', $guard);
+                        });
+                    })->get();
+
+    return $users;
+}
+
+function getUnreadNotificationCount()
+{
+    $user = Auth::guard('frontend')->user();
+
+    $count = $user->unreadNotifications()->count();
+
+    return $count;
+}
