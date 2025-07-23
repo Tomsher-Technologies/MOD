@@ -2,9 +2,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Models\Staff;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Hash;
@@ -78,13 +77,26 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email',
             'mobile' => 'nullable|string|max:20',
             'password' => 'required|min:6|confirmed',
             'role' => 'required'
+        ], [
+            'name.required' => __db('name_required'),
+            'email.required' => __db('email_required'),
+            'email.email' => __db('valid_email'),
+            'email.unique' => __db('email_already_exist'),
+            'mobile.max' => __db('mobile_max', ['max' => 20]), 
+            'password.required' => __db('password_required'),
+            'password.min' => __db('password_length', ['min' => 6]),
+            'password.confirmed' => __db('new_password_confirmed'),
+            'role.required' => __db('role_required'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         if(User::where('email', $request->email)->first() == null){
             $user = new User;
@@ -95,12 +107,12 @@ class StaffController extends Controller
             $user->password = Hash::make($request->password);
             if($user->save()){
                 $user->assignRole($request->role);
-                session()->flash('success','Staff created successfully');
+                session()->flash('success', __db('staff').__db('created_successfully'));
                 return redirect()->route('staffs.index');
             }
         }
 
-        session()->flash('error','Email is already in use.');
+        session()->flash('error', __db('email_already_exist'));
         return back();
     }
 
@@ -127,14 +139,26 @@ class StaffController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
-        $request->validate([
-            'name' => 'required|string|max:255',
+      
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
             'mobile' => 'nullable|string|max:20',
             'password' => 'nullable|min:6|confirmed',
-            'role_id' => 'required'
+            'role' => 'required'
+        ], [
+            'name.required' => __db('name_required'),
+            'email.required' => __db('email_required'),
+            'email.email' => __db('valid_email'),
+            'email.unique' => __db('email_already_exist'),
+            'mobile.max' => __db('mobile_max', ['max' => 20]), 
+            'password.min' => __db('password_length', ['min' => 6]),
+            'password.confirmed' => __db('new_password_confirmed'),
+            'role.required' => __db('role_required'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $user->name = $request->name;
         $user->email = $request->email;
@@ -144,13 +168,13 @@ class StaffController extends Controller
         }
         if($user->save()){
 
-            $user->syncRoles([$request->role_id]);
+            $user->syncRoles([$request->role]);
 
-            session()->flash('success','Staff details updated successfully');
+            session()->flash('success', __db('staff').__db('updated_successfully'));
             return redirect()->route('staffs.index');
         }
 
-        session()->flash('error','Something went wrong');
+        session()->flash('error',);
         return back();
     }
 

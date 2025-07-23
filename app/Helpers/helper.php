@@ -41,6 +41,25 @@ if (!function_exists('areActiveWebRoutes')) {
         }
     }
 }
+function __db($key, $replace = [], $locale = null)
+{
+    $locale = $locale ?? app()->getLocale();
+
+    // Try to fetch from cache or DB
+    $translation = Cache::rememberForever("db_translation_{$locale}_{$key}", function () use ($locale, $key) {
+        return \App\Models\Translation::where('label_key', $key)
+            ->first()?->values->firstWhere('lang', $locale)?->value;
+    });
+
+    $translated = __($key, $replace, $locale);
+    // Fallback to Laravel default if DB value is missing
+    return $translation && trim($translation) !== ''
+        ? strtr($translation, $replace)
+        : ($translated !== $key && trim($translated) !== ''
+        ? $translated
+        : __($key, $replace, 'en'));
+}
+
 function getAllActiveLanguages(){
     $languages = Language::where('status', 1)->orderBy('id')->get();
     return $languages;

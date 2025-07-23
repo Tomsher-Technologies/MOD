@@ -42,15 +42,22 @@ class RoleController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name',
             'permissions' => 'required',
+        ], [
+            'name.required'     => __db('role_name_required'),
+            'name.unique'       => __db('name_unique'),
+            'permissions.required' => __db('permission_required'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $role = Role::create(['name' => $request->input('name')]);
         $role->givePermissionTo($request->permissions);
         
-        session()->flash('success', 'Role created successfully');
+        session()->flash('success', __db('role').__db('created_successfully'));
         return redirect()->route('roles.index');
     }
 
@@ -77,10 +84,17 @@ class RoleController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name,'.$id,
             'permissions' => 'required',
+        ], [
+            'name.required'     => __db('role_name_required'),
+            'name.unique'       => __db('name_unique'),
+            'permissions.required' => __db('permission_required'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
     
         $role = Role::find($id);
         $role->name = $request->input('name');
@@ -88,7 +102,7 @@ class RoleController extends Controller
     
         $role->syncPermissions($request->input('permissions'));
 
-        session()->flash('success', 'Role updated successfully');
+        session()->flash('success', __db('role').__db('updated_successfully'));
         return redirect()->route('roles.index');
     }
 

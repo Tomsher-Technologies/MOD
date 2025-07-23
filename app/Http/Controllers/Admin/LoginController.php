@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
@@ -16,10 +17,18 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+        $validator = Validator::make($request->all(), [
+            'email'     => 'required|email',
+            'password'  => 'required|string',
+        ], [
+            'email.required'     => __db('email_required'),
+            'email.email'        => __db('valid_email'),
+            'password.required'  => __db('password_required'),
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $credentials = $request->only('email', 'password');
 
@@ -35,7 +44,7 @@ class LoginController extends Controller
             return redirect()->intended($redirectTo);
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials']);
+        return back()->withErrors(['password' => __db('invalid_credentials')]);
     }
 
      // Logout the user
