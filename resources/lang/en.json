@@ -36,8 +36,8 @@
 
     "something_went_wrong" : "Something went wrong",
     "status_updated" : "Status updated successfully",
-    "" : "",
-    "" : "",
+    "module_required" : "Module is required",
+    "select_module" : "Select Module",
     "" : "",
     "" : "",
     "" : "",

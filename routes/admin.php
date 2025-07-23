@@ -25,6 +25,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     // Manage roles & permissions
     Route::resource('roles', RoleController::class);
     Route::get('/roles/edit/{id}', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::get('/get-permissions-by-module/{module}', [RoleController::class, 'getPermissionsByModule'])->name('roles.edit-permissions-by-module');
 
     // Manage label translations
     Route::get('/translations', [TranslationController::class, 'index'])->name('translations.index');
