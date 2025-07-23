@@ -1,9 +1,9 @@
-@extends('layouts.admin_account',['title' => 'All Roles'])
+@extends('layouts.admin_account',['title' => __db('roles_and_permission')])
 
 @section('content')
 
 <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-    <h2 class="font-semibold mb-0 !text-[22px]">Roles & Permissions</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('roles_and_permission') }}</h2>
 </div>
 
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -14,8 +14,8 @@
                 <thead>
                     <tr>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">#</th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">Role Name</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Action</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('role_name') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,7 +43,7 @@
                     @empty
                         <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
                             <td class="px-4 py-3 text-center " colspan="3" dir="ltr">
-                                No data found.
+                                {{ __db('no_data_found') }}
                             </td>
                         </tr>
                     @endforelse

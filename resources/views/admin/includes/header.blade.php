@@ -9,11 +9,11 @@
 
                 $buttonConfig = [
                     'roles.index' => [
-                        'text' => 'Add New Role',
+                        'text' => __db('add_new_role'),
                         'link' => route('roles.create'),
                     ],
                     'staffs.index' => [
-                        'text' => 'Add New Staff',
+                        'text' => __db('add_new_staff'),
                         'link' => route('staffs.create'),
                     ],
                 ];

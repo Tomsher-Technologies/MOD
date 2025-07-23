@@ -1,11 +1,11 @@
-@extends('layouts.admin_account', ['title' => 'Create Role'])
+@extends('layouts.admin_account', ['title' => __db('label_translations')])
 
 @section('content')
 
 <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-    <h2 class="font-semibold mb-0 !text-[22px]">Manage Label Translations</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('label_translations') }}</h2>
     <button class="bg-blue-600 text-white px-4 py-2 rounded" data-modal-target="addTranslationModal"
-        data-modal-toggle="addTranslationModal">Add New</button>
+        data-modal-toggle="addTranslationModal">{{ __db('add_new') }}</button>
 </div>
 @php
     $languages = getAllActiveLanguages();
@@ -26,9 +26,16 @@
                         </div>
                         <input type="text" name="search"
                             class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg"
-                            placeholder="Search key..." value="{{ request('search') }}">
-                        <button type="submit"
-                            class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+                            placeholder="{{ __db('search') }}" value="{{ request('search') }}">
+                        <div class="flex">
+                            <button  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                                <a href="{{ route('translations.index') }}"
+                               >{{ __db('reset') }}</a></button>
+                            <button type="submit"
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+
+                            
+                        </div>
                     </div>
                 </form>
             </div>
@@ -37,11 +44,11 @@
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">#</th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">Label Key</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('label_key') }}</th>
                         @foreach ($languages as $lang)
                             <th class="p-3 !bg-[#B68A35] text-start text-white">{{ $lang->name }}</th>
                         @endforeach
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Action</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,7 +70,7 @@
                             @endforeach
                             
                             <td class="px-4 py-3 text-center " dir="ltr">
-                                <button class=" edit-btn" data-modal-target="editTranslationModal" title="Edit"
+                                <button class=" edit-btn" data-modal-target="editTranslationModal" title="{{ __db('edit') }}"
                                     data-modal-toggle="editTranslationModal" data-id="{{ $translation->id }}"
                                     data-key="{{ $translation->label_key }}" 
                                     {!! $langData !!} >
@@ -78,18 +85,19 @@
                     @empty
                         <tr class="border-t">
                             <td class="px-4 py-3 text-center " colspan="5" dir="ltr">
-                                No data found.
+                                {{ __db('no_data_found') }}
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            <div class="mt-4">
+                {{ $translations->links() }}
+            </div>
         </div>
     </div>
 
-    <div class="mt-4">
-        {{ $translations->links() }}
-    </div>
+    
 </div>
 
 
@@ -124,7 +132,10 @@
                 data: $form.serialize(),
                 success: function(res) {
                     if (res.success){
-                        location.reload();
+                        toastr.success(res.message);
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 2000);
                     }else{
                         let errors = res.errors;
                         $.each(errors, function(field, messages) {
@@ -163,7 +174,10 @@
                 success: function(res) {
                     console.log(res);
                     if (res.success){
-                        location.reload();
+                        toastr.success(res.message);
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 2000);
                     }else{
                         let errors = res.errors;
                         $.each(errors, function(field, messages) {

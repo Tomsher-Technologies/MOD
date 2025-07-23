@@ -3,7 +3,7 @@
         <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
             <div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                    Edit Translation
+                    {{ __db('edit_translation') }}
                 </h3>
                 <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-hide="editTranslationModal">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -16,7 +16,7 @@
                 @csrf
                 <input type="hidden" name="id" id="edit_id">
                 <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Label Key</label>
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('label_key') }}</label>
                     <input type="text" id="edit_key" class="w-full border border-gray-300 rounded p-2 bg-gray-100" readonly>
                 </div>
                 @foreach ($languages as $lang)
@@ -27,8 +27,8 @@
                 @endforeach
 
                 <div class="flex justify-start space-x-2 pt-4">
-                    <button data-modal-hide="editTranslationModal" type="button" class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12 ml-2">Cancel</button>
-                    <button type="submit" class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">Update</button>
+                    <button data-modal-hide="editTranslationModal" type="button" class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12 ml-2">{{ __db('cancel') }}</button>
+                    <button type="submit" class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('save') }}</button>
                 </div>
             </form>
         </div>

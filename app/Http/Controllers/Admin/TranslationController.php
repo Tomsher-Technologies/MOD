@@ -24,7 +24,7 @@ class TranslationController extends Controller
             });
         }
 
-        $translations = $query->paginate(10);
+        $translations = $query->paginate(30);
 
         return view('admin.translations.index', compact('translations'));
     }
@@ -65,7 +65,7 @@ class TranslationController extends Controller
 
         $translation->values()->createMany($values);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => __db('updated_successfully')]);
     }
 
     public function update(Request $request, $id)
@@ -102,7 +102,7 @@ class TranslationController extends Controller
             );
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => __db('updated_successfully')]);
     }
 
 }
