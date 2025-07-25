@@ -87,7 +87,7 @@
                                             <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $staff->id }}"
                                                 class="sr-only peer" {{ $staff->banned == 0 ? 'checked' : '' }} />
 
-                                            <div class="block bg-gray-300 peer-checked:bg-green-500 w-11 h-6 rounded-full transition"></div>
+                                            <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                         </label>
                                     </div>

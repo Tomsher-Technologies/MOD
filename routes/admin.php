@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
+use App\Http\Controllers\Admin\DropdownController;
+use App\Http\Controllers\Admin\EventController;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
@@ -31,6 +33,18 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/translations', [TranslationController::class, 'index'])->name('translations.index');
     Route::post('/translations', [TranslationController::class, 'store'])->name('translations.store');
     Route::post('/translations/{id}', [TranslationController::class, 'update'])->name('translations.update');
+
+    // Manage dynamic dropdowns
+    Route::get('/dropdowns', [DropdownController::class, 'index'])->name('dropdowns.index');
+    Route::get('/dropdowns/{dropdown}/options', [DropdownController::class, 'showOptions'])->name('dropdowns.options.show');
+    Route::post('/dropdowns/options', [DropdownController::class, 'storeOption'])->name('dropdowns.options.store');
+    Route::put('/dropdowns/options/{option}', [DropdownController::class, 'updateOption'])->name('dropdowns.options.update');
+    Route::post('/dropdowns/options/status', [DropdownController::class, 'updateStatus'])->name('dropdowns.options.status');
+    Route::get('/dropdowns/bulk-import', [DropdownController::class, 'bulkImport'])->name('dropdowns.bulk.import');
+    Route::post('/dropdowns/options/import', [DropdownController::class, 'import'])->name('admin.dropdowns.import');
+
+    Route::resource('events', EventController::class);
+    Route::post('events/{event}/set-default', [EventController::class, 'setDefault'])->name('events.setDefault');
 
 });
 

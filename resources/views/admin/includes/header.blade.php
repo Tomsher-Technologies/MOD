@@ -16,6 +16,10 @@
                         'text' => __db('add_new_staff'),
                         'link' => route('staffs.create'),
                     ],
+                    'events.index' => [
+                        'text' => __db('add_new_event'),
+                        'link' => route('events.create'),
+                    ]
                 ];
             @endphp
 

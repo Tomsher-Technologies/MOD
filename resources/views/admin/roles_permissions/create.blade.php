@@ -6,9 +6,8 @@
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('create_new_role') }}</h2>
         <a href="{{ route('roles.index') }}" id="add-attachment-btn"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
             </svg>
             <span>{{ __db('back') }}</span>
@@ -24,7 +23,7 @@
                     <label class="form-label block mb-1 text-gray-700 font-medium text-base">{{ __db('module') }} <span class="text-red-600">*</span></label>
                     <select name="module" id="moduleSelect" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="admin" {{ (old('module') == 'admin') ? 'selected' : '' }}>Admin</option>
-                        <option value="deligate" {{ (old('module') == 'deligate') ? 'selected' : '' }}>Deligate</option>
+                        <option value="delegate" {{ (old('module') == 'delegate') ? 'selected' : '' }}>Delegate</option>
                         <option value="escort" {{ (old('module') == 'escort') ? 'selected' : '' }}>Escort</option>
                         <option value="driver" {{ (old('module') == 'driver') ? 'selected' : '' }}>Driver</option>
                         <option value="hotel" {{ (old('module') == 'hotel') ? 'selected' : '' }}>Hotel</option>

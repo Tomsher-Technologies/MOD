@@ -30,7 +30,7 @@
                             <select name="module" class="block w-[50%] mr-2 p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg">
                                 <option value="">{{ __db('select_module') }}</option>
                                 <option value="admin" {{ (request()->module == 'admin') ? 'selected' : '' }}>Admin</option>
-                                <option value="deligate" {{ (request()->module == 'deligate') ? 'selected' : '' }}>Deligate</option>
+                                <option value="delegate" {{ (request()->module == 'delegate') ? 'selected' : '' }}>Delegate</option>
                                 <option value="escort" {{ (request()->module == 'escort') ? 'selected' : '' }}>Escort</option>
                                 <option value="driver" {{ (request()->module == 'driver') ? 'selected' : '' }}>Driver</option>
                                 <option value="hotel" {{ (request()->module == 'hotel') ? 'selected' : '' }}>Hotel</option>
@@ -58,7 +58,7 @@
                 </thead>
                 <tbody>
                     @forelse($roles as $key => $role)
-                        <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
+                        <tr class="odd:bg-[#F9F7ED] align-[middle]">
                             <td class="px-4 py-3 text-end" dir="ltr">
                                 {{ ($key+1) + ($roles->currentPage() - 1)*$roles->perPage() }}
                             </td>
