@@ -47,7 +47,7 @@
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                                 @if($event->logo)
-                                    <img src="{{ asset($event->logo) }}" alt="Logo" width="100" height="100" class="mb-2 mt-4"><br>
+                                    <img src="{{ getUploadedImage($event->logo) }}" alt="Logo" width="100" height="100" class="mb-2 mt-4"><br>
                                 @endif
                             </div>
 
@@ -58,7 +58,7 @@
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                                 @if($event->image)
-                                    <img src="{{ asset($event->image) }}" alt="Image" width="100" height="100" class="mb-2 mt-4"><br>
+                                    <img src="{{ getUploadedImage($event->image) }}" alt="Image" width="100" height="100" class="mb-2 mt-4"><br>
                                 @endif
                             </div>
 

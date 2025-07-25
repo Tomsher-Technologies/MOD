@@ -74,20 +74,24 @@ class EventController extends Controller
         // Handle logo upload and delete old logo if exists
         if ($request->hasFile('logo')) {
             if ($event->logo) {
-                Storage::disk('public')->delete($event->logo);
+                $pathToDelete = str_replace('/storage/', '', $event->logo);
+                if (Storage::disk('public')->exists($pathToDelete)) {
+                    Storage::disk('public')->delete($pathToDelete);
+                }
             }
             $data['logo'] = uploadImage('events', $request->logo, 'event');
         }
 
-        // Handle image upload and delete old image if exists
         if ($request->hasFile('image')) {
             if ($event->image) {
-                Storage::disk('public')->delete($event->image);
+                $pathToDelete = str_replace('/storage/', '', $event->image);
+                if (Storage::disk('public')->exists($pathToDelete)) {
+                    Storage::disk('public')->delete($pathToDelete);
+                }
             }
             $data['image'] = uploadImage('events', $request->image, 'event');
         }
 
-        // If is_default is set, unset others
         if (!empty($data['is_default'])) {
             Event::query()->update(['is_default' => false]);
             $data['is_default'] = true;
@@ -98,20 +102,6 @@ class EventController extends Controller
         $event->update($data);
 
         return redirect()->route('events.index')->with('success', __db('event').__db('updated_successfully'));
-    }
-
-    public function destroy(Event $event)
-    {
-        // Delete images
-        if ($event->logo) {
-            Storage::disk('public')->delete($event->logo);
-        }
-        if ($event->image) {
-            Storage::disk('public')->delete($event->image);
-        }
-        $event->delete();
-
-        return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
     }
 
     // Extra method to set default event from index (optional)

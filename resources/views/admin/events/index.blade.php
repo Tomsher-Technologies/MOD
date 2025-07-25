@@ -65,18 +65,18 @@
                             </td>
                             <td class="px-4 py-3 text-black">{{ $event->name_en }}
                                 @if ($event->is_default)
-                                    <span class="badge badge-success">Default</span>
+                                    <span class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">Default</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-black  text-center">{{ $event->name_ar }}</td>
                             <td class="px-4 py-3 text-black  text-center">
                                 @if ($event->logo)
-                                    <img src="{{ asset($event->logo) }}" alt="Logo" width="100" height="100" />
+                                    <img src="{{ getUploadedImage($event->logo) }}" alt="Logo" width="100" height="100" />
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-black  text-center">
                                 @if ($event->image)
-                                    <img src="{{ asset($event->image) }}" alt="Image" width="100" height="100" />
+                                    <img src="{{ getUploadedImage($event->image) }}" alt="Image" width="100" height="100" />
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-black  text-center">{{ ($event->start_date != NULL) ? date('d-m-Y', strtotime($event->start_date)) : '' }}</td>
