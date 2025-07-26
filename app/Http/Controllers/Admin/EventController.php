@@ -11,6 +11,16 @@ use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+       
+        $this->middleware('permission:manage_events',  ['only' => ['index','setDefault']]);
+        $this->middleware('permission:add_event',  ['only' => ['create','store']]);
+        $this->middleware('permission:edit_event',  ['only' => ['edit','update']]);
+        $this->middleware('permission:view_event',  ['only' => ['show','index']]);
+    }
+
     public function index(Request $request)
     {
         $request->session()->put('events_last_url', url()->full());
@@ -69,7 +79,6 @@ class EventController extends Controller
         return view('admin.events.show', compact('event', 'assignedUsers'));
     }
 
-
     public function edit($id)
     {
         $id = base64_decode($id);
@@ -122,7 +131,6 @@ class EventController extends Controller
         return redirect()->route('events.index')->with('success', __db('event').__db('updated_successfully'));
     }
 
-    
     public function setDefault(Event $event)
     {
         Event::query()->update(['is_default' => false]);

@@ -11,6 +11,16 @@ use Illuminate\Http\Request;
 
 class DropdownController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+       
+        $this->middleware('permission:manage_dropdowns',  ['only' => ['index','showOptions','setDefault']]);
+        $this->middleware('permission:add_dropdown_options',  ['only' => ['bulkImport','import','storeOption']]);
+        $this->middleware('permission:edit_dropdown_options',  ['only' => ['updateStatus','import','updateOption']]);
+        $this->middleware('permission:view_dropdown_options',  ['only' => ['showOptions','index']]);
+    }
+
     public function index()
     {
         $dropdowns = Dropdown::all();

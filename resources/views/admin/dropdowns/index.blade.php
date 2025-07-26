@@ -6,15 +6,16 @@
     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('dynamic_contents') }}</h2>
 
     <div>
-         <a href="{{ route('dropdowns.bulk.import') }}" class="btn me-8 text-md mb-[-10px] !bg-[#009448] text-white rounded-lg ">
-            <svg class="w-6 h-6 text-gray-800 dark:text-white" fill="none" stroke="white"
-                stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 12l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+        @can('add_dropdown_options')
+            <a href="{{ route('dropdowns.bulk.import') }}" class="btn me-8 text-md mb-[-10px] !bg-[#009448] text-white rounded-lg ">
+                <svg class="w-6 h-6 text-gray-800 dark:text-white" fill="none" stroke="white"
+                    stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 12l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
 
-            <span class="mr-2">{{ __db('bulk_import_options') }}</span>
-        </a>
-       
+                <span class="mr-2">{{ __db('bulk_import_options') }}</span>
+            </a>
+        @endcan
     </div>
 </div>
 

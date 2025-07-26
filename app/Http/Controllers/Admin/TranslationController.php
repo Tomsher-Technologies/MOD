@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 
 class TranslationController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+       
+        $this->middleware('permission:manage_labels',  ['only' => ['index']]);
+        $this->middleware('permission:edit_labels',  ['only' => ['edit','update']]);
+        $this->middleware('permission:view_labels',  ['only' => ['index']]);
+    }
     public function index(Request $request)
     {
         $query = Translation::with('values');
