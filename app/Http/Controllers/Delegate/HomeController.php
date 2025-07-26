@@ -7,5 +7,8 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    //
+    public function dashboard(Request $request){
+        $data = [];
+        return view('frontend.delegates.dashboard', compact('data'));
+    }
 }

@@ -172,7 +172,21 @@ function getModuleEventLogo(){
             return asset($defaultEventLogo);
         }
     }
+    return asset('assets/img/md-logo.svg');
+}
 
+
+function getModuleAccountEventLogo(){
+    $id = session('current_event_id');
+
+    $defaultEventLogo = Event::where('id', $id)->value('logo');
+
+    if ($defaultEventLogo) {
+        $relativePath = str_replace('/storage/', '', $defaultEventLogo);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return asset($defaultEventLogo);
+        }
+    }
     return asset('assets/img/md-logo.svg');
 }
 

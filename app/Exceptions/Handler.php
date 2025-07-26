@@ -20,6 +20,13 @@ class Handler extends ExceptionHandler
 
     protected function unauthenticated($request, AuthenticationException $exception)
     {
+       
+        if ($request->is('mod-admin/*')) {
+            $loginRoute = route('admin.login'); // Adjust this route name as per your setup
+        } else {
+            $loginRoute = route('web-login');
+        }
+
         // Return JSON for all API calls
         if ($request->expectsJson() || $request->is('api/*')) {
             return response()->json([
@@ -27,8 +34,7 @@ class Handler extends ExceptionHandler
                 'message' => 'Unauthorized access. Please login.'
             ], 401);
         }
-
-        // Default redirect (only used for web routes)
-        return redirect()->guest(route('login'));
+    
+        return redirect()->guest($loginRoute);
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.admin_account',['title' => __db('dashboard')])
+@extends('layouts.frontend_account',['title' => __db('dashboard')])
 
 @section('content')
  <div class="flex flex-wrap items-center justify-between gap-2 mb-6">

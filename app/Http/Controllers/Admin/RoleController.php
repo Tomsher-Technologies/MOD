@@ -142,4 +142,9 @@ class RoleController extends Controller
             'html' => view('admin.roles_permissions.module-permissions', compact('permissions'))->render()
         ]);
     }
+    
+    public function show($id)
+    {
+       return redirect()->route('roles.index');
+    }
 }

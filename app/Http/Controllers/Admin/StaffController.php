@@ -264,4 +264,9 @@ class StaffController extends Controller
         $roles = Role::where('module', $module)->where('is_active', 1)->get(['name']);
         return response()->json($roles);
     }
+
+    public function show($id)
+    {
+        return redirect()->route('staffs.index');
+    }
 }
