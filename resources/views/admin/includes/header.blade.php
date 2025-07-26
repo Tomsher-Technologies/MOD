@@ -1,7 +1,7 @@
 <div class="navbar-header border-b border-neutral-200 pe-0 !py-[31px]">
     <div class="flex items-center justify-between">
         <div class="col-auto me-auto">
-            <img src="{{ asset('assets/img/logo.svg') }}" alt="">
+            <img src="{{ getAdminEventLogo() }}" alt="" width="150">
         </div>
         <div class="col-auto ms-auto">
             @php

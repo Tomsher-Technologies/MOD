@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\EventUserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $request->session()->put('events_last_url', url()->full());
         $events = Event::orderBy('id', 'desc')->paginate(20);
         return view('admin.events.index', compact('events'));
     }
@@ -47,14 +49,31 @@ class EventController extends Controller
         } else {
             $data['is_default'] = false;
         }
+        $data['code'] =  generateEventCode();
 
         Event::create($data);
 
         return redirect()->route('events.index')->with('success',  __db('event').__db('created_successfully'));
     }
 
-    public function edit(Event $event)
+    public function show($id)
     {
+        $id = base64_decode($id);
+        $event = Event::findOrFail($id);
+
+        $assignedUsers = EventUserRole::with(['user', 'role'])
+                            ->where('event_id', $event->id)
+                            ->get()
+                            ->groupBy('module'); // group users by module (admin, delegate, etc.)
+
+        return view('admin.events.show', compact('event', 'assignedUsers'));
+    }
+
+
+    public function edit($id)
+    {
+        $id = base64_decode($id);
+        $event = Event::find($id);
         return view('admin.events.edit', compact('event'));
     }
 
@@ -71,7 +90,6 @@ class EventController extends Controller
             'is_default' => 'nullable|boolean',
         ]);
 
-        // Handle logo upload and delete old logo if exists
         if ($request->hasFile('logo')) {
             if ($event->logo) {
                 $pathToDelete = str_replace('/storage/', '', $event->logo);
@@ -98,13 +116,13 @@ class EventController extends Controller
         } else {
             $data['is_default'] = false;
         }
-
+       
         $event->update($data);
 
         return redirect()->route('events.index')->with('success', __db('event').__db('updated_successfully'));
     }
 
-    // Extra method to set default event from index (optional)
+    
     public function setDefault(Event $event)
     {
         Event::query()->update(['is_default' => false]);

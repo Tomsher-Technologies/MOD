@@ -29,6 +29,7 @@ class RoleController extends Controller
     
     public function index(Request $request)
     {
+        $request->session()->put('roles_last_url', url()->full());
         $search = $request->has('search') ? $request->search : '';
         $module = $request->has('module') ? $request->module : '';
         $query = Role::where('is_active',1);

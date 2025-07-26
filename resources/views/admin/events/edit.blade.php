@@ -4,7 +4,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('update_event_details') }}</h2>
-        <a href="{{ route('events.index') }}" id="add-attachment-btn" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+        <a href="{{ Session::has('events_last_url') ? Session::get('events_last_url') : route('events.index') }}" id="add-attachment-btn" class="float-left btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">
             <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />

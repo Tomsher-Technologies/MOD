@@ -24,12 +24,21 @@
                         <div class="grid grid-cols-12 gap-5">
 
                             <div class="col-span-3">
+                                <label class="form-label">{{ __db('military_number') }} <span class="text-red-600">*</span></label>
+                                <input type="text" id="military_number" name="military_number" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('military_number') }}">
+                                @error('military_number')
+                                    <div class="text-red-600">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-span-3">
                                 <label class="form-label">{{ __db('name') }} <span class="text-red-600">*</span></label>
                                 <input type="text" id="name" name="name" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('name') }}">
                                 @error('name')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                             </div>
+
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('email') }} <span class="text-red-600">*</span></label>
                                 <input type="text" id="email" name="email" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('email') }}">
@@ -47,11 +56,24 @@
                             </div>
 
                             <div class="col-span-3">
+                                <label class="form-label">{{ __db('module') }} <span class="text-red-600">*</span></label>
+                                <select name="module" id="module" class=" p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                    <option value="" {{ (old('module') == "") ? 'selected' : '' }}>{{ __db('choose_option') }}</option>
+                                    <option value="admin" {{ (old('module') == "admin") ? 'selected' : '' }}>{{ __db('admin') }}</option>
+                                    <option value="delegate" {{ (old('module') == "delegate") ? 'selected' : '' }}>{{ __db('delegate') }}</option>
+                                    <option value="escort" {{ (old('module') == "escort") ? 'selected' : '' }}>{{ __db('escort') }}</option>
+                                    <option value="driver" {{ (old('module') == "driver") ? 'selected' : '' }}>{{ __db('driver') }}</option>
+                                    <option value="hotel" {{ (old('module') == "hotel") ? 'selected' : '' }}>{{ __db('hotel') }}</option>
+                                </select>
+                                @error('module')
+                                    <div class="text-red-600">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-span-3">
                                 <label class="form-label">{{ __db('role') }} <span class="text-red-600">*</span></label>
-                                <select name="role" class=" p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                    @foreach ($roles as $role)
-                                        <option value="{{ $role->name }}" {{ (old('role') == $role->name) ? 'selected' : '' }}>{{ $role->name }}</option>
-                                    @endforeach
+                                <select name="role" id="role" class=" p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                    
                                 </select>
                                 @error('role')
                                     <div class="text-red-600">{{ $message }}</div>
@@ -86,6 +108,7 @@
         </div>
 
     </form>
+
 </div>
 @endsection
 
@@ -97,6 +120,25 @@
 
 @section('script')
 <script>
+    document.getElementById('module').addEventListener('change', function () {
+        const module = this.value;
+        const roleSelect = document.getElementById('role');
 
+        // Clear existing options
+        roleSelect.innerHTML = '<option value="">{{ @__db('choose_option') }}</option>';
+
+        if (module) {
+            fetch(`/mod-admin/get-roles-by-module/${module}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role.name;
+                        option.text = role.name;
+                        roleSelect.appendChild(option);
+                    });
+                });
+        }
+    });
 </script>
 @endsection

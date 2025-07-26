@@ -22,11 +22,11 @@
                 <div class="col-span-3">
                     <label class="form-label block mb-1 text-gray-700 font-medium text-base">{{ __db('module') }} <span class="text-red-600">*</span></label>
                     <select name="module" id="moduleSelect" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option value="admin" {{ (old('module') == 'admin') ? 'selected' : '' }}>Admin</option>
-                        <option value="delegate" {{ (old('module') == 'delegate') ? 'selected' : '' }}>Delegate</option>
-                        <option value="escort" {{ (old('module') == 'escort') ? 'selected' : '' }}>Escort</option>
-                        <option value="driver" {{ (old('module') == 'driver') ? 'selected' : '' }}>Driver</option>
-                        <option value="hotel" {{ (old('module') == 'hotel') ? 'selected' : '' }}>Hotel</option>
+                        <option value="admin" {{ (old('module') == 'admin') ? 'selected' : '' }}>{{ __db('admin') }}</option>
+                        <option value="delegate" {{ (old('module') == 'delegate') ? 'selected' : '' }}>{{ __db('delegate') }}</option>
+                        <option value="escort" {{ (old('module') == 'escort') ? 'selected' : '' }}>{{ __db('escort') }}</option>
+                        <option value="driver" {{ (old('module') == 'driver') ? 'selected' : '' }}>{{ __db('driver') }}</option>
+                        <option value="hotel" {{ (old('module') == 'hotel') ? 'selected' : '' }}>{{ __db('hotel') }}</option>
                     </select>
                     @error('module')
                         <div class="text-red-600">{{ $message }}</div>

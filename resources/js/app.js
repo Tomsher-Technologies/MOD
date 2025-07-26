@@ -9,10 +9,13 @@ import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import './bootstrap';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
+import Swal from 'sweetalert2';
+
 window.$ = $;
 window.jQuery = $;
 
 window.toastr = toastr;
+window.Swal = Swal;
 
 Fancybox.bind("[data-fancybox]", {
   animated: true,

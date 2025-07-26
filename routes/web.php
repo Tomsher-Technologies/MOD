@@ -9,7 +9,7 @@ use App\Http\Controllers\AuthController;
 
 require __DIR__.'/admin.php';
 
-Route::get('/', [AuthController::class, 'showLoginForm'])->name('admin.login');
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 
 // Delegate Module
 Route::prefix('mod-delegate') ->middleware(['auth', 'check.permission']) ->group(function () {

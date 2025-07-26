@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\EventController;
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('login', [LoginController::class, 'login'])->name('login');
+    Route::post('login', [LoginController::class, 'login'])->name('post.login');
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
 
@@ -21,8 +21,11 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Manage staffs
     Route::resource('staffs', StaffController::class);
+    Route::get('/staffs/edit/{id}', [StaffController::class, 'edit'])->name('staffs.edit');
     Route::get('/staffs/destroy/{id}', [StaffController::class, 'destroy'])->name('staffs.destroy');
     Route::post('/staff/status', [StaffController::class, 'updateStatus'])->name('staff.status');
+    Route::get('/get-roles-by-module/{module}', [StaffController::class, 'getByModule']);
+
     
     // Manage roles & permissions
     Route::resource('roles', RoleController::class);
@@ -44,7 +47,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/dropdowns/options/import', [DropdownController::class, 'import'])->name('admin.dropdowns.import');
 
     Route::resource('events', EventController::class);
+    Route::get('/events/edit/{id}', [EventController::class, 'edit'])->name('events.edit');
     Route::post('events/{event}/set-default', [EventController::class, 'setDefault'])->name('events.setDefault');
+    Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
+
 
 });
 

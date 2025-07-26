@@ -36,7 +36,7 @@ class DropdownController extends Controller
             }    
         }
 
-        $options = $query->paginate(10)->appends($request->all());
+        $options = $query->paginate(20)->appends($request->all());
         return view('admin.dropdowns.options', compact('dropdown', 'options'));
     }
 
