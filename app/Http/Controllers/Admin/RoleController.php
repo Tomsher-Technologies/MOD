@@ -29,45 +29,64 @@ class RoleController extends Controller
     
     public function index(Request $request)
     {
-        $roles = Role::where('is_active',1)->orderBy('id','DESC')->paginate(15);
+        $request->session()->put('roles_last_url', url()->full());
+        $search = $request->has('search') ? $request->search : '';
+        $module = $request->has('module') ? $request->module : '';
+        $query = Role::where('is_active',1);
+
+        if($search){
+            $query->where('name', 'like','%' . $search . '%');
+        }
+
+        if($module){
+            $query->where('module', $module);
+        }
+
+        $roles = $query->orderBy('id','DESC')->paginate(15);
+
         return view('admin.roles_permissions.index',compact('roles'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }
 
     public function create()
     {
-        $permission = CustomPermission::whereNull('parent_id')->with('children')->where('is_active',1)->get();
+        $permission = CustomPermission::whereNull('parent_id')->where('module','admin')
+                        ->with(['children' => function ($q) {
+                            $q->where('is_active', 1);
+                        }])->where('is_active',1)->get();
         return view('admin.roles_permissions.create',compact('permission'));
     }
 
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name',
             'permissions' => 'required',
+            'module' => 'required',
+        ], [
+            'name.required'     => __db('role_name_required'),
+            'name.unique'       => __db('name_unique'),
+            'permissions.required' => __db('permission_required'),
+            'module.required' => __db('module_required'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-        $role = Role::create(['name' => $request->input('name')]);
+        $role = Role::create(['name' => $request->input('name'), 'module' => $request->input('module')]);
         $role->givePermissionTo($request->permissions);
         
-        session()->flash('success', 'Role created successfully');
+        session()->flash('success', __db('role').__db('created_successfully'));
         return redirect()->route('roles.index');
     }
-
-    // public function show($id)
-    // {
-    //     $role = Role::find($id);
-    //     $rolePermissions = CustomPermission::join("role_has_permissions","role_has_permissions.permission_id","=","permissions.id")
-    //         ->where("role_has_permissions.role_id",$id)
-    //         ->get();
-    
-    //     return view('roles.show',compact('role','rolePermissions'));
-    // }
 
     public function edit($id)
     {
         $role = Role::find($id);
-        $permission = CustomPermission::whereNull('parent_id')->with('children')->where('is_active',1)->get();
+        $permission = CustomPermission::whereNull('parent_id')->where('module', $role->module)
+                        ->with(['children' => function ($q) {
+                            $q->where('is_active', 1);
+                        }])->where('is_active',1)->get();
         $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();
@@ -77,18 +96,28 @@ class RoleController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name,'.$id,
             'permissions' => 'required',
+            'module' => 'required',
+        ], [
+            'name.required'     => __db('role_name_required'),
+            'name.unique'       => __db('name_unique'),
+            'permissions.required' => __db('permission_required'),
+            'module.required' => __db('module_required'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
     
         $role = Role::find($id);
         $role->name = $request->input('name');
+        $role->module = $request->input('module');
         $role->save();
     
         $role->syncPermissions($request->input('permissions'));
 
-        session()->flash('success', 'Role updated successfully');
+        session()->flash('success', __db('role').__db('updated_successfully'));
         return redirect()->route('roles.index');
     }
 
@@ -97,5 +126,25 @@ class RoleController extends Controller
         DB::table("roles")->where('id',$id)->delete();
         return redirect()->route('roles.index')
                         ->with('status',trans('messages.role_delete_success'));
+    }
+
+    public function getPermissionsByModule(Request $request)
+    {
+        $permissions = CustomPermission::where('module', $request->module)
+            ->whereNull('parent_id')
+            ->with(['children' => function ($q) {
+                $q->where('is_active', 1);
+            }])
+            ->where('is_active', 1)
+            ->get();
+
+        return response()->json([
+            'html' => view('admin.roles_permissions.module-permissions', compact('permissions'))->render()
+        ]);
+    }
+    
+    public function show($id)
+    {
+       return redirect()->route('roles.index');
     }
 }

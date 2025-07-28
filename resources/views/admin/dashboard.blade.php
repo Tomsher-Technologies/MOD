@@ -1,8 +1,8 @@
-@extends('layouts.admin_account',['title' => 'Dashboard'])
+@extends('layouts.admin_account',['title' => __db('dashboard')])
 
 @section('content')
  <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="font-semibold mb-0 !text-[22px] ">Dashboard</h2>
+            <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('dashboard') }}</h2>
          </div>
          <!-- Delegates -->
          <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">

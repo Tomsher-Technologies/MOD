@@ -2,11 +2,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use App\Models\Staff;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use App\Models\EventUserRole;
 use Hash;
 
 class StaffController extends Controller
@@ -26,15 +26,17 @@ class StaffController extends Controller
      */
     public function index(Request $request)
     {
+        $request->session()->put('staffs_last_url', url()->full());
         $sort_search = $request->has('search') ? $request->search : '';
         $role_id = $request->has('role_id') ? $request->role_id : '';
-        $users = User::where('user_type','staff')->orderBy('id','desc');
+        $users = User::orderBy('id','desc');
         
         if($sort_search){
             $users = $users->where(function ($query) use ($sort_search){
                         $query->where('name', 'like','%' . $sort_search . '%')
                             ->orWhere('email', 'like', '%' . $sort_search . '%')
-                            ->orWhere('phone', 'like', '%' . $sort_search . '%');
+                            ->orWhere('phone', 'like', '%' . $sort_search . '%')
+                            ->orWhere('military_number', 'like', '%' . $sort_search . '%');
                     });
         }
         
@@ -44,6 +46,15 @@ class StaffController extends Controller
             });
         }
 
+        if($request->has('module') && $request->module != NULL){
+            if($request->module === 'admin'){
+                $users->where('user_type','staff');
+            }else{
+                $users->where('user_type', $request->module);
+            }
+        }else{
+            $users->where('user_type','!=','admin');
+        }
          // Filter by status
         if ($request->filled('status')) {
             // Assuming 1 = active, 2 = inactive; 
@@ -54,7 +65,7 @@ class StaffController extends Controller
             }
         }
 
-        $users = $users->paginate(10);
+        $users = $users->paginate(20);
        
         return view('admin.staffs.index', compact('users','sort_search','role_id'));
     }
@@ -78,29 +89,60 @@ class StaffController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email',
             'mobile' => 'nullable|string|max:20',
             'password' => 'required|min:6|confirmed',
-            'role' => 'required'
+            'role' => 'required',
+            'module' => 'required',
+            'military_number' => 'required|unique:users,military_number',
+        ], [
+            'name.required' => __db('name_required'),
+            'email.required' => __db('email_required'),
+            'email.email' => __db('valid_email'),
+            'email.unique' => __db('email_already_exist'),
+            'mobile.max' => __db('mobile_max', ['max' => 20]), 
+            'password.required' => __db('password_required'),
+            'password.min' => __db('password_length', ['min' => 6]),
+            'password.confirmed' => __db('new_password_confirmed'),
+            'role.required' => __db('role_required'),
+            'module.required' => __db('module_required'),
+            'military_number.required' => __db('military_number_required'),
+            'military_number.unique' => __db('military_number_already_exist'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         if(User::where('email', $request->email)->first() == null){
             $user = new User;
+            $user->military_number = $request->military_number;
             $user->name = $request->name;
             $user->email = $request->email;
             $user->phone = $request->mobile;
-            $user->user_type = "staff";
+            $user->user_type = ($request->module === 'admin') ? 'staff' : $request->module;
             $user->password = Hash::make($request->password);
             if($user->save()){
                 $user->assignRole($request->role);
-                session()->flash('success','Staff created successfully');
+                if($request->module != 'admin'){
+                    $role = Role::where('name', $request->role)->where('module', $request->module)->first();
+
+                    if ($role) {
+                        EventUserRole::create([
+                            'event_id'  => getDefaultEventId(), 
+                            'user_id'   => $user->id,
+                            'module'    => $request->module,
+                            'role_id'   => $role->id,
+                        ]);
+                    }
+                }
+                session()->flash('success', __db('staff').__db('created_successfully'));
                 return redirect()->route('staffs.index');
             }
         }
 
-        session()->flash('error','Email is already in use.');
+        session()->flash('error', __db('email_already_exist'));
         return back();
     }
 
@@ -112,8 +154,13 @@ class StaffController extends Controller
      */
     public function edit($id)
     {
-        $staff = User::findOrFail(decrypt($id));
-        $roles = Role::where('is_active', 1)->get();
+        $staff = User::findOrFail(base64_decode($id));
+        if($staff->user_type === 'staff'){
+            $module = 'admin';
+        }else{
+            $module = $staff->user_type;
+        }
+        $roles = Role::where('module', $module)->where('is_active', 1)->get(['name']);
         return view('admin.staffs.edit', compact('staff', 'roles'));
     }
 
@@ -127,15 +174,33 @@ class StaffController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
-        $request->validate([
-            'name' => 'required|string|max:255',
+      
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email,'.$user->id,
             'mobile' => 'nullable|string|max:20',
             'password' => 'nullable|min:6|confirmed',
-            'role_id' => 'required'
+            'role' => 'required',
+            'module' => 'required',
+            'military_number' => 'required|unique:users,military_number,'.$user->id,
+        ], [
+            'name.required' => __db('name_required'),
+            'email.required' => __db('email_required'),
+            'email.email' => __db('valid_email'),
+            'email.unique' => __db('email_already_exist'),
+            'mobile.max' => __db('mobile_max', ['max' => 20]), 
+            'password.min' => __db('password_length', ['min' => 6]),
+            'password.confirmed' => __db('new_password_confirmed'),
+            'role.required' => __db('role_required'),
+            'module.required' => __db('module_required'),
+            'military_number.required' => __db('military_number_required'),
+            'military_number.unique' => __db('military_number_already_exist'),
         ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
+        $user->military_number = $request->military_number;
         $user->name = $request->name;
         $user->email = $request->email;
         $user->phone = $request->mobile;
@@ -144,13 +209,30 @@ class StaffController extends Controller
         }
         if($user->save()){
 
-            $user->syncRoles([$request->role_id]);
+            $user->syncRoles([$request->role]);
 
-            session()->flash('success','Staff details updated successfully');
+            if($request->module != 'admin'){
+                $role = Role::where('name', $request->role)->where('module', $request->module)->first();
+
+                if ($role) {
+                    EventUserRole::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'event_id' => getDefaultEventId(),
+                            'module' => $request->module,
+                        ],
+                        [
+                            'role_id' => $role->id,
+                        ]
+                    );
+                }
+            }
+           
+            session()->flash('success', __db('staff').__db('updated_successfully'));
             return redirect()->route('staffs.index');
         }
 
-        session()->flash('error','Something went wrong');
+        session()->flash('error',);
         return back();
     }
 
@@ -175,5 +257,16 @@ class StaffController extends Controller
         $user->save();
        
         return 1;
+    }
+
+    public function getByModule($module)
+    {
+        $roles = Role::where('module', $module)->where('is_active', 1)->get(['name']);
+        return response()->json($roles);
+    }
+
+    public function show($id)
+    {
+        return redirect()->route('staffs.index');
     }
 }

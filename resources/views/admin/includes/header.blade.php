@@ -1,7 +1,7 @@
 <div class="navbar-header border-b border-neutral-200 pe-0 !py-[31px]">
     <div class="flex items-center justify-between">
         <div class="col-auto me-auto">
-            <img src="{{ asset('assets/img/logo.svg') }}" alt="">
+            <img src="{{ getAdminEventLogo() }}" alt="" width="150">
         </div>
         <div class="col-auto ms-auto">
             @php
@@ -9,21 +9,28 @@
 
                 $buttonConfig = [
                     'roles.index' => [
-                        'text' => 'Add New Role',
+                        'text' => __db('add_new_role'),
                         'link' => route('roles.create'),
+                        'permission' => 'add_role',
                     ],
                     'staffs.index' => [
-                        'text' => 'Add New Staff',
+                        'text' => __db('add_new_staff'),
                         'link' => route('staffs.create'),
+                        'permission' => 'add_staff',
                     ],
+                    'events.index' => [
+                        'text' => __db('add_new_event'),
+                        'link' => route('events.create'),
+                        'permission' => 'add_event',
+                    ]
                 ];
             @endphp
 
-            @if(isset($buttonConfig[$currentRoute]))
+            @if(isset($buttonConfig[$currentRoute]) && auth()->user()->can($buttonConfig[$currentRoute]['permission']))
                 <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
-                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg  h-12">
-                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                        height="24" fill="none" viewBox="0 0 24 24">
+                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M5 12h14m-7 7V5"/>
                     </svg>

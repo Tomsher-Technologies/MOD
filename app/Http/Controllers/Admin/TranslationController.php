@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 
 class TranslationController extends Controller
 {
+    function __construct()
+    {
+        $this->middleware('auth');
+       
+        $this->middleware('permission:manage_labels',  ['only' => ['index']]);
+        $this->middleware('permission:edit_labels',  ['only' => ['edit','update']]);
+        $this->middleware('permission:view_labels',  ['only' => ['index']]);
+    }
     public function index(Request $request)
     {
         $query = Translation::with('values');
@@ -24,7 +32,7 @@ class TranslationController extends Controller
             });
         }
 
-        $translations = $query->paginate(10);
+        $translations = $query->paginate(30);
 
         return view('admin.translations.index', compact('translations'));
     }
@@ -65,7 +73,7 @@ class TranslationController extends Controller
 
         $translation->values()->createMany($values);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => __db('updated_successfully')]);
     }
 
     public function update(Request $request, $id)
@@ -102,7 +110,7 @@ class TranslationController extends Controller
             );
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => __db('updated_successfully')]);
     }
 
 }
