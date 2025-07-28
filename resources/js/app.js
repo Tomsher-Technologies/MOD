@@ -1,4 +1,8 @@
-import $ from 'jquery';
+import jQuery from 'jquery';
+window.$ = window.jQuery = jQuery;
+
+import 'select2/dist/js/select2.full';
+import 'select2/dist/css/select2.min.css';
 
 // Import Flowbite components
 import 'flowbite';
@@ -9,10 +13,17 @@ import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import './bootstrap';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
-window.$ = $;
-window.jQuery = $;
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+$(function () {
+    $('.select2').select2({
+        minimumResultsForSearch: 5
+    });
+});
 
 window.toastr = toastr;
+window.Swal = Swal;
 
 Fancybox.bind("[data-fancybox]", {
   animated: true,
@@ -20,7 +31,6 @@ Fancybox.bind("[data-fancybox]", {
   groupAll: true,
 });
 
-// Toastr default options (can be customized further)
 toastr.options = {
     closeButton: true,
     progressBar: true,
@@ -31,9 +41,6 @@ toastr.options = {
     hideDuration: "1000",
     showMethod: "fadeIn",
     hideMethod: "fadeOut"
-}
+};
 
-// Optional future: import Swiper, Photoswipe, SplitType if used
-// import Swiper from 'swiper';
-// import PhotoSwipe from 'photoswipe';
-// import SplitType from 'split-type';
+

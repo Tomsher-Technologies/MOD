@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Event;
 use App\Models\Language;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
@@ -147,4 +148,75 @@ function getUnreadNotificationCount()
     $count = $user->unreadNotifications()->count();
 
     return $count;
+}
+
+function getAdminEventLogo(){
+    $defaultEventLogo = Event::where('is_default', 1)->value('logo');
+
+     if ($defaultEventLogo) {
+        $relativePath = str_replace('/storage/', '', $defaultEventLogo);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return asset($defaultEventLogo);
+        }
+    }
+
+    return asset('assets/img/md-logo.svg');
+}
+
+function getModuleEventLogo(){
+    $defaultEventLogo = Event::where('is_default', 1)->value('logo');
+
+    if ($defaultEventLogo) {
+        $relativePath = str_replace('/storage/', '', $defaultEventLogo);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return asset($defaultEventLogo);
+        }
+    }
+    return asset('assets/img/md-logo.svg');
+}
+
+
+function getModuleAccountEventLogo(){
+    $id = session('current_event_id');
+
+    $defaultEventLogo = Event::where('id', $id)->value('logo');
+
+    if ($defaultEventLogo) {
+        $relativePath = str_replace('/storage/', '', $defaultEventLogo);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return asset($defaultEventLogo);
+        }
+    }
+    return asset('assets/img/md-logo.svg');
+}
+
+function getloginImage(){
+    $defaultEventImage = Event::where('is_default', 1)->value('image');
+
+    if ($defaultEventImage) {
+        $relativePath = str_replace('/storage/', '', $defaultEventImage);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return asset($defaultEventImage);
+        }
+    }
+
+    return asset('assets/img/login-img.jpg');
+}
+
+function generateEventCode(){
+    $lastEvent = Event::orderBy('created_at', 'desc')->first();
+
+    if (!$lastEvent || !$lastEvent->code) {
+        return 'EVT0001';  
+    }
+
+    $lastNumber = (int) substr($lastEvent->code, 3);
+
+    $newNumber = $lastNumber + 1;
+
+    return 'EVT' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+}
+
+function getDefaultEventId() {
+    return \App\Models\Event::where('is_default', true)->value('id');
 }

@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'locale' => \App\Http\Middleware\SetLocale::class,
             'set_api_locale' => \App\Http\Middleware\SetApiLocale::class,
             'checkFrontendUserType' => \App\Http\Middleware\CheckFrontendUserType::class,
+            'check.permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
         $middleware->web([
             \App\Http\Middleware\SetLocale::class,
@@ -59,6 +60,13 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message' => 'Unauthorized access. Please login.'
                 ], 401);
             }
+
+            if ($request->is('mod-admin/*')) {
+                return redirect()->route('admin.login')->with('error', 'Unauthorized access.');
+            }
+
+            return redirect()->route('login')->with('error', 'Unauthorized access.');
+            
         });
     })->create();
     

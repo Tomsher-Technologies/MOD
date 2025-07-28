@@ -4,19 +4,19 @@
    <section class="bg-white dark:bg-dark-2 flex flex-wrap min-h-[100vh]">
         <div class="lg:w-1/2 lg:block hidden">
             <div class="flex items-center flex-col h-full justify-center">
-                <img src="{{ asset('assets/img/login-img.jpg') }}" alt="">
+                <img src="{{ getloginImage() }}" alt="">
             </div>
         </div>
         <div class="lg:w-1/2 py-8 px-6 flex flex-col justify-center">
             <div class="lg:max-w-[464px] mx-auto w-full">
                 <div>
                     <a href="index.html" class="mb-2.5 max-w-[290px]">
-                        <img src="{{ asset('assets/img/logo.svg') }}" alt="">
+                        <img src="{{ getModuleEventLogo() }}" alt="">
                     </a>
                     <h4 class="mb-3">{{ __db('sign_in_to_your_account') }}</h4>
                     <p class="mb-8 text-secondary-light text-lg">{{ __db('login_welcome_back') }}</p>
                 </div>
-                <form method="POST" action="{{ route('login') }}" autocomplete="off">
+                <form method="POST" action="{{ route('post.login') }}" autocomplete="off">
                     @csrf
                     <div class="icon-field mb-4 relative">
                         <span class="absolute start-4 top-1/2 -translate-y-1/2 pointer-events-none flex text-xl">
