@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\User;
 use App\Models\EventUserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class EventController extends Controller
 {
@@ -76,7 +78,14 @@ class EventController extends Controller
                             ->get()
                             ->groupBy('module'); // group users by module (admin, delegate, etc.)
 
-        return view('admin.events.show', compact('event', 'assignedUsers'));
+        $assignedUserIds = $event->assignedUsers->pluck('user_id');
+        $availableUsers = User::where('banned', 0)
+            ->whereNotIn('id', $assignedUserIds)
+            ->get();
+
+        $roles = Role::where('is_active', 1)->get();
+        $allModules = ['delegate', 'escort', 'driver', 'hotel']; 
+        return view('admin.events.show', compact('event', 'assignedUsers', 'availableUsers','roles','allModules'));
     }
 
     public function edit($id)
@@ -139,4 +148,41 @@ class EventController extends Controller
 
         return redirect()->back()->with('success', 'Default event updated.');
     }
+
+    public function assignUsers(Request $request, Event $event)
+    {
+        $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+            'role_id' => 'required|exists:roles,id',
+            'module' => 'required|string',
+        ]);
+
+        foreach ($request->user_ids as $userId) {
+            // Check if user is already assigned to this event and module
+            $exists = EventUserRole::where('event_id', $event->id)
+                ->where('user_id', $userId)
+                ->where('module', $request->module)
+                ->exists();
+
+            if (!$exists) {
+                EventUserRole::create([
+                    'event_id' => $event->id,
+                    'user_id' => $userId,
+                    'module' => $request->module,
+                    'role_id' => $request->role_id,
+                ]);
+            }
+        }
+
+        return 1;
+    }
+
+    // Unassign user
+    public function unassignUser(Event $event, $assignedId)
+    {
+        EventUserRole::find($assignedId)->delete();
+        return 1;
+    }
+
 }

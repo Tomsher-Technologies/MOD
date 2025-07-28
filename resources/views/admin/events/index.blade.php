@@ -47,10 +47,11 @@
                 <thead class="bg-gray-100">
                     <tr>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('event_code') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }} (EN)</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }} (AR)</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('logo') }}</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('login_image') }}</th>
+                        {{-- <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('login_image') }}</th> --}}
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('start_date') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('end_date') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('status') }}</th>
@@ -63,22 +64,23 @@
                             <td class="px-4 py-3 text-end" dir="ltr">
                                 {{ ($key+1) + ($events->currentPage() - 1)*$events->perPage() }}
                             </td>
-                            <td class="px-4 py-3 text-black">{{ $event->name_en }}
+                            <td class=" text-center px-4 py-3 text-black">{{ $event->code }}
                                 @if ($event->is_default)
                                     <span class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">Default</span>
                                 @endif
                             </td>
+                            <td class="px-4 py-3 text-black">{{ $event->name_en }} </td>
                             <td class="px-4 py-3 text-black  text-center">{{ $event->name_ar }}</td>
                             <td class="px-4 py-3 text-black  text-center">
                                 @if ($event->logo)
                                     <img src="{{ getUploadedImage($event->logo) }}" alt="Logo" width="100" height="100" />
                                 @endif
                             </td>
-                            <td class="px-4 py-3 text-black  text-center">
+                            {{-- <td class="px-4 py-3 text-black  text-center">
                                 @if ($event->image)
                                     <img src="{{ getUploadedImage($event->image) }}" alt="Image" width="100" height="100" />
                                 @endif
-                            </td>
+                            </td> --}}
                             <td class="px-4 py-3 text-black  text-center">{{ ($event->start_date != NULL) ? date('d-m-Y', strtotime($event->start_date)) : '' }}</td>
                             <td class="px-4 py-3 text-black  text-center">{{ ($event->end_date != NULL) ? date('d-m-Y', strtotime($event->end_date)) : '' }}</td>
 

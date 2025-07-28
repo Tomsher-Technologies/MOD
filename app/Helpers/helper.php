@@ -204,18 +204,17 @@ function getloginImage(){
 }
 
 function generateEventCode(){
-    $latestCode = Event::max('code');
-    $nextNumber = 1;
+    $lastEvent = Event::orderBy('created_at', 'desc')->first();
 
-    if ($latestCode) {
-        
-        if (preg_match('/(\d+)$/', $latestCode, $matches)) {
-            $nextNumber = (int)$matches[1] + 1;
-        }
+    if (!$lastEvent || !$lastEvent->code) {
+        return 'EVT0001';  
     }
 
-    $code = 'EVT-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-    return $code;
+    $lastNumber = (int) substr($lastEvent->code, 3);
+
+    $newNumber = $lastNumber + 1;
+
+    return 'EVT' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 }
 
 function getDefaultEventId() {

@@ -46,10 +46,13 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/dropdowns/bulk-import', [DropdownController::class, 'bulkImport'])->name('dropdowns.bulk.import');
     Route::post('/dropdowns/options/import', [DropdownController::class, 'import'])->name('admin.dropdowns.import');
 
+    // Manage Events
     Route::resource('events', EventController::class);
     Route::get('/events/edit/{id}', [EventController::class, 'edit'])->name('events.edit');
     Route::post('events/{event}/set-default', [EventController::class, 'setDefault'])->name('events.setDefault');
     Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
+    Route::post('/events/{event}/assign-user', [EventController::class, 'assignUsers'])->name('events.assignUsers');
+    Route::post('/events/{event}/unassign-user/{assigned}', [EventController::class, 'unassignUser'])->name('events.unassignUser');
 
 
 });

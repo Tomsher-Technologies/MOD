@@ -46,7 +46,7 @@
     "are_you_sure" : "Are you sure?",
     "event_required" : "Event is required",
     "event_not_assigned" : "'You are not assigned to the selected event.'",
-    "" : "",
+    "user_unassigned" : "User has been unassigned.",
     "" : "",
     "" : "",
     "" : "",
