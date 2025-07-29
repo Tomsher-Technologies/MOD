@@ -15,7 +15,7 @@ class InterviewMemberController extends Controller
 
         $this->middleware('permission:manage_interview_members',  ['only' => ['index']]);
         $this->middleware('permission:add_interview_members',  ['only' => ['create', 'store']]);
-        // $this->middleware('permission:edit_interview_members',  ['only' => ['edit', 'update']]);
+        $this->middleware('permission:edit_interview_members',  ['only' => ['edit', 'update']]);
         $this->middleware('permission:view_interview_members',  ['only' => ['show', 'index']]);
     }
 
