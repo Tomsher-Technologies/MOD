@@ -16,11 +16,11 @@ class EventController extends Controller
     function __construct()
     {
         $this->middleware('auth');
-       
-        $this->middleware('permission:manage_events',  ['only' => ['index','setDefault']]);
-        $this->middleware('permission:add_event',  ['only' => ['create','store']]);
-        $this->middleware('permission:edit_event',  ['only' => ['edit','update']]);
-        $this->middleware('permission:view_event',  ['only' => ['show','index']]);
+
+        $this->middleware('permission:manage_events',  ['only' => ['index', 'setDefault']]);
+        $this->middleware('permission:add_event',  ['only' => ['create', 'store']]);
+        $this->middleware('permission:edit_event',  ['only' => ['edit', 'update']]);
+        $this->middleware('permission:view_event',  ['only' => ['show', 'index']]);
     }
 
     public function index(Request $request)
@@ -65,7 +65,7 @@ class EventController extends Controller
 
         Event::create($data);
 
-        return redirect()->route('events.index')->with('success',  __db('event').__db('created_successfully'));
+        return redirect()->route('events.index')->with('success',  __db('event') . __db('created_successfully'));
     }
 
     public function show($id)
@@ -74,9 +74,9 @@ class EventController extends Controller
         $event = Event::findOrFail($id);
 
         $assignedUsers = EventUserRole::with(['user', 'role'])
-                            ->where('event_id', $event->id)
-                            ->get()
-                            ->groupBy('module'); // group users by module (admin, delegate, etc.)
+            ->where('event_id', $event->id)
+            ->get()
+            ->groupBy('module'); // group users by module (admin, delegate, etc.)
 
         $assignedUserIds = $event->assignedUsers->pluck('user_id');
         $availableUsers = User::where('banned', 0)
@@ -84,8 +84,8 @@ class EventController extends Controller
             ->get();
 
         $roles = Role::where('is_active', 1)->get();
-        $allModules = ['delegate', 'escort', 'driver', 'hotel']; 
-        return view('admin.events.show', compact('event', 'assignedUsers', 'availableUsers','roles','allModules'));
+        $allModules = ['delegate', 'escort', 'driver', 'hotel'];
+        return view('admin.events.show', compact('event', 'assignedUsers', 'availableUsers', 'roles', 'allModules'));
     }
 
     public function edit($id)
@@ -134,10 +134,10 @@ class EventController extends Controller
         } else {
             $data['is_default'] = false;
         }
-       
+
         $event->update($data);
 
-        return redirect()->route('events.index')->with('success', __db('event').__db('updated_successfully'));
+        return redirect()->route('events.index')->with('success', __db('event') . __db('updated_successfully'));
     }
 
     public function setDefault(Event $event)
@@ -185,4 +185,12 @@ class EventController extends Controller
         return 1;
     }
 
+    public function setCurrentEvent(Request $request)
+    {
+        $request->validate([
+            'event_id' => 'required|exists:events,id',
+        ]);
+        session(['current_event_id' => $request->event_id]);
+        return redirect()->back();
+    }
 }

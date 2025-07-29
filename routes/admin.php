@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\DropdownController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\InterviewMemberController;
+use App\Models\InterviewMember;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
@@ -26,7 +28,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/staff/status', [StaffController::class, 'updateStatus'])->name('staff.status');
     Route::get('/get-roles-by-module/{module}', [StaffController::class, 'getByModule']);
 
-    
+
     // Manage roles & permissions
     Route::resource('roles', RoleController::class);
     Route::get('/roles/edit/{id}', [RoleController::class, 'edit'])->name('roles.edit');
@@ -53,8 +55,12 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/events/{id}', [EventController::class, 'show'])->name('events.show');
     Route::post('/events/{event}/assign-user', [EventController::class, 'assignUsers'])->name('events.assignUsers');
     Route::post('/events/{event}/unassign-user/{assigned}', [EventController::class, 'unassignUser'])->name('events.unassignUser');
+    Route::post('/set-current-event', [EventController::class, 'setCurrentEvent'])->name('events.setCurrentEvent');
 
-
+    // Manage Interview Members
+    Route::resource('interview-members', InterviewMemberController::class);
+    Route::get('/interview-members/{id}', [InterviewMemberController::class, 'show'])->name('interviewMembers.show');
+    Route::get('/interview-members/edit/{id}', [InterviewMemberController::class, 'edit'])->name('interviewMembers.edit');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

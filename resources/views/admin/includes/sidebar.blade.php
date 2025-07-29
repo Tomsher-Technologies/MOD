@@ -29,7 +29,8 @@
 
             @can('manage_events')
                 <li>
-                    <a href="{{ route('events.index') }}" class="{{ areActiveRoutes(['events.index','events.create','events.edit']) }}">
+                    <a href="{{ route('events.index') }}"
+                        class="{{ areActiveRoutes(['events.index', 'events.create', 'events.edit']) }}">
                         <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -42,7 +43,8 @@
 
             @can('manage_dropdowns')
                 <li>
-                    <a href="{{ route('dropdowns.index') }}" class="{{ areActiveRoutes(['dropdowns.index','dropdowns.options.show','dropdowns.bulk.import']) }}">
+                    <a href="{{ route('dropdowns.index') }}"
+                        class="{{ areActiveRoutes(['dropdowns.index', 'dropdowns.options.show', 'dropdowns.bulk.import']) }}">
                         <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -55,7 +57,8 @@
 
             @can('manage_staff')
                 <li>
-                    <a href="{{ route('staffs.index') }}" class="{{ areActiveRoutes(['staffs.index','staffs.create','staffs.edit']) }}">
+                    <a href="{{ route('staffs.index') }}"
+                        class="{{ areActiveRoutes(['staffs.index', 'staffs.create', 'staffs.edit']) }}">
                         <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -68,7 +71,8 @@
 
             @can('manage_roles')
                 <li>
-                    <a href="{{ route('roles.index') }}" class="{{ areActiveRoutes(['roles.create', 'roles.edit', 'roles.index']) }}">
+                    <a href="{{ route('roles.index') }}"
+                        class="{{ areActiveRoutes(['roles.create', 'roles.edit', 'roles.index']) }}">
                         <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -79,11 +83,26 @@
                 </li>
             @endcan
 
-            @can('manage_labels')
+            @can('manage_interview_members')
                 <li>
-                    <a href="{{ route('translations.index') }}" class="{{ areActiveRoutes(['translations.create', 'translations.edit', 'translations.index']) }}">
+                    <a href="{{ route('interview-members.index') }}"
+                        class="{{ areActiveRoutes(['interview_members.create', 'interview_members.edit', 'interview_members.index']) }}">
                         <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                        </svg>
+                        <span class="text-lg">{{ __db('interview_members') }}</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('manage_labels')
+                <li>
+                    <a href="{{ route('translations.index') }}"
+                        class="{{ areActiveRoutes(['translations.create', 'translations.edit', 'translations.index']) }}">
+                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
@@ -95,8 +114,9 @@
             <hr>
             <li>
                 <a href="#">
-                    <svg class="pe-2" width="36" height="30" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <svg class="pe-2" width="36" height="30" aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                        viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0 0a8.949 8.949 0 0 0 4.951-1.488A3.987 3.987 0 0 0 13 16h-2a3.987 3.987 0 0 0-3.951 3.512A8.948 8.948 0 0 0 12 21Zm3-11a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     </svg>
@@ -106,8 +126,8 @@
             </li>
             <li>
                 <a href="{{ route('admin.logout') }}">
-                    <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
                     </svg>

@@ -57,11 +57,12 @@ function __db($key, $replace = [], $locale = null)
     return $translation && trim($translation) !== ''
         ? strtr($translation, $replace)
         : ($translated !== $key && trim($translated) !== ''
-        ? $translated
-        : __($key, $replace, 'en'));
+            ? $translated
+            : __($key, $replace, 'en'));
 }
 
-function getAllActiveLanguages(){
+function getAllActiveLanguages()
+{
     $languages = Language::where('status', 1)->orderBy('id')->get();
     return $languages;
 }
@@ -74,20 +75,21 @@ function getActiveLanguage()
     return 'en';
 }
 
-function uploadImage($type, $imageUrl, $filename = null){
+function uploadImage($type, $imageUrl, $filename = null)
+{
     $data_url = '';
     $ext = $imageUrl->getClientOriginalExtension();
-    
-    $path = $type.'/';
-    
-    $filename = $path . $filename.'_'.time().'_'.rand(10, 9999) . '.' . $ext;
+
+    $path = $type . '/';
+
+    $filename = $path . $filename . '_' . time() . '_' . rand(10, 9999) . '.' . $ext;
 
     $imageContents = file_get_contents($imageUrl);
 
     // Save the original image in the storage folder
     Storage::disk('public')->put($filename, $imageContents);
     $data_url = Storage::url($filename);
-    
+
     return $data_url;
 }
 
@@ -105,7 +107,7 @@ function getUploadedImage(?string $path, string $default = 'assets/img/default_i
 
 function formatFilePathsWithFullUrl(array $files): array
 {
-     return array_values(array_filter(array_map(function ($path) {
+    return array_values(array_filter(array_map(function ($path) {
         // Strip starting slash to match disk paths
         $cleanPath = ltrim($path, '/');
 
@@ -131,12 +133,12 @@ function getUnreadNotifications()
 function getUsersWithPermissions(array $permissions, string $guard = 'web')
 {
     $users =  User::where(function ($query) use ($permissions, $guard) {
-                        $query->whereHas('permissions', function ($q) use ($permissions, $guard) {
-                            $q->whereIn('name', $permissions)->where('guard_name', $guard);
-                        })->orWhereHas('roles.permissions', function ($q) use ($permissions, $guard) {
-                            $q->whereIn('name', $permissions)->where('guard_name', $guard);
-                        });
-                    })->get();
+        $query->whereHas('permissions', function ($q) use ($permissions, $guard) {
+            $q->whereIn('name', $permissions)->where('guard_name', $guard);
+        })->orWhereHas('roles.permissions', function ($q) use ($permissions, $guard) {
+            $q->whereIn('name', $permissions)->where('guard_name', $guard);
+        });
+    })->get();
 
     return $users;
 }
@@ -150,10 +152,11 @@ function getUnreadNotificationCount()
     return $count;
 }
 
-function getAdminEventLogo(){
+function getAdminEventLogo()
+{
     $defaultEventLogo = Event::where('is_default', 1)->value('logo');
 
-     if ($defaultEventLogo) {
+    if ($defaultEventLogo) {
         $relativePath = str_replace('/storage/', '', $defaultEventLogo);
         if (Storage::disk('public')->exists($relativePath)) {
             return asset($defaultEventLogo);
@@ -163,7 +166,8 @@ function getAdminEventLogo(){
     return asset('assets/img/md-logo.svg');
 }
 
-function getModuleEventLogo(){
+function getModuleEventLogo()
+{
     $defaultEventLogo = Event::where('is_default', 1)->value('logo');
 
     if ($defaultEventLogo) {
@@ -176,7 +180,8 @@ function getModuleEventLogo(){
 }
 
 
-function getModuleAccountEventLogo(){
+function getModuleAccountEventLogo()
+{
     $id = session('current_event_id');
 
     $defaultEventLogo = Event::where('id', $id)->value('logo');
@@ -190,7 +195,8 @@ function getModuleAccountEventLogo(){
     return asset('assets/img/md-logo.svg');
 }
 
-function getloginImage(){
+function getloginImage()
+{
     $defaultEventImage = Event::where('is_default', 1)->value('image');
 
     if ($defaultEventImage) {
@@ -203,11 +209,12 @@ function getloginImage(){
     return asset('assets/img/login-img.jpg');
 }
 
-function generateEventCode(){
+function generateEventCode()
+{
     $lastEvent = Event::orderBy('created_at', 'desc')->first();
 
     if (!$lastEvent || !$lastEvent->code) {
-        return 'EVT0001';  
+        return 'EVT0001';
     }
 
     $lastNumber = (int) substr($lastEvent->code, 3);
@@ -217,6 +224,12 @@ function generateEventCode(){
     return 'EVT' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 }
 
-function getDefaultEventId() {
+function getDefaultEventId()
+{
     return \App\Models\Event::where('is_default', true)->value('id');
+}
+
+function getAllEvents()
+{
+    return \App\Models\Event::all();
 }

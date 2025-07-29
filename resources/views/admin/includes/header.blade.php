@@ -3,7 +3,29 @@
         <div class="col-auto me-auto">
             <img src="{{ getAdminEventLogo() }}" alt="" width="150">
         </div>
-        <div class="col-auto ms-auto">
+
+        <div class="col-auto ms-auto flex items-center gap-4">
+            @php
+                $events = getAllEvents();
+                $currentEventId = session('current_event_id', $events->first()?->id ?? null);
+            @endphp
+
+            <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="inline-block">
+                @csrf
+                <select name="event_id" id="current-event-select"
+                    class="p-2 rounded border border-neutral-300 text-neutral-700 cursor-pointer"
+                    onchange="document.getElementById('currentEventForm').submit();" title="{{ __db('select_event') }}">
+                    @foreach ($events as $event)
+                        <option value="{{ $event->id }}" {{ $currentEventId == $event->id ? 'selected' : '' }}>
+                            {{ $event->code }} - {{ $event->name_en }}
+                            @if ($event->is_default)
+                                ({{ __db('default') }})
+                            @endif
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+
             @php
                 $currentRoute = Route::currentRouteName();
 
@@ -22,17 +44,22 @@
                         'text' => __db('add_new_event'),
                         'link' => route('events.create'),
                         'permission' => 'add_event',
-                    ]
+                    ],
+                    'interview-members.index' => [
+                        'text' => __db('add_new_member'),
+                        'link' => route('interview-members.create'),
+                        'permission' => 'add_interview_members',
+                    ],
                 ];
             @endphp
 
-            @if(isset($buttonConfig[$currentRoute]) && auth()->user()->can($buttonConfig[$currentRoute]['permission']))
+            @if (isset($buttonConfig[$currentRoute]) && auth()->user()->can($buttonConfig[$currentRoute]['permission']))
                 <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
-                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                    class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                     <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                         width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 12h14m-7 7V5"/>
+                            d="M5 12h14m-7 7V5" />
                     </svg>
                     <span>{{ $buttonConfig[$currentRoute]['text'] }}</span>
                 </a>
@@ -60,7 +87,7 @@
                                 </a>
                             </li>
                         @endforeach
-                     
+
                     </ul>
                 </div>
 
