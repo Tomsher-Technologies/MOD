@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\DelegationController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StaffController;
@@ -9,7 +10,9 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\DropdownController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\InterviewMemberController;
+use App\Http\Controllers\Admin\OtherMemberController;
 use App\Models\InterviewMember;
+use App\Models\OtherInterviewMember;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
@@ -57,10 +60,13 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/events/{event}/unassign-user/{assigned}', [EventController::class, 'unassignUser'])->name('events.unassignUser');
     Route::post('/set-current-event', [EventController::class, 'setCurrentEvent'])->name('events.setCurrentEvent');
 
-    // Manage Interview Members
-    Route::resource('interview-members', InterviewMemberController::class);
-    Route::get('/interview-members/{id}', [InterviewMemberController::class, 'show'])->name('interviewMembers.show');
-    Route::get('/interview-members/edit/{id}', [InterviewMemberController::class, 'edit'])->name('interviewMembers.edit');
+    // Manage Other Interview Members
+    Route::resource('other-interview-members', OtherMemberController::class);
+    Route::get('/other-interview-members/{id}', [OtherMemberController::class, 'show'])->name('otherInterviewMembers.show');
+    Route::get('/other-interview-members/edit/{id}', [OtherMemberController::class, 'edit'])->name('otherInterviewMembers.edit');
+
+    // Manage Delegation Members
+    Route::resource('delegations', DelegationController::class);
 });
 
 Route::get('/lang/{lang}', function ($lang) {

@@ -4,7 +4,7 @@
     <div class="dashboard-main-body ">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interview_member_details') }}</h2>
-            <a href="{{ Session::has('interview_member_last_url') ? Session::get('interview_member_last_url') : route('interview-members.index') }}"
+            <a href="{{ Session::has('interview_member_last_url') ? Session::get('interview_member_last_url') : route('other-interview-members.index') }}"
                 id="add-attachment-btn"
                 class="float-left btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">
                 <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -135,12 +135,12 @@
 
                 <div class="flex justify-start items-center gap-5 mt-6">
                     @can('edit_interview_members')
-                        <a href="{{ route('interviewMembers.edit', ['id' => base64_encode($interviewMember->id)]) }}"
+                        <a href="{{ route('otherInterviewMembers.edit', ['id' => base64_encode($interviewMember->id)]) }}"
                             class="btn !bg-yellow-400 text-yellow-900 rounded-lg px-6 py-2 font-semibold hover:bg-yellow-500">
                             {{ __db('edit') }}
                         </a>
                     @endcan
-                    <a href="{{ route('interview-members.index') }}"
+                    <a href="{{ route('other-interview-members.index') }}"
                         class="btn !bg-gray-600 text-white rounded-lg px-6 py-2 font-semibold hover:bg-gray-700">
                         {{ __db('back_to_interview_members') }}
                     </a>

@@ -233,3 +233,8 @@ function getAllEvents()
 {
     return \App\Models\Event::all();
 }
+
+function getDropDown($key)
+{
+    return \App\Models\Dropdown::where('code', $key)->with('options')->first();
+}

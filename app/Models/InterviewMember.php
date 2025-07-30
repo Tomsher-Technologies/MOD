@@ -7,14 +7,44 @@ use Illuminate\Database\Eloquent\Model;
 class InterviewMember extends Model
 {
     protected $fillable = [
-        'name_en',
-        'name_ar',
-        'status',
-        'event_id',
+        'type',
+        'member_id',
+        'interview_id',
     ];
-
-    public function event()
+    public function interview()
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Interview::class);
+    }
+
+    public function fromDelegate()
+    {
+        return $this->belongsTo(Delegate::class, 'member_id');
+    }
+
+    public function toDelegate()
+    {
+        return $this->belongsTo(Delegate::class, 'member_id');
+    }
+
+    public function otherMember()
+    {
+        return $this->belongsTo(OtherInterviewMember::class, 'member_id');
+    }
+
+    public function resolveMemberForInterview(Interview $interview)
+    {
+        if ($this->type === 'from') {
+            return $this->fromDelegate;
+        }
+
+        if ($this->type === 'to') {
+            if ($interview->type === 'del_others') {
+                return $this->otherMember;
+            } else {
+                return $this->toDelegate;
+            }
+        }
+
+        return null;
     }
 }

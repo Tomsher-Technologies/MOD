@@ -4,7 +4,7 @@
     <div class="dashboard-main-body ">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('update_interview_member_details') }}</h2>
-            <a href="{{ Session::has('interview_members_last_url') ? Session::get('interview_members_last_url') : route('interview-members.index') }}"
+            <a href="{{ Session::has('interview_members_last_url') ? Session::get('interview_members_last_url') : route('other-interview-members.index') }}"
                 id="add-attachment-btn"
                 class="float-left btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">
                 <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -15,7 +15,7 @@
             </a>
         </div>
 
-        <form action="{{ route('interview-members.update', $interviewMember) }}" method="POST" autocomplete="off">
+        <form action="{{ route('other-interview-members.update', $interviewMember) }}" method="POST" autocomplete="off">
             @csrf
             @method('PUT')
             <div class="bg-white rounded-lg p-6 mb-10 mt-4">
@@ -95,7 +95,7 @@
                         {{ __db('submit') }}
                     </button>
 
-                    <a href="{{ Session::has('interview_members_last_url') ? Session::get('interview_members_last_url') : route('interview-members.index') }}"
+                    <a href="{{ Session::has('interview_members_last_url') ? Session::get('interview_members_last_url') : route('other-interview-members.index') }}"
                         class="btn text-md !bg-[#637a85] border !border-[#637a85] !text-[#fff] rounded-lg h-12 mr-1">
                         {{ __db('cancel') }}
                     </a>

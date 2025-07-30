@@ -1,15 +1,15 @@
-@extends('layouts.admin_account', ['title' => __db('all_interview_members')])
+@extends('layouts.admin_account', ['title' => __db('all__other_interview_members')])
 
 @section('content')
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all_interview_members') }}</h2>
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all__other_interview_members') }}</h2>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between gap-12 mb-4">
-                    <form class="w-[75%]" action="{{ route('interview-members.index') }}" method="GET">
+                    <form class="w-[75%]" action="{{ route('other-interview-members.index') }}" method="GET">
                         <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +36,7 @@
                             </div>
 
                             <div class="flex">
-                                <a href="{{ route('interview-members.index') }}"
+                                <a href="{{ route('other-interview-members.index') }}"
                                     class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                     {{ __db('reset') }}</a>
 
@@ -60,10 +60,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($interview_members as $key => $member)
+                        @forelse($other_interview_members as $key => $member)
                             <tr class="odd:bg-[#F9F7ED] align-[middle]">
                                 <td class="px-4 py-3 text-end" dir="ltr">
-                                    {{ $key + 1 + ($interview_members->currentPage() - 1) * $interview_members->perPage() }}
+                                    {{ $key + 1 + ($other_interview_members->currentPage() - 1) * $other_interview_members->perPage() }}
                                 </td>
                                 <td class="text-center px-4 py-3 text-black">
                                     {{ $member->event?->code ?? '-' }}
@@ -92,8 +92,8 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-center" dir="ltr">
-                                    @can('edit_interview_members')
-                                        <a href="{{ route('interviewMembers.edit', ['id' => base64_encode($member->id)]) }}"
+                                    @can('edit_other_interview_members')
+                                        <a href="{{ route('otherInterviewMembers.edit', ['id' => base64_encode($member->id)]) }}"
                                             title="{{ __db('edit') }}"
                                             class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
@@ -105,8 +105,8 @@
                                         </a>
                                     @endcan
 
-                                    @can('view_interview_members')
-                                        <a href="{{ route('interviewMembers.show', ['id' => base64_encode($member->id)]) }}"
+                                    @can('view_other_interview_members')
+                                        <a href="{{ route('otherInterviewMembers.show', ['id' => base64_encode($member->id)]) }}"
                                             class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                 viewBox="0 0 16 12" fill="none">
@@ -133,7 +133,7 @@
                     </tbody>
                 </table>
                 <div class="mt-4">
-                    {{ $interview_members->appends(request()->input())->links() }}
+                    {{ $other_interview_members->appends(request()->input())->links() }}
                 </div>
             </div>
         </div>

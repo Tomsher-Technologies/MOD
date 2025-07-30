@@ -45,10 +45,10 @@
                         'link' => route('events.create'),
                         'permission' => 'add_event',
                     ],
-                    'interview-members.index' => [
+                    'other-interview-members.index' => [
                         'text' => __db('add_new_member'),
-                        'link' => route('interview-members.create'),
-                        'permission' => 'add_interview_members',
+                        'link' => route('other-interview-members.create'),
+                        'permission' => 'add_other_interview_members',
                     ],
                 ];
             @endphp

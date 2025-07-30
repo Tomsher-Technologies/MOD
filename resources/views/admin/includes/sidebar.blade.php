@@ -83,10 +83,10 @@
                 </li>
             @endcan
 
-            @can('manage_interview_members')
+            @can('manage_other_interview_members')
                 <li>
-                    <a href="{{ route('interview-members.index') }}"
-                        class="{{ areActiveRoutes(['interview_members.create', 'interview_members.edit', 'interview_members.index']) }}">
+                    <a href="{{ route('other-interview-members.index') }}"
+                        class="{{ areActiveRoutes(['other_interview_members.create', 'other_interview_members.edit', 'other_interview_members.index']) }}">
                         <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"

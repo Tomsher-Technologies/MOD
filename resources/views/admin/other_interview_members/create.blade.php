@@ -4,7 +4,7 @@
     <div class="dashboard-main-body">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('create_new_interview_member') }}</h2>
-            <a href="{{ route('interview-members.index') }}" id="add-attachment-btn"
+            <a href="{{ route('other-interview-members.index') }}" id="add-attachment-btn"
                 class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                 <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor" stroke-width="2">
@@ -14,7 +14,7 @@
             </a>
         </div>
 
-        <form action="{{ route('interview-members.store') }}" method="POST" autocomplete="off">
+        <form action="{{ route('other-interview-members.store') }}" method="POST" autocomplete="off">
             @csrf
             <div class="bg-white rounded-lg p-6 mb-10 mt-4">
                 <div class="bg-white p-6 grid grid-cols-1 gap-5 mb-4">
@@ -70,7 +70,7 @@
                         {{ __db('submit') }}
                     </button>
 
-                    <a href="{{ route('interview-members.index') }}"
+                    <a href="{{ route('other-interview-members.index') }}"
                         class="btn text-md !bg-[#637a85] border !border-[#637a85] !text-[#fff] rounded-lg h-12 mr-1">
                         {{ __db('cancel') }}
                     </a>
