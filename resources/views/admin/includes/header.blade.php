@@ -50,6 +50,11 @@
                         'link' => route('other-interview-members.create'),
                         'permission' => 'add_other_interview_members',
                     ],
+                    'delegations.index' => [
+                        'text' => __db('add_new_delegation'),
+                        'link' => route('delegations.create'),
+                        'permission' => 'add_delegations',
+                    ],
                 ];
             @endphp
 

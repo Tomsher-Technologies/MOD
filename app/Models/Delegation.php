@@ -21,7 +21,7 @@ class Delegation extends Model
     {
         return $this->belongsTo(DropdownOption::class, 'invitation_from_id')
             ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'invitation_from');
+                $q->where('code', 'departments');
             });
     }
 
@@ -29,7 +29,7 @@ class Delegation extends Model
     {
         return $this->belongsTo(DropdownOption::class, 'continent_id')
             ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'continent');
+                $q->where('code', 'continents');
             });
     }
 

@@ -67,6 +67,9 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Manage Delegation Members
     Route::resource('delegations', DelegationController::class);
+    Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
+    Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

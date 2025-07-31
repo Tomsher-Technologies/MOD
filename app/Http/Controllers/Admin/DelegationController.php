@@ -14,6 +14,11 @@ class DelegationController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+
+        $this->middleware('permission:manage_delegations',  ['only' => ['index', 'setDefault']]);
+        $this->middleware('permission:add_delegations',  ['only' => ['create', 'store']]);
+        $this->middleware('permission:edit_delegations',  ['only' => ['edit', 'update']]);
+        $this->middleware('permission:view_delegations',  ['only' => ['show', 'index']]);
     }
 
     public function index(Request $request)
@@ -30,15 +35,14 @@ class DelegationController extends Controller
         if ($search = $request->input('search')) {
             $query->where('delegate_id', 'like', "%{$search}%");
         }
-
         if ($status = $request->input('status')) {
             if ($status == 1) {
-                $query->whereHas('delegates', function ($q) {
-                    $q->where('team_head', true);
+                $query->whereHas('participationStatus', function ($q) {
+                    $q->where('value', 'active');
                 });
             } elseif ($status == 0) {
-                $query->whereDoesntHave('delegates', function ($q) {
-                    $q->where('team_head', true);
+                $query->whereHas('participationStatus', function ($q) {
+                    $q->where('value', 'inactive');
                 });
             }
         }
@@ -49,15 +53,41 @@ class DelegationController extends Controller
     }
     public function create()
     {
+        $delegateId = $this->generateNextDelegateId();
+
         $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.delegations.create', $dropdowns);
+        return view('admin.delegations.create', array_merge($dropdowns, [
+            'uniqueDelegateId' => $delegateId,
+        ]));
     }
+    public function show($id)
+    {
+        $delegation = \App\Models\Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates' => function ($query) {
+                $query->with(['gender', 'parent']);
+            },
+            'attachments',
+        ])->findOrFail($id);
+
+        // $interviews = \App\Models\Interview::with('attendees')->where('delegation_id', $id)->get();
+
+        return view('admin.delegations.show', compact('delegation'));
+    }
+
 
     public function store(Request $request)
     {
+
+        // return response()->json($request->all());
+
         $validated = $request->validate([
-            'delegate_id'            => 'required|string|unique:delegations,delegate_id',
+            'delegate_id' => 'required|string|unique:delegations,delegate_id',
             'invitation_from_id'     => 'required|exists:dropdown_options,id',
             'continent_id'           => 'required|exists:dropdown_options,id',
             'country_id'             => 'required|exists:dropdown_options,id',
@@ -66,24 +96,23 @@ class DelegationController extends Controller
             'note1'                  => 'nullable|string',
             'note2'                  => 'nullable|string',
 
-            'delegates'              => 'sometimes|array',
-            'delegates.*.title'      => 'nullable|string',
-            'delegates.*.name_en'    => 'required|string',
-            'delegates.*.name_ar'    => 'required|string',
-            'delegates.*.gender_id'  => 'nullable|exists:dropdown_options,id',
+            'delegates' => 'sometimes|array',
+            'delegates.*.title' => 'nullable|string',
+            'delegates.*.name_ar' => 'nullable|string',
+            'delegates.*.name_en' => 'nullable|string',
             'delegates.*.designation_en' => 'nullable|string',
             'delegates.*.designation_ar' => 'nullable|string',
-            'delegates.*.parent_id'  => 'nullable|exists:delegates,id',
+            'delegates.*.gender_id' => 'nullable|exists:dropdown_options,id',
+            'delegates.*.parent_id' => 'nullable|exists:delegates,id',
             'delegates.*.relationship' => 'nullable|string',
+            'delegates.*.internal_ranking' => 'nullable|string',
+            'delegates.*.note' => 'nullable|string',
             'delegates.*.team_head' => 'nullable|boolean',
             'delegates.*.badge_printed' => 'nullable|boolean',
-            'delegates.*.escorts'   => 'nullable|string',
-            'delegates.*.drivers'   => 'nullable|string',
-            'delegates.*.hotel_name' => 'nullable|string',
 
-            'attachments'            => 'sometimes|array',
-            'attachments.*.title'    => 'required|string',
-            'attachments.*.file'     => 'required|file|max:5120',
+            'attachments'            => 'nullable|array',
+            'attachments.*.title'    => 'nullable|string',
+            'attachments.*.file'     => 'nullable|file|max:5120',
             'attachments.*.document_date' => 'nullable|date',
         ]);
 
@@ -105,24 +134,45 @@ class DelegationController extends Controller
             if (!empty($validated['delegates'])) {
                 foreach ($validated['delegates'] as $delegateData) {
                     $delegateData['delegation_id'] = $delegation->id;
+                    $delegateData['team_head'] = !empty($delegateData['team_head']);
+                    $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
                     $delegation->delegates()->create($delegateData);
                 }
             }
 
-            if (!empty($validated['attachments'])) {
-                foreach ($validated['attachments'] as $attachmentData) {
-                    $filePath = $attachmentData['file']->store('delegation_attachments');
-                    $delegation->attachments()->create([
-                        'title' => $attachmentData['title'],
-                        'file_path' => $filePath,
-                        'document_date' => $attachmentData['document_date'] ?? null,
-                    ]);
+            if (!empty($validated['delegates'])) {
+                foreach ($validated['delegates'] as $delegateData) {
+                    $delegateData['delegation_id'] = $delegation->id;
+                    $delegation->delegates()->create($delegateData);
                 }
             }
 
+            if ($request->has('attachments')) {
+                foreach ($request->attachments as $idx => $attachment) {
+                    if ($request->file("attachments.$idx.file")) {
+                        $file = $request->file("attachments.$idx.file");
+                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->delegate_id, 'files');
+                        $delegation->attachments()->create([
+                            'title_id' => $attachment['title'],
+                            'file_path' => $path,
+                            'document_date' => $attachment['document_date'] ?? now()->format('Y-m-d'),
+                        ]);
+                    }
+                }
+            }
+
+
             DB::commit();
 
-            return redirect()->route('delegations.index')->with('success', 'Delegation created successfully.');
+            if ($request->has('submit_and_exit')) {
+                return redirect()->route('delegations.index')->with('success', 'Delegation created.');
+            } elseif ($request->has('submit_add_delegate')) {
+                return redirect()->route('delegates.create', ['delegation_id' => $delegation->id]);
+            } elseif ($request->has('submit_add_flight')) {
+                return redirect()->route('flights.create', ['delegation_id' => $delegation->id]);
+            }
+
+            return redirect()->route('delegations.index')->with('success', 'Delegation created.');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withErrors(['error' => 'Failed to create delegation: ' . $e->getMessage()])->withInput();
@@ -146,5 +196,24 @@ class DelegationController extends Controller
             'participationStatusOptions' => $participationStatus ? $participationStatus->options : collect(),
             'genderOptions' => $gender ? $gender->options : collect(),
         ];
+    }
+
+    protected function generateNextDelegateId()
+    {
+        $lastDelegate = \App\Models\Delegation::where('delegate_id', 'like', 'DA%')
+            ->orderBy('delegate_id', 'desc')
+            ->first();
+
+        if (!$lastDelegate) {
+            return 'DA000001';
+        }
+
+        $lastId = $lastDelegate->delegate_id;
+        $number = intval(substr($lastId, 2));
+
+        $nextNumber = $number + 1;
+        $nextDelegateId = 'DA' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+
+        return $nextDelegateId;
     }
 }

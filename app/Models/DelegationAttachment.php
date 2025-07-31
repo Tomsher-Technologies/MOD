@@ -8,7 +8,7 @@ class DelegationAttachment extends Model
 {
     protected $fillable = [
         'delegation_id',
-        'title',
+        'title_id',
         'file_path',
         'document_date',
     ];
@@ -16,5 +16,13 @@ class DelegationAttachment extends Model
     public function delegation()
     {
         return $this->belongsTo(Delegation::class);
+    }
+
+    public function title()
+    {
+        return $this->belongsTo(DropdownOption::class, 'title_id')
+            ->whereHas('dropdown', function ($query) {
+                $query->where('code', 'title');
+            });
     }
 }

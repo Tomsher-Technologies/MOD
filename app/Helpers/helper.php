@@ -238,3 +238,14 @@ function getDropDown($key)
 {
     return \App\Models\Dropdown::where('code', $key)->with('options')->first();
 }
+
+function storeUploadedFileToModuleFolder($file, $folder, $parentId, $subDir = 'files')
+{
+    $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+    $extension = $file->getClientOriginalExtension();
+    $date = date('YmdHis');
+    $random = rand(1000, 9999);
+    $filename = $originalName . '_' . $date . '_' . $random . '.' . $extension;
+    $storageFolder = $folder . '/' . $parentId . '/' . $subDir;
+    return $file->storeAs($storageFolder, $filename);
+}
