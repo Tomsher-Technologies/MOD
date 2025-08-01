@@ -21,7 +21,7 @@
 
                     <div class="mt-4 mb-4">
                         {{-- <label class="block mb-1 text-sm text-gray-600 dark:text-gray-300">{{ __db('event') }}</label> --}}
-                        <select name="event_id" class="select2 form-control h-[56px] border-neutral-300 bg-neutral-50 dark:bg-dark-2 rounded-xl">
+                        <select name="event_id" class="select2 form-control" style="width: 100%" data-live-search="true">
                             <option value="">{{ __db('select_an_event') }}</option>
                             @foreach($events as $event)
                                 <option value="{{ $event->id }}">{{ $event->name_en }}</option>

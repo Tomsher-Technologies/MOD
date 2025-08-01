@@ -1,46 +1,40 @@
 import jQuery from 'jquery';
 window.$ = window.jQuery = jQuery;
 
-import 'select2/dist/js/select2.full';
+import select2 from 'select2';
 import 'select2/dist/css/select2.min.css';
 
-// Import Flowbite components
-import 'flowbite';
+select2(window.$);
 
-import { Fancybox } from "@fancyapps/ui";
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
-// Bootstrap or custom setup
-import './bootstrap';
-import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
-import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
-$(function () {
-    $('.select2').select2({
-        minimumResultsForSearch: 5
-    });
-});
+import toastr from 'toastr';
+import Swal from 'sweetalert2';
+import { Fancybox } from "@fancyapps/ui";
+import 'flowbite';
+import './bootstrap';
 
 window.toastr = toastr;
 window.Swal = Swal;
 
-Fancybox.bind("[data-fancybox]", {
-  animated: true,
-  dragToClose: false,
-  groupAll: true,
+document.addEventListener('DOMContentLoaded', () => {
+
+
+    Fancybox.bind("[data-fancybox]", {
+        animated: true,
+        dragToClose: false,
+        groupAll: true,
+    });
 });
-
-toastr.options = {
-    closeButton: true,
-    progressBar: true,
-    timeOut: "5000",
-    extendedTimeOut: "1000",
-    positionClass: "toast-top-right",
-    showDuration: "300",
-    hideDuration: "1000",
-    showMethod: "fadeIn",
-    hideMethod: "fadeOut"
-};
-
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        $('.select2').select2({
+            dropdownParent: $(document.body)
+        });
+    }, 100); // Slight delay ensures everything is in DOM
+});
+        
+        
 
