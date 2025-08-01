@@ -186,7 +186,10 @@
                                     </tr>
                                 @endforeach
                             @else
-                                <p>{{ __db('no_delegates_found') }}.</p>
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3 text-center">{{ __db('no_delegates_found') }}.
+                                    </td>
+                                </tr>
                             @endif
                         </tbody>
                     </table>
@@ -375,41 +378,43 @@
 
         <h4 class="text-lg font-semibold mb-3 mt-6">{{ __db('attachments') }}</h4>
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-            <ul class="flex">
-                @if ($delegation->attachments->count())
-                    @foreach ($delegation->attachments as $attachment)
-                        <li class="flex-1">
-                            <span class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('title') }}:</span>
-                            <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $attachment->title->value ?? '0' }}</h4>
-                        </li>
-                        <li class="flex-1">
-                            <span
-                                class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('uploaded_file') }}:</span>
-                            <h4 class="bg-[#f9f7ed] py-2 px-3">
-
-                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank"
-                                    class="font-medium !text-[#B68A35] ">{{ $attachment->file_path }}</a>
-
-                            </h4>
-                        </li>
-                        <li class="flex-1">
-                            <span
-                                class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('uploaded_date') }}:</span>
-                            <h4 class="bg-[#f9f7ed] py-2 px-3">
-                                {{ $attachment->created_at ? $attachment->created_at->format('d-m-Y') : '-' }}</h4>
-                        </li>
-                        <li class="flex-1">
-                            <span
-                                class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('document_date') }}:</span>
-                            <h4 class="bg-[#f9f7ed] py-2 px-3">
-                                {{ $attachment->document_date ? \Illuminate\Support\Carbon::parse($attachment->document_date)->format('d-m-Y') : '-' }}
-                            </h4>
-                        </li>
-                    @endforeach
-                @else
-                    <p>{{ __db('no_attachments_found') }}.</p>
-                @endif
-            </ul>
+            <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
+                <thead>
+                    <tr>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('title') }}</th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('file_name') }}</th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('uploaded_file') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('uploaded_date') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('document_date') }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if ($delegation->attachments->count())
+                        @foreach ($delegation->attachments as $attachment)
+                            <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
+                                <td class="px-4 py-3">{{ $attachment->title->value ?? '-' }}</td>
+                                <td class="px-4 py-3">
+                                    <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank"
+                                        class="font-medium !text-[#B68A35] ">{{ $attachment->file_name }}</a>
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{ $attachment->created_at ? $attachment->created_at->format('d-m-Y') : '-' }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {{ $attachment->document_date ? \Illuminate\Support\Carbon::parse($attachment->document_date)->format('d-m-Y') : '-' }}
+                                </td>
+                            </tr>
+                        @endforeach
+                    @else
+                        <tr>
+                            <td colspan="4" class="px-4 py-3 text-center">{{ __db('no_attachments_found') }}.</td>
+                        </tr>
+                    @endif
+                </tbody>
+            </table>
         </div>
 
     </div>

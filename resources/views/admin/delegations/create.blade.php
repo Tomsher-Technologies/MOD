@@ -463,135 +463,6 @@
 
                             </div>
                         @endforeach
-                    @else
-                        <div class="delegate-row border rounded p-4 grid grid-cols-12 gap-4 relative">
-                            <button type="button"
-                                class="delete-row absolute top-2 end-2 text-red-600 hover:text-red-800 hidden"
-                                title="Remove delegate">&times;</button>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Title') }}</label>
-                                <select name="delegates[0][title]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    <option value="">{{ __db('select_title') }}</option>
-                                    {!! $titleOptionsHtml !!}
-                                </select>
-                                @error('delegates.0.title')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Name (AR)') }}</label>
-                                <input type="text" name="delegates[0][name_ar]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                @error('delegates.0.name_ar')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Name (EN)') }}</label>
-                                <input type="text" name="delegates[0][name_en]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                @error('delegates.0.name_en')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Designation (EN)') }}</label>
-                                <input type="text" name="delegates[0][designation_en]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                @error('delegates.0.designation_en')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Designation (AR)') }}</label>
-                                <input type="text" name="delegates[0][designation_ar]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                @error('delegates.0.designation_ar')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Gender') }}</label>
-                                <select name="delegates[0][gender_id]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    <option value="">{{ __db('select_gender') }}</option>
-                                    {!! $genderOptionsHtml !!}
-                                </select>
-                                @error('delegates.0.gender_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Parent') }}</label>
-                                <select name="delegates[0][parent_id]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    <option value="">{{ __db('select_parent_id') }}</option>
-                                </select>
-                                @error('delegates.0.parent_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Relationship') }}</label>
-                                <select name="delegates[0][relationship]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    <option value="">{{ __db('select_relationship') }}</option>
-                                    {!! $relationshipOptionsHtml !!}
-                                </select>
-                                @error('delegates.0.relationship')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __('Internal Ranking') }}</label>
-                                <select name="delegates[0][internal_ranking]"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    <option value="">{{ __db('select_internal_ranking') }}</option>
-                                    {!! $internalRankingOptionsHtml !!}
-                                </select>
-                                @error('delegates.0.internal_ranking')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __('Note') }}</label>
-                                <textarea name="delegates[0][note]" rows="3"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"></textarea>
-                                @error('delegates.0.note')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
-                                <div class="flex items-center gap-3">
-                                    <input id="team-head-0" type="checkbox" name="delegates[0][team_head]"
-                                        value="1"
-                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                    <label for="team-head-0" class="text-sm text-gray-700">{{ __('Team Head') }}</label>
-                                </div>
-                                <span class="col-span-12 pt-">
-                                    <div class="flex items-center gap-3">
-                                        <input id="badge-printed" id="badge-printed-0" name="delegates[0][badge_printed]"
-                                            value="1" type="checkbox"
-                                            class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                        <label for="badge-printed"
-                                            class="text-sm text-gray-700">{{ __('Badge Printed') }}</label>
-                                    </div>
-                                </span>
-                            </span>
-
-                        </div>
                     @endif
                 </div>
 
@@ -668,7 +539,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const delegateContainer = document.getElementById('delegate-container');
-            let delegateIndex = {{ old('delegates') ? count(old('delegates')) : 1 }};
+            let delegateIndex = {{ old('delegates') ? count(old('delegates')) : 0 }};
 
             document.getElementById('add-delegate-btn').addEventListener('click', function(e) {
                 e.preventDefault();
@@ -679,7 +550,7 @@
 
                     <div class="col-span-3">
                         <label class="form-label">Title</label>
-                        <select name="delegates[\${delegateIndex}][title]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                        <select name="delegates[${delegateIndex}][title]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
                             <option value="">Select Title</option>
                             ${titleOptionsHtml}
                         </select>
@@ -687,27 +558,27 @@
 
                     <div class="col-span-3">
                         <label class="form-label">Name (AR)</label>
-                        <input type="text" name="delegates[\${delegateIndex}][name_ar]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
+                        <input type="text" name="delegates[${delegateIndex}][name_ar]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
                     </div>
 
                     <div class="col-span-3">
                         <label class="form-label">Name (EN)</label>
-                        <input type="text" name="delegates[\${delegateIndex}][name_en]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
+                        <input type="text" name="delegates[${delegateIndex}][name_en]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
                     </div>
 
                     <div class="col-span-3">
                         <label class="form-label">Designation (EN)</label>
-                        <input type="text" name="delegates[\${delegateIndex}][designation_en]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
+                        <input type="text" name="delegates[${delegateIndex}][designation_en]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
                     </div>
 
                     <div class="col-span-3">
                         <label class="form-label">Designation (AR)</label>
-                        <input type="text" name="delegates[\${delegateIndex}][designation_ar]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
+                        <input type="text" name="delegates[${delegateIndex}][designation_ar]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
                     </div>
 
                     <div class="col-span-3">
                         <label class="form-label">Gender</label>
-                        <select name="delegates[\${delegateIndex}][gender_id]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                        <select name="delegates[${delegateIndex}][gender_id]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
                             <option value="">Select Gender</option>
                             ${genderOptionsHtml}
                         </select>
@@ -715,14 +586,14 @@
 
                     <div class="col-span-3">
                         <label class="form-label">Parent</label>
-                        <select name="delegates[\${delegateIndex}][parent_id]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                        <select name="delegates[${delegateIndex}][parent_id]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
                             <option value="">Select Parent</option>
                         </select>
                     </div>
 
                     <div class="col-span-3">
                         <label class="form-label">Relationship</label>
-                        <select name="delegates[\${delegateIndex}][relationship]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                        <select name="delegates[${delegateIndex}][relationship]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
                             <option value="">Select Relationship</option>
                             ${relationshipOptionsHtml}
                         </select>
@@ -730,7 +601,7 @@
 
                     <div class="col-span-3">
                         <label class="form-label">Internal Ranking</label>
-                        <select name="delegates[\${delegateIndex}][internal_ranking]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                        <select name="delegates[${delegateIndex}][internal_ranking]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
                             <option value="">Select Ranking</option>
                             ${internalRankingOptionsHtml}
                         </select>
@@ -738,22 +609,22 @@
 
                     <div class="col-span-6">
                         <label class="form-label">Note</label>
-                        <textarea name="delegates[\${delegateIndex}][note]" rows="3" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"></textarea>
+                        <textarea name="delegates[${delegateIndex}][note]" rows="3" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"></textarea>
                     </div>
 
 
                      <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
                         <div class="flex items-center gap-3">
-                            <input type="checkbox" id="team-head-\${delegateIndex}" name="delegates[\${delegateIndex}][team_head]" value="1"
+                            <input type="checkbox" id="team-head-${delegateIndex}" name="delegates[${delegateIndex}][team_head]" value="1"
                                 class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                            <label for="team-head-\${delegateIndex}"
+                            <label for="team-head-${delegateIndex}"
                                 class="text-sm text-gray-700">{{ __('Team Head') }}</label>
                         </div>
                         <span class="col-span-12 pt-">
                             <div class="flex items-center gap-3">
-                                <input type="checkbox" id="badge-printed-\${delegateIndex}" name="delegates[\${delegateIndex}][badge_printed]" value="1"
+                                <input type="checkbox" id="badge-printed-${delegateIndex}" name="delegates[${delegateIndex}][badge_printed]" value="1"
                                     class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                <label for="badge-printed-\${delegateIndex}"
+                                <label for="badge-printed-${delegateIndex}"
                                     class="text-sm text-gray-700">{{ __('Badge Printed') }}</label>
                             </div>
                         </span>

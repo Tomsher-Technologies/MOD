@@ -140,20 +140,14 @@ class DelegationController extends Controller
                 }
             }
 
-            if (!empty($validated['delegates'])) {
-                foreach ($validated['delegates'] as $delegateData) {
-                    $delegateData['delegation_id'] = $delegation->id;
-                    $delegation->delegates()->create($delegateData);
-                }
-            }
-
             if ($request->has('attachments')) {
                 foreach ($request->attachments as $idx => $attachment) {
                     if ($request->file("attachments.$idx.file")) {
                         $file = $request->file("attachments.$idx.file");
-                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->delegate_id, 'files');
+                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->delegate_id, 'files') ?? "";
                         $delegation->attachments()->create([
                             'title_id' => $attachment['title'],
+                            'file_name' => $file->getClientOriginalName(),
                             'file_path' => $path,
                             'document_date' => $attachment['document_date'] ?? now()->format('Y-m-d'),
                         ]);

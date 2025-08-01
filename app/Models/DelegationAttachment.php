@@ -8,6 +8,7 @@ class DelegationAttachment extends Model
 {
     protected $fillable = [
         'delegation_id',
+        'file_name',
         'title_id',
         'file_path',
         'document_date',
