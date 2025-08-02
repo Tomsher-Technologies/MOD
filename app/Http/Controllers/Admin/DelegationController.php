@@ -33,7 +33,7 @@ class DelegationController extends Controller
         ])->orderBy('id', 'desc');
 
         if ($search = $request->input('search')) {
-            $query->where('delegate_id', 'like', "%{$search}%");
+            $query->where('code', 'like', "%{$search}%");
         }
         if ($status = $request->input('status')) {
             if ($status == 1) {
@@ -80,6 +80,25 @@ class DelegationController extends Controller
         return view('admin.delegations.show', compact('delegation'));
     }
 
+    public function addTravel($id)
+    {
+        $delegation = \App\Models\Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates',
+            'attachments',
+        ])->findOrFail($id);
+
+        // return response()->json([
+        //     'delegation' => $delegation,
+        // ]);
+
+        return view('admin.delegations.add-travel', compact('delegation'));
+    }
+
 
     public function store(Request $request)
     {
@@ -87,7 +106,7 @@ class DelegationController extends Controller
         // return response()->json($request->all());
 
         $validated = $request->validate([
-            'delegate_id' => 'required|string|unique:delegations,delegate_id',
+            'code' => 'required|string|unique:delegations,code',
             'invitation_from_id'     => 'required|exists:dropdown_options,id',
             'continent_id'           => 'required|exists:dropdown_options,id',
             'country_id'             => 'required|exists:dropdown_options,id',
@@ -97,7 +116,8 @@ class DelegationController extends Controller
             'note2'                  => 'nullable|string',
 
             'delegates' => 'sometimes|array',
-            'delegates.*.title' => 'nullable|string',
+            // 'delegates.*.tmp_id' => 'required',
+            'delegates.*.title_id' => 'nullable|string',
             'delegates.*.name_ar' => 'nullable|string',
             'delegates.*.name_en' => 'nullable|string',
             'delegates.*.designation_en' => 'nullable|string',
@@ -105,13 +125,13 @@ class DelegationController extends Controller
             'delegates.*.gender_id' => 'nullable|exists:dropdown_options,id',
             'delegates.*.parent_id' => 'nullable|exists:delegates,id',
             'delegates.*.relationship' => 'nullable|string',
-            'delegates.*.internal_ranking' => 'nullable|string',
+            'delegates.*.internal_ranking_id' => 'nullable|string',
             'delegates.*.note' => 'nullable|string',
             'delegates.*.team_head' => 'nullable|boolean',
             'delegates.*.badge_printed' => 'nullable|boolean',
 
             'attachments'            => 'nullable|array',
-            'attachments.*.title'    => 'nullable|string',
+            'attachments.*.title_id'    => 'nullable|string',
             'attachments.*.file'     => 'nullable|file|max:5120',
             'attachments.*.document_date' => 'nullable|date',
         ]);
@@ -121,7 +141,7 @@ class DelegationController extends Controller
         try {
 
             $delegation = Delegation::create([
-                'delegate_id' => $validated['delegate_id'],
+                'code' => $validated['code'],
                 'invitation_from_id' => $validated['invitation_from_id'],
                 'continent_id' => $validated['continent_id'],
                 'country_id' => $validated['country_id'],
@@ -131,11 +151,42 @@ class DelegationController extends Controller
                 'note2' => $validated['note2'] ?? null,
             ]);
 
+            // $tmpIdToDbId = [];
+
+            // if (!empty($validated['delegates'])) {
+            //     foreach ($validated['delegates'] as $delegateData) {
+            //         $tmpId = $delegateData['tmp_id'];
+
+            //         unset($delegateData['parent_id']);
+
+            //         $delegateData['delegation_id'] = $delegation->id;
+            //         $delegateData['team_head'] = !empty($delegateData['team_head']);
+            //         $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
+
+            //         $createdDelegate = $delegation->delegates()->create($delegateData);
+            //         $tmpIdToDbId[$tmpId] = $createdDelegate->id;
+            //     }
+
+            //     foreach ($validated['delegates'] as $delegateData) {
+            //         if (!empty($delegateData['parent_id']) && isset($tmpIdToDbId[$delegateData['parent_id']])) {
+            //             $parentDbId = $tmpIdToDbId[$delegateData['parent_id']];
+            //             $delegateTmpId = $delegateData['tmp_id'];
+
+            //             $delegate = $delegation->delegates()->where('id', $tmpIdToDbId[$delegateTmpId])->first();
+            //             if ($delegate) {
+            //                 $delegate->parent_id = $parentDbId;
+            //                 $delegate->save();
+            //             }
+            //         }
+            //     }
+            // }
+
             if (!empty($validated['delegates'])) {
                 foreach ($validated['delegates'] as $delegateData) {
                     $delegateData['delegation_id'] = $delegation->id;
                     $delegateData['team_head'] = !empty($delegateData['team_head']);
                     $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
+                    $delegateData['internal_ranking_id'] = $delegation->internal_ranking_id ?? null;
                     $delegation->delegates()->create($delegateData);
                 }
             }
@@ -144,7 +195,7 @@ class DelegationController extends Controller
                 foreach ($request->attachments as $idx => $attachment) {
                     if ($request->file("attachments.$idx.file")) {
                         $file = $request->file("attachments.$idx.file");
-                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->delegate_id, 'files') ?? "";
+                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? "";
                         $delegation->attachments()->create([
                             'title_id' => $attachment['title'],
                             'file_name' => $file->getClientOriginalName(),
@@ -162,8 +213,8 @@ class DelegationController extends Controller
                 return redirect()->route('delegations.index')->with('success', 'Delegation created.');
             } elseif ($request->has('submit_add_delegate')) {
                 return redirect()->route('delegates.create', ['delegation_id' => $delegation->id]);
-            } elseif ($request->has('submit_add_flight')) {
-                return redirect()->route('flights.create', ['delegation_id' => $delegation->id]);
+            } elseif ($request->has('submit_add_travel')) {
+                return redirect()->route('delegates.addTravel', ['delegation_id' => $delegation->id]);
             }
 
             return redirect()->route('delegations.index')->with('success', 'Delegation created.');
@@ -172,6 +223,73 @@ class DelegationController extends Controller
             return back()->withErrors(['error' => 'Failed to create delegation: ' . $e->getMessage()])->withInput();
         }
     }
+
+    public function storeTravel(Request $request, $delegationId)
+    {
+        $delegation = Delegation::findOrFail($delegationId);
+
+        $validated = $request->validate([
+            'delegate_ids' => 'required|array|min:1',
+            'delegate_ids.*' => 'integer|exists:delegates,id',
+
+            'arrival.mode' => 'required|string|in:flight,land,sea',
+            'arrival.airport_id' => 'nullable|integer|exists:dropdown_options,id',
+            'arrival.flight_no' => 'nullable|string|max:255',
+            'arrival.flight_name' => 'nullable|string|max:255',
+            'arrival.date_time' => 'nullable|date',
+            'arrival.status' => 'nullable|string|max:255',
+            'arrival.comment' => 'nullable|string',
+
+            'departure.mode' => 'required|string|in:flight,land,sea',
+            'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
+            'departure.flight_no' => 'nullable|string|max:255',
+            'departure.flight_name' => 'nullable|string|max:255',
+            'departure.date_time' => 'nullable|date',
+            'departure.status' => 'nullable|string|max:255',
+            'departure.comment' => 'nullable|string',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($validated['delegate_ids'] as $delegateId) {
+                $delegate = $delegation->delegates()->findOrFail($delegateId);
+
+                $delegate->transports()->create([
+                    'type' => 'arrival',
+                    'mode' => $validated['arrival']['mode'],
+                    'airport_id' => $validated['arrival']['airport_id'] ?? null,
+                    'flight_no' => $validated['arrival']['flight_no'] ?? null,
+                    'flight_name' => $validated['arrival']['flight_name'] ?? null,
+                    'date_time' => $validated['arrival']['date_time'] ?? null,
+                    'status' => $validated['arrival']['status'] ?? null,
+                    'comment' => $validated['arrival']['comment'] ?? null,
+                ]);
+
+                $delegate->transports()->create([
+                    'type' => 'departure',
+                    'mode' => $validated['departure']['mode'],
+                    'airport_id' => $validated['departure']['airport_id'] ?? null,
+                    'flight_no' => $validated['departure']['flight_no'] ?? null,
+                    'flight_name' => $validated['departure']['flight_name'] ?? null,
+                    'date_time' => $validated['departure']['date_time'] ?? null,
+                    'status' => $validated['departure']['status'] ?? null,
+                    'comment' => $validated['departure']['comment'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('delegations.show', $delegationId)
+                ->with('success', 'Travel details assigned to selected delegates successfully.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return back()->withErrors(['error' => 'Failed to save travel details: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
+
 
     protected function loadDropdownOptions()
     {
@@ -194,15 +312,15 @@ class DelegationController extends Controller
 
     protected function generateNextDelegateId()
     {
-        $lastDelegate = \App\Models\Delegation::where('delegate_id', 'like', 'DA%')
-            ->orderBy('delegate_id', 'desc')
+        $lastDelegate = \App\Models\Delegation::where('code', 'like', 'DA%')
+            ->orderBy('code', 'desc')
             ->first();
 
         if (!$lastDelegate) {
             return 'DA000001';
         }
 
-        $lastId = $lastDelegate->delegate_id;
+        $lastId = $lastDelegate->code;
         $number = intval(substr($lastId, 2));
 
         $nextNumber = $number + 1;

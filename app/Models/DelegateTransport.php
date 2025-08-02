@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class DelegateTransport extends Model
 {
     protected $fillable = [
-        'delegate_id',
+        'code',
         'type',
         'mode',
         'airport_id',

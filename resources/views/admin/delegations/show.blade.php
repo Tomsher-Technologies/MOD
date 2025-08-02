@@ -27,7 +27,7 @@
                         <li class="flex-1 ">
                             <span
                                 class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('delegation_id') }}:</span>
-                            <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->delegate_id }}</h4>
+                            <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->code }}</h4>
                         </li>
                         <li class="flex-1 ">
                             <span
@@ -127,10 +127,10 @@
                                         </td>
 
                                         <td class="px-4 py-3">{{ $delegate->designation_en ?? '-' }}</td>
-                                        <td class="px-4 py-3">{{ $delegate->internal_ranking ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $delegate->internalRanking->value ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->gender?->value ?? '-' }}</td>
-                                        <td class="px-4 py-3">{{ $delegate->parent?->delegate_id ?? '-' }}</td>
-                                        <td class="px-4 py-3">{{ $delegate->relationship ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $delegate->parent?->code ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $delegate->relationship->value ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->badge_printed ? 'Yes' : 'No' }}</td>
                                         <td class="px-4 py-3">{{ $delegation->participationStatus->value ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->accommodation ?? '-' }}</td>
@@ -447,8 +447,4 @@
             });
         });
     </script>
-
-
-
-
 @endsection

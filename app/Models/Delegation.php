@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Delegation extends Model
 {
     protected $fillable = [
-        'delegate_id',
+        'code',
         'invitation_from_id',
         'continent_id',
         'country_id',
@@ -24,6 +24,7 @@ class Delegation extends Model
                 $q->where('code', 'departments');
             });
     }
+
 
     public function continent()
     {

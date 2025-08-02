@@ -72,7 +72,7 @@
                     <tbody>
                         @foreach ($delegations as $delegation)
                             <tr class="odd:bg-[#F9F7ED]">
-                                <td class="p-3 text-start">{{ $delegation->delegate_id }}</td>
+                                <td class="p-3 text-start">{{ $delegation->code }}</td>
                                 <td class="p-3 text-start">{{ $delegation->invitationFrom->value ?? '-' }}</td>
 
                                 <td class="p-3 text-start">

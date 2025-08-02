@@ -69,6 +69,9 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::resource('delegations', DelegationController::class);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+    Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
+    Route::get('/delegations/submit-add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegates.addTravel');
+
 
 });
 

@@ -8,8 +8,8 @@ class Interview extends Model
 {
     protected $fillable = [
         'delegation_id',
-        'from_delegate_id',
-        'to_delegate_id',
+        'from_code',
+        'to_code',
         'type', // delegate to delegate or delegate to others - del_del or del_others
         'other_member_id',
         'date_time',
@@ -23,12 +23,12 @@ class Interview extends Model
     }
     public function fromDelegate()
     {
-        return $this->belongsTo(Delegate::class, 'from_delegate_id');
+        return $this->belongsTo(Delegate::class, 'from_code');
     }
 
     public function toDelegate()
     {
-        return $this->belongsTo(Delegate::class, 'to_delegate_id');
+        return $this->belongsTo(Delegate::class, 'to_code');
     }
 
     public function otherMember()
