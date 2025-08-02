@@ -3,7 +3,7 @@
 @section('content')
     <div class="dashboard-main-body ">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
-            <h2 class="font-semibold mb-0 !text-[22px] ">Add Flight Details </h2>
+            <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('add_travel_details') }} </h2>
             <a href="{{ route('delegations.show', $delegation->id) }}" id="add-attachment-btn"
                 class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                 <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -14,6 +14,18 @@
                 <span>Back</span>
             </a>
         </div>
+
+        @if ($errors->any())
+            <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
+                <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
             <div class="xl:col-span-12">
                 <div class="bg-white h-full w-full rounded-lg border-0 p-10">
@@ -58,63 +70,71 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }}
         </h2>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
-            <div class="xl:col-span-12 h-full">
-                <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                    <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
-                        <thead>
-                            <tr>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white"></th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('sl_no') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('title') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('name') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('designation') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('internal_ranking') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('gender') }}</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($delegation->delegates as $delegate)
-                                <tr class="text-sm align-[middle]">
-                                    <td class="px-4 py-2 border border-gray-200">
-                                        <input type="checkbox" name="delegate_ids[]" value="{{ $delegate->id }}"
-                                            class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded" />
-                                    </td>
-                                    <td class="px-4 py-2 border border-gray-200">{{ $delegate->code }}</td>
-                                    <td class="px-4 py-3 border border-gray-200">{{ $delegate->title->value }}</td>
-                                    <td class="px-4 py-3 border border-gray-200">
-                                        @if ($delegate->team_head)
-                                            <span
-                                                class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>
-                                        @endif
-                                        <div class="block">{{ $delegate->name_en }}</div>
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200">{{ $delegate->designation_en }}
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200">
-                                        {{ $delegate->internalRanking->value ?? '' }}
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200">{{ $delegate->gender->value }}</td>
-                                </tr>
-                            @endforeach
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-
         <form method="POST" action="{{ route('delegations.storeTravel', $delegation->id) }}"
             enctype="multipart/form-data">
             @csrf
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
+                <div class="xl:col-span-12 h-full">
+                    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                        <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
+                            <thead>
+                                <tr>
+                                    <th class="p-3 !bg-[#B68A35] text-start text-white"></th>
+                                    <th scope="col"
+                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                        {{ __db('sl_no') }}</th>
+                                    <th scope="col"
+                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                        {{ __db('title') }}</th>
+                                    <th scope="col"
+                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                        {{ __db('name') }}</th>
+                                    <th scope="col"
+                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                        {{ __db('designation') }}</th>
+                                    <th scope="col"
+                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                        {{ __db('internal_ranking') }}</th>
+                                    <th scope="col"
+                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                        {{ __db('gender') }}</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($delegation->delegates->filter(fn($d) => !$d->transport) as $delegate)
+                                    <tr class="text-sm align-[middle]">
+                                        <td class="px-4 py-2 border border-gray-200">
+                                            <input type="checkbox" name="delegate_ids[]" value="{{ $delegate->id }}"
+                                                class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded" />
+                                        </td>
+                                        <td class="px-4 py-2 border border-gray-200">{{ $delegate->code }}</td>
+                                        <td class="px-4 py-3 border border-gray-200">{{ $delegate->title->value }}</td>
+                                        <td class="px-4 py-3 border border-gray-200">
+                                            @if ($delegate->team_head)
+                                                <span
+                                                    class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>
+                                            @endif
+                                            <div class="block">{{ $delegate->value_en }}</div>
+                                        </td>
+                                        <td class="px-4 py-3 border border-gray-200">{{ $delegate->designation_en }}
+                                        </td>
+                                        <td class="px-4 py-3 border border-gray-200">
+                                            {{ $delegate->internalRanking->value ?? '' }}
+                                        </td>
+                                        <td class="px-4 py-3 border border-gray-200">{{ $delegate->gender->value }}</td>
+                                    </tr>
+                                @endforeach
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+
 
             <hr class="mx-6 border-neutral-200 h-10">
             <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('arrival') }}</h2>
@@ -141,10 +161,11 @@
                         <div>
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('arrival_airport') }}:</label>
-                            <select name="arrival[airport_id]" class="p-3 rounded-lg w-full border text-sm">
+                            <select name="arrival[airport_id]"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
                                 <option selected disabled>{{ __db('select_to_airport') }}</option>
                                 @foreach (getDropdown('airports')->options as $airport)
-                                    <option value="{{ $airport->id }}">{{ $airport->name }}</option>
+                                    <option value="{{ $airport->id }}">{{ $airport->value }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -173,10 +194,11 @@
                         <div>
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('arrival_status') }}:</label>
-                            <select name="arrival[status]" class="p-3 rounded-lg w-full border text-sm">
+                            <select name="arrival[status_id]"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
                                 <option selected disabled>{{ __db('select_status') }}</option>
                                 @foreach (getDropdown('arrival_status')->options as $status)
-                                    <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                    <option value="{{ $status->id }}">{{ $status->value }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -215,10 +237,11 @@
                         <div>
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('departure_airport') }}:</label>
-                            <select name="departure[airport_id]" class="p-3 rounded-lg w-full border text-sm">
+                            <select name="departure[airport_id]"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
                                 <option selected disabled>{{ __db('select_from_airport') }}</option>
                                 @foreach (getDropdown('airports')->options as $airport)
-                                    <option value="{{ $airport->id }}">{{ $airport->name }}</option>
+                                    <option value="{{ $airport->id }}">{{ $airport->value }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -251,10 +274,11 @@
                             <div>
                                 <label
                                     class="form-label block mb-1 text-gray-700 font-medium">{{ __db('departure_status') }}:</label>
-                                <select name="departure[status]" class="p-3 rounded-lg w-full border text-sm">
+                                <select name="departure[status_id]"
+                                    class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
                                     <option selected disabled>{{ __db('select_status') }}</option>
                                     @foreach (getDropdown('departure_status')->options as $status)
-                                        <option value="{{ $status->id }}">{{ $status->name }}</option>
+                                        <option value="{{ $status->id }}">{{ $status->value }}</option>
                                     @endforeach
                                 </select>
                             </div>
