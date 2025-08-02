@@ -185,103 +185,77 @@
                                     '<option value="' . $option->id . '">' . e($option->value) . '</option>';
                             }
                         }
+
+                        $attachmentsData = old('attachments')
+                            ? array_map(function ($att) {
+                                return [
+                                    'title' => $att['title'] ?? '',
+                                    'file' => null,
+                                    'document_date' => $att['document_date'] ?? '',
+                                ];
+                            }, old('attachments'))
+                            : [
+                                [
+                                    'title' => '',
+                                    'file' => null,
+                                    'document_date' => '',
+                                ],
+                            ];
                     @endphp
 
-                    <div id="attachment-container" class="col-span-12">
-                        @if (old('attachments'))
-                            @foreach (old('attachments') as $i => $oldAttachment)
+
+                    <div class="col-span-12" x-data="attachmentsComponent()">
+
+                        <div id="attachment-container">
+                            <template x-for="(attachment, index) in attachments" :key="index">
                                 <div class="grid grid-cols-12 gap-5 mb-2 attachment-row">
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('title') }}</label>
-                                        <select name="attachments[{{ $i }}][title]"
-                                            class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                                        <select :name="`attachments[${index}][title]`"
+                                            class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                            x-model="attachment.title">
                                             <option value="">{{ __db('select_title') }}</option>
                                             {!! $attachmentTitleOptionsHtml !!}
                                         </select>
-
-                                        @error('attachments.' . $i . '.title')
-                                            <div class="text-red-600">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('file') }}</label>
                                         <input
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
-                                            type="file" name="attachments[{{ $i }}][file]">
-                                        @error('attachments.' . $i . '.file')
-                                            <div class="text-red-600">{{ $message }}</div>
-                                        @enderror
-
+                                            type="file" :name="`attachments[${index}][file]`"
+                                            @change="e => attachment.file = e.target.files[0]">
                                     </div>
+
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('document_date') }}</label>
-                                        <input type="date" name="attachments[{{ $i }}][document_date]"
-                                            value="{{ $oldAttachment['document_date'] ?? '' }}"
-                                            class="w-full border border-gray-300 text-sm rounded-lg px-3 py-3 text-sm">
-
-                                        @error('attachments.' . $i . '.document_date')
-                                            <div class="text-red-600">{{ $message }}</div>
-                                        @enderror
-
+                                        <input type="date" :name="`attachments[${index}][document_date]`"
+                                            class="w-full border border-gray-300 text-sm rounded-lg px-3 py-3"
+                                            x-model="attachment.document_date">
                                     </div>
+
                                     <div class="col-span-3 flex items-end">
                                         <button type="button"
-                                            class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
+                                            class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                            @click="removeAttachment(index)"
+                                            x-show="attachments.length > 1">{{ __db('delete') ?: 'Delete' }}</button>
                                     </div>
                                 </div>
-                            @endforeach
-                        @else
-                            <div class="grid grid-cols-12 gap-5 mb-2 attachment-row">
-                                <div class="col-span-3">
-                                    <label class="form-label">{{ __db('title') }}</label>
-                                    <select name="attachments[0][title]"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                        <option value="">{{ __db('select_title') }}</option>
-                                        {!! $attachmentTitleOptionsHtml !!}
-                                    </select>
-
-                                    @error('attachments.0.title')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-span-3">
-                                    <label class="form-label">{{ __db('file') }}</label>
-                                    <input
-                                        class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
-                                        type="file" name="attachments[0][file]">
-                                    @error('attachments.0.file')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
-
-                                </div>
-                                <div class="col-span-3">
-                                    <label class="form-label">{{ __db('document_date') }}</label>
-                                    <input type="date" name="attachments[0][document_date]"
-                                        class="w-full border border-gray-300 text-sm rounded-lg px-3 py-3 text-sm">
-                                    @error('attachments.0.document_date')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
-
-                                </div>
-                                <div class="col-span-3 flex items-end">
-                                    <button type="button"
-                                        class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
-                                </div>
-                            </div>
-                        @endif
+                            </template>
+                        </div>
+                        <div class="col-span-12 mb-10">
+                            <button type="button" id="add-attachment-btn"
+                                class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3"
+                                @click="attachments.push({title:'', file:null, document_date:''})">
+                                <svg class="w-6 h-6 text-white me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M5 12h14m-7 7V5" />
+                                </svg>
+                                <span>{{ __db('add_attachments') }}</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="col-span-12 mb-10">
-                        <button type="button" id="add-attachment-btn"
-                            class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-                            <svg class="w-6 h-6 text-white me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="M5 12h14m-7 7V5" />
-                            </svg>
-                            <span>{{ __db('add_attachments') }}</span>
-                        </button>
-                    </div>
                 </div>
 
                 <hr class="mx-6 border-neutral-200 h-10">
@@ -317,171 +291,188 @@
                     $internalRankingDropdown = getDropDown('internal_ranking');
                     $internalRankingOptions = $internalRankingDropdown?->options ?? collect();
                     $internalRankingOptionsHtml = buildOptionsHtml($internalRankingOptions);
+
+                    $delegatesData = old('delegates')
+                        ? array_values(
+                            array_map(function ($d) {
+                                return [
+                                    'title' => $d['title'] ?? '',
+                                    'name_ar' => $d['name_ar'] ?? '',
+                                    'name_en' => $d['name_en'] ?? '',
+                                    'designation_en' => $d['designation_en'] ?? '',
+                                    'designation_ar' => $d['designation_ar'] ?? '',
+                                    'gender_id' => $d['gender_id'] ?? '',
+                                    'parent_id' => $d['parent_id'] ?? '',
+                                    'relationship' => $d['relationship'] ?? '',
+                                    'internal_ranking' => $d['internal_ranking'] ?? '',
+                                    'note' => $d['note'] ?? '',
+                                    'team_head' => !empty($d['team_head']),
+                                    'badge_printed' => !empty($d['badge_printed']),
+                                ];
+                            }, old('delegates')),
+                        )
+                        : [
+                            [
+                                'title' => '',
+                                'name_ar' => '',
+                                'name_en' => '',
+                                'designation_en' => '',
+                                'designation_ar' => '',
+                                'gender_id' => '',
+                                'parent_id' => '',
+                                'relationship' => '',
+                                'internal_ranking' => '',
+                                'note' => '',
+                                'team_head' => false,
+                                'badge_printed' => false,
+                            ],
+                        ];
                 @endphp
 
-                <div id="delegate-container" class="space-y-4">
-                    @if (old('delegates'))
-                        @foreach (old('delegates') as $i => $oldDelegate)
+                <div class="space-y-4" x-data="delegateComponent()">
+
+                    <div id="delegate-container">
+                        <template x-for="(delegate, index) in delegates" :key="index">
                             <div class="delegate-row border rounded p-4 grid grid-cols-12 gap-4 relative">
                                 <button type="button"
                                     class="delete-row absolute top-2 end-2 text-red-600 hover:text-red-800"
-                                    title="Remove delegate">&times;</button>
+                                    title="Remove delegate" @click="removeDelegate(index)"
+                                    x-show="delegates.length > 1">&times;</button>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Title') }}</label>
-                                    <select name="delegates[{{ $i }}][title]"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                                    <label class="form-label">{{ db__('title') }}</label>
+                                    <select :name="`delegates[${index}][title]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.title">
                                         <option value="">{{ __db('select_title') }}</option>
                                         {!! $titleOptionsHtml !!}
                                     </select>
-                                    @error('delegates.' . $i . '.title')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Name (AR)') }}</label>
-                                    <input type="text" name="delegates[{{ $i }}][name_ar]"
-                                        value="{{ $oldDelegate['name_ar'] ?? '' }}"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    @error('delegates.' . $i . '.name_ar')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">{{ db__('name_ar') }}</label>
+                                    <input type="text" :name="`delegates[${index}][name_ar]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.name_ar">
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Name (EN)') }}</label>
-                                    <input type="text" name="delegates[{{ $i }}][name_en]"
-                                        value="{{ $oldDelegate['name_en'] ?? '' }}"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    @error('delegates.' . $i . '.name_en')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">{{ db__('name_en') }}</label>
+                                    <input type="text" :name="`delegates[${index}][name_en]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.name_en">
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Designation (EN)') }}</label>
-                                    <input type="text" name="delegates[{{ $i }}][designation_en]"
-                                        value="{{ $oldDelegate['designation_en'] ?? '' }}"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    @error('delegates.' . $i . '.designation_en')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">{{ db__('designation_en') }}</label>
+                                    <input type="text" :name="`delegates[${index}][designation_en]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.designation_en">
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Designation (AR)') }}</label>
-                                    <input type="text" name="delegates[{{ $i }}][designation_ar]"
-                                        value="{{ $oldDelegate['designation_ar'] ?? '' }}"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                                    @error('delegates.' . $i . '.designation_ar')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">{{ db__('designation_ar') }}</label>
+                                    <input type="text" :name="`delegates[${index}][designation_ar]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.designation_ar">
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Gender') }}</label>
-                                    <select name="delegates[{{ $i }}][gender_id]"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                                    <label class="form-label">{{ db__('gender') }}</label>
+                                    <select :name="`delegates[${index}][gender_id]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.gender_id">
                                         <option value="">{{ __db('select_gender') }}</option>
                                         {!! $genderOptionsHtml !!}
                                     </select>
-                                    @error('delegates.' . $i . '.gender_id')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Parent') }}</label>
-                                    <select name="delegates[{{ $i }}][parent_id]"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                                    <label class="form-label">{{ db__('parent') }}</label>
+                                    <select :name="`delegates[${index}][parent_id]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.parent_id">
                                         <option value="">{{ __db('select_parent_id') }}</option>
                                         @if (isset($parentDelegates))
                                             @foreach ($parentDelegates as $p)
-                                                <option value="{{ $p->id }}"
-                                                    {{ ($oldDelegate['parent_id'] ?? '') == $p->id ? 'selected' : '' }}>
-                                                    {{ $p->name_en }}</option>
+                                                <option value="{{ $p->id }}">{{ $p->name_en }}</option>
                                             @endforeach
                                         @endif
                                     </select>
-                                    @error('delegates.' . $i . '.parent_id')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Relationship') }}</label>
-                                    <select name="delegates[{{ $i }}][relationship]"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                                    <label class="form-label">{{ db__('relationship') }}</label>
+                                    <select :name="`delegates[${index}][relationship]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.relationship">
                                         <option value="">{{ __db('select_relationship') }}</option>
                                         {!! $relationshipOptionsHtml !!}
                                     </select>
-                                    @error('delegates.' . $i . '.relationship')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
                                 </div>
 
                                 <div class="col-span-3">
-                                    <label class="form-label">{{ __('Internal Ranking') }}</label>
-                                    <select name="delegates[{{ $i }}][internal_ranking]"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
+                                    <label class="form-label">{{ db__('internal_ranking') }}</label>
+                                    <select :name="`delegates[${index}][internal_ranking]`"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                        x-model="delegate.internal_ranking">
                                         <option value="">{{ __db('select_internal_ranking') }}</option>
                                         {!! $internalRankingOptionsHtml !!}
                                     </select>
-                                    @error('delegates.' . $i . '.internal_ranking')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
                                 </div>
 
                                 <div class="col-span-6">
-                                    <label class="form-label">{{ __('Note') }}</label>
-                                    <textarea name="delegates[{{ $i }}][note]" rows="3"
-                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">{{ $oldDelegate['note'] ?? '' }}</textarea>
-                                    @error('delegates.' . $i . '.note')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
+                                    <label class="form-label">{{ db__('note') }}</label>
+                                    <textarea :name="`delegates[${index}][note]`" rows="3"
+                                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" x-model="delegate.note"></textarea>
                                 </div>
 
                                 <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
                                     <div class="flex items-center gap-3">
-                                        <input type="checkbox" id="team-head-{{ $i }}"
-                                            name="delegates[{{ $i }}][team_head]" value="1"
-                                            class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                        <label for="team-head-{{ $i }}"
-                                            class="text-sm text-gray-700">{{ __('Team Head') }}</label>
+                                        <input type="checkbox" :id="`team-head-${index}`"
+                                            :name="`delegates[${index}][team_head]`" value="1"
+                                            class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            x-model="delegate.team_head" />
+                                        <label :for="`team-head-${index}`"
+                                            class="text-sm text-gray-700">{{ db__('team_head') }}</label>
                                     </div>
-                                    <span class="col-span-12 pt-">
-                                        <div class="flex items-center gap-3">
-                                            <input type="checkbox" id="badge-printed-{{ $i }}"
-                                                name="delegates[{{ $i }}][badge_printed]" value="1"
-                                                class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                            <label for="badge-printed-{{ $i }}"
-                                                class="text-sm text-gray-700">{{ __('Badge Printed') }}</label>
-                                        </div>
-                                    </span>
+                                    <div class="flex items-center gap-3">
+                                        <input type="checkbox" :id="`badge-printed-${index}`"
+                                            :name="`delegates[${index}][badge_printed]`" value="1"
+                                            class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            x-model="delegate.badge_printed" />
+                                        <label :for="`badge-printed-${index}`"
+                                            class="text-sm text-gray-700">{{ db__('badge_printed') }}</label>
+                                    </div>
                                 </span>
-
                             </div>
-                        @endforeach
-                    @endif
-                </div>
-
-                <div class="flex justify-between items-center mt-5">
-                    <button type="button" id="add-delegate-btn"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-6">Add
-                        Delegate</button>
-                    <div class="flex gap-4">
-
-                        <button type="submit"
-                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit') }}</button>
-                        <button type="submit" name="submit_add_flight" value="1"
-                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit_add_flight') }}</button>
-                        <button type="submit" name="submit_add_delegate" value="1"
-                            class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8">{{ __db('submit_add_delegate') }}</button>
+                        </template>
                     </div>
 
+
+                    <div class="flex justify-between items-center mt-5">
+
+                        <button type="button" id="add-delegate-btn"
+                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-6" @click="addDelegate()">
+                            {{ __db('add_delegate') }}
+                        </button>
+
+                        <div class="flex gap-4">
+
+                            <button type="submit"
+                                class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit') }}</button>
+                            <button type="submit" name="submit_add_flight" value="1"
+                                class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit_add_flight') }}</button>
+                            <button type="submit" name="submit_add_delegate" value="1"
+                                class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8">{{ __db('submit_add_delegate') }}</button>
+                        </div>
+
+                    </div>
                 </div>
+
             </div>
+
+
 
         </form>
     </div>
@@ -489,159 +480,72 @@
 
 @section('script')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let index = {{ old('attachments') ? count(old('attachments')) : 0 }};
-            let attachmentOptionsHtml = `{!! $attachmentTitleOptionsHtml !!}`;
-
-            document.getElementById('add-attachment-btn').onclick = function(e) {
-                e.preventDefault();
-                let container = document.getElementById('attachment-container');
-                let html = `<div class="grid grid-cols-12 gap-5 mb-2 attachment-row">
-            <div class="col-span-3">
-                <label class="form-label">{{ __db('title') }}</label>
-                <select name="attachments[${index}][title]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                    <option value="">{{ __db('select_title') }}</option>
-                    ${attachmentOptionsHtml}
-                </select>
-            </div>
-            <div class="col-span-3">
-                <label class="form-label">{{ __db('file') }}</label>
-                <input class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
-                    type="file" name="attachments[${index}][file]">
-            </div>
-            <div class="col-span-3">
-                <label class="form-label">{{ __db('document_date') }}</label>
-                <input type="date" name="attachments[${index}][document_date]"
-                    class="w-full border border-gray-300 text-sm rounded-lg px-3 py-3 text-sm">
-            </div>
-            <div class="col-span-3 flex items-end">
-                <button type="button" class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
-            </div>
-        </div>`;
-                container.insertAdjacentHTML('beforeend', html);
-                index++;
-            };
-
-            document.getElementById('attachment-container').addEventListener('click', function(e) {
-                if (e.target.classList.contains('delete-row')) {
-                    e.preventDefault();
-                    e.target.closest('.attachment-row').remove();
-                }
-            });
-        });
+        window.attachmentsData = @json($attachmentsData);
     </script>
 
     <script>
-        const genderOptionsHtml = `{!! $genderOptionsHtml !!}`;
-        const relationshipOptionsHtml = `{!! $relationshipOptionsHtml !!}`;
-        const titleOptionsHtml = `{!! $titleOptionsHtml !!}`;
-        const internalRankingOptionsHtml = `{!! $internalRankingOptionsHtml !!}`;
+        window.delegatesData = @json($delegatesData);
+    </script>
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const delegateContainer = document.getElementById('delegate-container');
-            let delegateIndex = {{ old('delegates') ? count(old('delegates')) : 0 }};
-
-            document.getElementById('add-delegate-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-
-                const html = `
-                <div class="delegate-row border rounded p-4 grid grid-cols-12 gap-4 relative">
-                    <button type="button" class="delete-row absolute top-2 end-2 text-red-600 hover:text-red-800" title="Remove delegate">&times;</button>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Title</label>
-                        <select name="delegates[${delegateIndex}][title]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                            <option value="">Select Title</option>
-                            ${titleOptionsHtml}
-                        </select>
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Name (AR)</label>
-                        <input type="text" name="delegates[${delegateIndex}][name_ar]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Name (EN)</label>
-                        <input type="text" name="delegates[${delegateIndex}][name_en]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Designation (EN)</label>
-                        <input type="text" name="delegates[${delegateIndex}][designation_en]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Designation (AR)</label>
-                        <input type="text" name="delegates[${delegateIndex}][designation_ar]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600" />
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Gender</label>
-                        <select name="delegates[${delegateIndex}][gender_id]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                            <option value="">Select Gender</option>
-                            ${genderOptionsHtml}
-                        </select>
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Parent</label>
-                        <select name="delegates[${delegateIndex}][parent_id]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                            <option value="">Select Parent</option>
-                        </select>
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Relationship</label>
-                        <select name="delegates[${delegateIndex}][relationship]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                            <option value="">Select Relationship</option>
-                            ${relationshipOptionsHtml}
-                        </select>
-                    </div>
-
-                    <div class="col-span-3">
-                        <label class="form-label">Internal Ranking</label>
-                        <select name="delegates[${delegateIndex}][internal_ranking]" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600">
-                            <option value="">Select Ranking</option>
-                            ${internalRankingOptionsHtml}
-                        </select>
-                    </div>
-
-                    <div class="col-span-6">
-                        <label class="form-label">Note</label>
-                        <textarea name="delegates[${delegateIndex}][note]" rows="3" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"></textarea>
-                    </div>
-
-
-                     <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
-                        <div class="flex items-center gap-3">
-                            <input type="checkbox" id="team-head-${delegateIndex}" name="delegates[${delegateIndex}][team_head]" value="1"
-                                class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                            <label for="team-head-${delegateIndex}"
-                                class="text-sm text-gray-700">{{ __('Team Head') }}</label>
-                        </div>
-                        <span class="col-span-12 pt-">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" id="badge-printed-${delegateIndex}" name="delegates[${delegateIndex}][badge_printed]" value="1"
-                                    class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                <label for="badge-printed-${delegateIndex}"
-                                    class="text-sm text-gray-700">{{ __('Badge Printed') }}</label>
-                            </div>
-                        </span>
-                    </span>
-
-                </div>
-                `;
-
-                delegateContainer.insertAdjacentHTML('beforeend', html);
-                delegateIndex++;
-            });
-
-            delegateContainer.addEventListener('click', function(e) {
-                if (e.target.classList.contains('delete-row')) {
-                    e.target.closest('.delegate-row').remove();
+    <script>
+        function attachmentsComponent() {
+            return {
+                attachments: window.attachmentsData || [{
+                    title: '',
+                    file: null,
+                    document_date: ''
+                }],
+                addAttachment() {
+                    this.attachments.push({
+                        title: '',
+                        file: null,
+                        document_date: ''
+                    });
+                },
+                removeAttachment(idx) {
+                    this.attachments.splice(idx, 1);
                 }
-            });
-        });
+            }
+        }
+    </script>
+
+    <script>
+        function delegateComponent() {
+            return {
+                delegates: window.delegatesData || [{
+                    title: '',
+                    name_ar: '',
+                    name_en: '',
+                    designation_en: '',
+                    designation_ar: '',
+                    gender_id: '',
+                    parent_id: '',
+                    relationship: '',
+                    internal_ranking: '',
+                    note: '',
+                    team_head: false,
+                    badge_printed: false
+                }],
+                addDelegate() {
+                    this.delegates.push({
+                        title: '',
+                        name_ar: '',
+                        name_en: '',
+                        designation_en: '',
+                        designation_ar: '',
+                        gender_id: '',
+                        parent_id: '',
+                        relationship: '',
+                        internal_ranking: '',
+                        note: '',
+                        team_head: false,
+                        badge_printed: false
+                    });
+                },
+                removeDelegate(idx) {
+                    this.delegates.splice(idx, 1);
+                }
+            }
+        }
     </script>
 @endsection

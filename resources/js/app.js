@@ -4,9 +4,11 @@ window.$ = window.jQuery = jQuery;
 import select2 from "select2";
 import "select2/dist/css/select2.min.css";
 
-select2(window.$);
+import Alpine from "alpinejs";
+window.Alpine = Alpine;
+Alpine.start();
 
-import "jquery.repeater";
+select2(window.$);
 
 import "toastr/build/toastr.min.css";
 import "sweetalert2/dist/sweetalert2.min.css";
