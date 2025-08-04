@@ -369,9 +369,6 @@ class DelegationController extends Controller
 
     public function searchByCode(Request $request)
     {
-        if (!$request->ajax()) {
-            abort(404);
-        }
 
         $code = $request->query('code');
         if (!$code) {

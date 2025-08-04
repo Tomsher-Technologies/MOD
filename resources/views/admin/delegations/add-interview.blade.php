@@ -201,9 +201,9 @@
                         <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('status') }}:</label>
                         <select name="status" class="p-3 rounded-lg w-full border text-sm">
                             <option selected disabled>{{ __db('select_status') }}</option>
-                            @foreach (getDropdown('interview_status')->options as $status)
+                            {{-- @foreach (getDropdown('interview_status')->options as $status)
                                 <option value="{{ $status->id }}">{{ $status->value }}</option>
-                            @endforeach
+                            @endforeach --}}
                         </select>
                     </div>
 
@@ -353,7 +353,7 @@
                     return;
                 }
 
-                fetch(`/admin/delegations/search-by-code?code=${encodeURIComponent(code)}`, {
+                fetch(`/mod-admin/delegations/search-by-code?code=${encodeURIComponent(code)}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
                         }
