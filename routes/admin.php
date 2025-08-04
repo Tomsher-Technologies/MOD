@@ -66,13 +66,20 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/other-interview-members/edit/{id}', [OtherMemberController::class, 'edit'])->name('otherInterviewMembers.edit');
 
     // Manage Delegation Members
+
+    Route::get('/delegations/search', [DelegationController::class, 'search'])->name('delegations.search');
+
     Route::resource('delegations', DelegationController::class);
+    Route::get('/delegations-get',  [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
     Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegates.addTravel');
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
+    Route::get('/delegations/add-interview/{id}', [DelegationController::class, 'addInterview'])->name('delegates.addInterview');
+    Route::post('/delegations/{delegation}/interview', [DelegationController::class, 'storeInterview'])->name('delegations.storeInterview');
 
-
+    Route::get('/delegations/search-by-code', [DelegationController::class, 'searchByCode'])->name('delegations.searchByCode');
+    Route::get('/delegations/{delegation}/members', [DelegationController::class, 'members'])->name('delegations.members');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Delegation;
 use App\Models\Dropdown;
+use App\Models\Interview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class DelegationController extends Controller
 {
@@ -15,8 +18,8 @@ class DelegationController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_delegations',  ['only' => ['index', 'setDefault']]);
-        $this->middleware('permission:add_delegations',  ['only' => ['create', 'store']]);
+        $this->middleware('permission:manage_delegations',  ['only' => ['index', 'setDefault', 'search', 'members']]);
+        $this->middleware('permission:add_delegations',  ['only' => ['create', 'store', 'addInterview', 'addTravel', 'storeInterview', 'storeTravel']]);
         $this->middleware('permission:edit_delegations',  ['only' => ['edit', 'update']]);
         $this->middleware('permission:view_delegations',  ['only' => ['show', 'index']]);
     }
@@ -101,6 +104,24 @@ class DelegationController extends Controller
         // ]);
 
         return view('admin.delegations.add-travel', compact('delegation'));
+    }
+
+    public function addInterview($id)
+    {
+        $delegation = \App\Models\Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates',
+        ])->findOrFail($id);
+
+        // return response()->json([
+        //     'delegation' => $delegation,
+        // ]);
+
+        return view('admin.delegations.add-interview', compact('delegation'));
     }
 
 
@@ -215,8 +236,8 @@ class DelegationController extends Controller
 
             if ($request->has('submit_and_exit')) {
                 return redirect()->route('delegations.index')->with('success', 'Delegation created.');
-            } elseif ($request->has('submit_add_delegate')) {
-                return redirect()->route('delegates.create', ['delegation_id' => $delegation->id]);
+            } elseif ($request->has('submit_add_interview')) {
+                return redirect()->route('delegates.addInterview', ['delegation_id' => $delegation->id]);
             } elseif ($request->has('submit_add_travel')) {
                 return redirect()->route('delegates.addTravel', ['delegation_id' => $delegation->id]);
             }
@@ -296,6 +317,114 @@ class DelegationController extends Controller
             return back()->withErrors(['error' => 'Failed to save travel details: ' . $e->getMessage()])
                 ->withInput();
         }
+    }
+
+    public function storeInterview(Request $request, $delegationId)
+    {
+        $delegation = Delegation::findOrFail($delegationId);
+
+        $validator = Validator::make($request->all(), [
+            'delegate_ids' => 'required|array|min:1',
+            'delegate_ids.*' => 'integer|exists:delegates,id',
+            'date_time' => 'required|date',
+            'interview_type' => ['required', Rule::in(['delegation', 'other'])],
+            'interview_with_delegation' => 'required_if:interview_type,delegation|string|max:255|nullable',
+            'interview_with_other_member_id' => 'required_if:interview_type,other|integer|nullable',
+            'status' => 'required|string|max:50',
+            'members' => 'nullable|string|max:255',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $data = $validator->validated();
+
+        foreach ($data['delegate_ids'] as $delegateIdSelected) {
+            $interviewData = [
+                'delegation_id' => $delegation->id,
+                'from_code' => $delegateIdSelected,
+                'date_time' => $data['date_time'],
+                'type' => $data['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
+                'status' => $data['status'],
+                'comment' => $data['comment'] ?? null,
+            ];
+
+            if ($data['interview_type'] === 'delegation') {
+                $interviewData['to_code'] = $data['interview_with_delegation'];
+                $interviewData['other_member_id'] = null;
+            } else {
+                $interviewData['to_code'] = null;
+                $interviewData['other_member_id'] = $data['interview_with_other_member_id'];
+            }
+
+            Interview::create($interviewData);
+        }
+
+        return redirect()->route('delegations.show', $delegation->id)
+            ->with('success', 'Interview(s) added successfully.');
+    }
+
+
+    public function searchByCode(Request $request)
+    {
+        if (!$request->ajax()) {
+            abort(404);
+        }
+
+        $code = $request->query('code');
+        if (!$code) {
+            return response()->json(['success' => false, 'message' => 'Code required.']);
+        }
+
+        $delegation = Delegation::with('delegates')->where('code', $code)->first();
+
+        if (!$delegation) {
+            return response()->json(['success' => false, 'message' => 'Delegation not found.']);
+        }
+
+        return response()->json(['success' => true, 'delegation' => [
+            'id' => $delegation->id,
+            'code' => $delegation->code,
+            'delegates' => $delegation->delegates->map(fn($d) => ['id' => $d->id, 'value_en' => $d->value_en]),
+        ]]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = Delegation::query();
+
+        if ($continentId = $request->query('continent_id')) {
+            $query->where('continent_id', $continentId);
+        }
+
+        if ($countryId = $request->query('country_id')) {
+            $query->where('country_id', $countryId);
+        }
+
+        $delegations = $query->with('invitationFrom')->get();
+
+        return response()->json([
+            'success' => true,
+            'delegations' => $delegations->map(fn($d) => [
+                'id' => $d->id,
+                'code' => $d->code,
+                'invitationFrom_value' => $d->invitationFrom->value ?? '',
+            ]),
+        ]);
+    }
+
+    public function members($delegationId)
+    {
+        $delegation = Delegation::with('delegates')->findOrFail($delegationId);
+
+        $members = $delegation->delegates->map(fn($d) => [
+            'id' => $d->id,
+            'name_en' => $d->name_en,
+        ]);
+
+        return response()->json(['success' => true, 'members' => $members]);
     }
 
 

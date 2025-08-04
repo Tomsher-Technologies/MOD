@@ -236,7 +236,7 @@ function getAllEvents()
 
 function getDropDown($key)
 {
-    return \App\Models\Dropdown::where('code', $key)->with('options')->first();
+    return \App\Models\Dropdown::where('code', $key)->with('options')->first() ?? [];
 }
 
 function storeUploadedFileToModuleFolder($file, $folder, $parentId, $subDir = 'files')

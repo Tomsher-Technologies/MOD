@@ -543,12 +543,12 @@
 
             <div class="flex gap-4">
 
-                <button type="submit"
+                <button type="submit" name="submit_exit"
                     class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit') }}</button>
                 <button type="submit" name="submit_add_travel" value="1"
                     class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit_add_flight') }}</button>
-                <button type="submit" name="submit_add_delegate" value="1"
-                    class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8">{{ __db('submit_add_delegate') }}</button>
+                <button type="submit" name="submit_add_interview" value="1"
+                    class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8">{{ __db('submit_add_interview') }}</button>
             </div>
 
         </div>

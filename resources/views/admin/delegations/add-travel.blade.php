@@ -307,7 +307,7 @@
                     class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg py-[1px] h-12">{{ __db('submit_and_exit') }}</button>
 
                 <button type="submit" id="submit_add_interview"
-                    class="btn text-md mb-[-10px] !bg-[#D7BC6D] text-white rounded-lg py-[1px] h-12">{{ __db('submit_and_add_interview') }}</button>
+                    class="btn text-md mb-[-10px] !bg-[#D7BC6D] text-white rounded-lg py-[1px] h-12">{{ __db('submit_add_interview') }}</button>
             </div>
 
 
