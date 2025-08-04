@@ -85,6 +85,7 @@
                     <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                         <thead>
                             <tr>
+                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('sl_no') }}</th>
                                 <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('title') }}</th>
                                 <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('name') }}</th>
                                 <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white">
@@ -114,6 +115,8 @@
                             @if ($delegation->delegates->count())
                                 @foreach ($delegation->delegates as $delegate)
                                     <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
+                                        <td class="px-4 py-3">{{ $loop->iteration }}</td>
+
                                         <td class="px-4 py-3">{{ $delegate->title->value ?? '-' }}</td>
 
                                         <td class="px-4 py-3">
@@ -129,13 +132,12 @@
                                         <td class="px-4 py-3">{{ $delegate->designation_en ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->internalRanking->value ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->gender?->value ?? '-' }}</td>
-                                        <td class="px-4 py-3">{{ $delegate->parent?->code ?? '-' }}</td>
+                                        <td class="px-4 py-3">{{ $delegate->parent?->name_en ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->relationship->value ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->badge_printed ? 'Yes' : 'No' }}</td>
                                         <td class="px-4 py-3">{{ $delegation->participationStatus->value ?? '-' }}</td>
                                         <td class="px-4 py-3">{{ $delegate->accommodation ?? '-' }}</td>
                                         <td class="px-4 py-2">
-                                            {{-- {{ $delegate->arrival_status ?? '-' }} --}}
                                             <svg class=" cursor-pointer" width="36" height="30"
                                                 data-modal-target="default-modal3-{{ $delegate->id }}"
                                                 data-modal-toggle="default-modal3-{{ $delegate->id }}"
@@ -406,7 +408,7 @@
                                     {{ $attachment->created_at ? $attachment->created_at->format('d-m-Y') : '-' }}
                                 </td>
                                 <td class="px-4 py-3">
-                                    {{ $attachment->document_date ? \Illuminate\Support\Carbon::parse($attachment->document_date)->format('d-m-Y') : '-' }}
+                                    {{ $attachment->document_date ?? '-' }}
                                 </td>
                             </tr>
                         @endforeach
@@ -431,7 +433,7 @@
             <div class="relative w-full max-w-2xl mx-auto">
                 <div class="bg-white rounded-lg shadow dark:bg-gray-700">
                     <div class="flex items-start justify-between p-4 border-b rounded-t">
-                        <h3 class="text-xl font-semibold text-gray-900">Flight Information for
+                        <h3 class="text-xl font-semibold text-gray-900">{{ __db('transport_information_for') }}
                             {{ $delegate->name_en ?? '-' }}</h3>
                         <button type="button"
                             class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
@@ -443,57 +445,72 @@
                         </button>
                     </div>
                     <div class="p-6 space-y-6">
-                        <h3 class="text-xl font-semibold text-gray-900 pb-2">Arrival</h3>
+                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
+
+                        @php
+                            $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                        @endphp
+
                         <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">To Airport</p>
-                                <p class="text-base">
-                                    {{ $delegate->delegateTransports->where('type', 'arrival')->first()?->airport->value ?? '-' }}
-                                </p>
-                            </div>
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">Flight No</p>
-                                <p class="text-base">
-                                    {{ $delegate->delegateTransports->where('type', 'arrival')->first()?->flight_no ?? '-' }}
-                                </p>
-                            </div>
+                            @if ($arrival && $arrival->airport && $arrival->airport->value)
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                                    <p class="text-base">
+                                        {{ $delegate->delegateTransports->where('type', 'arrival')->first()?->airport->value ?? '-' }}
+                                    </p>
+                                </div>
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                    <p class="text-base">
+                                        {{ $delegate->delegateTransports->where('type', 'arrival')->first()?->flight_no ?? '-' }}
+                                    </p>
+                                </div>
+                                <div class="py-4 !pb-0">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                    <p class="text-base">
+                                        {{ $delegate->delegateTransports->where('type', 'arrival')->first()?->flight_name ?? '-' }}
+                                    </p>
+                                </div>
+                            @endif
                             <div class="py-4 !pb-0">
-                                <p class="font-medium text-gray-600">Flight Name</p>
+                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
                                 <p class="text-base">
-                                    {{ $delegate->delegateTransports->where('type', 'arrival')->first()?->flight_name ?? '-' }}
-                                </p>
-                            </div>
-                            <div class="py-4 !pb-0">
-                                <p class="font-medium text-gray-600">Date & Time</p>
-                                <p class="text-base">
-                                    {{ optional($delegate->delegateTransports->where('type', 'arrival')->first()?->date_time)->format('F d, Y - H:i') ?? '-' }}
+                                    {{ $arrival->date_time ?? '-' }}
                                 </p>
                             </div>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 pb-2">Departure</h3>
+
+
+                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
+                        @php
+                            $departure = $delegate->delegateTransports->where('type', 'departure')->first();
+                        @endphp
+
                         <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            <div class="border-b py-4 !pt-0">
-                                <p class="font-medium text-gray-600">From Airport</p>
-                                <p class="text-base">
-                                    {{ $delegate->delegateTransports->where('type', 'departure')->first()?->airport->value ?? '-' }}
-                                </p>
-                            </div>
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">Flight No</p>
-                                <p class="text-base">
-                                    {{ $delegate->delegateTransports->where('type', 'departure')->first()?->flight_no ?? '-' }}
-                                </p>
-                            </div>
+                            @if ($departure && $departure->airport && $departure->airport->value)
+                                <div class="border-b py-4 !pt-0">
+                                    <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                    <p class="text-base">
+                                        {{ $delegate->delegateTransports->where('type', 'departure')->first()?->airport->value ?? '-' }}
+                                    </p>
+                                </div>
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                    <p class="text-base">
+                                        {{ $delegate->delegateTransports->where('type', 'departure')->first()?->flight_no ?? '-' }}
+                                    </p>
+                                </div>
+                                <div class="py-4 !pb-0">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                    <p class="text-base">
+                                        {{ $delegate->delegateTransports->where('type', 'departure')->first()?->flight_name ?? '-' }}
+                                    </p>
+                                </div>
+                            @endif
                             <div class="py-4 !pb-0">
-                                <p class="font-medium text-gray-600">Flight Name</p>
+                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
                                 <p class="text-base">
-                                    {{ $delegate->delegateTransports->where('type', 'departure')->first()?->flight_name ?? '-' }}
-                                </p>
-                            </div>
-                            <div class="py-4 !pb-0">
-                                <p class="font-medium text-gray-600">Date & Time</p>
-                                <p class="text-base">
-                                    {{ optional($delegate->delegateTransports->where('type', 'departure')->first()?->date_time)->format('F d, Y - H:i') ?? '-' }}
+                                    {{ $departure->date_time ?? '-' }}
                                 </p>
                             </div>
                         </div>
@@ -502,8 +519,6 @@
             </div>
         </div>
     @endforeach
-
-
 @endsection
 
 @section('script')

@@ -123,7 +123,9 @@
                                         <td class="px-4 py-3 border border-gray-200">
                                             {{ $delegate->internalRanking->value ?? '' }}
                                         </td>
-                                        <td class="px-4 py-3 border border-gray-200">{{ $delegate->gender->value }}</td>
+                                        <td class="px-4 py-3 border border-gray-200">
+                                            {{ $delegate->gender->value ?? '' }}
+                                        </td>
                                     </tr>
                                 @endforeach
 

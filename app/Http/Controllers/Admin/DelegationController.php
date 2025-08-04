@@ -77,6 +77,10 @@ class DelegationController extends Controller
 
         // $interviews = \App\Models\Interview::with('attendees')->where('delegation_id', $id)->get();
 
+        // return response()->json([
+        //     'delegation' => $delegation,
+        // ]);
+
         return view('admin.delegations.show', compact('delegation'));
     }
 
@@ -119,10 +123,10 @@ class DelegationController extends Controller
             // 'delegates.*.tmp_id' => 'required',
             'delegates.*.title_id' => 'nullable|string',
             'delegates.*.name_ar' => 'nullable|string',
-            'delegates.*.name_en' => 'nullable|string',
+            'delegates.*.name_en' => 'required|string',
             'delegates.*.designation_en' => 'nullable|string',
             'delegates.*.designation_ar' => 'nullable|string',
-            'delegates.*.gender_id' => 'nullable|exists:dropdown_options,id',
+            'delegates.*.gender_id' => 'required|exists:dropdown_options,id',
             'delegates.*.parent_id' => 'nullable|exists:delegates,id',
             'delegates.*.relationship' => 'nullable|string',
             'delegates.*.internal_ranking_id' => 'nullable|string',
