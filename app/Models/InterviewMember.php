@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class InterviewMember extends Model
 {
     protected $fillable = [
-        'type',
+        'type',  // 'from' or 'to'
         'member_id',
         'interview_id',
     ];

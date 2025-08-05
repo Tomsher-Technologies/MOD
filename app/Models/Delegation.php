@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Delegation extends Model
 {
     protected $fillable = [
+        'created_by',
         'code',
         'invitation_from_id',
         'continent_id',

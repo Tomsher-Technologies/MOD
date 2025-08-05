@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Delegation;
 use App\Models\Dropdown;
 use App\Models\Interview;
+use App\Models\InterviewMember;
+use App\Models\OtherInterviewMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -117,11 +119,13 @@ class DelegationController extends Controller
             'delegates',
         ])->findOrFail($id);
 
+        $otherMembers = OtherInterviewMember::all();
+
         // return response()->json([
-        //     'delegation' => $delegation,
+        //     'otherMembers' => $otherMembers,
         // ]);
 
-        return view('admin.delegations.add-interview', compact('delegation'));
+        return view('admin.delegations.add-interview', compact('delegation', 'otherMembers'));
     }
 
 
@@ -321,6 +325,9 @@ class DelegationController extends Controller
 
     public function storeInterview(Request $request, $delegationId)
     {
+
+        // return response()->json($request->all());
+
         $delegation = Delegation::findOrFail($delegationId);
 
         $validator = Validator::make($request->all(), [
@@ -328,10 +335,11 @@ class DelegationController extends Controller
             'delegate_ids.*' => 'integer|exists:delegates,id',
             'date_time' => 'required|date',
             'interview_type' => ['required', Rule::in(['delegation', 'other'])],
-            'interview_with_delegation' => 'required_if:interview_type,delegation|string|max:255|nullable',
-            'interview_with_other_member_id' => 'required_if:interview_type,other|integer|nullable',
+            'interview_with_delegation' => 'required_if:interview_type,delegation|string|nullable|exists:delegations,code',
+            'interview_with_other_member_id' => 'required_if:interview_type,other|string|nullable|exists:other_interview_members,id',
+            'members' => 'required_if:interview_type,delegation|string|nullable',
+            'members.*' => 'integer|exists:delegates,id',
             'status' => 'required|string|max:50',
-            'members' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
         ]);
 
@@ -341,30 +349,49 @@ class DelegationController extends Controller
 
         $data = $validator->validated();
 
-        foreach ($data['delegate_ids'] as $delegateIdSelected) {
-            $interviewData = [
-                'delegation_id' => $delegation->id,
-                'from_code' => $delegateIdSelected,
-                'date_time' => $data['date_time'],
-                'type' => $data['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
-                'status' => $data['status'],
-                'comment' => $data['comment'] ?? null,
-            ];
-
-            if ($data['interview_type'] === 'delegation') {
-                $interviewData['to_code'] = $data['interview_with_delegation'];
-                $interviewData['other_member_id'] = null;
-            } else {
-                $interviewData['to_code'] = null;
-                $interviewData['other_member_id'] = $data['interview_with_other_member_id'];
-            }
-
-            Interview::create($interviewData);
+        $interviewWithDelegationId = null;
+        if ($data['interview_type'] === 'delegation') {
+            $delegation = Delegation::where('code', $data['interview_with_delegation'])->first();
+            $interviewWithDelegationId = $delegation ? $delegation->id : null;
         }
 
+        // return response()->json([
+        //     'delegation' => $delegation,
+        //     'interviewWithDelegationId' => $interviewWithDelegationId,
+        // ]);
+
+        $interview = Interview::create([
+            'delegation_id' => $delegation->id,
+            'type' => $data['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
+            'interview_with' => $data['interview_type'] === 'delegation' ? $interviewWithDelegationId : null,
+            'other_member_id' => $data['interview_type'] === 'other' ? $data['interview_with_other_member_id'] : null,
+            'date_time' => $data['date_time'],
+            'status' => $data['status'],
+            'comment' => $data['comment'] ?? null,
+        ]);
+
+        foreach ($data['delegate_ids'] as $delegateId) {
+            InterviewMember::create([
+                'interview_id' => $interview->id,
+                'type' => 'from',
+                'member_id' => $delegateId,
+            ]);
+        }
+
+        if ($data['interview_type'] === 'delegation' && !empty($data['members'])) {
+            InterviewMember::create([
+                'interview_id' => $interview->id,
+                'type' => 'to',
+                'member_id' => $data['members'],
+            ]);
+        }
+
+        // For "other", the 'other_member_id' is on Interview; DON'T add to InterviewMember.
+
         return redirect()->route('delegations.show', $delegation->id)
-            ->with('success', 'Interview(s) added successfully.');
+            ->with('success', 'Interview added successfully.');
     }
+
 
 
     public function searchByCode(Request $request)

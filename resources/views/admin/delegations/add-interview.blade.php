@@ -153,12 +153,12 @@
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="interview_type" value="delegation" checked
                                     class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput(this)">
-                                <span class="text-gray-700">Delegation</span>
+                                <span class="text-gray-700">{{ __db('delegation') }}</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="interview_type" value="other"
                                     class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput(this)">
-                                <span class="text-gray-700">Other</span>
+                                <span class="text-gray-700">{{ __db('other') }}</span>
                             </label>
                         </div>
                     </div>
@@ -167,9 +167,9 @@
                         <div class="w-full">
                             <label class="form-label block text-gray-700 font-semibold">{{ __db('interview_with') }}
                                 ({{ __db('delegate_id') }}):</label>
-                            <input type="text" id="delegation_code_input"
+                            <input type="text" id="delegation_code_input" name="interview_with_delegation"
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                                placeholder="Enter Delegation ID" value="{{ old('interview_with_delegation') }}">
+                                placeholder="{{ __db('delegate_id') }}" value="{{ old('interview_with_delegation') }}">
                         </div>
                         <button type="button" id="search-delegation-btn"
                             class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
@@ -182,12 +182,14 @@
                         </button>
                     </div>
 
+
                     <div id="other-input" class="hidden col-span-1">
                         <label class="form-label block text-gray-700 font-medium">{{ __db('select') }}:</label>
                         <select name="interview_with_other_member_id" class="p-3 rounded-lg w-full border text-sm">
                             <option selected disabled>{{ __db('select_other_member') }}</option>
-                            <option value="1">Name 1</option>
-                            <option value="2">Name 2</option>
+                            @foreach ($otherMembers as $member)
+                                <option value="{{ $member->id }}">{{ $member->name_en ?? $member->name_ar }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -201,9 +203,9 @@
                         <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('status') }}:</label>
                         <select name="status" class="p-3 rounded-lg w-full border text-sm">
                             <option selected disabled>{{ __db('select_status') }}</option>
-                            {{-- @foreach (getDropdown('interview_status')->options as $status)
+                            @foreach (getDropdown('interview_status')->options as $status)
                                 <option value="{{ $status->id }}">{{ $status->value }}</option>
-                            @endforeach --}}
+                            @endforeach
                         </select>
                     </div>
 
@@ -362,8 +364,9 @@
                     .then(data => {
                         if (data.success && data.delegation) {
                             populateMembers(data.delegation.delegates);
+                            toastr.success("{{ __db('members_fetched') }}");
                         } else {
-                            alert('Delegation not found.');
+                            toastr.error("{{ __db('delegation_not_found') }}");
                             membersSelect.innerHTML =
                                 '<option selected disabled>No members found</option>';
                         }
@@ -404,13 +407,20 @@
                                             'text-white'));
                                     this.classList.add('bg-[#B68A35]', 'text-white');
                                     selectedDelegationId = delegation.id;
+
+                                    document.querySelector(
+                                            'input[name="interview_with_delegation"]')
+                                        .value = delegation.code;
+
                                     modalSelectBtn.disabled = false;
                                 });
                                 delegationsList.appendChild(li);
                             });
                             modalResults.classList.remove('hidden');
+                            toastr.success("{{ __db('delegations_fetched') }}");
                         } else {
                             delegationsList.innerHTML = '<li>No delegations found.</li>';
+                            toastr.error("{{ __db('delegation_not_found') }}");
                             modalResults.classList.remove('hidden');
                         }
                     })
@@ -432,10 +442,12 @@
                         if (data.success) {
                             populateMembers(data.members);
                             closeModal();
-                            codeInput.value =
-                                '';
+                            toastr.success("{{ __db('members_fetched') }}");
+                            // codeInput.value =
+                            //     '';
                         } else {
-                            alert('Failed to load members.');
+                            toastr.success("{{ __db('failed_to_load_members') }}");
+
                         }
                     })
                     .catch(() => alert('Error loading members.'));
