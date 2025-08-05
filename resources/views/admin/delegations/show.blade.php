@@ -400,6 +400,7 @@
                         @foreach ($delegation->attachments as $attachment)
                             <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
                                 <td class="px-4 py-3">{{ $attachment->title->value ?? '-' }}</td>
+                                <td class="px-4 py-3">{{ $attachment->file_name ?? '-' }}</td>
                                 <td class="px-4 py-3">
                                     <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank"
                                         class="font-medium !text-[#B68A35] ">{{ $attachment->file_name }}</a>
