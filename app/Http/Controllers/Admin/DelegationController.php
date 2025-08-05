@@ -66,6 +66,24 @@ class DelegationController extends Controller
             'uniqueDelegateId' => $delegateId,
         ]));
     }
+
+    public function edit($id)
+    {
+        $delegation = \App\Models\Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates' => function ($query) {
+                $query->with(['gender', 'parent', 'delegateTransports']);
+            },
+            'attachments',
+        ])->findOrFail($id);
+
+        return view('admin.delegations.edit', compact('delegation'));
+    }
+
     public function show($id)
     {
         $delegation = \App\Models\Delegation::with([
@@ -253,6 +271,38 @@ class DelegationController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        $delegation = Delegation::findOrFail($id);
+
+        $validated = $request->validate([
+            'invitation_from_id'      => 'required|exists:dropdown_options,id',
+            'continent_id'            => 'required|exists:dropdown_options,id',
+            'country_id'              => 'required|exists:dropdown_options,id',
+            'invitation_status_id'    => 'required|exists:dropdown_options,id',
+            'participation_status_id' => 'required|exists:dropdown_options,id',
+            'note1'                   => 'nullable|string',
+            'note2'                   => 'nullable|string',
+        ]);
+
+        try {
+            $delegation->update([
+                'invitation_from_id'    => $validated['invitation_from_id'],
+                'continent_id'          => $validated['continent_id'],
+                'country_id'            => $validated['country_id'],
+                'invitation_status_id'  => $validated['invitation_status_id'],
+                'participation_status_id' => $validated['participation_status_id'],
+                'note1'                 => $validated['note1'] ?? null,
+                'note2'                 => $validated['note2'] ?? null,
+            ]);
+
+            return redirect()->route('delegations.index')->with('success', 'Delegation updated successfully.');
+        } catch (\Throwable $e) {
+            return back()->withErrors(['error' => 'Failed to update delegation: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+
     public function storeTravel(Request $request, $delegationId)
     {
         $delegation = Delegation::findOrFail($delegationId);
@@ -265,7 +315,7 @@ class DelegationController extends Controller
             'delegate_ids' => 'required|array|min:1',
             'delegate_ids.*' => 'integer|exists:delegates,id',
 
-            'arrival.mode' => 'required|string|in:flight,land,sea',
+            'arrival.mode' => 'nullable|string|in:flight,land,sea',
             'arrival.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'arrival.flight_no' => 'nullable|string|max:255',
             'arrival.flight_name' => 'nullable|string|max:255',
@@ -273,7 +323,7 @@ class DelegationController extends Controller
             'arrival.status' => 'nullable|string|max:255',
             'arrival.comment' => 'nullable|string',
 
-            'departure.mode' => 'required|string|in:flight,land,sea',
+            'departure.mode' => 'nullable|string|in:flight,land,sea',
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
             'departure.flight_name' => 'nullable|string|max:255',

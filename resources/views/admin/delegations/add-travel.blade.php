@@ -1,7 +1,6 @@
 @extends('layouts.admin_account', ['title' => __db('all_delegations')])
 
 @section('content')
-    <div class="dashboard-main-body ">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
             <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('add_travel_details') }} </h2>
             <a href="{{ route('delegations.show', $delegation->id) }}" id="add-attachment-btn"
@@ -312,7 +311,6 @@
 
 
         </form>
-    </div>
 @endsection
 
 @section('script')
