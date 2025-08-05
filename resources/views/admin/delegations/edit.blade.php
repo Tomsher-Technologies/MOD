@@ -3,13 +3,13 @@
 @section('content')
     <x-back-btn title="" back-url="{{ route('delegations.index') }}" />
 
-    <form action="{{ route('delegations.update', $delegation->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+    <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 
-        <div class="bg-white h-full w-full rounded-lg border-0 p-6">
+        <form action="{{ route('delegations.update', $delegation->id) }}" method="POST" class="mb-5">
+            @csrf
+            @method('PUT')
+
             <div class="grid grid-cols-12 gap-5">
-
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('delegate_id') }}:</label>
                     <input type="text" name="code"
@@ -105,24 +105,29 @@
                     @enderror
                 </div>
 
-                <div class="col-span-6">
-                    <label class="form-label">{{ __db('note1') }}:</label>
-                    <textarea name="note1" rows="4"
-                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-300 focus:border-blue-500"
-                        placeholder="Enter Note 1">{{ old('note1', $delegation->note1) }}</textarea>
-                    @error('note1')
-                        <div class="text-red-600">{{ $message }}</div>
-                    @enderror
-                </div>
+                <div class="col-span-12">
+                    <div class="flex w-full justify-between gap-5">
+                        <div class="w-full">
+                            <label class="form-label">{{ __db('note1') }}:</label>
+                            <textarea name="note1" rows="4"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-300 focus:border-blue-500"
+                                placeholder="Enter Note 1">{{ old('note1', $delegation->note1) }}</textarea>
+                            @error('note1')
+                                <div class="text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
 
-                <div class="col-span-6">
-                    <label class="form-label">{{ __db('note2') }}:</label>
-                    <textarea name="note2" rows="4"
-                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-300 focus:border-blue-500"
-                        placeholder="Enter Note 2">{{ old('note2', $delegation->note2) }}</textarea>
-                    @error('note2')
-                        <div class="text-red-600">{{ $message }}</div>
-                    @enderror
+                        <div class="w-full">
+                            <label class="form-label">{{ __db('note2') }}:</label>
+                            <textarea name="note2" rows="4"
+                                class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-300 focus:border-blue-500"
+                                placeholder="Enter Note 2">{{ old('note2', $delegation->note2) }}</textarea>
+                            @error('note2')
+                                <div class="text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="col-span-12 mt-6">
@@ -132,349 +137,296 @@
                     </button>
                 </div>
             </div>
+        </form>
+
+        <span class="border-t border-neutral-200 pt-8 mt-8 w-full">
+            <h4 class="text-lg font-semibold">{{ __db('attachments') }}</h4>
+        </span>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+            <div class="xl:col-span-12 h-full">
+                <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0">
+                    @php
+                        $columns = [
+                            [
+                                'label' => 'Sl.No',
+                                'render' => fn($row, $key) => $key + 1,
+                            ],
+                            [
+                                'label' => 'Title',
+                                'render' => fn($row) => e($row->title?->value ?? 'N/A'),
+                            ],
+                            [
+                                'label' => 'Document Date',
+                                'render' => fn($row) => optional($row->document_date)
+                                    ? \Carbon\Carbon::parse($row->document_date)->format('d-m-Y')
+                                    : '',
+                            ],
+                            [
+                                'label' => 'Uploaded file',
+                                'render' => function ($row) {
+                                    $fileName = e($row->file_name);
+                                    $fileUrl = $row->file_path ? asset('storage/' . $row->file_path) : '#';
+                                    return "<a href=\"$fileUrl\" class=\"font-semibold !text-[#b68a35] hover:underline text-xs\" target=\"_blank\">$fileName</a>";
+                                },
+                            ],
+                            [
+                                'label' => 'Actions',
+                                'render' => function ($row) {
+                                    return '
+                <div class="flex items-center gap-5">
+                    <a href="' .
+                                        route('attachments.edit', $row->id) .
+                                        '" title="Edit">
+                        <svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                        </svg>
+                    </a>
+                    <form action="' .
+                                        route('attachments.destroy', $row->id) .
+                                        '" method="POST" onsubmit="return confirm(\'Are you sure?\'); ">
+                        ' .
+                                        csrf_field() .
+                                        method_field('DELETE') .
+                                        '
+                        <button type="submit" title="Delete" class="text-red-600 hover:text-red-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="#B68A35">
+                                <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                ';
+                                },
+                            ],
+                        ];
+                    @endphp
+
+                    <x-reusable-table :columns="$columns" :data="$delegation->attachments" noDataMessage="No attachments found." />
+
+                    <form meth >
+                        @csrf
+
+                        @php
+                            $attachmentTitleDropdown = getDropDown('attachment_title');
+
+                            $attachmentTitleOptionsHtml = '';
+                            if ($attachmentTitleDropdown && $attachmentTitleDropdown->options) {
+                                foreach ($attachmentTitleDropdown->options as $option) {
+                                    $attachmentTitleOptionsHtml .=
+                                        '<option value="' . $option->id . '">' . e($option->value) . '</option>';
+                                }
+                            }
+
+                            $attachmentsData = [
+                                [
+                                    'title_id' => '',
+                                    'file' => null,
+                                    'document_date' => '',
+                                ],
+                            ];
+                        @endphp
+
+                        <div id="attachment-container" x-data="attachmentsComponent()" class="mt-10">
+                            <template x-for="(attachment, index) in attachments" :key="index">
+                                <div class="grid grid-cols-12 gap-5 mb-2 attachment-row">
+                                    <div class="col-span-3">
+                                        <label class="form-label">{{ __db('title') }}</label>
+                                        <select :name="`attachments[${index}][title_id]`"
+                                            class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                            x-model="attachment.title_id">
+                                            <option value="">{{ __db('select_title') }}</option>
+                                            {!! $attachmentTitleOptionsHtml !!}
+                                        </select>
+                                        <span class="text-red-600"
+                                            x-text="window.attachmentsFieldErrors?.[`attachments.${index}.title_id`]?.[0] ?? ''"></span>
+                                    </div>
+
+                                    <div class="col-span-3">
+                                        <label class="form-label">{{ __db('file') }}</label>
+                                        <input
+                                            class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
+                                            type="file" :name="`attachments[${index}][file]`"
+                                            @change="e => attachment.file = e.target.files[0]">
+                                        <span class="text-red-600"
+                                            x-text="window.attachmentsFieldErrors?.[`attachments.${index}.file`]?.[0] ?? ''"></span>
+                                    </div>
+
+                                    <div class="col-span-3">
+                                        <label class="form-label">{{ __db('document_date') }}</label>
+                                        <input type="date" :name="`attachments[${index}][document_date]`"
+                                            class="w-full border border-gray-300 text-sm rounded-lg px-3 py-3"
+                                            x-model="attachment.document_date">
+                                        <span class="text-red-600"
+                                            x-text="window.attachmentsFieldErrors?.[`attachments.${index}.document_date`]?.[0] ?? ''"></span>
+                                    </div>
+
+                                    <div class="col-span-3 flex items-center">
+                                        <button type="button"
+                                            class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                                            @click="removeAttachment(index)"
+                                            x-show="attachments.length > 1">{{ __db('delete') ?: 'Delete' }}</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div class="col-span-12 mb-10">
+                                <button type="button" id="add-attachment-btn"
+                                    class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3 mt-3"
+                                    @click="attachments.push({title_id:'', file:null, document_date:''})">
+                                    <svg class="w-6 h-6 text-white me-2" xmlns="http://www.w3.org/2000/svg"
+                                        fill="none" viewBox="0 0 24 24">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="M5 12h14m-7 7V5" />
+                                    </svg>
+                                    <span>{{ __db('add_attachments') }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+
+    </div>
 
 
 
     <div class="flex items-center justify-between mt-6">
-
-        <h2 class="font-semibold mb-0 !text-[22px] ">Delegates (20)</h2>
-
+        <h2 class="font-semibold mb-0 !text-[22px] ">Delegates ({{ $delegation->delegates->count() }})</h2>
         <div class="flex items-center gap-3">
-
             <a href="delegate-new-add.html" id="add-attachment-btn"
                 class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
-
                 <span>Add Delegate</span>
             </a>
-
             <a href="submit-add-flight-details.html" id="add-attachment-btn"
                 class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
-
                 <span>Add Group Arrival</span>
             </a>
-
             <a href="submit-add-flight-details.html" id="add-attachment-btn"
                 class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
-
                 <span>Add Group Departure</span>
             </a>
         </div>
-
-
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <table class="table-auto mb-0 border-collapse border border-gray-300 w-full">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Sl.No</th>
-                            <th scope="col" class="p-3  !bg-[#B68A35] text-start text-white border !border-[#cbac71] ">
-                                Title
-                            </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Name</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Designation</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Internal
-                                Ranking</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Gender
-                            </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Parent ID
-                            </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Relationship</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Badge
-                                Printed</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Participation Status</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Accommodation</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Arrival
-                                Status </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">1</td>
-                            <td class="px-4 border border-gray-200 py-3">Mr</td>
-                            <td class="px-4 border border-gray-200 py-3">
-                                <span
-                                    class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>
-                                <div class="block">Mohammed Al Obaidi</div>
-                            </td>
-                            <td class="px-4 border border-gray-200 py-3">Technical Officer
-                            </td>
-                            <td class="px-4 border border-gray-200 py-3">Member</td>
-                            <td class="px-4 border border-gray-200 py-3">Male</td>
-                            <td class="px-4 border border-gray-200 py-3">-</td>
-                            <td class="px-4 border border-gray-200 py-3">-</td>
-                            <td class="px-4 border border-gray-200 py-3">Yes</td>
-                            <td class="px-4 border border-gray-200 py-3">Waiting</td>
-                            <td class="px-4 border border-gray-200 py-3">Marriott Hotel - Single Room - 409</td>
-                            <td class="px-4 border border-gray-200 py-2">
-                                <svg class=" cursor-pointer" width="30" height="30"
-                                    data-modal-target="default-modal3" data-modal-toggle="default-modal3"
-                                    viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
-                                    </g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <rect width="480" height="32" x="16" y="464"
-                                            fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
-                                        <path fill="var(--ci-primary-color, #B68A35)"
-                                            d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z"
-                                            class="ci-primary"></path>
-                                    </g>
-                                </svg>
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">2</td>
-                            <td class="px-4 py-3 border border-gray-200">Ms</td>
-                            <td class="px-4 py-3 border border-gray-200">Fatima Al Zahra
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                Senior Engineer
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Major</td>
-                            <td class="px-4 py-3 border border-gray-200">Female</td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                Mohammed Al Obaidi
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Wife</td>
-                            <td class="px-4 py-3 border border-gray-200">No</td>
-                            <td class="px-4 py-3 border border-gray-200">Not Yet Arrived</td>
-                            <td class="px-4 py-3 border border-gray-200">Hilton - Double Room - 203</td>
-                            <td class="px-4 py-2 border border-gray-200">
-                                <svg class=" cursor-pointer" width="30" height="30"
-                                    data-modal-target="default-modal3" data-modal-toggle="default-modal3"
-                                    viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
-                                    </g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <rect width="480" height="32" x="16" y="464"
-                                            fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
-                                        <path fill="var(--ci-primary-color, #B68A35)"
-                                            d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z"
-                                            class="ci-primary"></path>
-                                    </g>
-                                </svg>
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">3</td>
-                            <td class="px-4 py-3 border border-gray-200">Dr</td>
-                            <td class="px-4 py-3 border border-gray-200">Ahmed Khalid
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                Military Doctor
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Captain</td>
-                            <td class="px-4 py-3 border border-gray-200">Male</td>
-                            <td class="px-4 py-3 border border-gray-200">-</td>
-                            <td class="px-4 py-3 border border-gray-200">-</td>
-                            <td class="px-4 py-3 border border-gray-200">Yes</td>
-                            <td class="px-4 py-3 border border-gray-200">Arrived</td>
-                            <td class="px-4 py-3 border border-gray-200">Ritz - Single Room - 110</td>
-                            <td class="px-4 py-2 border border-gray-200">
-                                <svg class=" cursor-pointer" width="30" height="30"
-                                    data-modal-target="default-modal3" data-modal-toggle="default-modal3"
-                                    viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
-                                    </g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <rect width="480" height="32" x="16" y="464"
-                                            fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
-                                        <path fill="var(--ci-primary-color, #B68A35)"
-                                            d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z"
-                                            class="ci-primary"></path>
-                                    </g>
-                                </svg>
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">4</td>
-                            <td class="px-4 py-3 border border-gray-200">Mr</td>
-                            <td class="px-4 py-3 border border-gray-200">Laila Al Nuaimi
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                Special Advisor
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Minister</td>
-                            <td class="px-4 py-3 border border-gray-200">Female</td>
-                            <td class="px-4 py-3 border border-gray-200">-</td>
-                            <td class="px-4 py-3 border border-gray-200">-</td>
-                            <td class="px-4 py-3 border border-gray-200">Yes</td>
-                            <td class="px-4 py-3 border border-gray-200">Departured</td>
-                            <td class="px-4 py-3 border border-gray-200">Guesthouse - Double Room - 325</td>
-                            <td class="px-4 py-2 border border-gray-200">
-                                <svg class=" cursor-pointer" width="30" height="30"
-                                    data-modal-target="default-modal3" data-modal-toggle="default-modal3"
-                                    viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
-                                    </g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <rect width="480" height="32" x="16" y="464"
-                                            fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
-                                        <path fill="var(--ci-primary-color, #B68A35)"
-                                            d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z"
-                                            class="ci-primary"></path>
-                                    </g>
-                                </svg>
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">5</td>
-                            <td class="px-4 py-3 border border-gray-200">Dr</td>
-                            <td class="px-4 py-3 border border-gray-200">Saeed Al Nuaimi
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Admin Assistant
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Member</td>
-                            <td class="px-4 py-3 border border-gray-200">Male</td>
-                            <td class="px-4 py-3 border border-gray-200">-</td>
-                            <td class="px-4 py-3 border border-gray-200">-</td>
-                            <td class="px-4 py-3 border border-gray-200">No</td>
-                            <td class="px-4 py-3 border border-gray-200">Not Yet Arrived</td>
-                            <td class="px-4 py-3 border border-gray-200">Marriott – Room 409</td>
-                            <td class="px-4 py-2 border border-gray-200">
-                                <svg class=" cursor-pointer" width="30" height="30"
-                                    data-modal-target="default-modal3" data-modal-toggle="default-modal3"
-                                    viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
-                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round">
-                                    </g>
-                                    <g id="SVGRepo_iconCarrier">
-                                        <rect width="480" height="32" x="16" y="464"
-                                            fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
-                                        <path fill="var(--ci-primary-color, #B68A35)"
-                                            d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z"
-                                            class="ci-primary"></path>
-                                    </g>
-                                </svg>
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                @php
+                    $delegates = $delegation->delegates ?? collect();
+
+                    $columns = [
+                        [
+                            'label' => 'Sl.No',
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => 'Title',
+                            'render' => fn($row) => $row->title->value ?? '-',
+                        ],
+                        [
+                            'label' => 'Name',
+                            'render' => function ($row) {
+                                $teamHeadBadge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
+                                    : '';
+                                $name = $row->name_en ?: $row->name_ar ?: 'Unnamed';
+                                return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => 'Designation',
+                            'render' => fn($row) => $row->designation_en ?: $row->designation_ar ?: '-',
+                        ],
+                        [
+                            'label' => 'Internal Ranking',
+                            'render' => fn($row) => $row->internalRanking->value ?? '-',
+                        ],
+                        [
+                            'label' => 'Gender',
+                            'render' => fn($row) => $row->gender->value ?? '-',
+                        ],
+                        [
+                            'label' => 'Parent ID',
+                            'render' => fn($row) => $row->parent
+                                ? ($row->parent->name_en ?:
+                                $row->parent->name_ar ?:
+                                '-')
+                                : '-',
+                        ],
+                        [
+                            'label' => 'Relationship',
+                            'render' => fn($row) => $row->relationship->value ?? '-',
+                        ],
+                        [
+                            'label' => 'Badge Printed',
+                            'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
+                        ],
+                        [
+                            'label' => 'Participation Status',
+                            'render' => fn($row) => $row->delegation->participationStatus->value ?? '-',
+                        ],
+                        // [
+                        //     'label' => 'Accommodation',
+                        //     'render' => function ($row) {
+                        //         if ($row->accommodation_id) {
+                        //             $accommodation = \App\Models\Accommodation::find($row->accommodation_id);
+                        //             return $accommodation
+                        //                 ? e(
+                        //                     $accommodation->name .
+                        //                         ' - ' .
+                        //                         $accommodation->room_type .
+                        //                         ' - ' .
+                        //                         $accommodation->room_number,
+                        //                 )
+                        //                 : '-';
+                        //         }
+                        //         return '-';
+                        //     },
+                        // ],
+                        [
+                            'label' => 'Arrival Status',
+                            'render' => function ($row) {
+                                $transport = $row->delegateTransports->first();
+                                return $transport ? e($transport->arrival_status ?? '-') : '-';
+                            },
+                        ],
+                        [
+                            'label' => 'Action',
+                            'render' => function ($row) {
+                                return '
+                <div class="flex items-center gap-5">
+                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal" data-delegate-id="' .
+                                    e($row->id) .
+                                    '">
+                        <svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+                        </svg>
+                    </a>
+                    <a href="' .
+                                    route('delegates.edit', $row->id) .
+                                    '">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                            <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
+                        </svg>
+                    </a>
+                </div>';
+                            },
+                        ],
+                    ];
+
+                    $noDataMessage = 'No delegates found.';
+                @endphp
+
+                <x-reusable-table :data="$delegation->delegates" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
     </div>
+
+
+
     <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px] ">Escorts</h2>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -554,6 +506,8 @@
             </div>
         </div>
     </div>
+
+
     <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px] ">Drivers
     </h2>
@@ -639,21 +593,16 @@
             </div>
         </div>
     </div>
+
+
     <hr class="mx-6 border-neutral-200 h-10">
-
     <div class="flex items-center justify-between mt-6">
-
         <h2 class="font-semibold mb-0 !text-[22px] ">Interviews</h2>
-
         <a href="submit-add-interview.html" id="add-attachment-btn"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
-
             <span>Add Interview</span>
         </a>
-
-
     </div>
-
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
@@ -801,4 +750,28 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script>
+        window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
+    </script>
+
+    <script>
+        function attachmentsComponent() {
+            return {
+                attachments: window.attachmentsData || [],
+                addAttachment() {
+                    this.attachments.push({
+                        title_id: '',
+                        file: null,
+                        document_date: ''
+                    });
+                },
+                removeAttachment(idx) {
+                    this.attachments.splice(idx, 1);
+                }
+            }
+        }
+    </script>
 @endsection

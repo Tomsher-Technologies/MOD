@@ -109,7 +109,6 @@
                         [
                             'label' => 'Actions',
                             'render' => function ($delegation) {
-                                // Use your own permission logic
                                 $buttons = '';
                                 if (auth()->user() && auth()->user()->can('edit_delegations')) {
                                     $buttons .=

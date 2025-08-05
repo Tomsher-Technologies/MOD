@@ -79,6 +79,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
     Route::get('/delegations/add-interview/{id}', [DelegationController::class, 'addInterview'])->name('delegates.addInterview');
     Route::post('/delegations/{delegation}/interview', [DelegationController::class, 'storeInterview'])->name('delegations.storeInterview');
+
+    Route::get('/delegate/{delegate}/edit', [DelegationController::class, 'storeInterview'])->name('delegates.edit');
+    Route::get('/attachments/{id}/edit', [DelegationController::class, 'storeInterview'])->name('attachments.edit');
+    Route::get('/attachments/{id}/destroy', [DelegationController::class, 'storeInterview'])->name('attachments.destroy');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

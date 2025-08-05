@@ -240,7 +240,7 @@
                                             x-text="window.attachmentsFieldErrors?.[`attachments.${index}.document_date`]?.[0] ?? ''"></span>
                                     </div>
 
-                                    <div class="col-span-3 flex items-end">
+                                    <div class="col-span-3 flex items-center">
                                         <button type="button"
                                             class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                             @click="removeAttachment(index)"
@@ -544,12 +544,12 @@
 @endsection
 
 @section('script')
-    <script>
-        window.attachmentsData = @json($attachmentsData);
-        window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
-        window.delegatesData = @json($delegatesData);
-        window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
-    </script>
+        <script>
+            window.attachmentsData = @json($attachmentsData);
+            window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
+            window.delegatesData = @json($delegatesData);
+            window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
+        </script>
 
     <script>
         function delegateComponent() {
