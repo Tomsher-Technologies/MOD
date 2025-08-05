@@ -10,7 +10,7 @@ class DelegateTransport extends Model
     protected $fillable = [
         'created_by',
         'updated_by',
-        'code',
+        'delegate_id',
         'type',
         'mode',
         'airport_id',

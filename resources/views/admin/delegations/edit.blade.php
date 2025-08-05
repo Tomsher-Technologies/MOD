@@ -293,19 +293,19 @@
 
 
     <div class="flex items-center justify-between mt-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">Delegates ({{ $delegation->delegates->count() }})</h2>
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})</h2>
         <div class="flex items-center gap-3">
-            <a href="delegate-new-add.html" id="add-attachment-btn"
+            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}" id="add-attachment-btn"
                 class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
-                <span>Add Delegate</span>
+                <span>{{ __db('add_delegate') }}</span>
             </a>
-            <a href="submit-add-flight-details.html" id="add-attachment-btn"
+            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"  id="add-attachment-btn"
                 class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
-                <span>Add Group Arrival</span>
+                <span>{{ __db('add_group_arrival') }}</span>
             </a>
-            <a href="submit-add-flight-details.html" id="add-attachment-btn"
+            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showDeparture' => 1]) }}" id="add-attachment-btn"
                 class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
-                <span>Add Group Departure</span>
+                <span>{{ __db('add_group_departure') }}</span>
             </a>
         </div>
     </div>

@@ -59,7 +59,6 @@
         @csrf
 
         @php
-            $delegates = $delegation->delegates->filter(fn($d) => !$d->transport);
 
             $columns = [
                 [
@@ -110,159 +109,167 @@
             </div>
         </div>
 
+        @if ($showArrival)
+            <hr class="mx-6 border-neutral-200 h-10">
+            <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('arrival') }}</h2>
+            <div class="bg-white rounded-lg p-6 mb-10 mt-4">
 
-
-
-
-        <hr class="mx-6 border-neutral-200 h-10">
-        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('arrival') }}</h2>
-        <div class="bg-white rounded-lg p-6 mb-10 mt-4">
-
-            <div class="flex items-center gap-4 mb-5">
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="arrival[mode]" value="flight" class="form-radio text-blue-600" checked />
-                    <span class="text-[15px] text-gray-700">{{ __db('flight') }}</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="arrival[mode]" value="land" class="form-radio text-green-600" />
-                    <span class="text-[15px] text-gray-700">{{ __db('land') }}</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="arrival[mode]" value="sea" class="form-radio text-purple-600" />
-                    <span class="text-[15px] text-gray-700">{{ __db('sea') }}</span>
-                </label>
-            </div>
-
-            <div class="grid grid-cols-5 gap-5 w-full">
-                <div id="arrival-flight-fields" class="col-span-3 grid grid-cols-3 gap-5">
-                    <div>
-                        <label
-                            class="form-label block mb-1 text-gray-700 font-medium">{{ __db('arrival_airport') }}:</label>
-                        <select name="arrival[airport_id]" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
-                            <option selected disabled>{{ __db('select_to_airport') }}</option>
-                            @foreach (getDropdown('airports')->options as $airport)
-                                <option value="{{ $airport->id }}">{{ $airport->value }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_no') }}:</label>
-                        <input name="arrival[flight_no]" type="text"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm" placeholder="Enter Flight No" />
-                    </div>
-                    <div>
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_name') }}:</label>
-                        <input name="arrival[flight_name]" type="text"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
-                            placeholder="Enter Flight Name" />
-                    </div>
-                </div>
-                <div class="col-span-2 grid grid-cols-2 gap-5">
-                    <div>
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
-                        <input name="arrival[date_time]" type="datetime-local"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm" />
-                    </div>
-                    <div>
-                        <label
-                            class="form-label block mb-1 text-gray-700 font-medium">{{ __db('arrival_status') }}:</label>
-                        <select name="arrival[status_id]" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
-                            <option selected disabled>{{ __db('select_status') }}</option>
-                            @foreach (getDropdown('arrival_status')->options as $status)
-                                <option value="{{ $status->id }}">{{ $status->value }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-span-5 mt-4" id="land-sea-arrival">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('comment') }}:</label>
-                <textarea name="arrival[comment]" rows="4" class="block p-2.5 w-full text-sm rounded-lg border !border-[#d1d5db]"
-                    placeholder="Type here..."></textarea>
-            </div>
-        </div>
-
-
-        <hr class="mx-6 border-neutral-200 h-5">
-        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('departure') }}</h2>
-        <div class="bg-white rounded-lg p-6 mb-5 mt-4">
-            <div class="flex items-center gap-4 mb-5">
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="departure[mode]" value="flight" class="form-radio text-blue-600" checked>
-                    <span class="text-[15px] text-gray-700">{{ __db('flight') }}</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="departure[mode]" value="land" class="form-radio text-green-600">
-                    <span class="text-[15px] text-gray-700">{{ __db('land') }}</span>
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="departure[mode]" value="sea" class="form-radio text-purple-600">
-                    <span class="text-[15px] text-gray-700">{{ __db('sea') }}</span>
-                </label>
-            </div>
-
-            <div class="grid grid-cols-5 gap-5 w-full">
-                <div id="departure-flight-fields" class="col-span-3 grid grid-cols-3 gap-5">
-                    <div>
-                        <label
-                            class="form-label block mb-1 text-gray-700 font-medium">{{ __db('departure_airport') }}:</label>
-                        <select name="departure[airport_id]"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
-                            <option selected disabled>{{ __db('select_from_airport') }}</option>
-                            @foreach (getDropdown('airports')->options as $airport)
-                                <option value="{{ $airport->id }}">{{ $airport->value }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_no') }}:</label>
-                        <input name="departure[flight_no]" type="text"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
-                            placeholder="Enter Flight No" />
-                    </div>
-                    <div>
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_name') }}:</label>
-                        <input name="departure[flight_name]" type="text"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
-                            placeholder="Enter Flight Name" />
-                    </div>
+                <div class="flex items-center gap-4 mb-5">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="arrival[mode]" value="flight" class="form-radio text-blue-600"
+                            checked />
+                        <span class="text-[15px] text-gray-700">{{ __db('flight') }}</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="arrival[mode]" value="land" class="form-radio text-green-600" />
+                        <span class="text-[15px] text-gray-700">{{ __db('land') }}</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="arrival[mode]" value="sea" class="form-radio text-purple-600" />
+                        <span class="text-[15px] text-gray-700">{{ __db('sea') }}</span>
+                    </label>
                 </div>
 
-                <div class="col-span-2 grid grid-cols-2 gap-5">
-
-                    <div>
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
-                        <input name="departure[date_time]" type="datetime-local"
-                            class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm" />
-                    </div>
-
-                    <div>
+                <div class="grid grid-cols-5 gap-5 w-full">
+                    <div id="arrival-flight-fields" class="col-span-3 grid grid-cols-3 gap-5">
                         <div>
                             <label
-                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('departure_status') }}:</label>
-                            <select name="departure[status_id]"
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('arrival_airport') }}:</label>
+                            <select name="arrival[airport_id]"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
+                                <option selected disabled>{{ __db('select_to_airport') }}</option>
+                                @foreach (getDropdown('airports')->options as $airport)
+                                    <option value="{{ $airport->id }}">{{ $airport->value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_no') }}:</label>
+                            <input name="arrival[flight_no]" type="text"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
+                                placeholder="Enter Flight No" />
+                        </div>
+                        <div>
+                            <label
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_name') }}:</label>
+                            <input name="arrival[flight_name]" type="text"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
+                                placeholder="Enter Flight Name" />
+                        </div>
+                    </div>
+                    <div class="col-span-2 grid grid-cols-2 gap-5">
+                        <div>
+                            <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
+                            <input name="arrival[date_time]" type="datetime-local"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm" />
+                        </div>
+                        <div>
+                            <label
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('arrival_status') }}:</label>
+                            <select name="arrival[status_id]"
                                 class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
                                 <option selected disabled>{{ __db('select_status') }}</option>
-                                @foreach (getDropdown('departure_status')->options as $status)
+                                @foreach (getDropdown('arrival_status')->options as $status)
                                     <option value="{{ $status->id }}">{{ $status->value }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
+
+                <div class="col-span-5 mt-4" id="land-sea-arrival">
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('comment') }}:</label>
+                    <textarea name="arrival[comment]" rows="4" class="block p-2.5 w-full text-sm rounded-lg border !border-[#d1d5db]"
+                        placeholder="Type here..."></textarea>
+                </div>
             </div>
+        @endif
 
-            <div class="col-span-5 mt-4" id="land-sea-departure">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('comment') }}:</label>
-                <textarea name="departure[comment]" rows="4"
-                    class="block p-2.5 w-full text-sm rounded-lg border !border-[#d1d5db]" placeholder="Type here..."></textarea>
+
+        @if ($showDeparture)
+            <hr class="mx-6 border-neutral-200 h-5">
+            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('departure') }}</h2>
+            <div class="bg-white rounded-lg p-6 mb-5 mt-4">
+                <div class="flex items-center gap-4 mb-5">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="departure[mode]" value="flight" class="form-radio text-blue-600"
+                            checked>
+                        <span class="text-[15px] text-gray-700">{{ __db('flight') }}</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="departure[mode]" value="land" class="form-radio text-green-600">
+                        <span class="text-[15px] text-gray-700">{{ __db('land') }}</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="departure[mode]" value="sea" class="form-radio text-purple-600">
+                        <span class="text-[15px] text-gray-700">{{ __db('sea') }}</span>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-5 gap-5 w-full">
+                    <div id="departure-flight-fields" class="col-span-3 grid grid-cols-3 gap-5">
+                        <div>
+                            <label
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('departure_airport') }}:</label>
+                            <select name="departure[airport_id]"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
+                                <option selected disabled>{{ __db('select_from_airport') }}</option>
+                                @foreach (getDropdown('airports')->options as $airport)
+                                    <option value="{{ $airport->id }}">{{ $airport->value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_no') }}:</label>
+                            <input name="departure[flight_no]" type="text"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
+                                placeholder="Enter Flight No" />
+                        </div>
+                        <div>
+                            <label
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('flight_name') }}:</label>
+                            <input name="departure[flight_name]" type="text"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
+                                placeholder="Enter Flight Name" />
+                        </div>
+                    </div>
+
+                    <div class="col-span-2 grid grid-cols-2 gap-5">
+
+                        <div>
+                            <label
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
+                            <input name="departure[date_time]" type="datetime-local"
+                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm" />
+                        </div>
+
+                        <div>
+                            <div>
+                                <label
+                                    class="form-label block mb-1 text-gray-700 font-medium">{{ __db('departure_status') }}:</label>
+                                <select name="departure[status_id]"
+                                    class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
+                                    <option selected disabled>{{ __db('select_status') }}</option>
+                                    @foreach (getDropdown('departure_status')->options as $status)
+                                        <option value="{{ $status->id }}">{{ $status->value }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 mt-4" id="land-sea-departure">
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('comment') }}:</label>
+                    <textarea name="departure[comment]" rows="4"
+                        class="block p-2.5 w-full text-sm rounded-lg border !border-[#d1d5db]" placeholder="Type here..."></textarea>
+                </div>
+
+
+
             </div>
-
-
-
-        </div>
-
+        @endif
 
         <div class="flex justify-start gap-5 items-center">
             <button type="submit" id="submit_add_transport"
