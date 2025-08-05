@@ -23,7 +23,7 @@ class DelegationAttachment extends Model
     {
         return $this->belongsTo(DropdownOption::class, 'title_id')
             ->whereHas('dropdown', function ($query) {
-                $query->where('code', 'title');
+                $query->where('code', 'attachment_title');
             });
     }
 }

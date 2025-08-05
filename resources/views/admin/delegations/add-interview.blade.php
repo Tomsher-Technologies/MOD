@@ -4,43 +4,25 @@
 
     <x-back-btn title="{{ __db('add_travel_details') }}" back-url="{{ route('delegations.show', $delegation->id) }}" />
 
+    @php
+        $columns = [
+            ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? ''],
+            ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? ''],
+            ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? ''],
+            ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? ''],
+            ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus->value ?? ''],
+            ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus->value ?? ''],
+        ];
+        $data = [$delegation];
+    @endphp
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
             <div class="bg-white h-full w-full rounded-lg border-0 p-10">
-                <ul class="flex">
-                    <li class="flex-1">
-                        <span class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('delegation_id') }}:</span>
-                        <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->code }}</h4>
-                    </li>
-                    <li class="flex-1">
-                        <span
-                            class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('invitation_from') }}:</span>
-                        <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->invitationFrom->value ?? '' }}</h4>
-                    </li>
-                    <li class="flex-1">
-                        <span class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('continent') }}:</span>
-                        <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->continent->value ?? '' }}</h4>
-                    </li>
-                    <li class="flex-1">
-                        <span class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('country') }}:</span>
-                        <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->country->value ?? '' }}</h4>
-                    </li>
-                    <li class="flex-1">
-                        <span
-                            class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('invitation_status') }}:</span>
-                        <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->invitationStatus->value ?? '' }}</h4>
-                    </li>
-                    <li class="flex-1">
-                        <span
-                            class="font-bold !bg-[#B68A35] text-white py-2 px-3 w-full">{{ __db('participation_status') }}:</span>
-                        <h4 class="bg-[#f9f7ed] py-2 px-3">{{ $delegation->participationStatus->value ?? '' }}</h4>
-                    </li>
-                </ul>
+                <x-reusable-table :columns="$columns" :data="$data" />
             </div>
         </div>
     </div>
-
-
 
     <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }}
@@ -52,61 +34,61 @@
 
     <form method="POST" action="{{ route('delegations.storeInterview', $delegation->id) }}" enctype="multipart/form-data">
         @csrf
+        @php
+            $delegates = $delegation->delegates->filter(fn($d) => !$d->transport);
+
+            $columns = [
+                [
+                    'label' => '',
+                    'render' => function ($row) {
+                        $checked = collect(old('delegate_ids'))->contains($row->id) ? 'checked' : '';
+                        return '<input type="checkbox" name="delegate_ids[]" value="' .
+                            $row->id .
+                            '" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded" ' .
+                            $checked .
+                            ' />';
+                    },
+                ],
+                [
+                    'label' => __db('sl_no'),
+                    'render' => fn($row, $key) => $row->code,
+                ],
+                [
+                    'label' => __db('title'),
+                    'render' => fn($row) => $row->title->value ?? '',
+                ],
+                [
+                    'label' => __db('name'),
+                    'render' => function ($row) {
+                        $badge = $row->team_head
+                            ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                            : '';
+                        return $badge . '<div class="block">' . e($row->value_en ?? '-') . '</div>';
+                    },
+                ],
+                [
+                    'label' => __db('designation'),
+                    'render' => fn($row) => $row->designation_en ?? '',
+                ],
+                [
+                    'label' => __db('internal_ranking'),
+                    'render' => fn($row) => $row->internalRanking->value ?? '',
+                ],
+                [
+                    'label' => __db('gender'),
+                    'render' => fn($row) => $row->gender->value ?? '',
+                ],
+            ];
+        @endphp
+
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
             <div class="xl:col-span-12 h-full">
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                    <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
-                        <thead>
-                            <tr>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white"></th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('sl_no') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('title') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('name') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('designation') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('internal_ranking') }}</th>
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{ __db('gender') }}</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($delegation->delegates->filter(fn($d) => !$d->transport) as $delegate)
-                                <tr class="text-sm align-[middle]">
-                                    <td class="px-4 py-2 border border-gray-200">
-                                        <input type="checkbox" name="delegate_ids[]" value="{{ $delegate->id }}"
-                                            class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded"
-                                            {{ collect(old('delegate_ids'))->contains($delegate->id) ? 'checked' : '' }} />
-                                    </td>
-                                    <td class="px-4 py-2 border border-gray-200">{{ $delegate->code }}</td>
-                                    <td class="px-4 py-3 border border-gray-200">{{ $delegate->title->value }}</td>
-                                    <td class="px-4 py-3 border border-gray-200">
-                                        @if ($delegate->team_head)
-                                            <span
-                                                class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>
-                                        @endif
-                                        <div class="block">{{ $delegate->value_en }}</div>
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200">{{ $delegate->designation_en }}
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200">
-                                        {{ $delegate->internalRanking->value ?? '' }}
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200">
-                                        {{ $delegate->gender->value ?? '' }}
-                                    </td>
-                                </tr>
-                            @endforeach
-
-                        </tbody>
-                    </table>
+                    <x-reusable-table :columns="$columns" :data="$delegates" />
                 </div>
             </div>
         </div>
+
 
 
         <hr class="mx-6 border-neutral-200 h-10">
@@ -434,7 +416,7 @@
                 modalSelectBtn.addEventListener('click', function() {
                     if (!selectedDelegationId) return;
 
-                    fetch(`/mod-admin/delegations/${selectedDelegationId}/members`, {
+                    fetch(`/mod-admin/delegations/members/${selectedDelegationId}`, {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest'
                             }

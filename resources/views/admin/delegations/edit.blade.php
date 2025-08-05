@@ -204,82 +204,82 @@
 
                     <x-reusable-table :columns="$columns" :data="$delegation->attachments" noDataMessage="No attachments found." />
 
-                    <form meth >
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('delegations.updateAttachment', $delegation->id) }}"
+                        enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
 
                         @php
                             $attachmentTitleDropdown = getDropDown('attachment_title');
+                            $options = $attachmentTitleDropdown ? $attachmentTitleDropdown->options : [];
 
-                            $attachmentTitleOptionsHtml = '';
-                            if ($attachmentTitleDropdown && $attachmentTitleDropdown->options) {
-                                foreach ($attachmentTitleDropdown->options as $option) {
-                                    $attachmentTitleOptionsHtml .=
-                                        '<option value="' . $option->id . '">' . e($option->value) . '</option>';
-                                }
-                            }
-
-                            $attachmentsData = [
-                                [
-                                    'title_id' => '',
-                                    'file' => null,
-                                    'document_date' => '',
-                                ],
-                            ];
                         @endphp
 
-                        <div id="attachment-container" x-data="attachmentsComponent()" class="mt-10">
-                            <template x-for="(attachment, index) in attachments" :key="index">
-                                <div class="grid grid-cols-12 gap-5 mb-2 attachment-row">
+                        <div x-data="attachmentsComponent()">
+                            <template x-for="(attachment, index) in attachments" :key="attachment.id ?? index">
+                                <div class="grid grid-cols-12 gap-5 mb-4 items-center border p-4 rounded">
+
+                                    <input type="hidden" :name="`attachments[${index}][id]`" x-model="attachment.id" />
+                                    <input type="hidden" :name="`attachments[${index}][deleted]`"
+                                        x-model="attachment.deleted" />
+
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('title') }}</label>
                                         <select :name="`attachments[${index}][title_id]`"
-                                            class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
-                                            x-model="attachment.title_id">
+                                            class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
+                                            x-model.number="attachment.title_id" :disabled="attachment.deleted">
                                             <option value="">{{ __db('select_title') }}</option>
-                                            {!! $attachmentTitleOptionsHtml !!}
+                                            @foreach ($options as $option)
+                                                <option value="{{ $option->id }}">{{ $option->value }}</option>
+                                            @endforeach
                                         </select>
-                                        <span class="text-red-600"
-                                            x-text="window.attachmentsFieldErrors?.[`attachments.${index}.title_id`]?.[0] ?? ''"></span>
                                     </div>
 
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('file') }}</label>
                                         <input
-                                            class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50"
+                                            class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
                                             type="file" :name="`attachments[${index}][file]`"
                                             @change="e => attachment.file = e.target.files[0]">
-                                        <span class="text-red-600"
-                                            x-text="window.attachmentsFieldErrors?.[`attachments.${index}.file`]?.[0] ?? ''"></span>
                                     </div>
 
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('document_date') }}</label>
                                         <input type="date" :name="`attachments[${index}][document_date]`"
-                                            class="w-full border border-gray-300 text-sm rounded-lg px-3 py-3"
-                                            x-model="attachment.document_date">
-                                        <span class="text-red-600"
-                                            x-text="window.attachmentsFieldErrors?.[`attachments.${index}.document_date`]?.[0] ?? ''"></span>
+                                            class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
+                                            x-model="attachment.document_date" :disabled="attachment.deleted" />
                                     </div>
-
-                                    <div class="col-span-3 flex items-center">
+                                    <div class="col-span-3">
                                         <button type="button"
-                                            class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                                            @click="removeAttachment(index)"
-                                            x-show="attachments.length > 1">{{ __db('delete') ?: 'Delete' }}</button>
+                                            class="bg-red-600 text-white p-3 h-[46px] rounded hover:bg-red-700"
+                                            @click="toggleDelete(index)"
+                                            x-text="attachment.deleted ? 'Undo' : '{{ __db('delete') }}'"></button>
                                     </div>
                                 </div>
+
+                                <span class="text-red-600"
+                                    x-text="window.attachmentsFieldErrors?.[`attachments.${index}.file`]?.[0] ?? ''"></span>
                             </template>
 
-                            <div class="col-span-12 mb-10">
-                                <button type="button" id="add-attachment-btn"
-                                    class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3 mt-3"
-                                    @click="attachments.push({title_id:'', file:null, document_date:''})">
-                                    <svg class="w-6 h-6 text-white me-2" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="M5 12h14m-7 7V5" />
-                                    </svg>
-                                    <span>{{ __db('add_attachments') }}</span>
+                            <button type="button" class="btn !bg-[#B68A35] text-white rounded-lg px-4 py-2 mt-3"
+                                @click="addAttachment()">
+                                + {{ __db('add_attachments') }}
+                            </button>
+
+                            <div class="mt-6">
+                                <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-6 py-2"
+                                    x-show="attachments.length > 0">
+                                    {{ __db('save_attachments') }}
                                 </button>
                             </div>
                         </div>
@@ -760,18 +760,29 @@
     <script>
         function attachmentsComponent() {
             return {
-                attachments: window.attachmentsData || [],
+                attachments: [],
+
                 addAttachment() {
                     this.attachments.push({
+                        id: null,
                         title_id: '',
+                        document_date: '',
+                        file_name: '',
+                        file_path: '',
                         file: null,
-                        document_date: ''
+                        deleted: false,
                     });
                 },
-                removeAttachment(idx) {
-                    this.attachments.splice(idx, 1);
-                }
-            }
+
+                toggleDelete(index) {
+                    const attachment = this.attachments[index];
+                    if (!attachment.id) {
+                        this.attachments.splice(index, 1);
+                    } else {
+                        attachment.deleted = !attachment.deleted;
+                    }
+                },
+            };
         }
     </script>
 @endsection

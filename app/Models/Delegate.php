@@ -66,12 +66,6 @@ class Delegate extends Model
         return $this->hasMany(DelegateTransport::class);
     }
 
-
-    public function interviews()
-    {
-        return $this->hasMany(Interview::class);
-    }
-
     public function parent()
     {
         return $this->belongsTo(Delegate::class, 'parent_id');

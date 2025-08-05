@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Delegation;
+use App\Models\DelegationAttachment;
 use App\Models\Dropdown;
 use App\Models\Interview;
 use App\Models\InterviewMember;
 use App\Models\OtherInterviewMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -81,27 +83,36 @@ class DelegationController extends Controller
             'attachments',
         ])->findOrFail($id);
 
+
         return view('admin.delegations.edit', compact('delegation'));
     }
 
     public function show($id)
     {
-        $delegation = \App\Models\Delegation::with([
+        $delegation = Delegation::with([
             'invitationFrom',
             'continent',
             'country',
             'invitationStatus',
             'participationStatus',
             'delegates' => function ($query) {
-                $query->with(['gender', 'parent', 'delegateTransports']);
+                $query->with([
+                    'gender',
+                    'parent',
+                    'delegateTransports',
+                ]);
             },
             'attachments',
         ])->findOrFail($id);
 
-        // $interviews = \App\Models\Interview::with('attendees')->where('delegation_id', $id)->get();
+        $interviews = Interview::with(['interviewMembers', 'interviewMembers.fromDelegate', 'interviewMembers.toDelegate', 'interviewWithDelegation'])
+            ->where('delegation_id', $id)
+            ->get();
+
 
         // return response()->json([
         //     'delegation' => $delegation,
+        //     'ssss' => $interviews,
         // ]);
 
         return view('admin.delegations.show', compact('delegation'));
@@ -302,6 +313,82 @@ class DelegationController extends Controller
         }
     }
 
+    public function updateAttachments(Request $request, $delegationId)
+    {
+        $delegation = Delegation::with('attachments')->findOrFail($delegationId);
+
+        $validatedData = $request->validate([
+            'attachments' => ['required', 'array'],
+            'attachments.*.id' => ['nullable', 'exists:delegation_attachments,id'],
+            'attachments.*.title_id' => ['required', 'exists:dropdown_options,id'],
+            'attachments.*.document_date' => ['nullable', 'date'],
+            'attachments.*.file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png'],
+        ]);
+
+        $inputAttachments = $validatedData['attachments'];
+
+        foreach ($inputAttachments as $idx => $attachmentData) {
+
+            if (!empty($attachmentData['id']) && $attachmentData['deleted']) {
+                $att = $delegation->attachments()->find($attachmentData['id']);
+                if ($att) {
+                    if ($att->file_path && Storage::disk('public')->exists($att->file_path)) {
+                        Storage::disk('public')->delete($att->file_path);
+                    }
+                    $att->delete();
+                }
+                continue;
+            }
+
+            $data = [
+                'title_id' => $attachmentData['title_id'],
+                'document_date' => $attachmentData['document_date'] ?? now()->format('Y-m-d'),
+            ];
+
+            if ($request->hasFile("attachments.$idx.file")) {
+                $file = $request->file("attachments.$idx.file");
+
+                $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? "";
+
+                $data['file_path'] = $path;
+                $data['file_name'] = $file->getClientOriginalName();
+
+                if (!empty($attachmentData['id'])) {
+                    $oldAtt = $delegation->attachments()->find($attachmentData['id']);
+                    if ($oldAtt && $oldAtt->file_path && Storage::disk('public')->exists($oldAtt->file_path)) {
+                        Storage::disk('public')->delete($oldAtt->file_path);
+                    }
+                }
+            }
+
+            if (!empty($attachmentData['id'])) {
+                $att = $delegation->attachments()->find($attachmentData['id']);
+                if ($att) {
+                    $att->update($data);
+                }
+            } else {
+                $delegation->attachments()->create($data);
+            }
+        }
+
+        return redirect()->route('delegations.edit', $delegationId)
+            ->with('success', 'Attachments updated successfully.');
+    }
+
+
+    public function destroyAttachment($id)
+    {
+        $attachment = DelegationAttachment::findOrFail($id);
+
+        if ($attachment->file_path && Storage::disk('public')->exists($attachment->file_path)) {
+            Storage::disk('public')->delete($attachment->file_path);
+        }
+
+        $attachment->delete();
+
+        return redirect()->back()->with('success', 'Attachment deleted successfully.');
+    }
+
 
     public function storeTravel(Request $request, $delegationId)
     {
@@ -447,8 +534,6 @@ class DelegationController extends Controller
         return redirect()->route('delegations.show', $delegation->id)
             ->with('success', 'Interview added successfully.');
     }
-
-
 
     public function searchByCode(Request $request)
     {

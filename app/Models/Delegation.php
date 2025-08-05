@@ -90,6 +90,11 @@ class Delegation extends Model
         return $this->hasMany(Delegate::class);
     }
 
+    public function interviews()
+    {
+        return $this->hasMany(Interview::class);
+    }
+
     public function attachments()
     {
         return $this->hasMany(DelegationAttachment::class);
