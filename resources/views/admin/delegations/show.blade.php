@@ -274,14 +274,14 @@
         $columns = [
             [
                 'label' => 'Date & Time',
-                'render' => fn($row) => $row->date_time ? $row->date_time->format('Y-m-d h:i A') : '-',
+                'render' => fn($row) => $row->date_time ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A') : '-',
             ],
             [
                 'label' => 'Attended By',
                 'render' => function ($row) {
                     $attendees = $row->interviewMembers->filter(fn($im) => $im->type === 'from');
                     $names = $attendees
-                        ->map(function ($im) {
+                        ->map(function ($im) use ($row) {
                             $member = $im->resolveMemberForInterview($row);
                             return $member ? e($member->name_en ?? ($member->name_ar ?? '-')) : '';
                         })
@@ -314,7 +314,7 @@
             ],
             [
                 'label' => 'Status',
-                'render' => fn($row) => e(ucfirst($row->status)),
+                'render' => fn($row) => e(ucfirst($row->status->value)),
             ],
         ];
 

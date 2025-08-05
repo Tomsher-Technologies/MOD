@@ -151,7 +151,7 @@ class DelegationController extends Controller
         $otherMembers = OtherInterviewMember::all();
 
         // return response()->json([
-        //     'otherMembers' => $otherMembers,
+        //     'delegation' => $delegation,
         // ]);
 
         return view('admin.delegations.add-interview', compact('delegation', 'otherMembers'));
@@ -488,14 +488,9 @@ class DelegationController extends Controller
 
         $interviewWithDelegationId = null;
         if ($data['interview_type'] === 'delegation') {
-            $delegation = Delegation::where('code', $data['interview_with_delegation'])->first();
-            $interviewWithDelegationId = $delegation ? $delegation->id : null;
+            $interviewWithdelegation = Delegation::where('code', $data['interview_with_delegation'])->first();
+            $interviewWithDelegationId = $interviewWithdelegation ? $interviewWithdelegation->id : null;
         }
-
-        // return response()->json([
-        //     'delegation' => $delegation,
-        //     'interviewWithDelegationId' => $interviewWithDelegationId,
-        // ]);
 
         $interview = Interview::create([
             'delegation_id' => $delegation->id,
@@ -503,7 +498,7 @@ class DelegationController extends Controller
             'interview_with' => $data['interview_type'] === 'delegation' ? $interviewWithDelegationId : null,
             'other_member_id' => $data['interview_type'] === 'other' ? $data['interview_with_other_member_id'] : null,
             'date_time' => $data['date_time'],
-            'status' => $data['status'],
+            'status_id' => $data['status'],
             'comment' => $data['comment'] ?? null,
         ]);
 

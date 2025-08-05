@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Auth;
 class Interview extends Model
 {
     protected $fillable = [
+        'delegation_id',
         'created_by',
         'updated_by',
-        'delegation_id',
         'type', // delegate to delegate or delegate to others - del_del or del_others
         'interview_with', //delegation id
         'other_member_id',
         'date_time',
-        'status',
+        'status_id',
         'comment',
     ];
 
@@ -46,7 +46,7 @@ class Interview extends Model
 
     public function delegation()
     {
-        return $this->belongsTo(Delegation::class);
+        return $this->belongsTo(Delegation::class, 'delegation_id');
     }
 
     public function interviewMembers()
@@ -61,6 +61,14 @@ class Interview extends Model
 
     public function otherMember()
     {
-        return $this->belongsTo(OtherInterviewMember::class);
+        return $this->belongsTo(OtherInterviewMember::class, 'other_member_id');
+    }
+
+    public function status()
+    {
+        return $this->belongsTo(DropdownOption::class, 'status_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'interview_status');
+            });
     }
 }
