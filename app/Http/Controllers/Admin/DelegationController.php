@@ -145,7 +145,7 @@ class DelegationController extends Controller
             'note2'                  => 'nullable|string',
 
             'delegates' => 'sometimes|array',
-            // 'delegates.*.tmp_id' => 'required',
+            'delegates.*.tmp_id' => 'required',
             'delegates.*.title_id' => 'nullable|string',
             'delegates.*.name_ar' => 'nullable|string',
             'delegates.*.name_en' => 'required|string',
@@ -182,43 +182,43 @@ class DelegationController extends Controller
 
             // $tmpIdToDbId = [];
 
-            // if (!empty($validated['delegates'])) {
-            //     foreach ($validated['delegates'] as $delegateData) {
-            //         $tmpId = $delegateData['tmp_id'];
-
-            //         unset($delegateData['parent_id']);
-
-            //         $delegateData['delegation_id'] = $delegation->id;
-            //         $delegateData['team_head'] = !empty($delegateData['team_head']);
-            //         $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
-
-            //         $createdDelegate = $delegation->delegates()->create($delegateData);
-            //         $tmpIdToDbId[$tmpId] = $createdDelegate->id;
-            //     }
-
-            //     foreach ($validated['delegates'] as $delegateData) {
-            //         if (!empty($delegateData['parent_id']) && isset($tmpIdToDbId[$delegateData['parent_id']])) {
-            //             $parentDbId = $tmpIdToDbId[$delegateData['parent_id']];
-            //             $delegateTmpId = $delegateData['tmp_id'];
-
-            //             $delegate = $delegation->delegates()->where('id', $tmpIdToDbId[$delegateTmpId])->first();
-            //             if ($delegate) {
-            //                 $delegate->parent_id = $parentDbId;
-            //                 $delegate->save();
-            //             }
-            //         }
-            //     }
-            // }
-
             if (!empty($validated['delegates'])) {
                 foreach ($validated['delegates'] as $delegateData) {
+                    $tmpId = $delegateData['tmp_id'];
+
+                    unset($delegateData['parent_id']);
+
                     $delegateData['delegation_id'] = $delegation->id;
                     $delegateData['team_head'] = !empty($delegateData['team_head']);
                     $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
-                    $delegateData['internal_ranking_id'] = $delegation->internal_ranking_id ?? null;
-                    $delegation->delegates()->create($delegateData);
+
+                    $createdDelegate = $delegation->delegates()->create($delegateData);
+                    $tmpIdToDbId[$tmpId] = $createdDelegate->id;
+                }
+
+                foreach ($validated['delegates'] as $delegateData) {
+                    if (!empty($delegateData['parent_id']) && isset($tmpIdToDbId[$delegateData['parent_id']])) {
+                        $parentDbId = $tmpIdToDbId[$delegateData['parent_id']];
+                        $delegateTmpId = $delegateData['tmp_id'];
+
+                        $delegate = $delegation->delegates()->where('id', $tmpIdToDbId[$delegateTmpId])->first();
+                        if ($delegate) {
+                            $delegate->parent_id = $parentDbId;
+                            $delegate->save();
+                        }
+                    }
                 }
             }
+
+            // if (!empty($validated['delegates'])) {
+            //     foreach ($validated['delegates'] as $delegateData) {
+            //         $delegateData['delegation_id'] = $delegation->id;
+            //         $delegateData['team_head'] = !empty($delegateData['team_head']);
+            //         $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
+            //         $delegateData['internal_ranking_id'] = $delegation->internal_ranking_id ?? null;
+            //         $delegation->delegates()->create($delegateData);
+            //     }
+            // }
 
             if ($request->has('attachments')) {
                 foreach ($request->attachments as $idx => $attachment) {
@@ -226,7 +226,7 @@ class DelegationController extends Controller
                         $file = $request->file("attachments.$idx.file");
                         $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? "";
                         $delegation->attachments()->create([
-                            'title_id' => $attachment['title'],
+                            'title_id' => $attachment['title_id'],
                             'file_name' => $file->getClientOriginalName(),
                             'file_path' => $path,
                             'document_date' => $attachment['document_date'] ?? now()->format('Y-m-d'),
@@ -238,7 +238,7 @@ class DelegationController extends Controller
 
             DB::commit();
 
-            if ($request->has('submit_and_exit')) {
+            if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', 'Delegation created.');
             } elseif ($request->has('submit_add_interview')) {
                 return redirect()->route('delegates.addInterview', ['delegation_id' => $delegation->id]);
@@ -386,7 +386,13 @@ class DelegationController extends Controller
             ]);
         }
 
-        // For "other", the 'other_member_id' is on Interview; DON'T add to InterviewMember.
+        if ($request->has('submit_exit')) {
+            return redirect()->route('delegations.index')->with('success', 'Interview created.');
+        } elseif ($request->has('submit_add_new')) {
+            return redirect()->route('delegates.addInterview', ['id' => $delegationId])->with('success', 'Interview created.');
+        } elseif ($request->has('submit_add_travel')) {
+            return redirect()->route('delegates.addTravel', ['id' => $delegationId])->with('success', 'Interview created.');
+        }
 
         return redirect()->route('delegations.show', $delegation->id)
             ->with('success', 'Interview added successfully.');

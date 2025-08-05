@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Delegation extends Model
 {
     protected $fillable = [
-        'created_by',
+        'updated_by',
         'code',
         'invitation_from_id',
         'continent_id',
@@ -17,6 +18,31 @@ class Delegation extends Model
         'note1',
         'note2',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($delegation) {
+            if (Auth::check()) {
+                $delegation->created_by = Auth::id();
+            }
+        });
+
+        static::updating(function ($delegation) {
+            if (Auth::check()) {
+                $delegation->updated_by = Auth::id();
+            }
+        });
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 
     public function invitationFrom()
     {

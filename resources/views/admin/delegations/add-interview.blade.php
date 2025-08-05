@@ -15,17 +15,6 @@
             </a>
         </div>
 
-        @if ($errors->any())
-            <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
-                <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
-                <ul class="list-disc list-inside">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
             <div class="xl:col-span-12">
                 <div class="bg-white h-full w-full rounded-lg border-0 p-10">
@@ -70,6 +59,10 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }}
         </h2>
 
+        @error('delegate_ids')
+            <div class="text-red-600">{{ $message }}</div>
+        @enderror
+
         <form method="POST" action="{{ route('delegations.storeInterview', $delegation->id) }}"
             enctype="multipart/form-data">
             @csrf
@@ -106,7 +99,8 @@
                                     <tr class="text-sm align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">
                                             <input type="checkbox" name="delegate_ids[]" value="{{ $delegate->id }}"
-                                                class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded" />
+                                                class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded"
+                                                {{ collect(old('delegate_ids'))->contains($delegate->id) ? 'checked' : '' }} />
                                         </td>
                                         <td class="px-4 py-2 border border-gray-200">{{ $delegate->code }}</td>
                                         <td class="px-4 py-3 border border-gray-200">{{ $delegate->title->value }}</td>
@@ -149,6 +143,9 @@
                     <div class="col-span-4">
                         <label
                             class="form-label block mb-1 text-gray-700 font-medium">{{ __db('interview_with') }}:</label>
+                        @error('interview_type')
+                            <div class="text-red-600">{{ $message }}</div>
+                        @enderror
                         <div class="flex items-center gap-6 mt-2">
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="radio" name="interview_type" value="delegation" checked
@@ -170,6 +167,9 @@
                             <input type="text" id="delegation_code_input" name="interview_with_delegation"
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                 placeholder="{{ __db('delegate_id') }}" value="{{ old('interview_with_delegation') }}">
+                            @error('interview_with_delegation')
+                                <div class="text-red-600">{{ $message }}</div>
+                            @enderror
                         </div>
                         <button type="button" id="search-delegation-btn"
                             class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
@@ -191,12 +191,20 @@
                                 <option value="{{ $member->id }}">{{ $member->name_en ?? $member->name_ar }}</option>
                             @endforeach
                         </select>
+
+                        @error('interview_with_other_member_id')
+                            <div class="text-red-600">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div id="membersbox">
                         <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
                         <select name="members" class="p-3 rounded-lg w-full border text-sm" id="members-select">
                         </select>
+
+                        @error('members')
+                            <div class="text-red-600">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div id="statusbox">
@@ -207,20 +215,25 @@
                                 <option value="{{ $status->id }}">{{ $status->value }}</option>
                             @endforeach
                         </select>
+
+                        @error('status')
+                            <div class="text-red-600">{{ $message }}</div>
+                        @enderror
                     </div>
 
                 </div>
             </div>
 
             <div class="flex justify-start gap-5 items-center">
-                <button type="submit" id="submit_add_transport"
-                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('submit_and_add_new_flight_details') }}</button>
 
-                <button type="submit" id="submit_exit"
+                <button type="submit" name="submit_exit"
                     class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg py-[1px] h-12">{{ __db('submit_and_exit') }}</button>
 
-                <button type="submit" id="submit_add_interview"
-                    class="btn text-md mb-[-10px] !bg-[#D7BC6D] text-white rounded-lg py-[1px] h-12">{{ __db('submit_add_interview') }}</button>
+                <button type="submit" name="submit_add_new"
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('submit_add_new') }}</button>
+
+                <button type="submit" name="submit_add_travel"
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('submit_add_flight_details') }}</button>
             </div>
 
 
@@ -280,7 +293,9 @@
                     class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50">{{ __db('search') }}</button>
 
                 <button id="modal-select-btn"
-                    class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50">{{ __db('select') }}</button>
+                    class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50 hidden">
+                    {{ __db('select') }}
+                </button>
 
                 <button id="modal-close-btn"
                     class="btn border !border-[#B68A35] !text-[#B68A35] rounded-lg px-5 py-2">{{ __db('cancel') }}</button>
@@ -344,6 +359,7 @@
                 modal.classList.add('hidden');
                 delegationsList.innerHTML = '';
                 modalResults.classList.add('hidden');
+                modalSelectBtn.classList.add('hidden');
                 modalSelectBtn.disabled = true;
                 selectedDelegationId = null;
             }
@@ -413,15 +429,24 @@
                                         .value = delegation.code;
 
                                     modalSelectBtn.disabled = false;
+                                    modalSelectBtn.classList.remove(
+                                        'hidden');
                                 });
                                 delegationsList.appendChild(li);
                             });
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");
+
+                            modalSelectBtn.classList.add('hidden');
+                            modalSelectBtn.disabled = true;
+
                         } else {
                             delegationsList.innerHTML = '<li>No delegations found.</li>';
                             toastr.error("{{ __db('delegation_not_found') }}");
                             modalResults.classList.remove('hidden');
+
+                            modalSelectBtn.classList.add('hidden');
+                            modalSelectBtn.disabled = true;
                         }
                     })
                     .catch(() => {

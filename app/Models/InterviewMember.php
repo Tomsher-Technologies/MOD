@@ -3,14 +3,43 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class InterviewMember extends Model
 {
     protected $fillable = [
+        'created_by',
+        'updated_by',
         'type',  // 'from' or 'to'
         'member_id',
         'interview_id',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($interviewMember) {
+            if (Auth::check()) {
+                $interviewMember->created_by = Auth::id();
+            }
+        });
+
+        static::updating(function ($interviewMember) {
+            if (Auth::check()) {
+                $interviewMember->updated_by = Auth::id();
+            }
+        });
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
     public function interview()
     {
         return $this->belongsTo(Interview::class);
