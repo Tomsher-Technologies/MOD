@@ -262,6 +262,10 @@ if (!function_exists('getRouteForPage')) {
                 'add_delegations'       => route('delegations.store'),
                 'del_add_delegations'   => route('delegations.store'),
             ],
+            'delegation.update' => [
+                'add_delegations'       => $modelId ?  route('delegations.update', $modelId) : null,
+                'del_add_delegations'   => $modelId ?  route('delegations.update', $modelId) : null,
+            ],
             'interview.storeInterview' => [
                 'add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
                 'del_add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
@@ -269,6 +273,11 @@ if (!function_exists('getRouteForPage')) {
             'travel.storeTravel' => [
                 'add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
                 'del_add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
+            ],
+
+            'delegation.edit' => [
+                'edit_delegations'      => $modelId ? route('delegations.edit', $modelId) : null,
+                'del_edit_delegations'  => $modelId ? route('delegations.edit', $modelId) : null,
             ],
 
             'delegation.searchByCode' => [

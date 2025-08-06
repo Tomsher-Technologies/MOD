@@ -100,8 +100,18 @@ class DelegationController extends Controller
                 $query->with(['gender', 'parent', 'delegateTransports']);
             },
             'attachments',
+            'interviews' => function ($query) {
+                $query->with([
+                    'status',
+                    'interviewWithDelegation',
+                    'interviewMembers'
+                ]);
+            }
         ])->findOrFail($id);
-
+        // return response()->json([
+        //     'delegation' => $delegation,
+        //     'nextDelegateId' => $this->generateNextDelegateId(),
+        // ]);
 
         return view('admin.delegations.edit', compact('delegation'));
     }

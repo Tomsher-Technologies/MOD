@@ -1,10 +1,9 @@
-
 <div>
-<x-back-btn title="" back-url="{{ route('delegations.index') }}" />
+    <x-back-btn title="" back-url="{{ getRouteForPage('delegations.index') }}" />
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 
-        <form action="{{ route('delegations.update', $delegation->id) }}" method="POST" class="mb-5">
+        <form action="{{ getRouteForPage('delegation.update', $delegation->id) }}" method="POST" class="mb-5">
             @csrf
             @method('PUT')
 
@@ -290,17 +289,21 @@
     </div>
 
     <div class="flex items-center justify-between mt-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})</h2>
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})
+        </h2>
         <div class="flex items-center gap-3">
-            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}" id="add-attachment-btn"
+            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"
+                id="add-attachment-btn"
                 class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
                 <span>{{ __db('add_delegate') }}</span>
             </a>
-            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"  id="add-attachment-btn"
+            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"
+                id="add-attachment-btn"
                 class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
                 <span>{{ __db('add_group_arrival') }}</span>
             </a>
-            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showDeparture' => 1]) }}" id="add-attachment-btn"
+            <a href="{{ route('delegates.addTravel', ['id' => $delegation->id, 'showDeparture' => 1]) }}"
+                id="add-attachment-btn"
                 class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
                 <span>{{ __db('add_group_departure') }}</span>
             </a>
@@ -422,7 +425,7 @@
         </div>
     </div>
 
-    <hr class="mx-6 border-neutral-200 h-10">
+    {{-- <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px] ">Escorts</h2>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
@@ -430,22 +433,29 @@
                 <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                     <thead>
                         <tr>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Sl.No</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Military
                                 Number</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Title</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Name</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Mobile
                                 Number</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Gender
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Known
                                 Languages</th>
 
@@ -500,10 +510,10 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div> --}}
 
 
-    <hr class="mx-6 border-neutral-200 h-10">
+    {{-- <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px] ">Drivers
     </h2>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -512,25 +522,33 @@
                 <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                     <thead>
                         <tr>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Sl.No</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Military
                                 Number</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Title</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Name</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Mobile
                                 Number</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Vehicle
                                 Type</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Plate
                                 Number</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Capacity
                             </th>
 
@@ -587,163 +605,113 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div> --}}
+
+
+    @php
+        $delegatesCollection = collect($delegation->delegates)->mapWithKeys(function ($delegate) {
+            return [(int) $delegate->id => $delegate];
+        });
+
+        $columns = [
+            ['label' => 'Sl.No', 'render' => fn($row, $key) => $key + 1],
+            [
+                'label' => 'Date & Time',
+                'render' => fn($row) => $row->date_time
+                    ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                    : '',
+            ],
+            [
+                'label' => 'Attended By',
+                'render' => function ($row) use ($delegatesCollection) {
+                    if ($row->interview_members && $row->interview_members->count()) {
+                        $attendedBy = $row->interview_members->filter(fn($m) => $m->type === 'from');
+                        if ($attendedBy->isEmpty()) {
+                            return '-';
+                        }
+
+                        return $attendedBy
+                            ->map(function ($member) use ($delegatesCollection) {
+                                $memberId = (int) $member->member_id;
+                                $delegate = $delegatesCollection->get($memberId);
+                                $delegateName = $delegate
+                                    ? ($delegate->name_en ?:
+                                    $delegate->name_ar ?:
+                                    'N/A')
+                                    : 'Unknown';
+                                return '<span class="block">Member ID: ' .
+                                    e($memberId) .
+                                    ' - Delegate Name: ' .
+                                    e($delegateName) .
+                                    '</span>';
+                            })
+                            ->implode('');
+                    }
+                    return '-';
+                },
+            ],
+            [
+                'label' => 'Interview With',
+                'render' => function ($row) {
+                    $delegationLink =
+                        '<a href="#" class="!text-[#B68A35]" data-modal-target="DelegationModal" data-modal-toggle="DelegationModal">' .
+                        'Delegation ID : ' .
+                        e($row->interviewWithDelegation->code ?? '') .
+                        '</a>';
+
+                    $names = $row->interviewMembers
+                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                        ->implode('');
+
+                    return $delegationLink . $names;
+                },
+            ],
+            ['label' => 'Status', 'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown'))],
+            [
+                'label' => 'Action',
+                'render' => function ($row) {
+                    $deleteBtn =
+                        '<a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal" class="mr-2">' .
+                        '<svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">' .
+                        '<path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/></svg></a>';
+
+                    $editBtn =
+                        '<a href="' .
+                        route('delegates.edit', $row->id) .
+                        '">' .
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">' .
+                        '<path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path></svg></a>';
+
+                    return '<div class="flex items-center gap-5">' . $deleteBtn . $editBtn . '</div>';
+                },
+            ],
+        ];
+
+        $noDataMessage = 'No interviews found.';
+    @endphp
 
     <hr class="mx-6 border-neutral-200 h-10">
+
     <div class="flex items-center justify-between mt-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">Interviews</h2>
-        <a href="submit-add-interview.html" id="add-attachment-btn"
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }}</h2>
+        <a href="{{ getRouteForPage('delegates.addInterview', $delegation->id) }}" id="add-attachment-btn"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
-            <span>Add Interview</span>
+            <span>{{ __db('add_interview') }}</span>
         </a>
     </div>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Sl.No</th>
-                            <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Date &
-                                Time</th>
-                            <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Attended
-                                By</th>
-                            <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Interview
-                                With</th>
-                            <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Status
-                            </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">1</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">2025-06-18 10:00
-                                AM</td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <span class="block">Sr.Sara Al-Suwaidi</span>
-                                <span class="block">Mr.Dalia Al-Hassan</span>
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <a href="#" class="!text-[#B68A35]" data-modal-target="DelegationModal"
-                                    data-modal-toggle="DelegationModal"> Delegation ID : DA25-002</a>
-                                <span class="block">Khalid</span>
-                                <span class="block">Omar</span>
-                            </td>
-                            <td class="px-4 py-3 text-black border border-gray-200">Pending</td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">2</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">2025-07-11 11:30
-                                AM</td>
-                            <td class="px-4 py-3 border border-gray-200">Dr.Bandar bin Abdulaziz </td>
-                            <td class="px-4 py-3 border border-gray-200">Hadi</td>
-                            <td class="px-4 py-3 text-black border border-gray-200">Accepted</td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">3</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">2025-06-26 01:00
-                                PM</td>
-                            <td class="px-4 py-3 border border-gray-200">Mr. Crispus Kiyonga, </td>
-                            <td class="px-4 py-3 border border-gray-200">Rashed</td>
-                            <td class="px-4 py-3 text-black border border-gray-200">Canceled</td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">4</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">2025-09-14 02:30
-                                PM</td>
-                            <td class="px-4 py-3 border border-gray-200">Mr.Mark Carney </td>
-                            <td class="px-4 py-3 border border-gray-200">Zayed</td>
-                            <td class="px-4 py-3 text-black border border-gray-200">Completed</td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                <div class="flex items-center gap-5">
-                                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
-                                        <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="1.5"
-                                                d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                                        </svg>
-                                    </a>
-                                    <a href="delegate-view-edit.html">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+
+                <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
+
+
             </div>
         </div>
     </div>
+
+
 </div>
 
 
