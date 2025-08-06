@@ -2,8 +2,6 @@
     <x-back-btn title="{{ __db('add_travel_details') }}" back-url="{{ route('delegations.show', $delegation->id) }}" />
 
     @php
-        //Manage route dynamically by checking the permissions of the user.
-
         $columns = [
             ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? ''],
             ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? ''],
@@ -31,7 +29,7 @@
         <div class="text-red-600">{{ $message }}</div>
     @enderror
 
-    <form method="POST" action="{{ getRouteForPage('interview-store', $delegation->id) ?? '#' }}"
+    <form method="POST" action="{{ getRouteForPage('interview.storeInterview', $delegation->id) ?? '#' }}"
         enctype="multipart/form-data">
         @csrf
         @php
@@ -280,9 +278,9 @@
 
     <script>
         window.pageRoutes = {
-            delegationSearchByCode: @json(getRouteForPage('delegation-search-by-code')),
-            delegationSearchByFilters: @json(getRouteForPage('delegation-search-by-filters')),
-            delegationMembers: @json(getRouteForPage('delegation-members'))
+            delegationSearchByCode: @json(getRouteForPage('delegation.searchByCode')),
+            delegationSearchByFilters: @json(getRouteForPage('delegation.search')),
+            delegationMembers: @json(getRouteForPage('delegation.members'))
         };
     </script>
 

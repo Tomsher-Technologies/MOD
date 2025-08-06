@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <form action="{{  getRouteForPage('delegation-store') ?? '#'  }}" method="POST" autocomplete="off" enctype="multipart/form-data"
+    <form action="{{  getRouteForPage('delegation.store') ?? '#'  }}" method="POST" autocomplete="off" enctype="multipart/form-data"
         class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>

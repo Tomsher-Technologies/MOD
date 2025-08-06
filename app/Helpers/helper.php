@@ -254,25 +254,33 @@ if (!function_exists('getRouteForPage')) {
     function getRouteForPage(string $pageKey, $modelId = null): ?string
     {
         $pageRoutes = [
-            'delegation-store' => [
+            'delegations.index' => [
+                'manage_delegations' => route('delegations.index'),
+                'del_manage_delegations' => route('delegations.index'),
+            ],
+            'delegation.store' => [
                 'add_delegations'       => route('delegations.store'),
                 'del_add_delegations'   => route('delegations.store'),
             ],
-            'interview-store' => [
+            'interview.storeInterview' => [
                 'add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
                 'del_add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
             ],
+            'travel.storeTravel' => [
+                'add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
+                'del_add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
+            ],
 
-            'delegation-search-by-code' => [
+            'delegation.searchByCode' => [
                 'manage_delegations'      => route('delegations.searchByCode'),
                 'del_manage_delegations'  => route('delegations.searchByCode'),
             ],
 
-            'delegation-search-by-filters' => [
+            'delegation.search' => [
                 'manage_delegations'      => route('delegations.search'),
                 'del_manage_delegations'  => route('delegations.search'),
             ],
-            'delegation-members' => [
+            'delegation.members' => [
                 'add_interviews'      => '/mod-admin/delegations/members',
                 'del_add_interviews'  => '/mod-admin/delegations/members',
             ],
