@@ -2,4 +2,5 @@
 
 @section('content')
     @include('shared-pages.delegations.edit')
+
 @endsection

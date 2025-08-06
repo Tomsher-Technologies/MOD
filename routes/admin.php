@@ -9,10 +9,7 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\DropdownController;
 use App\Http\Controllers\Admin\EventController;
-use App\Http\Controllers\Admin\InterviewMemberController;
 use App\Http\Controllers\Admin\OtherMemberController;
-use App\Models\InterviewMember;
-use App\Models\OtherInterviewMember;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
@@ -84,9 +81,15 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
     Route::post('/delegations/store-delegate/{id}', [DelegationController::class, 'storeDelegate'])->name('delegations.storeDelegate');
 
-    Route::get('/delegate/edit/{id}', [DelegationController::class, 'storeInterview'])->name('delegates.edit');
-    Route::get('/attachments/edit/{id}', [DelegationController::class, 'storeInterview'])->name('attachments.edit');
-    Route::get('/attachments/destroy/{id}', [DelegationController::class, 'storeInterview'])->name('attachments.destroy');
+    Route::delete('/attachments/destroy/{id}', [DelegationController::class, 'destroyAttachment'])->name('attachments.destroy');
+
+
+
+
+    Route::get('/attachments/edit/{id}', [DelegationController::class, 'editAttachment'])->name('attachments.edit');
+
+    Route::get('/delegate/edit/{id}', [DelegationController::class, 'editDelegate'])->name('delegates.edit');
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

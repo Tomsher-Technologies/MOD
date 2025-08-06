@@ -247,55 +247,65 @@ function storeUploadedFileToModuleFolder($file, $folder, $parentId, $subDir = 'f
     $random = rand(1000, 9999);
     $filename = $originalName . '_' . $date . '_' . $random . '.' . $extension;
     $storageFolder = $folder . '/' . $parentId . '/' . $subDir;
-    return $file->storeAs($storageFolder, $filename);
+    return $file->storeAs($storageFolder, $filename, 'public');
 }
 
+
 if (!function_exists('getRouteForPage')) {
-    function getRouteForPage(string $pageKey, $modelId = null): ?string
+    function getRouteForPage(string $pageKey, $params = null): ?string
     {
         $pageRoutes = [
             'delegations.index' => [
-                'manage_delegations' => route('delegations.index'),
-                'del_manage_delegations' => route('delegations.index'),
+                'manage_delegations' => 'delegations.index',
+                'del_manage_delegations' => 'delegations.index',
             ],
             'delegation.store' => [
-                'add_delegations'       => route('delegations.store'),
-                'del_add_delegations'   => route('delegations.store'),
+                'add_delegations' => 'delegations.store',
+                'del_add_delegations' => 'delegations.store',
             ],
             'delegation.update' => [
-                'add_delegations'       => $modelId ?  route('delegations.update', $modelId) : null,
-                'del_add_delegations'   => $modelId ?  route('delegations.update', $modelId) : null,
+                'add_delegations' => 'delegations.update',
+                'del_add_delegations' => 'delegations.update',
             ],
             'delegation.storeInterview' => [
-                'add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
-                'del_add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
+                'add_interviews' => 'delegations.storeInterview',
+                'del_add_interviews' => 'delegations.storeInterview',
             ],
             'delegation.addInterview' => [
-                'add_interviews' => $modelId ? route('delegations.addInterview', $modelId) : null,
-                'del_add_interviews' => $modelId ? route('delegations.addInterview', $modelId) : null,
+                'add_interviews' => 'delegations.addInterview',
+                'del_add_interviews' => 'delegations.addInterview',
             ],
             'delegation.storeTravel' => [
-                'add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
-                'del_add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
+                'add_travels' => 'delegations.storeTravel',
+                'del_add_travels' => 'delegations.storeTravel',
             ],
-
             'delegation.edit' => [
-                'edit_delegations'      => $modelId ? route('delegations.edit', $modelId) : null,
-                'del_edit_delegations'  => $modelId ? route('delegations.edit', $modelId) : null,
+                'edit_delegations' => 'delegations.edit',
+                'del_edit_delegations' => 'delegations.edit',
             ],
-
+            'delegation.addDelegate' => [
+                'add_delegate' => 'delegations.addDelegate',
+                'del_add_delegate' => 'delegations.addDelegate',
+            ],
             'delegation.searchByCode' => [
-                'manage_delegations'      => route('delegations.searchByCode'),
-                'del_manage_delegations'  => route('delegations.searchByCode'),
+                'manage_delegations' => 'delegations.searchByCode',
+                'del_manage_delegations' => 'delegations.searchByCode',
             ],
-
             'delegation.search' => [
-                'manage_delegations'      => route('delegations.search'),
-                'del_manage_delegations'  => route('delegations.search'),
+                'manage_delegations' => 'delegations.search',
+                'del_manage_delegations' => 'delegations.search',
             ],
             'delegation.members' => [
-                'add_interviews'      => '/mod-admin/delegations/members',
-                'del_add_interviews'  => '/mod-admin/delegations/members',
+                'add_interviews' => '/mod-admin/delegations/members',
+                'del_add_interviews' => '/mod-admin/delegations/members',
+            ],
+            'attachments.destroy' => [
+                'manage_delegations' => 'attachments.destroy',
+                'del_manage_delegations' => 'attachments.destroy',
+            ],
+            'attachments.edit' => [
+                'manage_delegations' => 'attachments.edit',
+                'del_manage_delegations' => 'attachments.edit',
             ],
         ];
 
@@ -308,9 +318,21 @@ if (!function_exists('getRouteForPage')) {
             return null;
         }
 
-        foreach ($pageRoutes[$pageKey] as $permission => $route) {
+        foreach ($pageRoutes[$pageKey] as $permission => $routeNameOrUrl) {
             if ($user->can($permission)) {
-                return $route;
+                if (is_string($routeNameOrUrl) && str_starts_with($routeNameOrUrl, '/')) {
+                    return $routeNameOrUrl;
+                }
+
+                if ($params === null) {
+                    return route($routeNameOrUrl);
+                }
+
+                if (is_array($params)) {
+                    return route($routeNameOrUrl, $params);
+                }
+
+                return route($routeNameOrUrl, $params);
             }
         }
 
