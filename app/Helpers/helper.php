@@ -249,3 +249,50 @@ function storeUploadedFileToModuleFolder($file, $folder, $parentId, $subDir = 'f
     $storageFolder = $folder . '/' . $parentId . '/' . $subDir;
     return $file->storeAs($storageFolder, $filename);
 }
+
+if (!function_exists('getRouteForPage')) {
+    function getRouteForPage(string $pageKey, $modelId = null): ?string
+    {
+        $pageRoutes = [
+            'delegation-store' => [
+                'add_delegations'       => route('delegations.store'),
+                'del_add_delegations'   => route('delegations.store'),
+            ],
+            'interview-store' => [
+                'add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
+                'del_add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
+            ],
+
+            'delegation-search-by-code' => [
+                'manage_delegations'      => route('delegations.searchByCode'),
+                'del_manage_delegations'  => route('delegations.searchByCode'),
+            ],
+
+            'delegation-search-by-filters' => [
+                'manage_delegations'      => route('delegations.search'),
+                'del_manage_delegations'  => route('delegations.search'),
+            ],
+            'delegation-members' => [
+                'add_interviews'      => '/mod-admin/delegations/members',
+                'del_add_interviews'  => '/mod-admin/delegations/members',
+            ],
+        ];
+
+        $user = auth()->user();
+        if (!$user) {
+            return null;
+        }
+
+        if (!isset($pageRoutes[$pageKey])) {
+            return null;
+        }
+
+        foreach ($pageRoutes[$pageKey] as $permission => $route) {
+            if ($user->can($permission)) {
+                return $route;
+            }
+        }
+
+        return "#";
+    }
+}

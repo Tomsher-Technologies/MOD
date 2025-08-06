@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-use function PHPUnit\Framework\isEmpty;
-
 class DelegationController extends Controller
 {
 
@@ -24,10 +22,29 @@ class DelegationController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_delegations',  ['only' => ['index', 'setDefault', 'search', 'members']]);
-        $this->middleware('permission:add_delegations',  ['only' => ['create', 'store', 'addInterview', 'addTravel', 'storeInterview', 'storeTravel']]);
-        $this->middleware('permission:edit_delegations',  ['only' => ['edit', 'update']]);
-        $this->middleware('permission:view_delegations',  ['only' => ['show', 'index']]);
+        $this->middleware('permission:manage_delegations', [
+            'only' => ['index', 'setDefault', 'search', 'members']
+        ]);
+
+        $this->middleware('permission:add_delegations', [
+            'only' => ['create', 'store']
+        ]);
+
+        $this->middleware('permission:edit_delegations', [
+            'only' => ['edit', 'update']
+        ]);
+
+        $this->middleware('permission:view_delegations', [
+            'only' => ['show']
+        ]);
+
+        $this->middleware('permission:add_interviews', [
+            'only' => ['addInterview', 'storeInterview']
+        ]);
+
+        $this->middleware('permission:add_travels', [
+            'only' => ['addTravel', 'storeTravel']
+        ]);
     }
 
     public function index(Request $request)
@@ -157,8 +174,6 @@ class DelegationController extends Controller
 
         return view('admin.delegations.add-travel', compact('delegation', 'delegates', 'showArrival', 'showDeparture'));
     }
-
-
 
     public function addInterview($id)
     {
