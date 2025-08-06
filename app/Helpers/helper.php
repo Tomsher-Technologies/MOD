@@ -266,11 +266,15 @@ if (!function_exists('getRouteForPage')) {
                 'add_delegations'       => $modelId ?  route('delegations.update', $modelId) : null,
                 'del_add_delegations'   => $modelId ?  route('delegations.update', $modelId) : null,
             ],
-            'interview.storeInterview' => [
+            'delegation.storeInterview' => [
                 'add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
                 'del_add_interviews' => $modelId ? route('delegations.storeInterview', $modelId) : null,
             ],
-            'travel.storeTravel' => [
+            'delegation.addInterview' => [
+                'add_interviews' => $modelId ? route('delegations.addInterview', $modelId) : null,
+                'del_add_interviews' => $modelId ? route('delegations.addInterview', $modelId) : null,
+            ],
+            'delegation.storeTravel' => [
                 'add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
                 'del_add_travels' => $modelId ? route('delegations.storeTravel', $modelId) : null,
             ],

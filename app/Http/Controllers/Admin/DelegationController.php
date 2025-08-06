@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Delegate;
 use App\Models\Delegation;
 use App\Models\DelegationAttachment;
 use App\Models\Dropdown;
@@ -205,6 +206,26 @@ class DelegationController extends Controller
         return view('admin.delegations.add-interview', compact('delegation', 'otherMembers'));
     }
 
+    public function addDelegate($id)
+    {
+        $delegation = \App\Models\Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates',
+        ])->findOrFail($id);
+
+        $otherMembers = OtherInterviewMember::all();
+
+        // return response()->json([
+        //     'delegation' => $delegation,
+        // ]);
+
+        return view('admin.delegations.add-delegate', compact('delegation', 'otherMembers'));
+    }
+
 
     public function store(Request $request)
     {
@@ -318,9 +339,9 @@ class DelegationController extends Controller
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', 'Delegation created.');
             } elseif ($request->has('submit_add_interview')) {
-                return redirect()->route('delegates.addInterview', ['delegation_id' => $delegation->id]);
+                return redirect()->route('delegations.addInterview', ['delegation_id' => $delegation->id]);
             } elseif ($request->has('submit_add_travel')) {
-                return redirect()->route('delegates.addTravel', ['delegation_id' => $delegation->id]);
+                return redirect()->route('delegations.addTravel', ['delegation_id' => $delegation->id]);
             }
 
             return redirect()->route('delegations.index')->with('success', 'Delegation created.');
@@ -573,13 +594,41 @@ class DelegationController extends Controller
         if ($request->has('submit_exit')) {
             return redirect()->route('delegations.index')->with('success', 'Interview created.');
         } elseif ($request->has('submit_add_new')) {
-            return redirect()->route('delegates.addInterview', ['id' => $delegationId])->with('success', 'Interview created.');
+            return redirect()->route('delegations.addInterview', ['id' => $delegationId])->with('success', 'Interview created.');
         } elseif ($request->has('submit_add_travel')) {
-            return redirect()->route('delegates.addTravel', ['id' => $delegationId])->with('success', 'Interview created.');
+            return redirect()->route('delegations.addTravel', ['id' => $delegationId])->with('success', 'Interview created.');
         }
 
         return redirect()->route('delegations.show', $delegation->id)
             ->with('success', 'Interview added successfully.');
+    }
+
+    public function storeDelegate(Request $request, $delegationId)
+    {
+        $validated = $request->validate([
+            'title_id' => 'nullable|string',
+            'name_ar' => 'nullable|string',
+            'name_en' => 'required|string',
+            'designation_en' => 'nullable|string',
+            'designation_ar' => 'nullable|string',
+            'gender_id' => 'required|exists:dropdown_options,id',
+            'parent_id' => 'nullable|exists:delegates,id',
+            'relationship' => 'nullable|string',
+            'internal_ranking_id' => 'nullable|string',
+            'note' => 'nullable|string',
+            'team_head' => 'nullable|boolean',
+            'badge_printed' => 'nullable|boolean',
+            'accommodation' => 'nullable|boolean',
+        ]);
+
+        $validated['team_head'] = !empty($validated['team_head']);
+        $validated['badge_printed'] = !empty($validated['badge_printed']);
+        $validated['accommodation'] = !empty($validated['accommodation']);
+
+        $delegation = Delegation::findOrFail($delegationId);
+        $delegation->delegates()->create($validated);
+
+        return redirect()->route('delegations.edit', $delegationId)->with('success', 'Delegation created.');
     }
 
     public function searchByCode(Request $request)

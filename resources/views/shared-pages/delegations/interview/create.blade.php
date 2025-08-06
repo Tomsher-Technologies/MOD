@@ -29,7 +29,7 @@
         <div class="text-red-600">{{ $message }}</div>
     @enderror
 
-    <form method="POST" action="{{ getRouteForPage('interview.storeInterview', $delegation->id) ?? '#' }}"
+    <form method="POST" action="{{ getRouteForPage('delegation.storeInterview', $delegation->id) ?? '#' }}"
         enctype="multipart/form-data">
         @csrf
         @php

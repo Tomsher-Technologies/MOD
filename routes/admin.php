@@ -75,11 +75,14 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/delegations-get',  [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
-    Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegates.addTravel');
+    Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegations.addTravel');
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
-    Route::get('/delegations/add-interview/{id}', [DelegationController::class, 'addInterview'])->name('delegates.addInterview');
+    Route::get('/delegations/add-interview/{id}', [DelegationController::class, 'addInterview'])->name('delegations.addInterview');
     Route::post('/delegations/interview/{id}', [DelegationController::class, 'storeInterview'])->name('delegations.storeInterview');
     Route::put('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
+
+    Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
+    Route::post('/delegations/store-delegate/{id}', [DelegationController::class, 'storeDelegate'])->name('delegations.storeDelegate');
 
     Route::get('/delegate/edit/{id}', [DelegationController::class, 'storeInterview'])->name('delegates.edit');
     Route::get('/attachments/edit/{id}', [DelegationController::class, 'storeInterview'])->name('attachments.edit');
