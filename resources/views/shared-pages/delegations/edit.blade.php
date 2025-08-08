@@ -189,14 +189,14 @@
                                     return '<div class="flex items-center gap-5">' .
                                         '<form action="' .
                                         getRouteForPage('attachments.destroy', $row->id) .
-                                        '" method="POST" onsubmit="return confirm(\'Are you sure you want to delete this attachment?\'); ">' .
+                                        '" method="POST" class="delete-attachment-form">' .
                                         csrf_field() .
                                         method_field('DELETE') .
-                                        '<button type="submit" title="Delete" class="text-red-600 hover:text-red-800">
-                                <svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
-                                </svg>
-                            </button>
+                                        '<button type="submit" title="Delete" class="delete-attachment-btn text-red-600 hover:text-red-800">
+        <svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+        </svg>
+    </button>
                         </form>
                             <button
             type="button"
@@ -639,8 +639,8 @@
             [
                 'label' => 'Attended By',
                 'render' => function ($row) use ($delegatesCollection) {
-                    if ($row->interview_members && $row->interview_members->count()) {
-                        $attendedBy = $row->interview_members->filter(fn($m) => $m->type === 'from');
+                    if ($row->interviewMembers && count($row->interviewMembers)) {
+                        $attendedBy = collect($row->interviewMembers)->filter(fn($m) => $m->type === 'from');
                         if ($attendedBy->isEmpty()) {
                             return '-';
                         }
@@ -715,13 +715,11 @@
         </a>
     </div>
 
+    {{-- <pre>{{ dd($delegation) }}</pre> --}}
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-
                 <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
-
-
             </div>
         </div>
     </div>
@@ -729,6 +727,7 @@
     <div x-data="{
         isAttachmentEditModalOpen: false,
         attachment: {},
+        delegationId: {{ $delegation->id }},
         fileUrl: '',
         open(data) {
             this.attachment = data;
@@ -758,17 +757,17 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </button>
-                    <form :action="`{{ url('attachments') }}/${attachment.id}`" method="POST"
+                    <form :action="`{{ url('/mod-admin/delegations/attachments-update') }}/${delegationId}`" method="POST"
                         enctype="multipart/form-data" class="p-6 space-y-6">
                         @csrf
-                        @method('PUT')
-                        <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                            Edit Attachment
-                        </h3>
+                        @method('POST')
+
+                        <input type="hidden" name="attachments[0][id]" :value="attachment.id">
 
                         <div>
                             <label class="form-label block mb-1">Title</label>
-                            <select name="title_id" x-model="attachment.title_id" class="w-full p-2 border rounded">
+                            <select name="attachments[0][title_id]" x-model="attachment.title_id"
+                                class="w-full p-2 border rounded">
                                 <option value="">Select Title</option>
                                 @foreach ($attachmentTitleDropdown->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -777,12 +776,12 @@
                         </div>
                         <div>
                             <label class="form-label block mb-1">Document Date</label>
-                            <input type="date" name="document_date" x-model="attachment.document_date"
-                                class="w-full p-2 border rounded" />
+                            <input type="date" name="attachments[0][document_date]"
+                                x-model="attachment.document_date" class="w-full p-2 border rounded" />
                         </div>
                         <div>
                             <label class="form-label block mb-1">Replace File</label>
-                            <input type="file" name="file" @change="handleFileChange"
+                            <input type="file" name="attachments[0][file]" @change="handleFileChange"
                                 class="w-full p-2 border rounded" />
                             <template x-if="attachment.file_name">
                                 <p class="mt-2 text-sm text-gray-600">
@@ -792,6 +791,7 @@
                                 </p>
                             </template>
                         </div>
+
                         <div class="flex justify-end gap-3">
                             <button type="button" @click="isAttachmentEditModalOpen = false"
                                 class="btn border border-gray-300 px-4 py-2 rounded hover:bg-gray-100">
@@ -802,6 +802,7 @@
                             </button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -857,5 +858,28 @@
                 },
             };
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.delete-attachment-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This will permanently delete the attachment.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#B68A35',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 @endsection

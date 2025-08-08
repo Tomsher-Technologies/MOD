@@ -76,7 +76,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
     Route::get('/delegations/add-interview/{id}', [DelegationController::class, 'addInterview'])->name('delegations.addInterview');
     Route::post('/delegations/interview/{id}', [DelegationController::class, 'storeInterview'])->name('delegations.storeInterview');
-    Route::put('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
+    Route::post('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
 
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
     Route::post('/delegations/store-delegate/{id}', [DelegationController::class, 'storeDelegate'])->name('delegations.storeDelegate');
@@ -85,8 +85,6 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
 
 
-
-    Route::get('/attachments/edit/{id}', [DelegationController::class, 'editAttachment'])->name('attachments.edit');
 
     Route::get('/delegate/edit/{id}', [DelegationController::class, 'editDelegate'])->name('delegates.edit');
 

@@ -109,9 +109,9 @@ class DelegationController extends Controller
                 ]);
             }
         ])->findOrFail($id);
+
         // return response()->json([
         //     'delegation' => $delegation,
-        //     'nextDelegateId' => $this->generateNextDelegateId(),
         // ]);
 
         return view('admin.delegations.edit', compact('delegation'));
@@ -225,14 +225,6 @@ class DelegationController extends Controller
 
         return view('admin.delegations.add-delegate', compact('delegation', 'otherMembers'));
     }
-
-    public function editAttachment($id)
-    {
-
-        return view('admin.delegations.edit-attachment');
-    }
-
-
     public function store(Request $request)
     {
 
@@ -404,7 +396,7 @@ class DelegationController extends Controller
 
         foreach ($inputAttachments as $idx => $attachmentData) {
 
-            if (!empty($attachmentData['id']) && $attachmentData['deleted']) {
+            if (!empty($attachmentData['id']) && (!empty($attachmentData['deleted']) && $attachmentData['deleted'])) {
                 $att = $delegation->attachments()->find($attachmentData['id']);
                 if ($att) {
                     if ($att->file_path && Storage::disk('public')->exists($att->file_path)) {

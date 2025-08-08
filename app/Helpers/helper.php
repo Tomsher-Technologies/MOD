@@ -304,8 +304,8 @@ if (!function_exists('getRouteForPage')) {
                 'del_manage_delegations' => 'attachments.destroy',
             ],
             'attachments.edit' => [
-                'manage_delegations' => 'attachments.edit',
-                'del_manage_delegations' => 'attachments.edit',
+                'manage_delegations' => 'delegations.updateAttachment',
+                'del_manage_delegations' => 'delegations.updateAttachment',
             ],
         ];
 
