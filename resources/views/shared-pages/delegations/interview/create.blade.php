@@ -300,7 +300,7 @@
                 delegationInput.classList.add('hidden');
                 otherInput.classList.remove('hidden');
                 membersBox.classList.add('hidden');
-                statusBox.classList.add('hidden');
+                statusBox.classList.remove('hidden');
             }
         }
     </script>

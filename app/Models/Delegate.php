@@ -16,6 +16,7 @@ class Delegate extends Model
         'designation_en',
         'designation_ar',
         'parent_id',
+        'note',
         'relationship_id',
         'internal_ranking_id',
         'driver_id',

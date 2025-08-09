@@ -410,24 +410,41 @@
                         ],
                         [
                             'label' => 'Action',
-                            'render' => function ($row) {
-                                return '
-                <div class="flex items-center gap-5">
-                    <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal" data-delegate-id="' .
-                                    e($row->id) .
-                                    '">
-                        <svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
-                        </svg>
-                    </a>
-                    <a href="' .
-                                    route('delegates.edit', $row->id) .
-                                    '">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
-                            <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
-                        </svg>
-                    </a>
-                </div>';
+                            'render' => function ($row) use ($delegation) {
+                                $editUrl = getRouteForPage('delegation.editDelegate', [
+                                    'delegation' => $delegation->id,
+                                    'delegate' => $row->id,
+                                ]);
+
+                                $deleteForm =
+                                    '
+                        <form action="' .
+                                    getRouteForPage('delegation.destroyDelegate', [$delegation, $row]) .
+                                    '" method="POST" onsubmit="return confirm(\'Are you sure?\');">
+                            ' .
+                                    csrf_field() .
+                                    '
+                            ' .
+                                    method_field('DELETE') .
+                                    '
+                            <button type="submit" class="text-red-600 hover:text-red-800">
+                                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+                                </svg>
+                            </button>
+                        </form>';
+
+                                $editButton =
+                                    '
+                        <a href="' .
+                                    $editUrl .
+                                    '" class="text-blue-600 hover:text-blue-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                                <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
+                            </svg>
+                        </a>';
+
+                                return '<div class="flex items-center gap-5">' . $editButton . $deleteForm . '</div>';
                             },
                         ],
                     ];
@@ -668,17 +685,36 @@
             [
                 'label' => 'Interview With',
                 'render' => function ($row) {
-                    $delegationLink =
-                        '<a href="#" class="!text-[#B68A35]" data-modal-target="DelegationModal" data-modal-toggle="DelegationModal">' .
-                        'Delegation ID : ' .
-                        e($row->interviewWithDelegation->code ?? '') .
-                        '</a>';
+                    if (!empty($row->other_member_id) && $row->otherMember) {
+                        $otherMemberName = $row->otherMember->name ?? '';
+                        $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                        if ($otherMemberId) {
+                            $with =
+                                '<a href="' .
+                                route('other-interview-members.show', [
+                                    'other_interview_member' => base64_encode($otherMemberId),
+                                ]) .
+                                '" class="!text-[#B68A35]">
+                                    <span class="block">Other Member ID: ' .
+                                e($otherMemberId) .
+                                '</span>
+                                </a>';
+                        }
+                    } else {
+                        $with =
+                            '<a href="' .
+                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                            '" class="!text-[#B68A35]">' .
+                            'Delegation ID : ' .
+                            e($row->interviewWithDelegation->code ?? '') .
+                            '</a>';
+                    }
 
                     $names = $row->interviewMembers
                         ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
                         ->implode('');
 
-                    return $delegationLink . $names;
+                    return $with . $names;
                 },
             ],
             ['label' => 'Status', 'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown'))],
@@ -757,7 +793,7 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </button>
-                    <form :action="`{{ url('/mod-admin/delegations/attachments-update') }}/${delegationId}`" method="POST"
+                    <form :action="`{{ getRouteForPage('attachments.edit', $delegation->id) }}`" method="POST"
                         enctype="multipart/form-data" class="p-6 space-y-6">
                         @csrf
                         @method('POST')

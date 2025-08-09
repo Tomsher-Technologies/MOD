@@ -21,7 +21,7 @@
             @empty
                 <tr>
                     <td colspan="{{ count($columns) }}" class="px-4 py-2 border border-gray-200">
-                        {{ $noDataMessage }}
+                        {{ $noDataMessage ?? __db('no_data_found') }}
                     </td>
                 </tr>
             @endforelse

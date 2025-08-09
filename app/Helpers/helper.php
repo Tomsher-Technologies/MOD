@@ -279,6 +279,18 @@ if (!function_exists('getRouteForPage')) {
                 'add_travels' => 'delegations.storeTravel',
                 'del_add_travels' => 'delegations.storeTravel',
             ],
+            'delegation.storeDelegate' => [
+                'add_travels' => 'delegations.storeDelegate',
+                'del_add_travels' => 'delegations.storeDelegate',
+            ],
+            'delegation.editDelegate' => [
+                'manage_delegations' => 'delegations.editDelegate',
+                'del_manage_delegations' => 'delegations.editDelegate',
+            ],
+            'delegation.destroyDelegate' => [
+                'delete_delegation' => 'delegations.destroyDelegate',
+                'del_manage_delegations' => 'delegations.destroyDelegate',
+            ],
             'delegation.edit' => [
                 'edit_delegations' => 'delegations.edit',
                 'del_edit_delegations' => 'delegations.edit',

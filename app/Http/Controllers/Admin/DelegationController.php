@@ -12,6 +12,7 @@ use App\Models\InterviewMember;
 use App\Models\OtherInterviewMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -60,19 +61,36 @@ class DelegationController extends Controller
         ])->orderBy('id', 'desc');
 
         if ($search = $request->input('search')) {
-            $query->where('code', 'like', "%{$search}%");
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where('name_en', 'like', "%{$search}%");
+                        // ->orWhere('escorts', 'like', "%{$search}%")
+                        // ->orWhere('drivers', 'like', "%{$search}%");
+                    });
+            });
         }
-        if ($status = $request->input('status')) {
-            if ($status == 1) {
-                $query->whereHas('participationStatus', function ($q) {
-                    $q->where('value', 'active');
-                });
-            } elseif ($status == 0) {
-                $query->whereHas('participationStatus', function ($q) {
-                    $q->where('value', 'inactive');
-                });
-            }
+
+        if ($invitationFrom = $request->input('invitation_from')) {
+            $query->whereIn('invitation_from_id', $invitationFrom);
         }
+        if ($continentId = $request->input('continent_id')) {
+            $query->where('continent_id', $continentId);
+        }
+        if ($countryId = $request->input('country_id')) {
+            $query->where('country_id', $countryId);
+        }
+        if ($invitationStatusId = $request->input('invitation_status_id')) {
+            $query->where('invitation_status_id', $invitationStatusId);
+        }
+        if ($participationStatusId = $request->input('participation_status_id')) {
+            $query->where('participation_status_id', $participationStatusId);
+        }
+        // if ($hotelName = $request->input('hotel_name')) {
+        //     $query->whereHas('delegates', function ($delegateQuery) use ($hotelName) {
+        //         $delegateQuery->where('hotel_name', $hotelName);
+        //     });
+        // }
 
         $delegations = $query->paginate(20);
 
@@ -218,13 +236,23 @@ class DelegationController extends Controller
         ])->findOrFail($id);
 
         $otherMembers = OtherInterviewMember::all();
-
+        $delegate = new Delegate();
         // return response()->json([
         //     'delegation' => $delegation,
         // ]);
 
-        return view('admin.delegations.add-delegate', compact('delegation', 'otherMembers'));
+        return view('admin.delegations.add-delegate', compact('delegation', 'otherMembers', 'delegate'));
     }
+
+    public function editDelegate(Delegation $delegation, Delegate $delegate)
+    {
+        return view('admin.delegations.edit-delegate', [
+            'delegation' => $delegation,
+            'delegate' => $delegate,
+        ]);
+    }
+
+
     public function store(Request $request)
     {
 
@@ -601,11 +629,19 @@ class DelegationController extends Controller
             ->with('success', 'Interview added successfully.');
     }
 
-    public function storeDelegate(Request $request, $delegationId)
+    public function storeOrUpdateDelegate(Request $request, Delegation $delegation, Delegate $delegate = null)
     {
-        $validated = $request->validate([
+        $isEditMode = $delegate && $delegate->exists;
+
+        // return response()->json([
+        //     'isEditMode' => $isEditMode,
+        //     'delegate' => $delegate,
+        //     'delegation' => $delegation
+        // ]);
+
+        $validator = Validator::make($request->all(), [
             'title_id' => 'nullable|string|exists:dropdown_options,id',
-            'name_ar' => 'nullable|string',
+            'name_ar' => 'required|string',
             'name_en' => 'required|string',
             'designation_en' => 'nullable|string',
             'designation_ar' => 'nullable|string',
@@ -617,7 +653,6 @@ class DelegationController extends Controller
             'team_head' => 'nullable|boolean',
             'badge_printed' => 'nullable|boolean',
             'accommodation' => 'nullable|boolean',
-
             'arrival.mode' => 'nullable|string|in:flight,land,sea',
             'arrival.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'arrival.flight_no' => 'nullable|string|max:255',
@@ -625,7 +660,6 @@ class DelegationController extends Controller
             'arrival.date_time' => 'nullable|date',
             'arrival.status_id' => 'nullable|string|max:255|exists:dropdown_options,id',
             'arrival.comment' => 'nullable|string',
-
             'departure.mode' => 'nullable|string|in:flight,land,sea',
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
@@ -635,40 +669,71 @@ class DelegationController extends Controller
             'departure.comment' => 'nullable|string',
         ]);
 
-        $validated['team_head'] = !empty($validated['team_head']);
-        $validated['badge_printed'] = !empty($validated['badge_printed']);
-        $validated['accommodation'] = !empty($validated['accommodation']);
-
-        $delegation = Delegation::findOrFail($delegationId);
-        $delegate = $delegation->delegates()->create($validated);
-
-        if (isset($validated['arrival']['status_id'])) {
-            $delegate->delegateTransports()->create([
-                'type' => 'arrival',
-                'mode' => $validated['arrival']['mode'],
-                'airport_id' => $validated['arrival']['mode'] === 'flight' ? $validated['arrival']['airport_id'] : null,
-                'flight_no' => $validated['arrival']['mode'] === 'flight' ? $validated['arrival']['flight_no'] : null,
-                'flight_name' => $validated['arrival']['mode'] === 'flight' ? $validated['arrival']['flight_name'] : null,
-                'date_time' => $validated['arrival']['date_time'] ?? null,
-                'status_id' => $validated['arrival']['status_id'] ?? null,
-                'comment' => $validated['arrival']['comment'] ?? null,
-            ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        if (isset($validated['departure']['status_id'])) {
-            $delegate->delegateTransports()->create([
-                'type' => 'departure',
-                'mode' => $validated['departure']['mode'],
-                'airport_id' => $validated['arrival']['mode'] === 'flight' ? $validated['departure']['airport_id'] : null,
-                'flight_no' => $validated['arrival']['mode'] === 'flight' ? $validated['departure']['flight_no'] : null,
-                'flight_name' => $validated['arrival']['mode'] === 'flight' ? $validated['departure']['flight_name'] : null,
-                'date_time' => $validated['departure']['date_time'] ?? null,
-                'status_id' => $validated['departure']['status_id'] ?? null,
-                'comment' => $validated['departure']['comment'] ?? null,
-            ]);
-        }
+        $validated = $validator->validated();
 
-        return redirect()->route('delegations.edit', $delegationId)->with('success', 'Delegation created.');
+        try {
+            DB::beginTransaction();
+
+            $delegateData = [
+                'title_id' => $validated['title_id'] ?? null,
+                'name_en' => $validated['name_en'],
+                'name_ar' => $validated['name_ar'] ?? null,
+                'designation_en' => $validated['designation_en'] ?? null,
+                'designation_ar' => $validated['designation_ar'] ?? null,
+                'gender_id' => $validated['gender_id'],
+                'parent_id' => $validated['parent_id'] ?? null,
+                'relationship_id' => $validated['relationship_id'] ?? null,
+                'note' => $validated['note'] ?? null,
+                'team_head' => !empty($validated['team_head']),
+                'badge_printed' => !empty($validated['badge_printed']),
+                'accommodation' => !empty($validated['accommodation']),
+            ];
+
+            if ($isEditMode) {
+                $delegate->update($delegateData);
+            } else {
+                $delegate = $delegation->delegates()->create($delegateData);
+            }
+
+            if (isset($validated['arrival']['status_id'])) {
+                $arrivalData = [
+                    'mode' => $validated['arrival']['mode'],
+                    'airport_id' => $validated['arrival']['mode'] === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
+                    'flight_no' => $validated['arrival']['mode'] === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
+                    'flight_name' => $validated['arrival']['mode'] === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
+                    'date_time' => $validated['arrival']['date_time'] ?? null,
+                    'status_id' => $validated['arrival']['status_id'] ?? null,
+                    'comment' => $validated['arrival']['comment'] ?? null,
+                ];
+                $delegate->delegateTransports()->updateOrCreate(['type' => 'arrival'], $arrivalData);
+            }
+
+            if (isset($validated['departure']['status_id'])) {
+                $departureData = [
+                    'mode' => $validated['departure']['mode'],
+                    'airport_id' => $validated['departure']['mode'] === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
+                    'flight_no' => $validated['departure']['mode'] === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
+                    'flight_name' => $validated['departure']['mode'] === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
+                    'date_time' => $validated['departure']['date_time'] ?? null,
+                    'status_id' => $validated['departure']['status_id'] ?? null,
+                    'comment' => $validated['departure']['comment'] ?? null,
+                ];
+                $delegate->delegateTransports()->updateOrCreate(['type' => 'departure'], $departureData);
+            }
+
+            DB::commit();
+
+            $message = $isEditMode ? 'Delegate updated successfully.' : 'Delegate created successfully.';
+            return redirect()->route('delegations.edit', $delegation->id)->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Delegate Save/Update Failed: " . $e->getMessage());
+            return back()->withInput()->with('error', $e->getMessage());
+        }
     }
 
     public function deleteDelegate($delegationId, $delegateId)

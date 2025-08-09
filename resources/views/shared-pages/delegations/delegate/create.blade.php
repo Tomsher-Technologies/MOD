@@ -1,16 +1,5 @@
 <div>
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px]">Add Delegate</h2>
-        <a href="{{ route('delegations.edit', $delegation->id) }}"
-            class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                width="24" height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 12H5m14 0-4 4m4-4-4-4" />
-            </svg>
-            <span>Back</span>
-        </a>
-    </div>
+    <x-back-btn title="{{ __db('add_delegate') }}" back-url="{{ getRouteForPage('delegation.edit', $delegation->id) }}" />
 
     @if ($errors->any())
         <div class="mb-4">
@@ -22,7 +11,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('delegations.storeDelegate', $delegation->id) }}">
+    <form method="POST" action="{{ getRouteForPage('delegation.storeDelegate', $delegation->id) }}">
         @csrf
 
         <div class="delegate-row border bg-white p-6 rounded bg-gray-100 mb-2">
@@ -311,20 +300,10 @@
                     <textarea name="departure[comment]" rows="4"
                         class="block p-2.5 w-full text-sm rounded-lg border !border-[#d1d5db]" placeholder="Type here..."></textarea>
                 </div>
-
-
-
             </div>
-
-            <div class="col-span-5 mt-4" id="land-sea-departure">
-                <label class="form-label block mb-1 text-gray-700 font-medium">Comment:</label>
-                <textarea name="departure_comment" rows="4"
-                    class="block p-2.5 w-full text-sm rounded-lg border !border-[#d1d5db]" placeholder="Type here..."></textarea>
-            </div>
-
             <div class="flex justify-between items-center mt-6">
                 <button type="submit" id="add-delegates"
-                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">Submit</button>
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('submit') }}</button>
             </div>
         </div>
     </form>
