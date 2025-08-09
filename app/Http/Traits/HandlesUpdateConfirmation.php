@@ -13,6 +13,9 @@ use Illuminate\Support\Str;
 
 trait HandlesUpdateConfirmation
 {
+    /**
+     * Nicely formats display values for confirmation payload.
+     */
     private function formatDisplayValue($value, $isBoolean = false)
     {
         if ($isBoolean) {
@@ -47,14 +50,11 @@ trait HandlesUpdateConfirmation
             }
 
             $originalValue = $originalMainData[$key];
-            $isChanged = false;
             $isBooleanField = $model->hasCast($key, 'boolean');
 
-            if ($isBooleanField) {
-                $isChanged = (bool) $originalValue !== (bool) $newValue;
-            } else {
-                $isChanged = $originalValue != $newValue;
-            }
+            $isChanged = $isBooleanField
+                ? ((bool) $originalValue !== (bool) $newValue)
+                : ($originalValue != $newValue);
 
             if ($isChanged) {
                 $changedFields[$key] = [
@@ -65,30 +65,61 @@ trait HandlesUpdateConfirmation
             }
         }
 
+
         foreach ($relationsToCompare as $requestKey => $config) {
-            if (!isset($validatedData[$requestKey])) continue;
+
+            if (!isset($validatedData[$requestKey])) {
+                continue;
+            }
             $relationName = $config['relation'];
-            $findBy = $config['find_by'];
-            $existingRelatedModel = $model->{$relationName}()->where($findBy)->first();
-            $submittedRelationData = $validatedData[$requestKey];
 
-            foreach ($submittedRelationData as $key => $value) {
-                $originalValue = $existingRelatedModel ? $existingRelatedModel->{$key} : null;
+            // Special handling for list/checkbox relations (sync tables)
+            if (($config['type'] ?? null) === 'list' && isset($config['column'])) {
+                $oldList = $model->{$relationName}()->pluck($config['column'])->sort()->values();
+                $newList = collect($validatedData[$requestKey])->map(fn($v) => (int)$v)->sort()->values();
 
-                if ($key === 'date_time' && ($originalValue || $value)) {
-                    if (!$originalValue || !Carbon::parse($originalValue)->eq(Carbon::parse($value))) {
-                        $changedFields["{$requestKey}.{$key}"] = [
-                            'label' => Str::headline($requestKey . ' Date Time'),
-                            'old' => $originalValue ? Carbon::parse($originalValue)->format('Y-m-d h:i A') : 'N/A',
-                            'new' => $value ? Carbon::parse($value)->format('Y-m-d h:i A') : 'N/A',
+                $removed = $oldList->diff($newList);
+                $added   = $newList->diff($oldList);
+
+                if ($removed->isNotEmpty() || $added->isNotEmpty()) {
+                    $changedFields[$requestKey] = [
+                        'label'   => Str::headline(str_replace('_ids', '', $requestKey)),
+                        'removed' => $removed->implode(', '),
+                        'added'   => $added->implode(', '),
+                        'old'     => $oldList->implode(', '),
+                        'new'     => $newList->implode(', '),
+                    ];
+                }
+            }
+
+            // Handling for a single related model
+            if (($config['type'] ?? null) === 'single') {
+                $findBy = $config['find_by'] ?? [];
+                $relationQuery = $model->{$relationName}();
+                foreach ($findBy as $field => $valueKey) {
+                    $relationQuery->where($field, $model->{$valueKey});
+                }
+                $existingRelatedModel = $relationQuery->first();
+                $submittedRelationData = $validatedData[$requestKey];
+
+                foreach ($submittedRelationData as $field => $value) {
+                    $originalValue = $existingRelatedModel ? $existingRelatedModel->{$field} : null;
+
+                    if ($field === 'date_time' && ($originalValue || $value)) {
+                        if (!$originalValue || !Carbon::parse($originalValue)->eq(Carbon::parse($value))) {
+                            $changedFields["{$requestKey}.{$field}"] = [
+                                'label' => Str::headline($requestKey . ' Date Time'),
+                                'old'   => $originalValue ? Carbon::parse($originalValue)->format('Y-m-d h:i A') : 'N/A',
+                                'new'   => $value ? Carbon::parse($value)->format('Y-m-d h:i A') : 'N/A',
+                            ];
+                        }
+                    } elseif ($originalValue != $value) {
+                        $changedFields["{$requestKey}.{$field}"] = [
+                            'label' => Str::headline($requestKey . ' ' . str_replace('_id', '', $field)),
+                            'old'   => $this->formatDisplayValue($originalValue),
+                            'new'   => $this->formatDisplayValue($value),
                         ];
                     }
-                } elseif ($originalValue != $value) {
-                    $changedFields["{$requestKey}.{$key}"] = [
-                        'label' => Str::headline($requestKey . ' ' . str_replace('_id', '', $key)),
-                        'old'   => $this->formatDisplayValue($originalValue),
-                        'new'   => $this->formatDisplayValue($value),
-                    ];
                 }
             }
         }

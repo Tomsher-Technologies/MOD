@@ -83,7 +83,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/delegations/{delegation}/interviews/{interview}/edit', [DelegationController::class, 'editInterview'])
         ->name('delegations.editInterview')
         ->scopeBindings();
-    Route::post('/delegations/interview/{id}', [DelegationController::class, 'storeOrUpdateInterview'])->name('delegations.storeOrUpdateInterview');
+    Route::post('/delegations/{delegation}/interview/{interview?}', [DelegationController::class, 'storeOrUpdateInterview'])->name('delegations.storeOrUpdateInterview');
 
     //Attachments
     Route::post('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');

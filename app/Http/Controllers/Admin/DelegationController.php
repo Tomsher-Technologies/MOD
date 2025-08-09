@@ -668,7 +668,7 @@ class DelegationController extends Controller
             'to_delegate_id' => 'required_if:interview_type,delegation|nullable|integer|exists:delegates,id',
             'other_member_id' => 'required_if:interview_type,other|nullable|integer|exists:other_interview_members,id',
             'status_id' => 'required|integer|exists:dropdown_options,id',
-            'comment' => 'nullable|string|max:5000',
+            // 'comment' => 'nullable|string|max:5000',
         ]);
 
         if ($validator->fails()) {
@@ -695,7 +695,7 @@ class DelegationController extends Controller
             'interview_with' => $validated['interview_type'] === 'delegation' ? ($interviewWithDelegation->id ?? null) : null,
             'other_member_id' => $validated['other_member_id'],
             'status_id' => $validated['status_id'],
-            'comment' => $validated['comment'],
+            'comment' => $validated['comment'] ?? null,
         ];
 
         if (!$isEditMode) {
@@ -721,33 +721,22 @@ class DelegationController extends Controller
             }
         }
 
-        $mainModelData = Arr::except($dataToProcess, ['delegation_id']); // Exclude fields that don't change
+        $mainModelData = Arr::except($dataToProcess, ['delegation_id']);
 
-        $changedFields = [];
+        $relationsToCompare = [
+            'from_delegate_ids' => [
+                'relation' => 'fromMembers',
+                'type'     => 'list',
+                'column'   => 'member_id'
+            ],
+            'to_delegate_id' => [
+                'relation' => 'toMembers',
+                'type'     => 'list',
+                'column'   => 'member_id'
+            ]
+        ];
 
-        $oldFromMembers = $interview->fromMembers()->pluck('member_id')->sort()->values()->all();
-        $newFromMembers = collect($validated['from_delegate_ids'])->map(fn($id) => (int)$id)->sort()->values()->all();
-        if ($oldFromMembers !== $newFromMembers) {
-            $changedFields['from_delegate_ids'] = [
-                'label' => 'Interview Participants (From)',
-                'old' => implode(', ', $oldFromMembers),
-                'new' => implode(', ', $newFromMembers),
-            ];
-        }
-
-        if ($dataToProcess['type'] === 'del_del') {
-            $oldToMember = $interview->toMembers()->value('member_id');
-            $newToMember = isset($validated['to_delegate_id']) ? (int)$validated['to_delegate_id'] : null;
-            if ($oldToMember !== $newToMember) {
-                $changedFields['to_delegate_id'] = [
-                    'label' => 'Interview With (Member)',
-                    'old' => $oldToMember ?? 'N/A',
-                    'new' => $newToMember ?? 'N/A',
-                ];
-            }
-        }
-
-        $confirmationResult = $this->processUpdate($request, $interview, $mainModelData, [], $changedFields);
+        $confirmationResult = $this->processUpdate($request, $interview, $mainModelData, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
             return $confirmationResult;
@@ -759,8 +748,8 @@ class DelegationController extends Controller
             DB::beginTransaction();
 
             $interview->update($dataToSave);
-
             $interview->fromMembers()->sync($validated['from_delegate_ids']);
+
             if ($validated['interview_type'] === 'delegation' && !empty($validated['to_delegate_id'])) {
                 $interview->toMembers()->sync([$validated['to_delegate_id']]);
             } else {

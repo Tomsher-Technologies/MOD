@@ -20,11 +20,11 @@
         $oldToDelegateId = old('to_delegate_id', $isEditMode ? $interview->toMembers()->value('member_id') : '');
 
         $formAction = $isEditMode
-            ? getRouteForPage('delegation.updateInterview', [
-                'delegation' => $delegation->id,
-                'interview' => $interview->id,
+            ? getRouteForPage('delegation.storeInterview', [
+                'delegation' => $delegation,
+                'interview' => $interview,
             ])
-            : getRouteForPage('delegation.storeInterview', $delegation->id);
+            : getRouteForPage('delegation.storeInterview', $delegation);
     @endphp
 
     <x-back-btn :title="$title" back-url="{{ getRouteForPage('delegation.show', $delegation->id) }}" />
@@ -47,9 +47,6 @@
 
     <form method="POST" action="{{ $formAction ?? '#' }}" enctype="multipart/form-data" data-ajax-form="true">
         @csrf
-        @if ($isEditMode)
-            @method('PUT')
-        @endif
 
         @error('from_delegate_ids')
             <div class="text-red-600 mt-1">{{ $message }}</div>
@@ -180,7 +177,7 @@
 
                 <div id="statusbox">
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('status') }}:</label>
-                    <select name="status" class="p-3 rounded-lg w-full border text-sm">
+                    <select name="status_id" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_status') }}</option>
                         @foreach (getDropdown('interview_status')->options as $status)
                             <option value="{{ $status->id }}" @selected(old('status_id', $isEditMode ? $interview->status_id : '') == $status->id)>
@@ -189,7 +186,7 @@
                         @endforeach
                     </select>
 
-                    @error('status')
+                    @error('status_id')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
                 </div>
