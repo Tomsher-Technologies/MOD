@@ -22,8 +22,15 @@ class Delegate extends Model
         'driver_id',
         'escort_id',
         'accommodation_id',
+        'accommodation',
         'team_head',
         'badge_printed',
+    ];
+
+    protected $casts = [
+        'team_head' => 'boolean',
+        'badge_printed' => 'boolean',
+        'accommodation' => 'boolean',
     ];
 
     public function title()

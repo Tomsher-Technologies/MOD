@@ -6,11 +6,6 @@
     <x-back-btn title="{{ $isEditMode ? __db('edit_delegate') : __db('add_delegate') }}"
         back-url="{{ route('delegations.edit', $delegation->id) }}" />
 
-    @if (session('error'))
-        <div class="p-4 my-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-            {{ session('error') }}
-        </div>
-    @endif
     @if ($errors->any())
         <div class="p-4 my-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
             <span class="font-medium">Please fix the errors below:</span>
@@ -23,7 +18,7 @@
     @endif
 
     <form method="POST"
-        action="{{ $isEditMode ? route('delegations.updateDelegate', [$delegation, $delegate]) : route('delegations.storeDelegate', $delegation) }}">
+        action="{{ $isEditMode ? route('delegations.updateDelegate', [$delegation, $delegate]) : route('delegations.storeDelegate', $delegation) }}" data-ajax-form="true">
         @csrf
         @if ($isEditMode)
             @method('PUT')

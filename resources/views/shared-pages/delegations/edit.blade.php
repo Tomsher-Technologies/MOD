@@ -22,7 +22,7 @@
                     <label class="form-label">{{ __db('invitation_from') }}:</label>
                     <select name="invitation_from_id"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled>{{ __('Select Invitation From') }}</option>
+                        <option disabled>{{ __db('select_invitation_from') }}</option>
                         @foreach (getDropDown('internal_ranking')->options as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('invitation_from_id', $delegation->invitation_from_id) == $option->id ? 'selected' : '' }}>
@@ -147,21 +147,21 @@
                     @php
                         $columns = [
                             [
-                                'label' => 'Sl.No',
+                                'label' => __db('sl_no'),
                                 'render' => fn($row, $key) => $key + 1,
                             ],
                             [
-                                'label' => 'Title',
+                                'label' => __db('title'),
                                 'render' => fn($row) => e($row->title?->value ?? 'N/A'),
                             ],
                             [
-                                'label' => 'Document Date',
+                                'label' => __db('document_date'),
                                 'render' => fn($row) => optional($row->document_date)
                                     ? \Carbon\Carbon::parse($row->document_date)->format('d-m-Y')
                                     : '',
                             ],
                             [
-                                'label' => 'Uploaded file',
+                                'label' => __db('uploaded_file'),
                                 'render' => function ($row) {
                                     $fileName = e($row->file_name);
                                     $fileUrl = $row->file_path ? asset('storage/' . $row->file_path) : '#';
@@ -169,7 +169,7 @@
                                 },
                             ],
                             [
-                                'label' => 'Actions',
+                                'label' => __db('actions'),
                                 'render' => function ($row) {
                                     $attachmentData = [
                                         'id' => $row->id,
@@ -179,7 +179,6 @@
                                         'file_path' => $row->file_path,
                                     ];
 
-                                    // Safely escape for HTML usage within JS context
                                     $attachmentJson = htmlspecialchars(
                                         json_encode($attachmentData),
                                         ENT_QUOTES,
@@ -334,15 +333,15 @@
 
                     $columns = [
                         [
-                            'label' => 'Sl.No',
+                            'label' => __db('sl_no'),
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
-                            'label' => 'Title',
+                            'label' => __db('title'),
                             'render' => fn($row) => $row->title->value ?? '-',
                         ],
                         [
-                            'label' => 'Name',
+                            'label' => __db('name'),
                             'render' => function ($row) {
                                 $teamHeadBadge = $row->team_head
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
@@ -352,19 +351,19 @@
                             },
                         ],
                         [
-                            'label' => 'Designation',
+                            'label' => __db('designation'),
                             'render' => fn($row) => $row->designation_en ?: $row->designation_ar ?: '-',
                         ],
                         [
-                            'label' => 'Internal Ranking',
+                            'label' => __db('internal_ranking'),
                             'render' => fn($row) => $row->internalRanking->value ?? '-',
                         ],
                         [
-                            'label' => 'Gender',
+                            'label' => __db('gender'),
                             'render' => fn($row) => $row->gender->value ?? '-',
                         ],
                         [
-                            'label' => 'Parent ID',
+                            'label' => __db('parent_id'),
                             'render' => fn($row) => $row->parent
                                 ? ($row->parent->name_en ?:
                                 $row->parent->name_ar ?:
@@ -372,15 +371,15 @@
                                 : '-',
                         ],
                         [
-                            'label' => 'Relationship',
+                            'label' => __db('relationship'),
                             'render' => fn($row) => $row->relationship->value ?? '-',
                         ],
                         [
-                            'label' => 'Badge Printed',
+                            'label' => __db('badge_printed'),
                             'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
                         ],
                         [
-                            'label' => 'Participation Status',
+                            'label' => __db('participation_status'),
                             'render' => fn($row) => $row->delegation->participationStatus->value ?? '-',
                         ],
                         // [
@@ -402,14 +401,14 @@
                         //     },
                         // ],
                         [
-                            'label' => 'Arrival Status',
+                            'label' => __db('arrival_status'),
                             'render' => function ($row) {
                                 $transport = $row->delegateTransports->first();
                                 return $transport ? e($transport->arrival_status ?? '-') : '-';
                             },
                         ],
                         [
-                            'label' => 'Action',
+                            'label' => __db('action'),
                             'render' => function ($row) use ($delegation) {
                                 $editUrl = getRouteForPage('delegation.editDelegate', [
                                     'delegation' => $delegation->id,
@@ -420,14 +419,14 @@
                                     '
                         <form action="' .
                                     getRouteForPage('delegation.destroyDelegate', [$delegation, $row]) .
-                                    '" method="POST" onsubmit="return confirm(\'Are you sure?\');">
+                                    '" method="POST" class="delete-delegate-form">
                             ' .
                                     csrf_field() .
                                     '
                             ' .
                                     method_field('DELETE') .
                                     '
-                            <button type="submit" class="text-red-600 hover:text-red-800">
+                            <button type="submit" class="delete-delegate-btn text-red-600 hover:text-red-800">
                                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
                                 </svg>
@@ -444,12 +443,12 @@
                             </svg>
                         </a>';
 
-                                return '<div class="flex items-center gap-5">' . $editButton . $deleteForm . '</div>';
+                                return '<div class="flex items-center gap-5">' . $deleteForm . $editButton . '</div>';
                             },
                         ],
                     ];
 
-                    $noDataMessage = 'No delegates found.';
+                    $noDataMessage = __db('no_data_found');
                 @endphp
 
                 <x-reusable-table :data="$delegation->delegates" :columns="$columns" :no-data-message="__db('no_data_found')" />
@@ -646,15 +645,15 @@
         });
 
         $columns = [
-            ['label' => 'Sl.No', 'render' => fn($row, $key) => $key + 1],
+            ['label' => __db('sl_no'), 'render' => fn($row, $key) => $key + 1],
             [
-                'label' => 'Date & Time',
+                'label' => __db('date_time'),
                 'render' => fn($row) => $row->date_time
                     ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
                     : '',
             ],
             [
-                'label' => 'Attended By',
+                'label' => __db('attended_by'),
                 'render' => function ($row) use ($delegatesCollection) {
                     if ($row->interviewMembers && count($row->interviewMembers)) {
                         $attendedBy = collect($row->interviewMembers)->filter(fn($m) => $m->type === 'from');
@@ -683,7 +682,7 @@
                 },
             ],
             [
-                'label' => 'Interview With',
+                'label' => __db('interview_with'),
                 'render' => function ($row) {
                     if (!empty($row->other_member_id) && $row->otherMember) {
                         $otherMemberName = $row->otherMember->name ?? '';
@@ -717,9 +716,9 @@
                     return $with . $names;
                 },
             ],
-            ['label' => 'Status', 'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown'))],
+            ['label' => __db('status'), 'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown'))],
             [
-                'label' => 'Action',
+                'label' => __db('action'),
                 'render' => function ($row) {
                     $deleteBtn =
                         '<a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal" class="mr-2">' .
@@ -738,7 +737,6 @@
             ],
         ];
 
-        $noDataMessage = 'No interviews found.';
     @endphp
 
     <hr class="mx-6 border-neutral-200 h-10">
@@ -801,27 +799,27 @@
                         <input type="hidden" name="attachments[0][id]" :value="attachment.id">
 
                         <div>
-                            <label class="form-label block mb-1">Title</label>
+                            <label class="form-label block mb-1">{{ __db('title') }}</label>
                             <select name="attachments[0][title_id]" x-model="attachment.title_id"
                                 class="w-full p-2 border rounded">
-                                <option value="">Select Title</option>
+                                <option value="">{{ __db('select_title') }}</option>
                                 @foreach ($attachmentTitleDropdown->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label class="form-label block mb-1">Document Date</label>
+                            <label class="form-label block mb-1">{{ __db('document_date') }}</label>
                             <input type="date" name="attachments[0][document_date]"
                                 x-model="attachment.document_date" class="w-full p-2 border rounded" />
                         </div>
                         <div>
-                            <label class="form-label block mb-1">Replace File</label>
+                            <label class="form-label block mb-1">{{ __db('replace_file') }}</label>
                             <input type="file" name="attachments[0][file]" @change="handleFileChange"
                                 class="w-full p-2 border rounded" />
                             <template x-if="attachment.file_name">
                                 <p class="mt-2 text-sm text-gray-600">
-                                    Current file:
+                                    {{ __db('current_file') }}:
                                     <a :href="fileUrl" target="_blank" class="text-blue-600 underline"
                                         x-text="attachment.file_name"></a>
                                 </p>
@@ -831,10 +829,10 @@
                         <div class="flex justify-end gap-3">
                             <button type="button" @click="isAttachmentEditModalOpen = false"
                                 class="btn border border-gray-300 px-4 py-2 rounded hover:bg-gray-100">
-                                Cancel
+                                {{ __db('cancel') }}
                             </button>
                             <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2 rounded">
-                                Save
+                                {{ __db('save') }}
                             </button>
                         </div>
                     </form>
@@ -843,8 +841,6 @@
             </div>
         </div>
     </div>
-
-
 
 </div>
 
@@ -904,6 +900,25 @@
                     Swal.fire({
                         title: 'Are you sure?',
                         text: "This will permanently delete the attachment.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#B68A35',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.delete-delegate-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This will permanently delete the delegate.",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#B68A35',

@@ -13,7 +13,7 @@
 
     <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
 
-
+    <script src="{{ asset('assets/js/ajax-form-handler.js') }}"></script>
 
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -68,6 +68,8 @@
                 </div>
             </div>
         </div>
+
+        @include('layouts.partials._confirmation-modal')
     </main>
 
     <script>
@@ -105,6 +107,7 @@
 
 
     @yield('script')
+     @stack('scripts')
 
 </body>
 
