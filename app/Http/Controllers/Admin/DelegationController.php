@@ -43,6 +43,18 @@ class DelegationController extends Controller
             'only' => ['show']
         ]);
 
+        $this->middleware('permission:add_delegate', [
+            'only' => ['addDelegate']
+        ]);
+
+        $this->middleware('permission:delete_delegate', [
+            'only' => ['destroyDelegate']
+        ]);
+
+        $this->middleware('permission:edit_delegate', [
+            'only' => ['editDelegate']
+        ]);
+
         $this->middleware('permission:add_interviews', [
             'only' => ['addInterview', 'storeInterview']
         ]);
@@ -248,16 +260,22 @@ class DelegationController extends Controller
 
     public function editInterview(Delegation $delegation, Interview $interview)
     {
-        if ($interview->exists && $interview->delegation_id !== $delegation->id) {
-            abort(404);
+        if ($interview->delegation_id !== $delegation->id) {
+            abort(404, 'Interview not found for this delegation.');
         }
 
         $otherMembers = OtherInterviewMember::all();
 
+        $toDelegationMembers = [];
+
+        if ($interview->type === 'del_del' && $interview->interviewWithDelegation) {
+            $toDelegationMembers = $interview->interviewWithDelegation->delegates()->get();
+        }
         return view('admin.delegations.edit-interview', [
             'delegation' => $delegation,
             'interview' => $interview,
             'otherMembers' => $otherMembers,
+            'toDelegationMembers' => $toDelegationMembers,
         ]);
     }
 
@@ -628,9 +646,9 @@ class DelegationController extends Controller
         if ($request->has('submit_exit')) {
             return redirect()->route('delegations.index')->with('success', 'Interview created.');
         } elseif ($request->has('submit_add_new')) {
-            return redirect()->route('delegations.addInterview', ['id' => $delegationId])->with('success', 'Interview created.');
+            return redirect()->route('delegations.addInterview', $delegation)->with('success', 'Interview created.');
         } elseif ($request->has('submit_add_travel')) {
-            return redirect()->route('delegations.addTravel', ['id' => $delegationId])->with('success', 'Interview created.');
+            return redirect()->route('delegations.addTravel', $delegation)->with('success', 'Interview created.');
         }
 
         return redirect()->route('delegations.show', $delegation->id)
@@ -650,7 +668,7 @@ class DelegationController extends Controller
             'to_delegate_id' => 'required_if:interview_type,delegation|nullable|integer|exists:delegates,id',
             'other_member_id' => 'required_if:interview_type,other|nullable|integer|exists:other_interview_members,id',
             'status_id' => 'required|integer|exists:dropdown_options,id',
-            'comment' => 'nullable|string',
+            'comment' => 'nullable|string|max:5000',
         ]);
 
         if ($validator->fails()) {
@@ -658,6 +676,13 @@ class DelegationController extends Controller
         }
 
         $validated = $validator->validated();
+
+        if ($validated['interview_type'] === 'delegation') {
+            $validated['other_member_id'] = null;
+        } else {
+            $validated['interview_with_delegation_code'] = null;
+            $validated['to_delegate_id'] = null;
+        }
 
         $interviewWithDelegation = $validated['interview_with_delegation_code']
             ? Delegation::where('code', $validated['interview_with_delegation_code'])->first()
@@ -668,7 +693,7 @@ class DelegationController extends Controller
             'date_time' => $validated['date_time'],
             'type' => $validated['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
             'interview_with' => $validated['interview_type'] === 'delegation' ? ($interviewWithDelegation->id ?? null) : null,
-            'other_member_id' => $validated['interview_type'] === 'other' ? $validated['other_member_id'] : null,
+            'other_member_id' => $validated['other_member_id'],
             'status_id' => $validated['status_id'],
             'comment' => $validated['comment'],
         ];

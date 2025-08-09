@@ -260,10 +260,6 @@
                     class="btn border !border-[#B68A35] !text-[#B68A35] rounded-lg px-5 py-2">{{ __db('cancel') }}</button>
             </div>
         </div>
-
-
-
-
     </div>
 </div>
 

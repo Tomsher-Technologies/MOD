@@ -68,23 +68,32 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/delegations/search-by-code', [DelegationController::class, 'searchByCode'])->name('delegations.searchByCode');
     Route::get('/delegations/members/{delegation}', [DelegationController::class, 'members'])->name('delegations.members');
 
+    //Delegations
     Route::resource('delegations', DelegationController::class);
     Route::get('/delegations-get',  [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+
+    //Travel
     Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegations.addTravel');
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
-    Route::get('/delegations/add-interview/{id}', [DelegationController::class, 'addInterview'])->name('delegations.addInterview');
-    Route::post('/delegations/interview/{id}', [DelegationController::class, 'storeInterview'])->name('delegations.storeInterview');
-    Route::post('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
 
+    //Interview
+    Route::get('/delegations/{delegation}/add-interview', [DelegationController::class, 'addInterview'])->name('delegations.addInterview');
+    Route::get('/delegations/{delegation}/interviews/{interview}/edit', [DelegationController::class, 'editInterview'])
+        ->name('delegations.editInterview')
+        ->scopeBindings();
+    Route::post('/delegations/interview/{id}', [DelegationController::class, 'storeOrUpdateInterview'])->name('delegations.storeOrUpdateInterview');
+
+    //Attachments
+    Route::post('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
     Route::delete('/attachments/destroy/{id}', [DelegationController::class, 'destroyAttachment'])->name('attachments.destroy');
 
+    //Delegate
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
     Route::get('/delegations/edit-delegate/{delegation}/{delegate}', [DelegationController::class, 'editDelegate'])->name('delegations.editDelegate');
     Route::post('/delegations/{delegation}/delegates', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.storeDelegate');
     Route::put('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.updateDelegate');
-
     Route::delete('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'destroyDelegate'])->name('delegations.destroyDelegate');
 });
 

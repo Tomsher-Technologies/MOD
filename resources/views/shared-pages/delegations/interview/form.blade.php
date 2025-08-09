@@ -2,140 +2,135 @@
     @php
         $isEditMode = $interview->exists;
         $title = $isEditMode ? __db('edit_interview') : __db('add_interview');
+
+        $oldFromDelegateIds = collect(
+            old('from_delegate_ids', $isEditMode ? $interview->fromMembers()->pluck('member_id')->all() : []),
+        );
+
+        $oldInterviewType = old(
+            'interview_type',
+            $isEditMode ? ($interview->type === 'del_del' ? 'delegation' : 'other') : 'delegation',
+        );
+
+        $oldToDelegationCode = old(
+            'interview_with_delegation_code',
+            $isEditMode && $interview->interviewWithDelegation ? $interview->interviewWithDelegation->code : '',
+        );
+
+        $oldToDelegateId = old('to_delegate_id', $isEditMode ? $interview->toMembers()->value('member_id') : '');
+
+        $formAction = $isEditMode
+            ? getRouteForPage('delegation.updateInterview', [
+                'delegation' => $delegation->id,
+                'interview' => $interview->id,
+            ])
+            : getRouteForPage('delegation.storeInterview', $delegation->id);
     @endphp
 
-    <x-back-btn :title="$title" back-url="{{ route('delegations.show', $delegation->id) }}" />
+    <x-back-btn :title="$title" back-url="{{ getRouteForPage('delegation.show', $delegation->id) }}" />
 
-    {{-- Delegation Info Table (from your old file) --}}
-    @php
-        $delegationInfoColumns = [
-            ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? ''],
-            ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? ''],
-            ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? ''],
-            ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? ''],
-            ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus->value ?? ''],
-            ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus->value ?? ''],
-        ];
-    @endphp
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
+    {{-- <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
             <div class="bg-white h-full w-full rounded-lg border-0 p-10">
-                <x-reusable-table :columns="$delegationInfoColumns" :data="[$delegation]" />
+                @php
+                    $columns = [
+                        ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? ''],
+                        ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? ''],
+                        ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? ''],
+                        ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? ''],
+                    ];
+                @endphp
+                <x-reusable-table :columns="$columns" :data="[$delegation]" />
             </div>
         </div>
-    </div>
-    <hr class="mx-6 border-neutral-200 h-10">
+    </div> --}}
 
-    {{-- 2. Main Form with AJAX and Dynamic Action/Method --}}
-    <form method="POST"
-        action="{{ $isEditMode ? route('interviews.update', ['delegation' => $delegation, 'interview' => $interview]) : route('interviews.store', $delegation) }}"
-        data-ajax-form="true">
+    <form method="POST" action="{{ $formAction ?? '#' }}" enctype="multipart/form-data" data-ajax-form="true">
         @csrf
         @if ($isEditMode)
             @method('PUT')
         @endif
 
-        {{-- Prepare existing data for populating form fields --}}
-        @php
-            $existingFromDelegateIds = old(
-                'from_delegate_ids',
-                $isEditMode ? $interview->fromMembers()->pluck('member_id')->all() : [],
-            );
-            $existingToDelegateId = old(
-                'to_delegate_id',
-                $isEditMode ? $interview->toMembers()->value('member_id') : null,
-            );
-            $interviewType = old(
-                'interview_type',
-                $isEditMode ? ($interview->type === 'del_del' ? 'delegation' : 'other') : 'delegation',
-            );
-            $interviewWithDelegationCode = old(
-                'interview_with_delegation_code',
-                $isEditMode && $interview->interviewWithDelegation ? $interview->interviewWithDelegation->code : '',
-            );
-        @endphp
-
-        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} (Interview Participants)</h2>
         @error('from_delegate_ids')
-            <div class="text-red-600 my-2">{{ $message }}</div>
+            <div class="text-red-600 mt-1">{{ $message }}</div>
         @enderror
 
-        {{-- Delegates Table (from your old file, adapted for edit mode) --}}
-        @php
-            $delegateColumns = [
-                [
-                    'label' => '<input type="checkbox" id="select-all" />',
-                    'render' => function ($row) use ($existingFromDelegateIds) {
-                        $checked = in_array($row->id, $existingFromDelegateIds) ? 'checked' : '';
-                        return '<input type="checkbox" name="from_delegate_ids[]" value="' .
-                            $row->id .
-                            '" class="delegate-checkbox w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded" ' .
-                            $checked .
-                            ' />';
-                    },
-                ],
-                ['label' => __db('sl_no'), 'render' => fn($row, $key) => $row->code],
-                ['label' => __db('title'), 'render' => fn($row) => $row->title->value ?? ''],
-                [
-                    'label' => __db('name'),
-                    'render' => function ($row) {
-                        $badge = $row->team_head
-                            ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
-                            : '';
-                        return $badge . '<div class="block">' . e($row->name_en ?? '-') . '</div>';
-                    },
-                ],
-                ['label' => __db('designation'), 'render' => fn($row) => $row->designation_en ?? ''],
-                ['label' => __db('internal_ranking'), 'render' => fn($row) => $row->internalRanking->value ?? ''],
-                ['label' => __db('gender'), 'render' => fn($row) => $row->gender->value ?? ''],
-            ];
-        @endphp
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
             <div class="xl:col-span-12 h-full">
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                    <x-reusable-table :columns="$delegateColumns" :data="$delegation->delegates" />
+                    @php
+                        $delegates = $delegation->delegates->filter(fn($d) => !$d->transport);
+                        $columns = [
+                            [
+                                'label' => '',
+                                'render' => function ($row) use ($oldFromDelegateIds) {
+                                    $checked = $oldFromDelegateIds->contains($row->id) ? 'checked' : '';
+                                    return '<input type="checkbox" name="from_delegate_ids[]" value="' .
+                                        $row->id .
+                                        '" class="delegate-checkbox w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded" ' .
+                                        $checked .
+                                        ' />';
+                                },
+                            ],
+                            ['label' => __db('title'), 'render' => fn($row) => $row->title->value ?? ''],
+                            ['label' => __db('name'), 'render' => fn($row) => e($row->value_en ?? '-')],
+                            ['label' => __db('designation'), 'render' => fn($row) => $row->designation_en ?? ''],
+                            [
+                                'label' => __db('internal_ranking'),
+                                'render' => fn($row) => $row->internalRanking->value ?? '',
+                            ],
+                            ['label' => __db('gender'), 'render' => fn($row) => $row->gender->value ?? ''],
+                        ];
+                    @endphp
+                    <x-reusable-table :columns="$columns" :data="$delegates" :is-raw="['label', 'render']" />
                 </div>
             </div>
         </div>
 
         <hr class="mx-6 border-neutral-200 h-10">
-        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('add_interview_requests') }}</h2>
-
-        {{-- Interview Details Form (from your old file, adapted for edit mode) --}}
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interview_details') }}</h2>
         <div class="bg-white rounded-lg p-6 mb-10 mt-4">
             <div class="bg-white grid grid-cols-4 gap-5 mt-6 mb-4">
+
                 <div>
-                    <label class="form-label">Date & Time <span class="text-red-500">*</span></label>
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
                     <input type="datetime-local" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
                         name="date_time"
-                        value="{{ old('date_time', $interview->date_time ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d\TH:i') : '') }}"
-                        required>
+                        value="{{ old('date_time', $isEditMode ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d\TH:i') : '') }}">
+                    @error('date_time')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
+
                 <div class="col-span-4">
-                    <label class="form-label">Interview With <span class="text-red-500">*</span></label>
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('interview_with') }}:</label>
+                    @error('interview_type')
+                        <div class="text-red-600">{{ $message }}</div>
+                    @enderror
                     <div class="flex items-center gap-6 mt-2">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="interview_type" value="delegation"
-                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput(this)"
-                                @if ($interviewType === 'delegation') checked @endif>
+                            <input type="radio" name="interview_type" value="delegation" @checked($oldInterviewType === 'delegation')
+                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput()">
                             <span class="text-gray-700">{{ __db('delegation') }}</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="interview_type" value="other"
-                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput(this)"
-                                @if ($interviewType === 'other') checked @endif>
+                            <input type="radio" name="interview_type" value="other" @checked($oldInterviewType === 'other')
+                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput()">
                             <span class="text-gray-700">{{ __db('other') }}</span>
                         </label>
                     </div>
                 </div>
 
-                {{-- Delegation Type Inputs --}}
                 <div class="flex col-span-2 items-end gap-3" id="delegation-input">
                     <div class="w-full">
-                        <label class="form-label">Interview With (Delegation Code):</label>
+                        <label class="form-label block text-gray-700 font-semibold">{{ __db('interview_with') }}
+                            ({{ __db('delegate_id') }}):</label>
                         <input type="text" id="delegation_code_input" name="interview_with_delegation_code"
-                            class="p-3 rounded-lg w-full border text-sm" placeholder="{{ __db('delegate_id') }}"
-                            value="{{ $interviewWithDelegationCode }}">
+                            class="p-3 rounded-lg w-full border text-sm border-neutral-300"
+                            placeholder="{{ __db('enter_code_or_search') }}" value="{{ $oldToDelegationCode }}">
+                        @error('interview_with_delegation_code')
+                            <div class="text-red-600 mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
                     <button type="button" id="search-delegation-btn"
                         class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
@@ -146,102 +141,135 @@
                         <span class="w-[150px]">{{ __db('search_delegation_id') }}</span>
                     </button>
                 </div>
-                <div id="membersbox">
-                    <label class="form-label">Interview With (Member):</label>
-                    {{-- Name changed to to_delegate_id to match controller --}}
+
+
+                <div id="other-input" class="hidden col-span-1">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('select') }}:</label>
                     <select name="to_delegate_id" class="p-3 rounded-lg w-full border text-sm" id="members-select">
-                        <option value="">Select a delegation code first...</option>
+                        @if ($isEditMode && $oldInterviewType === 'delegation' && !empty($toDelegationMembers))
+                            <option value="" selected disabled>{{ __db('select_member') }}</option>
+                            @foreach ($toDelegationMembers as $member)
+                                <option value="{{ $member->id }}" @selected($oldToDelegateId == $member->id)>
+                                    {{ $member->value_en ?? $member->name_ar }}
+                                </option>
+                            @endforeach
+                        @else
+                            <option value="" selected disabled>{{ __db('enter_delegation_code_first') }}
+                            </option>
+                        @endif
                     </select>
+                    @error('to_delegate_id')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                {{-- Other Type Input --}}
-                <div id="other-input" class="hidden col-span-1">
-                    <label class="form-label">Select Other Member:</label>
+                <div id="membersbox">
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
                     <select name="other_member_id" class="p-3 rounded-lg w-full border text-sm">
-                        <option value="" selected disabled>{{ __db('select_other_member') }}</option>
+                        <option value="" selected disabled>{{ __db('select') }}</option>
                         @foreach ($otherMembers as $member)
-                            <option value="{{ $member->id }}" @if (old('other_member_id', $interview->other_member_id) == $member->id) selected @endif>
-                                {{ $member->name_en ?? $member->name_ar }}</option>
+                            <option value="{{ $member->id }}" @selected(old('other_member_id', $isEditMode ? $interview->other_member_id : '') == $member->id)>
+                                {{ $member->name_en ?? $member->name_ar }}
+                            </option>
                         @endforeach
                     </select>
+                    @error('other_member_id')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                {{-- Common Fields --}}
                 <div id="statusbox">
-                    <label class="form-label">Status <span class="text-red-500">*</span></label>
-                    {{-- Name changed to status_id to match controller --}}
-                    <select name="status_id" class="p-3 rounded-lg w-full border text-sm" required>
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('status') }}:</label>
+                    <select name="status" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_status') }}</option>
                         @foreach (getDropdown('interview_status')->options as $status)
-                            <option value="{{ $status->id }}" @if (old('status_id', $interview->status_id) == $status->id) selected @endif>
-                                {{ $status->value }}</option>
+                            <option value="{{ $status->id }}" @selected(old('status_id', $isEditMode ? $interview->status_id : '') == $status->id)>
+                                {{ $status->value }}
+                            </option>
                         @endforeach
                     </select>
+
+                    @error('status')
+                        <div class="text-red-600">{{ $message }}</div>
+                    @enderror
                 </div>
-                <div class="col-span-4">
-                    <label class="form-label">Comment</label>
-                    <textarea name="comment" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm" rows="3">{{ old('comment', $interview->comment) }}</textarea>
-                </div>
+
             </div>
         </div>
 
-        {{-- 3. Simplified Single Submit Button for AJAX Flow --}}
-        <div class="flex justify-start">
-            <button type="submit" class="btn text-md !bg-[#B68A35] text-white rounded-lg px-8 py-3">
-                {{ $isEditMode ? __db('update_interview') : __db('submit_interview') }}
+        <div class="flex justify-start gap-5 items-center">
+            <button type="submit" class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12 px-6">
+                {{ $isEditMode ? __db('update_and_exit') : __db('submit_and_exit') }}
             </button>
         </div>
     </form>
 
-    {{-- Search Modal (from your old file) --}}
+
     <div id="default-modal4" tabindex="-1" aria-hidden="true"
         class="hidden fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-black bg-opacity-50 p-4">
-        {{-- ... Your entire modal HTML ... --}}
         <div class="bg-white rounded-lg w-full max-w-lg p-6">
             <h3 class="text-xl font-semibold mb-4">{{ __db('search_delegations') }}</h3>
+
             <div class="grid grid-cols-2 gap-4 mb-6">
+
                 @php
                     $continentOptions = getDropDown('continents');
                     $countryOptions = getDropDown('country');
                 @endphp
                 <div>
-                    <label class="form-label">Continents:</label>
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('continents') }}:</label>
                     <select id="modal-continent" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_continent') }}</option>
+
                         @if ($continentOptions)
                             @foreach ($continentOptions->options as $option)
-                                <option value="{{ $option->id }}">{{ $option->value }}</option>
+                                <option value="{{ $option->id }}"
+                                    {{ request('continentOptions') == $option->id ? 'selected' : '' }}>
+                                    {{ $option->value }}
+                                </option>
                             @endforeach
                         @endif
                     </select>
                 </div>
                 <div>
-                    <label class="form-label">Country:</label>
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
                     <select id="modal-country" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_country') }}</option>
                         @if ($countryOptions)
                             @foreach ($countryOptions->options as $option)
-                                <option value="{{ $option->id }}">{{ $option->value }}</option>
+                                <option value="{{ $option->id }}"
+                                    {{ request('countryOptions') == $option->id ? 'selected' : '' }}>
+                                    {{ $option->value }}
+                                </option>
                             @endforeach
                         @endif
                     </select>
                 </div>
             </div>
+
             <div id="modal-search-results"
                 class="mb-6 max-h-60 overflow-auto border border-gray-300 rounded p-3 hidden">
-                <ul id="modal-delegations-list" class="divide-y divide-gray-300"></ul>
+                <ul id="modal-delegations-list" class="divide-y divide-gray-300">
+
+                </ul>
             </div>
+
             <div class="flex justify-end gap-3">
                 <button id="modal-search-btn"
-                    class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50">Search</button>
+                    class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50">{{ __db('search') }}</button>
+
                 <button id="modal-select-btn"
-                    class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50 hidden">Select</button>
+                    class="btn !bg-[#B68A35] !text-white rounded-lg px-5 py-2 disabled:opacity-50 hidden">
+                    {{ __db('select') }}
+                </button>
+
                 <button id="modal-close-btn"
-                    class="btn border !border-[#B68A35] !text-[#B68A35] rounded-lg px-5 py-2">Cancel</button>
+                    class="btn border !border-[#B68A35] !text-[#B68A35] rounded-lg px-5 py-2">{{ __db('cancel') }}</button>
             </div>
         </div>
     </div>
 </div>
+
 
 @section('script')
     <script>
@@ -368,7 +396,7 @@
                                     selectedDelegationId = delegation.id;
 
                                     document.querySelector(
-                                            'input[name="interview_with_delegation"]')
+                                            'input[name="to_delegate_id"]')
                                         .value = delegation.code;
 
                                     modalSelectBtn.disabled = false;

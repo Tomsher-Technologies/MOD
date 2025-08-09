@@ -263,33 +263,51 @@ if (!function_exists('getRouteForPage')) {
                 'add_delegations' => 'delegations.store',
                 'del_add_delegations' => 'delegations.store',
             ],
+            'delegation.show' => [
+                'add_delegations' => 'delegations.show',
+                'del_add_delegations' => 'delegations.show',
+            ],
             'delegation.update' => [
                 'add_delegations' => 'delegations.update',
                 'del_add_delegations' => 'delegations.update',
             ],
+
+            //Interview
             'delegation.storeInterview' => [
-                'add_interviews' => 'delegations.storeInterview',
-                'del_add_interviews' => 'delegations.storeInterview',
+                'add_interviews' => 'delegations.storeOrUpdateInterview',
+                'del_add_interviews' => 'delegations.storeOrUpdateInterview',
             ],
             'delegation.addInterview' => [
                 'add_interviews' => 'delegations.addInterview',
                 'del_add_interviews' => 'delegations.addInterview',
             ],
+            'delegation.editInterview' => [
+                'manage_interviews' => 'delegations.editInterview',
+                'del_manage_interviews' => 'delegations.editInterview',
+            ],
+
+            //Travel
+            'delegation.addTravel' => [
+                'add_travels' => 'delegations.addTravel',
+                'add_travels' => 'delegations.addTravel',
+            ],
             'delegation.storeTravel' => [
                 'add_travels' => 'delegations.storeTravel',
                 'del_add_travels' => 'delegations.storeTravel',
             ],
+
+            //Delegate
             'delegation.storeDelegate' => [
-                'add_travels' => 'delegations.storeDelegate',
-                'del_add_travels' => 'delegations.storeDelegate',
+                'add_delegate' => 'delegations.storeDelegate',
+                'del_add_delegate' => 'delegations.storeDelegate',
             ],
             'delegation.editDelegate' => [
-                'manage_delegations' => 'delegations.editDelegate',
-                'del_manage_delegations' => 'delegations.editDelegate',
+                'manage_delegates' => 'delegations.editDelegate',
+                'del_manage_delegates' => 'delegations.editDelegate',
             ],
             'delegation.destroyDelegate' => [
-                'delete_delegation' => 'delegations.destroyDelegate',
-                'del_manage_delegations' => 'delegations.destroyDelegate',
+                'delete_delegate' => 'delegations.destroyDelegate',
+                'del_delete_delegate' => 'delegations.destroyDelegate',
             ],
             'delegation.edit' => [
                 'edit_delegations' => 'delegations.edit',
@@ -299,6 +317,8 @@ if (!function_exists('getRouteForPage')) {
                 'add_delegate' => 'delegations.addDelegate',
                 'del_add_delegate' => 'delegations.addDelegate',
             ],
+
+
             'delegation.searchByCode' => [
                 'manage_delegations' => 'delegations.searchByCode',
                 'del_manage_delegations' => 'delegations.searchByCode',
@@ -307,10 +327,14 @@ if (!function_exists('getRouteForPage')) {
                 'manage_delegations' => 'delegations.search',
                 'del_manage_delegations' => 'delegations.search',
             ],
+
+            //Members
             'delegation.members' => [
                 'add_interviews' => '/mod-admin/delegations/members',
                 'del_add_interviews' => '/mod-admin/delegations/members',
             ],
+
+            //Attachments
             'attachments.destroy' => [
                 'manage_delegations' => 'attachments.destroy',
                 'del_manage_delegations' => 'attachments.destroy',

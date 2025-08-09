@@ -49,6 +49,17 @@ class Interview extends Model
         return $this->belongsTo(Delegation::class, 'delegation_id');
     }
 
+    public function fromMembers()
+    {
+        return $this->interviewMembers()->where('type', 'from');
+    }
+
+    public function toMembers()
+    {
+        return $this->interviewMembers()->where('type', 'to');
+    }
+
+
     public function interviewMembers()
     {
         return $this->hasMany(InterviewMember::class);
@@ -63,6 +74,7 @@ class Interview extends Model
     {
         return $this->belongsTo(OtherInterviewMember::class, 'other_member_id');
     }
+
 
     public function status()
     {
