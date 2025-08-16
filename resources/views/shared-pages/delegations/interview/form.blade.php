@@ -107,12 +107,12 @@
                     <div class="flex items-center gap-6 mt-2">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="interview_type" value="delegation" @checked($oldInterviewType === 'delegation')
-                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput()">
+                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput(this)">
                             <span class="text-gray-700">{{ __db('delegation') }}</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="interview_type" value="other" @checked($oldInterviewType === 'other')
-                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput()">
+                                class="text-[#B68A35] focus:ring-[#B68A35]" onchange="toggleInterviewInput(this)">
                             <span class="text-gray-700">{{ __db('other') }}</span>
                         </label>
                     </div>

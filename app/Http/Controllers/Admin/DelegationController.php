@@ -657,6 +657,10 @@ class DelegationController extends Controller
 
     public function storeOrUpdateInterview(Request $request, Delegation $delegation, Interview $interview = null)
     {
+        return response().json([
+            'res' => $req->all()
+        ]);
+        
         $isEditMode = $interview && $interview->exists;
 
         $validator = Validator::make($request->all(), [
