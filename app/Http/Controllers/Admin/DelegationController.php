@@ -507,7 +507,12 @@ class DelegationController extends Controller
                 Log::info('Admin chose to notify about these delegation changes: ' . implode(', ', $fieldsToNotify));
             }
 
-            return redirect()->route('delegations.index')->with('success', 'Delegation updated successfully.');
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Delegation updated successfully.',
+                'redirect_url' => route('delegations.show', $delegation->id),
+            ]);
+
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Delegation update failed: ' . $e->getMessage(), [
@@ -517,6 +522,7 @@ class DelegationController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
+
             return back()->withErrors(['error' => 'Failed to update delegation. Please check all required fields and try again.'])->withInput();
         }
     }

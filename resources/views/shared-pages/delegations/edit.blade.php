@@ -3,7 +3,7 @@
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 
-        <form action="{{ getRouteForPage('delegation.update', $delegation->id) }}" method="POST" class="mb-5">
+        <form action="{{ getRouteForPage('delegation.update', $delegation->id) }}" method="POST" data-ajax-form="true" class="mb-5">
             @csrf
             @method('PUT')
 
