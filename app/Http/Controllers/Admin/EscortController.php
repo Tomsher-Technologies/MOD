@@ -45,6 +45,7 @@ class EscortController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name_en', 'like', "%{$search}%")
                     ->orWhere('name_ar', 'like', "%{$search}%")
+                    ->orWhere('military_number', 'like', "%{$search}%")
                     ->orWhere('phone_number', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhereHas('delegation', function ($delegationQuery) use ($search) {

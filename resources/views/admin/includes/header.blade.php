@@ -55,6 +55,13 @@
                         'link' => route('delegations.create'),
                         'permission' => 'add_delegations',
                     ],
+                    'escorts.index' => [
+                        'text' => __db('add_escort'),
+                        'link' => route('escorts.create'),
+                        // 'permission' => 'add_escorts',
+                        'permission' => 'add_delegations',
+                        
+                    ],
                 ];
             @endphp
 

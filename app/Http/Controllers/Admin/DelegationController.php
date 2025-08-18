@@ -85,11 +85,11 @@ class DelegationController extends Controller
                 $q
                     ->where('code', 'like', "%{$search}%")
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
-                        $delegateQuery->where('name_en', 'like', "%{$search}%");
+                        $delegateQuery->where('name_en', 'like', "%{$search}%")
                         ->orWhereHas('escorts', function ($escortQuery) use ($search) {
                             $escortQuery->where('name_en', 'like', "%{$search}%")
                                 ->orWhere('name_ar', 'like', "%{$search}%");
-                        })
+                        });
                         // ->orWhere('drivers', 'like', "%{$search}%");
                     });
             });
