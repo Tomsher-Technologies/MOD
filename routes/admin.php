@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\DelegationController;
+use App\Http\Controllers\Admin\DropdownController;
+use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\LoginController;
+use App\Http\Controllers\Admin\OtherMemberController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
-use App\Http\Controllers\Admin\DropdownController;
-use App\Http\Controllers\Admin\EventController;
-use App\Http\Controllers\Admin\OtherMemberController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
@@ -27,7 +27,6 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/staffs/destroy/{id}', [StaffController::class, 'destroy'])->name('staffs.destroy');
     Route::post('/staff/status', [StaffController::class, 'updateStatus'])->name('staff.status');
     Route::get('/get-roles-by-module/{module}', [StaffController::class, 'getByModule']);
-
 
     // Manage roles & permissions
     Route::resource('roles', RoleController::class);
@@ -68,28 +67,30 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/delegations/search-by-code', [DelegationController::class, 'searchByCode'])->name('delegations.searchByCode');
     Route::get('/delegations/members/{delegation}', [DelegationController::class, 'members'])->name('delegations.members');
 
-    //Delegations
+    // Delegations
     Route::resource('delegations', DelegationController::class);
-    Route::get('/delegations-get',  [DelegationController::class, 'index']);
+    Route::get('/delegations-get', [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
 
-    //Travel
+    // Travel
     Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegations.addTravel');
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
 
-    //Interview
+    // Interview
     Route::get('/delegations/{delegation}/add-interview', [DelegationController::class, 'addInterview'])->name('delegations.addInterview');
     Route::get('/delegations/{delegation}/interviews/{interview}/edit', [DelegationController::class, 'editInterview'])
         ->name('delegations.editInterview')
         ->scopeBindings();
     Route::post('/delegations/{delegation}/interview/{interview?}', [DelegationController::class, 'storeOrUpdateInterview'])->name('delegations.storeOrUpdateInterview');
+    Route::delete('/interviews/destroy/{interview}', [DelegationController::class, 'destroyInterview'])
+        ->name('delegations.destroyInterview');
 
-    //Attachments
+    // Attachments
     Route::post('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
     Route::delete('/attachments/destroy/{id}', [DelegationController::class, 'destroyAttachment'])->name('attachments.destroy');
 
-    //Delegate
+    // Delegate
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
     Route::get('/delegations/edit-delegate/{delegation}/{delegate}', [DelegationController::class, 'editDelegate'])->name('delegations.editDelegate');
     Route::post('/delegations/{delegation}/delegates', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.storeDelegate');

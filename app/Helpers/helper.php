@@ -285,6 +285,10 @@ if (!function_exists('getRouteForPage')) {
                 'manage_interviews' => 'delegations.editInterview',
                 'del_manage_interviews' => 'delegations.editInterview',
             ],
+             'delegation.destroyInterview' => [
+                'delete_interviews' => 'delegations.destroyInterview',
+                'del_delete_interviews' => 'delegations.destroyInterview',
+            ],
 
             //Travel
             'delegation.addTravel' => [

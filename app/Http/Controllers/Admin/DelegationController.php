@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\HandlesUpdateConfirmation;
 use App\Models\Delegate;
 use App\Models\Delegation;
 use App\Models\DelegationAttachment;
@@ -15,9 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use App\Http\Traits\HandlesUpdateConfirmation;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 
 class DelegationController extends Controller
 {
@@ -59,6 +59,10 @@ class DelegationController extends Controller
             'only' => ['addInterview', 'storeInterview']
         ]);
 
+        $this->middleware('permission:delete_interviews', [
+            'only' => ['destroyInterview']
+        ]);
+
         $this->middleware('permission:add_travels', [
             'only' => ['addTravel', 'storeTravel']
         ]);
@@ -77,7 +81,8 @@ class DelegationController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
+                $q
+                    ->where('code', 'like', "%{$search}%")
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
                         $delegateQuery->where('name_en', 'like', "%{$search}%");
                         // ->orWhere('escorts', 'like', "%{$search}%")
@@ -111,6 +116,7 @@ class DelegationController extends Controller
 
         return view('admin.delegations.index', compact('delegations'));
     }
+
     public function create()
     {
         $delegateId = $this->generateNextDelegateId();
@@ -171,7 +177,6 @@ class DelegationController extends Controller
         $interviews = Interview::with(['interviewMembers', 'interviewMembers.fromDelegate', 'interviewMembers.toDelegate', 'interviewWithDelegation'])
             ->where('delegation_id', $id)
             ->get();
-
 
         // return response()->json([
         //     'delegation' => $delegation,
@@ -281,19 +286,17 @@ class DelegationController extends Controller
 
     public function store(Request $request)
     {
-
         // return response()->json($request->all());
 
         $validated = $request->validate([
             'code' => 'required|string|unique:delegations,code',
-            'invitation_from_id'     => 'required|exists:dropdown_options,id',
-            'continent_id'           => 'required|exists:dropdown_options,id',
-            'country_id'             => 'required|exists:dropdown_options,id',
-            'invitation_status_id'   => 'required|exists:dropdown_options,id',
+            'invitation_from_id' => 'required|exists:dropdown_options,id',
+            'continent_id' => 'required|exists:dropdown_options,id',
+            'country_id' => 'required|exists:dropdown_options,id',
+            'invitation_status_id' => 'required|exists:dropdown_options,id',
             'participation_status_id' => 'required|exists:dropdown_options,id',
-            'note1'                  => 'nullable|string',
-            'note2'                  => 'nullable|string',
-
+            'note1' => 'nullable|string',
+            'note2' => 'nullable|string',
             'delegates' => 'sometimes|array',
             'delegates.*.tmp_id' => 'required',
             'delegates.*.title_id' => 'nullable|string',
@@ -308,17 +311,15 @@ class DelegationController extends Controller
             'delegates.*.note' => 'nullable|string',
             'delegates.*.team_head' => 'nullable|boolean',
             'delegates.*.badge_printed' => 'nullable|boolean',
-
-            'attachments'            => 'nullable|array',
-            'attachments.*.title_id'    => 'nullable|string',
-            'attachments.*.file'     => 'nullable|file|max:5120',
+            'attachments' => 'nullable|array',
+            'attachments.*.title_id' => 'nullable|string',
+            'attachments.*.file' => 'nullable|file|max:5120',
             'attachments.*.document_date' => 'nullable|date',
         ]);
 
         DB::beginTransaction();
 
         try {
-
             $delegation = Delegation::create([
                 'code' => $validated['code'],
                 'invitation_from_id' => $validated['invitation_from_id'],
@@ -374,7 +375,7 @@ class DelegationController extends Controller
                 foreach ($request->attachments as $idx => $attachment) {
                     if ($request->file("attachments.$idx.file")) {
                         $file = $request->file("attachments.$idx.file");
-                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? "";
+                        $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? '';
                         $delegation->attachments()->create([
                             'title_id' => $attachment['title_id'],
                             'file_name' => $file->getClientOriginalName(),
@@ -384,7 +385,6 @@ class DelegationController extends Controller
                     }
                 }
             }
-
 
             DB::commit();
 
@@ -408,24 +408,24 @@ class DelegationController extends Controller
         $delegation = Delegation::findOrFail($id);
 
         $validated = $request->validate([
-            'invitation_from_id'      => 'required|exists:dropdown_options,id',
-            'continent_id'            => 'required|exists:dropdown_options,id',
-            'country_id'              => 'required|exists:dropdown_options,id',
-            'invitation_status_id'    => 'required|exists:dropdown_options,id',
+            'invitation_from_id' => 'required|exists:dropdown_options,id',
+            'continent_id' => 'required|exists:dropdown_options,id',
+            'country_id' => 'required|exists:dropdown_options,id',
+            'invitation_status_id' => 'required|exists:dropdown_options,id',
             'participation_status_id' => 'required|exists:dropdown_options,id',
-            'note1'                   => 'nullable|string',
-            'note2'                   => 'nullable|string',
+            'note1' => 'nullable|string',
+            'note2' => 'nullable|string',
         ]);
 
         try {
             $delegation->update([
-                'invitation_from_id'    => $validated['invitation_from_id'],
-                'continent_id'          => $validated['continent_id'],
-                'country_id'            => $validated['country_id'],
-                'invitation_status_id'  => $validated['invitation_status_id'],
+                'invitation_from_id' => $validated['invitation_from_id'],
+                'continent_id' => $validated['continent_id'],
+                'country_id' => $validated['country_id'],
+                'invitation_status_id' => $validated['invitation_status_id'],
                 'participation_status_id' => $validated['participation_status_id'],
-                'note1'                 => $validated['note1'] ?? null,
-                'note2'                 => $validated['note2'] ?? null,
+                'note1' => $validated['note1'] ?? null,
+                'note2' => $validated['note2'] ?? null,
             ]);
 
             return redirect()->route('delegations.index')->with('success', 'Delegation updated successfully.');
@@ -449,7 +449,6 @@ class DelegationController extends Controller
         $inputAttachments = $validatedData['attachments'];
 
         foreach ($inputAttachments as $idx => $attachmentData) {
-
             if (!empty($attachmentData['id']) && (!empty($attachmentData['deleted']) && $attachmentData['deleted'])) {
                 $att = $delegation->attachments()->find($attachmentData['id']);
                 if ($att) {
@@ -469,7 +468,7 @@ class DelegationController extends Controller
             if ($request->hasFile("attachments.$idx.file")) {
                 $file = $request->file("attachments.$idx.file");
 
-                $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? "";
+                $path = storeUploadedFileToModuleFolder($file, 'delegations', $delegation->code, 'files') ?? '';
 
                 $data['file_path'] = $path;
                 $data['file_name'] = $file->getClientOriginalName();
@@ -492,10 +491,10 @@ class DelegationController extends Controller
             }
         }
 
-        return redirect()->route('delegations.edit', $delegationId)
+        return redirect()
+            ->route('delegations.edit', $delegationId)
             ->with('success', 'Attachments updated successfully.');
     }
-
 
     public function destroyAttachment($id)
     {
@@ -510,7 +509,6 @@ class DelegationController extends Controller
         return redirect()->back()->with('success', 'Attachment deleted successfully.');
     }
 
-
     public function storeTravel(Request $request, $delegationId)
     {
         $delegation = Delegation::findOrFail($delegationId);
@@ -522,7 +520,6 @@ class DelegationController extends Controller
         $validated = $request->validate([
             'delegate_ids' => 'required|array|min:1',
             'delegate_ids.*' => 'integer|exists:delegates,id',
-
             'arrival.mode' => 'nullable|string|in:flight,land,sea',
             'arrival.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'arrival.flight_no' => 'nullable|string|max:255',
@@ -530,7 +527,6 @@ class DelegationController extends Controller
             'arrival.date_time' => 'nullable|date',
             'arrival.status_id' => 'nullable|string|max:255',
             'arrival.comment' => 'nullable|string',
-
             'departure.mode' => 'nullable|string|in:flight,land,sea',
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
@@ -575,92 +571,94 @@ class DelegationController extends Controller
 
             DB::commit();
 
-            return redirect()->route('delegations.show', $delegationId)
+            return redirect()
+                ->route('delegations.show', $delegationId)
                 ->with('success', 'Travel details assigned to selected delegates successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return back()->withErrors(['error' => 'Failed to save travel details: ' . $e->getMessage()])
+            return back()
+                ->withErrors(['error' => 'Failed to save travel details: ' . $e->getMessage()])
                 ->withInput();
         }
     }
 
-    public function storeInterview(Request $request, $delegationId)
-    {
+    // public function storeInterview(Request $request, $delegationId)
+    // {
+    //     // return response()->json($request->all());
 
-        // return response()->json($request->all());
+    //     $delegation = Delegation::findOrFail($delegationId);
 
-        $delegation = Delegation::findOrFail($delegationId);
+    //     $validator = Validator::make($request->all(), [
+    //         'delegate_ids' => 'required|array|min:1',
+    //         'delegate_ids.*' => 'integer|exists:delegates,id',
+    //         'date_time' => 'required|date',
+    //         'interview_type' => ['required', Rule::in(['delegation', 'other'])],
+    //         'interview_with_delegation' => 'required_if:interview_type,delegation|string|nullable|exists:delegations,code',
+    //         'interview_with_other_member_id' => 'required_if:interview_type,other|string|nullable|exists:other_interview_members,id',
+    //         'members' => 'required_if:interview_type,delegation|string|nullable',
+    //         'members.*' => 'integer|exists:delegates,id',
+    //         'status' => 'required|string|max:50',
+    //         'comment' => 'nullable|string|max:1000',
+    //     ]);
 
-        $validator = Validator::make($request->all(), [
-            'delegate_ids' => 'required|array|min:1',
-            'delegate_ids.*' => 'integer|exists:delegates,id',
-            'date_time' => 'required|date',
-            'interview_type' => ['required', Rule::in(['delegation', 'other'])],
-            'interview_with_delegation' => 'required_if:interview_type,delegation|string|nullable|exists:delegations,code',
-            'interview_with_other_member_id' => 'required_if:interview_type,other|string|nullable|exists:other_interview_members,id',
-            'members' => 'required_if:interview_type,delegation|string|nullable',
-            'members.*' => 'integer|exists:delegates,id',
-            'status' => 'required|string|max:50',
-            'comment' => 'nullable|string|max:1000',
-        ]);
+    //     if ($validator->fails()) {
+    //         return redirect()->back()->withErrors($validator)->withInput();
+    //     }
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+    //     $data = $validator->validated();
 
-        $data = $validator->validated();
+    //     $interviewWithDelegationId = null;
+    //     if ($data['interview_type'] === 'delegation') {
+    //         $interviewWithdelegation = Delegation::where('code', $data['interview_with_delegation'])->first();
+    //         $interviewWithDelegationId = $interviewWithdelegation ? $interviewWithdelegation->id : null;
+    //     }
 
-        $interviewWithDelegationId = null;
-        if ($data['interview_type'] === 'delegation') {
-            $interviewWithdelegation = Delegation::where('code', $data['interview_with_delegation'])->first();
-            $interviewWithDelegationId = $interviewWithdelegation ? $interviewWithdelegation->id : null;
-        }
+    //     $interview = Interview::create([
+    //         'delegation_id' => $delegation->id,
+    //         'type' => $data['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
+    //         'interview_with' => $data['interview_type'] === 'delegation' ? $interviewWithDelegationId : null,
+    //         'other_member_id' => $data['interview_type'] === 'other' ? $data['interview_with_other_member_id'] : null,
+    //         'date_time' => $data['date_time'],
+    //         'status_id' => $data['status'],
+    //         'comment' => $data['comment'] ?? null,
+    //     ]);
 
-        $interview = Interview::create([
-            'delegation_id' => $delegation->id,
-            'type' => $data['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
-            'interview_with' => $data['interview_type'] === 'delegation' ? $interviewWithDelegationId : null,
-            'other_member_id' => $data['interview_type'] === 'other' ? $data['interview_with_other_member_id'] : null,
-            'date_time' => $data['date_time'],
-            'status_id' => $data['status'],
-            'comment' => $data['comment'] ?? null,
-        ]);
+    //     foreach ($data['delegate_ids'] as $delegateId) {
+    //         InterviewMember::create([
+    //             'interview_id' => $interview->id,
+    //             'type' => 'from',
+    //             'member_id' => $delegateId,
+    //         ]);
+    //     }
 
-        foreach ($data['delegate_ids'] as $delegateId) {
-            InterviewMember::create([
-                'interview_id' => $interview->id,
-                'type' => 'from',
-                'member_id' => $delegateId,
-            ]);
-        }
+    //     if ($data['interview_type'] === 'delegation' && !empty($data['members'])) {
+    //         InterviewMember::create([
+    //             'interview_id' => $interview->id,
+    //             'type' => 'to',
+    //             'member_id' => $data['members'],
+    //         ]);
+    //     }
 
-        if ($data['interview_type'] === 'delegation' && !empty($data['members'])) {
-            InterviewMember::create([
-                'interview_id' => $interview->id,
-                'type' => 'to',
-                'member_id' => $data['members'],
-            ]);
-        }
+    //     if ($request->has('submit_exit')) {
+    //         return redirect()->route('delegations.index')->with('success', 'Interview created.');
+    //     } elseif ($request->has('submit_add_new')) {
+    //         return redirect()->route('delegations.addInterview', $delegation)->with('success', 'Interview created.');
+    //     } elseif ($request->has('submit_add_travel')) {
+    //         return redirect()->route('delegations.addTravel', $delegation)->with('success', 'Interview created.');
+    //     }
 
-        if ($request->has('submit_exit')) {
-            return redirect()->route('delegations.index')->with('success', 'Interview created.');
-        } elseif ($request->has('submit_add_new')) {
-            return redirect()->route('delegations.addInterview', $delegation)->with('success', 'Interview created.');
-        } elseif ($request->has('submit_add_travel')) {
-            return redirect()->route('delegations.addTravel', $delegation)->with('success', 'Interview created.');
-        }
-
-        return redirect()->route('delegations.show', $delegation->id)
-            ->with('success', 'Interview added successfully.');
-    }
+    //     return redirect()
+    //         ->route('delegations.show', $delegation->id)
+    //         ->with('success', 'Interview added successfully.');
+    // }
 
     public function storeOrUpdateInterview(Request $request, Delegation $delegation, Interview $interview = null)
     {
-        return response().json([
-            'res' => $req->all()
-        ]);
-        
+        // return response().json([
+        //     'res' => $req->all()
+        // ]);
+
         $isEditMode = $interview && $interview->exists;
 
         $validator = Validator::make($request->all(), [
@@ -695,8 +693,10 @@ class DelegationController extends Controller
         $dataToProcess = [
             'delegation_id' => $delegation->id,
             'date_time' => $validated['date_time'],
+            'from_delegate_ids' => $validated['from_delegate_ids'],
             'type' => $validated['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
             'interview_with' => $validated['interview_type'] === 'delegation' ? ($interviewWithDelegation->id ?? null) : null,
+            'to_delegate_id' => $validated['to_delegate_id'],
             'other_member_id' => $validated['other_member_id'],
             'status_id' => $validated['status_id'],
             'comment' => $validated['comment'] ?? null,
@@ -706,22 +706,33 @@ class DelegationController extends Controller
             try {
                 DB::beginTransaction();
                 $newInterview = Interview::create($dataToProcess);
+                $newInterview->interviewMembers()->delete();
 
-                $newInterview->fromMembers()->sync($validated['from_delegate_ids']);
+                foreach ($validated['from_delegate_ids'] as $fromId) {
+                    $newInterview->interviewMembers()->create([
+                        'member_id' => $fromId,
+                        'type' => 'from'
+                    ]);
+                }
+
+                // Attach new "to" member if present
                 if ($validated['interview_type'] === 'delegation' && !empty($validated['to_delegate_id'])) {
-                    $newInterview->toMembers()->sync([$validated['to_delegate_id']]);
+                    $newInterview->interviewMembers()->create([
+                        'member_id' => $validated['to_delegate_id'],
+                        'type' => 'to'
+                    ]);
                 }
 
                 DB::commit();
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Interview created successfully.',
-                    'redirect_url' => route('delegations.show', $delegation->id) // Adjust as needed
+                    'redirect_url' => route('delegations.show', $delegation->id)  // Adjust as needed
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
-                Log::error("Interview Create Failed: " . $e->getMessage());
-                return response()->json(['message' => 'Error creating interview.'], 500);
+                Log::error('Interview Create Failed: ' . $e->getMessage());
+                return response()->json(['message' => 'Error creating interview.', 'errors' => [$e->getMessage()]], 500);
             }
         }
 
@@ -730,14 +741,34 @@ class DelegationController extends Controller
         $relationsToCompare = [
             'from_delegate_ids' => [
                 'relation' => 'fromMembers',
-                'type'     => 'list',
-                'column'   => 'member_id'
+                'type' => 'list',
+                'column' => 'member_id',
+                'display_with' => [
+                    'model' => \App\Models\Delegate::class,
+                    'key' => 'id',
+                    'label' => 'name_en',
+                ],
             ],
             'to_delegate_id' => [
                 'relation' => 'toMembers',
-                'type'     => 'list',
-                'column'   => 'member_id'
-            ]
+                'type' => 'single',
+                'column' => 'member_id',
+                'display_with' => [
+                    'model' => \App\Models\Delegate::class,
+                    'key' => 'id',
+                    'label' => 'name_en',
+                ],
+            ],
+            'status_id' => [
+                'relation' => 'status',
+                'type' => 'single',
+                'column' => 'id',
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
         ];
 
         $confirmationResult = $this->processUpdate($request, $interview, $mainModelData, $relationsToCompare);
@@ -752,23 +783,35 @@ class DelegationController extends Controller
             DB::beginTransaction();
 
             $interview->update($dataToSave);
-            $interview->fromMembers()->sync($validated['from_delegate_ids']);
+
+            $interview->interviewMembers()->where('type', 'from')->delete();
+
+            foreach ($validated['from_delegate_ids'] as $fromId) {
+                $interview->interviewMembers()->create([
+                    'member_id' => $fromId,
+                    'type' => 'from',
+                ]);
+            }
+
+            $interview->interviewMembers()->where('type', 'to')->delete();
 
             if ($validated['interview_type'] === 'delegation' && !empty($validated['to_delegate_id'])) {
-                $interview->toMembers()->sync([$validated['to_delegate_id']]);
-            } else {
-                $interview->toMembers()->sync([]);
+                $interview->interviewMembers()->create([
+                    'member_id' => $validated['to_delegate_id'],
+                    'type' => 'to',
+                ]);
             }
 
             DB::commit();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Interview updated successfully.',
-                'redirect_url' => route('delegations.show', $delegation->id)
+                'redirect_url' => route('delegations.show', $delegation->id),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Interview Update Failed: " . $e->getMessage());
+            Log::error('Interview Update Failed: ' . $e->getMessage());
             return response()->json(['message' => 'Error updating interview.'], 500);
         }
     }
@@ -843,7 +886,7 @@ class DelegationController extends Controller
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
-                Log::error("Delegate Create Failed: " . $e->getMessage() . ' on line ' . $e->getLine());
+                Log::error('Delegate Create Failed: ' . $e->getMessage() . ' on line ' . $e->getLine());
                 return response()->json(['message' => 'A critical error occurred while creating the delegate.'], 500);
             }
         }
@@ -885,7 +928,7 @@ class DelegationController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Delegate Save/Update Failed: " . $e->getMessage() . ' on line ' . $e->getLine());
+            Log::error('Delegate Save/Update Failed: ' . $e->getMessage() . ' on line ' . $e->getLine());
             return response()->json(['message' => 'A critical error occurred while saving.'], 500);
         }
     }
@@ -895,18 +938,40 @@ class DelegationController extends Controller
         try {
             $delegate->delete();
 
-            return redirect()->route('delegations.edit', $delegation->id)
+            return redirect()
+                ->route('delegations.edit', $delegation->id)
                 ->with('success', 'Delegate has been deleted successfully.');
         } catch (\Exception $e) {
-            Log::error("Delegate Deletion Failed: " . $e->getMessage());
+            Log::error('Delegate Deletion Failed: ' . $e->getMessage());
 
             return back()->with('error', 'An error occurred while deleting the delegate.');
         }
     }
 
+    public function destroyInterview(Interview $interview)
+    {
+        try {
+            $delegationId = $interview->delegation_id;
+
+            $interview->interviewMembers()->delete();
+            $interview->delete();
+
+            // Always go to the delegation show route after delete
+            return redirect()
+                ->route('delegations.show', $delegationId)
+                ->with('success', 'Interview deleted successfully.');
+        } catch (\Exception $e) {
+            Log::error('Interview Delete Failed: ' . $e->getMessage());
+
+            // Still redirect to delegation page on failure
+            return redirect()
+                ->route('delegations.show', $interview->delegation_id)
+                ->with('error', 'Failed to delete interview.');
+        }
+    }
+
     public function searchByCode(Request $request)
     {
-
         $code = $request->query('code');
         if (!$code) {
             return response()->json(['success' => false, 'message' => 'Code required.']);
@@ -918,11 +983,12 @@ class DelegationController extends Controller
             return response()->json(['success' => false, 'message' => 'Delegation not found.']);
         }
 
-        return response()->json(['success' => true, 'delegation' => [
-            'id' => $delegation->id,
-            'code' => $delegation->code,
-            'delegates' => $delegation->delegates->map(fn($d) => ['id' => $d->id, 'value_en' => $d->value_en]),
-        ]]);
+        $members = $delegation->delegates->map(fn($d) => [
+            'id' => $d->id,
+            'name_en' => $d->name_en,
+        ]);
+
+        return response()->json(['success' => true, 'members' => $members]);
     }
 
     public function search(Request $request)
@@ -960,7 +1026,6 @@ class DelegationController extends Controller
 
         return response()->json(['success' => true, 'members' => $members]);
     }
-
 
     protected function loadDropdownOptions()
     {

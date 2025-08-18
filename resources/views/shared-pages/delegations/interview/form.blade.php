@@ -140,7 +140,7 @@
                 </div>
 
 
-                <div id="other-input" class="hidden col-span-1">
+                <div id="membersbox" class=" col-span-1">
                     <label class="form-label block text-gray-700 font-medium">{{ __db('select') }}:</label>
                     <select name="to_delegate_id" class="p-3 rounded-lg w-full border text-sm" id="members-select">
                         @if ($isEditMode && $oldInterviewType === 'delegation' && !empty($toDelegationMembers))
@@ -160,7 +160,7 @@
                     @enderror
                 </div>
 
-                <div id="membersbox">
+                <div id="other-input" class="hidden">
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
                     <select name="other_member_id" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select') }}</option>
@@ -317,6 +317,7 @@
             const membersSelect = document.getElementById('members-select');
 
             let selectedDelegationId = null;
+            let selectedDelegationCode = null;
             let selectedMembers = [];
 
             function openModal() {
@@ -346,8 +347,10 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        if (data.success && data.delegation) {
-                            populateMembers(data.delegation.delegates);
+                        console.log("data",data);
+                        
+                        if (data.success && data.members) {
+                            populateMembers(data.members);
                             toastr.success("{{ __db('members_fetched') }}");
                         } else {
                             toastr.error("{{ __db('delegation_not_found') }}");
@@ -391,6 +394,7 @@
                                             'text-white'));
                                     this.classList.add('bg-[#B68A35]', 'text-white');
                                     selectedDelegationId = delegation.id;
+                                    selectedDelegationCode = delegation.code;
 
                                     document.querySelector(
                                             'input[name="to_delegate_id"]')
@@ -405,8 +409,9 @@
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");
 
-                            modalSelectBtn.classList.add('hidden');
-                            modalSelectBtn.disabled = true;
+                                  modalSelectBtn.disabled = false;
+                                    modalSelectBtn.classList.remove(
+                                        'hidden');
 
                         } else {
                             delegationsList.innerHTML = '<li>No delegations found.</li>';
@@ -425,6 +430,8 @@
             modalSelectBtn.addEventListener('click', function() {
                 if (!selectedDelegationId) return;
 
+                  codeInput.value = selectedDelegationCode;
+
                 fetch(`${window.pageRoutes.delegationMembers}/${selectedDelegationId}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -433,11 +440,11 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
+                            
                             populateMembers(data.members);
                             closeModal();
                             toastr.success("{{ __db('members_fetched') }}");
-                            // codeInput.value =
-                            //     '';
+                          
                         } else {
                             toastr.success("{{ __db('failed_to_load_members') }}");
 
@@ -462,5 +469,10 @@
                 });
             }
         });
+
+
+
+       
+
     </script>
 @endsection
