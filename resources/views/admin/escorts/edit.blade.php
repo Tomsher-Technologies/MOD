@@ -13,7 +13,7 @@
         </a>
     </div>
 
-    <form action="{{ route('escorts.update', $escort->id) }}" method="POST" autocomplete="off">
+    <form action="{{ route('escorts.update', $escort->id) }}" method="POST" data-ajax-form="true" autocomplete="off">
         @csrf
         @method('PUT')
         <div class="bg-white rounded-lg p-6 mb-10 mt-4">

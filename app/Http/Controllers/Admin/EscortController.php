@@ -86,6 +86,7 @@ class EscortController extends Controller
             'id_number' => 'nullable|string|max:255',
             'id_issue_date' => 'nullable|date',
             'id_expiry_date' => 'nullable|date',
+            'status' => 'nullable|string|max:255',
         ]);
 
         $escort = Escort::create($request->all());
@@ -122,7 +123,7 @@ class EscortController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
@@ -134,15 +135,45 @@ class EscortController extends Controller
             'id_number' => 'nullable|string|max:255',
             'id_issue_date' => 'nullable|date',
             'id_expiry_date' => 'nullable|date',
+            'status' => 'nullable|string|max:255', // Add status to validation
         ]);
 
         $escort = Escort::findOrFail($id);
-        $escort->update($request->all());
 
-        // Log activity
-        $this->logActivity('Escort', $escort, 'update');
+        // Define relations to compare for confirmation dialog
+        $relationsToCompare = [
+            'status' => [], // Simple string comparison for 'status' field
+        ];
 
-        return redirect()->route('escorts.index')->with('success', __db('Escort updated successfully.'));
+        // Use the processUpdate method for confirmation dialog
+        $confirmationResult = $this->processUpdate($request, $escort, $validated, $relationsToCompare);
+
+        if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
+            return $confirmationResult;
+        }
+
+        $dataToSave = $confirmationResult['data'];
+        $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
+        $escort->update($dataToSave);
+
+        // Log activity with changed fields
+        if ($request->has('changed_fields_json')) {
+            $changes = json_decode($request->input('changed_fields_json'), true);
+            if (!empty($changes)) {
+                $this->logActivity('Escort', $escort, 'update', null, $changes);
+            }
+        }
+
+        if (!empty($fieldsToNotify)) {
+            \Illuminate\Support\Facades\Log::info('Admin chose to notify about these escort changes: ' . implode(', ', $fieldsToNotify));
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __db('Escort updated successfully.'),
+            'redirect_url' => route('escorts.index'), // Or escorts.show if there is one
+        ]);
     }
 
     /**

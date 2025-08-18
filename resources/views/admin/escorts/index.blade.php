@@ -44,6 +44,7 @@
                   <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Gender</th>
                   <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Known Languages</th>
                   <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Assigned Delegation</th>
+                  <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Status</th> <!-- New column -->
                   <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Action</th>
                </tr>
             </thead>
@@ -64,6 +65,7 @@
                         N/A
                     @endif
                   </td>
+                  <td class="px-4 py-3 border border-gray-200">{{ $escort->status ?? 'N/A' }}</td> <!-- New column -->
                   <td class="px-4 py-3 text-start " dir="ltr">
                     {{-- @can('edit_escorts') --}}
                         <a href="{{ route('escorts.edit', $escort->id) }}" title="{{ __db('edit') }}"
@@ -96,7 +98,7 @@
                </tr>
                @empty
                <tr class="border-t">
-                   <td class="px-4 py-3 text-center " colspan="9" dir="ltr"> {{-- Changed colspan from 8 to 9 --}}
+                   <td class="px-4 py-3 text-center " colspan="10" dir="ltr"> {{-- Changed colspan from 9 to 10 --}}
                        {{ __db('no__data_found') }}
                    </td>
                </tr>
