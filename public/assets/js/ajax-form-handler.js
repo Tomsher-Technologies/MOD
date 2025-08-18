@@ -144,6 +144,12 @@ function promptForConfirmation(form, changedFields) {
                 form.appendChild(notifyInput);
             });
 
+            const changedFieldsInput = document.createElement("input");
+            changedFieldsInput.type = "hidden";
+            changedFieldsInput.name = "changed_fields_json";
+            changedFieldsInput.value = JSON.stringify(changedFields);
+            form.appendChild(changedFieldsInput);
+
             // Re-submit the form, which will now include the confirmation flags
             handleFormSubmit(form);
         }

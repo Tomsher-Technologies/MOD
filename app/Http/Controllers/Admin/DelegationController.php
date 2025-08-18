@@ -724,6 +724,9 @@ class DelegationController extends Controller
                 }
 
                 DB::commit();
+
+                $this->logActivity('Delegation', $delegation, 'create');
+
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Interview created successfully.',
@@ -803,6 +806,17 @@ class DelegationController extends Controller
             }
 
             DB::commit();
+
+            if ($request->has('changed_fields_json')) {
+                $this->logActivity(
+                    module: 'Delegation',
+                    model: $delegation,
+                    event: 'update',
+                    userId: auth()->id(),
+                    changedFields: json_decode($request->input('changed_fields_json'), true),
+                    activityModelClass: \App\Models\DelegationActivity::class
+                );
+            }
 
             return response()->json([
                 'status' => 'success',

@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
 
 trait HandlesUpdateConfirmation
 {
-    /**
-     * Nicely formats display values for confirmation payload.
-     */
     private function formatDisplayValue($value, $isBoolean = false)
     {
         if ($isBoolean) {
@@ -26,9 +23,6 @@ trait HandlesUpdateConfirmation
         return $value;
     }
 
-    /**
-     * Helper to get human-readable label for given ID using display_with config.
-     */
     private function getDisplayLabel($modelClass, $keyField, $labelField, $id)
     {
         if ($id === null) {
@@ -202,5 +196,46 @@ trait HandlesUpdateConfirmation
             'status' => 'confirmation_required',
             'changed_fields' => $changedFields
         ]);
+    }
+
+    protected function logActivity(string $module, ?Model $model, string $eventId, ?int $userId = null, ?array $changedFields = null, ?string $message = null,
+        string $activityModelClass = \App\Models\DelegationActivity::class): void
+    {
+        $moduleIdField = $model ? $model->getKeyName() : null;
+        $moduleId = $model ? $model->getKey() : null;
+
+        $activityData = [
+            'event_id' => $eventId,
+            'module' => $module,
+            'module_id' => $moduleId,
+            'user_id' => $userId ?? auth()->id(),
+            'changes' => $changedFields ? json_encode($changedFields) : null,
+            'message' => $message ?? $this->generateActivityMessage($eventId, $module, $changedFields),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        try {
+            $activityModelClass::create($activityData);
+        } catch (\Throwable $e) {
+            Log::error("Failed to log activity for {$module} - {$e->getMessage()}");
+        }
+    }
+
+    protected function generateActivityMessage(string $eventId, string $module, ?array $changedFields = null): string
+    {
+        $user = auth()->user();
+        $userName = $user ? $user->name : 'Someone';
+
+        if ($eventId === 'create') {
+            return "{$module} was created by {$userName}.";
+        }
+        if ($eventId === 'update' && $changedFields) {
+            $changesSummary = collect($changedFields)
+                ->map(fn($change, $key) => "{$change['label']}: '{$change['old']}' => '{$change['new']}'")
+                ->implode('; ');
+            return "{$userName} updated {$module}: {$changesSummary}.";
+        }
+        return "{$userName} performed {$eventId} on {$module}.";
     }
 }
