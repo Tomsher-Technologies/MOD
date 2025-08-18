@@ -101,6 +101,11 @@ class Delegation extends Model
         return $this->hasMany(DelegationAttachment::class);
     }
 
+    public function escorts()
+    {
+        return $this->hasMany(Escort::class);
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class);

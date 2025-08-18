@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\DelegationController;
 use App\Http\Controllers\Admin\DropdownController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\EscortController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OtherMemberController;
 use App\Http\Controllers\Admin\RoleController;
@@ -96,6 +97,9 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/delegations/{delegation}/delegates', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.storeDelegate');
     Route::put('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.updateDelegate');
     Route::delete('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'destroyDelegate'])->name('delegations.destroyDelegate');
+
+    // Escorts
+    Route::resource('escorts', EscortController::class);
 });
 
 Route::get('/lang/{lang}', function ($lang) {

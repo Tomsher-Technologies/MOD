@@ -76,7 +76,8 @@ class DelegationController extends Controller
             'country',
             'invitationStatus',
             'participationStatus',
-            'delegates'
+            'delegates',
+            'escorts'
         ])->orderBy('id', 'desc');
 
         if ($search = $request->input('search')) {
@@ -85,7 +86,10 @@ class DelegationController extends Controller
                     ->where('code', 'like', "%{$search}%")
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
                         $delegateQuery->where('name_en', 'like', "%{$search}%");
-                        // ->orWhere('escorts', 'like', "%{$search}%")
+                        ->orWhereHas('escorts', function ($escortQuery) use ($search) {
+                            $escortQuery->where('name_en', 'like', "%{$search}%")
+                                ->orWhere('name_ar', 'like', "%{$search}%");
+                        })
                         // ->orWhere('drivers', 'like', "%{$search}%");
                     });
             });
