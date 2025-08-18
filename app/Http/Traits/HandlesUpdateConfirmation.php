@@ -198,19 +198,45 @@ trait HandlesUpdateConfirmation
         ]);
     }
 
-    protected function logActivity(string $module, ?Model $model, string $eventId, ?int $userId = null, ?array $changedFields = null, ?string $message = null,
+    protected function logActivity(string $module, ?Model $model, string $action, ?int $userId = null, ?array $changedFields = null, ?string $message = null, ?int $currentEventId = null,
         string $activityModelClass = \App\Models\DelegationActivity::class): void
     {
         $moduleIdField = $model ? $model->getKeyName() : null;
         $moduleId = $model ? $model->getKey() : null;
+
+        // Try to get the current event ID from various sources
+        $eventId = $currentEventId;
+        
+        if (!$eventId && $model) {
+            // If the model has an event_id field, use it
+            if ($model->hasAttribute('event_id') && $model->event_id) {
+                $eventId = $model->event_id;
+            }
+            // For delegation-related models, try to get event from delegation
+            elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
+                $eventId = $model->delegation->event_id;
+            }
+            elseif ($model instanceof \App\Models\Interview && $model->delegation && $model->delegation->event_id) {
+                $eventId = $model->delegation->event_id;
+            }
+            elseif ($model instanceof \App\Models\DelegationAttachment && $model->delegation && $model->delegation->event_id) {
+                $eventId = $model->delegation->event_id;
+            }
+        }
+        
+        // If still no event ID, try to get the default event
+        if (!$eventId) {
+            $defaultEvent = \App\Models\Event::where('is_default', true)->first();
+            $eventId = $defaultEvent ? $defaultEvent->id : null;
+        }
 
         $activityData = [
             'event_id' => $eventId,
             'module' => $module,
             'module_id' => $moduleId,
             'user_id' => $userId ?? auth()->id(),
-            'changes' => $changedFields ? json_encode($changedFields) : null,
-            'message' => $message ?? $this->generateActivityMessage($eventId, $module, $changedFields),
+            'changes' => $changedFields,
+            'message' => $message ?? $this->generateActivityMessage($action, $module, $changedFields),
             'created_at' => now(),
             'updated_at' => now(),
         ];
@@ -222,20 +248,23 @@ trait HandlesUpdateConfirmation
         }
     }
 
-    protected function generateActivityMessage(string $eventId, string $module, ?array $changedFields = null): string
+    protected function generateActivityMessage(string $action, string $module, ?array $changedFields = null): string
     {
         $user = auth()->user();
         $userName = $user ? $user->name : 'Someone';
 
-        if ($eventId === 'create') {
+        if ($action === 'create') {
             return "{$module} was created by {$userName}.";
         }
-        if ($eventId === 'update' && $changedFields) {
+        if ($action === 'update' && $changedFields) {
             $changesSummary = collect($changedFields)
                 ->map(fn($change, $key) => "{$change['label']}: '{$change['old']}' => '{$change['new']}'")
                 ->implode('; ');
             return "{$userName} updated {$module}: {$changesSummary}.";
         }
-        return "{$userName} performed {$eventId} on {$module}.";
+        if ($action === 'delete') {
+            return "{$module} was deleted by {$userName}.";
+        }
+        return "{$userName} performed {$action} on {$module}.";
     }
 }

@@ -17,6 +17,7 @@ class Delegation extends Model
         'participation_status_id',
         'note1',
         'note2',
+        'event_id',
     ];
 
     protected static function booted()
@@ -103,5 +104,12 @@ class Delegation extends Model
     public function event()
     {
         return $this->belongsTo(Event::class);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(DelegationActivity::class, 'module_id')
+            ->where('module', 'Delegation')
+            ->orderBy('created_at', 'desc');
     }
 }

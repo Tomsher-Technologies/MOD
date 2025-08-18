@@ -320,6 +320,10 @@ class DelegationController extends Controller
         DB::beginTransaction();
 
         try {
+            // Get the current event ID (default event if none specified)
+            $currentEvent = \App\Models\Event::where('is_default', true)->first();
+            $eventId = $currentEvent ? $currentEvent->id : null;
+            
             $delegation = Delegation::create([
                 'code' => $validated['code'],
                 'invitation_from_id' => $validated['invitation_from_id'],
@@ -329,6 +333,7 @@ class DelegationController extends Controller
                 'participation_status_id' => $validated['participation_status_id'],
                 'note1' => $validated['note1'] ?? null,
                 'note2' => $validated['note2'] ?? null,
+                'event_id' => $eventId,
             ]);
 
             // $tmpIdToDbId = [];
@@ -388,6 +393,9 @@ class DelegationController extends Controller
 
             DB::commit();
 
+            // Log delegation creation activity
+            $this->logActivity('Delegation', $delegation, 'create');
+
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', 'Delegation created.');
             } elseif ($request->has('submit_add_interview')) {
@@ -417,19 +425,85 @@ class DelegationController extends Controller
             'note2' => 'nullable|string',
         ]);
 
+        // Define relations with display labels for confirmation dialog
+        $relationsToCompare = [
+            'invitation_from_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'continent_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'country_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'invitation_status_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'participation_status_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+        ];
+
+        // Use the processUpdate method for confirmation dialog
+        $confirmationResult = $this->processUpdate($request, $delegation, $validated, $relationsToCompare);
+
+        if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
+            return $confirmationResult;
+        }
+
+        $dataToSave = $confirmationResult['data'];
+        $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
         try {
+            DB::beginTransaction();
+            
             $delegation->update([
-                'invitation_from_id' => $validated['invitation_from_id'],
-                'continent_id' => $validated['continent_id'],
-                'country_id' => $validated['country_id'],
-                'invitation_status_id' => $validated['invitation_status_id'],
-                'participation_status_id' => $validated['participation_status_id'],
-                'note1' => $validated['note1'] ?? null,
-                'note2' => $validated['note2'] ?? null,
+                'invitation_from_id' => $dataToSave['invitation_from_id'],
+                'continent_id' => $dataToSave['continent_id'],
+                'country_id' => $dataToSave['country_id'],
+                'invitation_status_id' => $dataToSave['invitation_status_id'],
+                'participation_status_id' => $dataToSave['participation_status_id'],
+                'note1' => $dataToSave['note1'] ?? null,
+                'note2' => $dataToSave['note2'] ?? null,
             ]);
+
+            DB::commit();
+            
+            // Log delegation update activity if there were changes
+            if ($request->has('changed_fields_json')) {
+                $changes = json_decode($request->input('changed_fields_json'), true);
+                if (!empty($changes)) {
+                    $this->logActivity('Delegation', $delegation, 'update', null, $changes);
+                }
+            }
+
+            if (!empty($fieldsToNotify)) {
+                Log::info('Admin chose to notify about these delegation changes: ' . implode(', ', $fieldsToNotify));
+            }
 
             return redirect()->route('delegations.index')->with('success', 'Delegation updated successfully.');
         } catch (\Throwable $e) {
+            DB::rollBack();
             return back()->withErrors(['error' => 'Failed to update delegation: ' . $e->getMessage()])->withInput();
         }
     }
@@ -499,6 +573,9 @@ class DelegationController extends Controller
     public function destroyAttachment($id)
     {
         $attachment = DelegationAttachment::findOrFail($id);
+        
+        // Log attachment deletion activity before deletion
+        $this->logActivity('DelegationAttachment', $attachment, 'delete');
 
         if ($attachment->file_path && Storage::disk('public')->exists($attachment->file_path)) {
             Storage::disk('public')->delete($attachment->file_path);
@@ -725,7 +802,7 @@ class DelegationController extends Controller
 
                 DB::commit();
 
-                $this->logActivity('Delegation', $delegation, 'create');
+                $this->logActivity('Interview', $newInterview, 'create');
 
                 return response()->json([
                     'status' => 'success',
@@ -809,9 +886,9 @@ class DelegationController extends Controller
 
             if ($request->has('changed_fields_json')) {
                 $this->logActivity(
-                    module: 'Delegation',
-                    model: $delegation,
-                    event: 'update',
+                    module: 'Interview',
+                    model: $interview,
+                    action: 'update',
                     userId: auth()->id(),
                     changedFields: json_decode($request->input('changed_fields_json'), true),
                     activityModelClass: \App\Models\DelegationActivity::class
@@ -893,6 +970,9 @@ class DelegationController extends Controller
 
                 DB::commit();
 
+                // Log delegate creation activity
+                $this->logActivity('Delegate', $newDelegate, 'create');
+
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Delegate created successfully.',
@@ -906,6 +986,41 @@ class DelegationController extends Controller
         }
 
         $relationsToCompare = [
+            'title_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'gender_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'parent_id' => [
+                'display_with' => [
+                    'model' => \App\Models\Delegate::class,
+                    'key' => 'id',
+                    'label' => 'name_en',
+                ],
+            ],
+            'relationship_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'internal_ranking_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
             'arrival' => ['relation' => 'delegateTransports', 'find_by' => ['type' => 'arrival']],
             'departure' => ['relation' => 'delegateTransports', 'find_by' => ['type' => 'departure']]
         ];
@@ -930,6 +1045,14 @@ class DelegationController extends Controller
 
             DB::commit();
 
+            // Log delegate update activity if there were changes
+            if ($request->has('changed_fields_json')) {
+                $changes = json_decode($request->input('changed_fields_json'), true);
+                if (!empty($changes)) {
+                    $this->logActivity('Delegate', $delegate, 'update', null, $changes);
+                }
+            }
+
             if (!empty($fieldsToNotify)) {
                 Log::info('Admin chose to notify about these changes: ' . implode(', ', $fieldsToNotify));
             }
@@ -950,6 +1073,9 @@ class DelegationController extends Controller
     public function destroyDelegate(Delegation $delegation, Delegate $delegate)
     {
         try {
+            // Log delegate deletion activity before deletion
+            $this->logActivity('Delegate', $delegate, 'delete');
+            
             $delegate->delete();
 
             return redirect()
@@ -966,6 +1092,9 @@ class DelegationController extends Controller
     {
         try {
             $delegationId = $interview->delegation_id;
+            
+            // Log interview deletion activity before deletion
+            $this->logActivity('Interview', $interview, 'delete');
 
             $interview->interviewMembers()->delete();
             $interview->delete();
