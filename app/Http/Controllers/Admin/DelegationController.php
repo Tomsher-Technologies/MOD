@@ -407,7 +407,13 @@ class DelegationController extends Controller
             return redirect()->route('delegations.index')->with('success', 'Delegation created.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to create delegation: ' . $e->getMessage()])->withInput();
+            Log::error('Delegation creation failed: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'validated_data' => $validated,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return back()->withErrors(['error' => 'Failed to create delegation. Please check all required fields and try again.'])->withInput();
         }
     }
 
@@ -504,7 +510,14 @@ class DelegationController extends Controller
             return redirect()->route('delegations.index')->with('success', 'Delegation updated successfully.');
         } catch (\Throwable $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to update delegation: ' . $e->getMessage()])->withInput();
+            Log::error('Delegation update failed: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'delegation_id' => $id,
+                'validated_data' => $validated,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return back()->withErrors(['error' => 'Failed to update delegation. Please check all required fields and try again.'])->withInput();
         }
     }
 
@@ -1172,8 +1185,8 @@ class DelegationController extends Controller
 
     protected function loadDropdownOptions()
     {
-        $invitationFrom = Dropdown::with('options')->where('code', 'invitation_from')->first();
-        $continent = Dropdown::with('options')->where('code', 'continent')->first();
+        $invitationFrom = Dropdown::with('options')->where('code', 'departments')->first();
+        $continent = Dropdown::with('options')->where('code', 'continents')->first();
         $country = Dropdown::with('options')->where('code', 'country')->first();
         $invitationStatus = Dropdown::with('options')->where('code', 'invitation_status')->first();
         $participationStatus = Dropdown::with('options')->where('code', 'participation_status')->first();
