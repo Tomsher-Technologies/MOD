@@ -10,9 +10,11 @@ class DelegationActivity extends Model
 
     protected $fillable = [
         'event_id',
-        'action',
         'module',
-        'module_id',
+        'submodule',
+        'action',
+        'submodule_id',
+        'delegation_id',
         'user_id',
         'changes',
         'message',

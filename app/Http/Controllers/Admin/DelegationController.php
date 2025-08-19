@@ -398,7 +398,12 @@ class DelegationController extends Controller
             DB::commit();
 
             // Log delegation creation activity
-            $this->logActivity('Delegation', $delegation, 'create');
+            $this->logActivity(
+                module: 'Delegation',
+                action: 'create',
+                model: $delegation,
+                delegationId: $delegation->id
+            );
 
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', 'Delegation created.');
@@ -503,7 +508,13 @@ class DelegationController extends Controller
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
-                    $this->logActivity('Delegation', $delegation, 'update', null, $changes);
+                    $this->logActivity(
+                        module: 'Delegation',
+                        action: 'update',
+                        model: $delegation,
+                        changedFields: $changes,
+                        delegationId: $delegation->id
+                    );
                 }
             }
 
@@ -598,7 +609,14 @@ class DelegationController extends Controller
         $attachment = DelegationAttachment::findOrFail($id);
         
         // Log attachment deletion activity before deletion
-        $this->logActivity('DelegationAttachment', $attachment, 'delete');
+        $this->logActivity(
+            module: 'Delegation',
+            submodule: 'attachment',
+            action: 'delete',
+            model: $attachment,
+            submoduleId: $attachment->id,
+            delegationId: $attachment->delegation_id
+        );
 
         if ($attachment->file_path && Storage::disk('public')->exists($attachment->file_path)) {
             Storage::disk('public')->delete($attachment->file_path);
@@ -642,26 +660,26 @@ class DelegationController extends Controller
             foreach ($validated['delegate_ids'] as $delegateId) {
                 $delegate = $delegation->delegates()->findOrFail($delegateId);
 
-                if (isset($validated['arrival']['status_id'])) {
+                if (isset($validated['arrival']['status_id']) && $validated['arrival']['status_id']) {
                     $delegate->delegateTransports()->create([
                         'type' => 'arrival',
                         'mode' => $validated['arrival']['mode'],
-                        'airport_id' => $validated['arrival']['mode'] === 'flight' ? $validated['arrival']['airport_id'] : null,
-                        'flight_no' => $validated['arrival']['mode'] === 'flight' ? $validated['arrival']['flight_no'] : null,
-                        'flight_name' => $validated['arrival']['mode'] === 'flight' ? $validated['arrival']['flight_name'] : null,
+                        'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
+                        'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
+                        'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
                         'date_time' => $validated['arrival']['date_time'] ?? null,
                         'status_id' => $validated['arrival']['status_id'] ?? null,
                         'comment' => $validated['arrival']['comment'] ?? null,
                     ]);
                 }
 
-                if (isset($validated['departure']['status_id'])) {
+                if (isset($validated['departure']['status_id']) && $validated['departure']['status_id']) {
                     $delegate->delegateTransports()->create([
                         'type' => 'departure',
                         'mode' => $validated['departure']['mode'],
-                        'airport_id' => $validated['arrival']['mode'] === 'flight' ? $validated['departure']['airport_id'] : null,
-                        'flight_no' => $validated['arrival']['mode'] === 'flight' ? $validated['departure']['flight_no'] : null,
-                        'flight_name' => $validated['arrival']['mode'] === 'flight' ? $validated['departure']['flight_name'] : null,
+                        'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
+                        'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
+                        'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
                         'date_time' => $validated['departure']['date_time'] ?? null,
                         'status_id' => $validated['departure']['status_id'] ?? null,
                         'comment' => $validated['departure']['comment'] ?? null,
@@ -825,7 +843,14 @@ class DelegationController extends Controller
 
                 DB::commit();
 
-                $this->logActivity('Interview', $newInterview, 'create');
+                $this->logActivity(
+                    module: 'Delegation',
+                    submodule: 'interview',
+                    action: 'create',
+                    model: $newInterview,
+                    submoduleId: $newInterview->id,
+                    delegationId: $delegation->id
+                );
 
                 return response()->json([
                     'status' => 'success',
@@ -909,12 +934,15 @@ class DelegationController extends Controller
 
             if ($request->has('changed_fields_json')) {
                 $this->logActivity(
-                    module: 'Interview',
-                    model: $interview,
+                    module: 'Delegation',
+                    submodule: 'interview',
                     action: 'update',
+                    model: $interview,
                     userId: auth()->id(),
                     changedFields: json_decode($request->input('changed_fields_json'), true),
-                    activityModelClass: \App\Models\DelegationActivity::class
+                    activityModelClass: \App\Models\DelegationActivity::class,
+                    submoduleId: $interview->id,
+                    delegationId: $delegation->id
                 );
             }
 
@@ -994,7 +1022,14 @@ class DelegationController extends Controller
                 DB::commit();
 
                 // Log delegate creation activity
-                $this->logActivity('Delegate', $newDelegate, 'create');
+                $this->logActivity(
+                    module: 'Delegation',
+                    submodule: 'delegate',
+                    action: 'create',
+                    model: $newDelegate,
+                    submoduleId: $newDelegate->id,
+                    delegationId: $delegation->id
+                );
 
                 return response()->json([
                     'status' => 'success',
@@ -1102,7 +1137,15 @@ class DelegationController extends Controller
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
-                    $this->logActivity('Delegate', $delegate, 'update', null, $changes);
+                    $this->logActivity(
+                        module: 'Delegation',
+                        submodule: 'delegate',
+                        action: 'update',
+                        model: $delegate,
+                        changedFields: $changes,
+                        submoduleId: $delegate->id,
+                        delegationId: $delegation->id
+                    );
                 }
             }
 
@@ -1127,7 +1170,14 @@ class DelegationController extends Controller
     {
         try {
             // Log delegate deletion activity before deletion
-            $this->logActivity('Delegate', $delegate, 'delete');
+            $this->logActivity(
+                module: 'Delegation',
+                submodule: 'delegate',
+                action: 'delete',
+                model: $delegate,
+                submoduleId: $delegate->id,
+                delegationId: $delegation->id
+            );
             
             $delegate->delete();
 
@@ -1147,7 +1197,14 @@ class DelegationController extends Controller
             $delegationId = $interview->delegation_id;
             
             // Log interview deletion activity before deletion
-            $this->logActivity('Interview', $interview, 'delete');
+            $this->logActivity(
+                module: 'Delegation',
+                submodule: 'interview',
+                action: 'delete',
+                model: $interview,
+                submoduleId: $interview->id,
+                delegationId: $delegationId
+            );
 
             $interview->interviewMembers()->delete();
             $interview->delete();

@@ -236,12 +236,19 @@ trait HandlesUpdateConfirmation
         ]);
     }
 
-    protected function logActivity(string $module, ?Model $model, string $action, ?int $userId = null, ?array $changedFields = null, ?string $message = null, ?int $currentEventId = null,
-        string $activityModelClass = \App\Models\DelegationActivity::class): void
-    {
-        $moduleIdField = $model ? $model->getKeyName() : null;
-        $moduleId = $model ? $model->getKey() : null;
-
+    protected function logActivity(
+        string $module,
+        string $action,
+        ?Model $model = null,
+        ?int $userId = null,
+        ?array $changedFields = null,
+        ?string $message = null,
+        ?int $currentEventId = null,
+        string $activityModelClass = \App\Models\DelegationActivity::class,
+        ?string $submodule = null,
+        ?int $submoduleId = null,
+        ?int $delegationId = null
+    ): void {
         // Try to get the current event ID from various sources
         $eventId = $currentEventId;
         
@@ -271,7 +278,10 @@ trait HandlesUpdateConfirmation
         $activityData = [
             'event_id' => $eventId,
             'module' => $module,
-            'module_id' => $moduleId,
+            'submodule' => $submodule,
+            'action' => $action,
+            'submodule_id' => $submoduleId,
+            'delegation_id' => $delegationId,
             'user_id' => $userId ?? auth()->id(),
             'changes' => $changedFields,
             'message' => $message ?? $this->generateActivityMessage($action, $module, $changedFields),

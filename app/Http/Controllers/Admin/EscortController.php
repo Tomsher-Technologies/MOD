@@ -92,7 +92,14 @@ class EscortController extends Controller
         $escort = Escort::create($request->all());
 
         // Log activity
-        $this->logActivity('Escort', $escort, 'create');
+        $this->logActivity(
+            module: 'Escorts',
+            submodule: 'managing_members',
+            action: 'create',
+            model: $escort,
+            submoduleId: $escort->id,
+            delegationId: $escort->delegation_id
+        );
 
         return redirect()->route('escorts.index')->with('success', __db('Escort created successfully.'));
     }
@@ -161,7 +168,15 @@ class EscortController extends Controller
         if ($request->has('changed_fields_json')) {
             $changes = json_decode($request->input('changed_fields_json'), true);
             if (!empty($changes)) {
-                $this->logActivity('Escort', $escort, 'update', null, $changes);
+                $this->logActivity(
+                    module: 'Escorts',
+                    submodule: 'managing_members',
+                    action: 'update',
+                    model: $escort,
+                    changedFields: $changes,
+                    submoduleId: $escort->id,
+                    delegationId: $escort->delegation_id
+                );
             }
         }
 
@@ -185,7 +200,14 @@ class EscortController extends Controller
         $escort->delete();
 
         // Log activity
-        $this->logActivity('Escort', $escort, 'delete');
+        $this->logActivity(
+            module: 'Escorts',
+            submodule: 'managing_members',
+            action: 'delete',
+            model: $escort,
+            submoduleId: $escort->id,
+            delegationId: $escort->delegation_id
+        );
 
         return redirect()->route('escorts.index')->with('success', __db('Escort deleted successfully.'));
     }
