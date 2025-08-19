@@ -29,7 +29,7 @@ class DelegationController extends Controller
         $this->middleware('auth');
 
         $this->middleware('permission:manage_delegations', [
-            'only' => ['index', 'setDefault', 'search', 'members', 'editAttachment']
+            'only' => ['index', 'setDefault', 'search', 'members', 'editAttachment', 'updateAttachments', 'destroyAttachment']
         ]);
 
         $this->middleware('permission:add_delegations', [
@@ -53,7 +53,7 @@ class DelegationController extends Controller
         ]);
 
         $this->middleware('permission:edit_delegate', [
-            'only' => ['editDelegate', 'updateAttachments', 'destroyAttachment']
+            'only' => ['editDelegate']
         ]);
 
         $this->middleware('permission:add_interviews', [
@@ -210,23 +210,157 @@ class DelegationController extends Controller
                 // 'status'
             ]);
 
-        // if ($search = $request->input('search')) {
-        //     $query->where(function ($q) use ($search) {
-        //         $q->where('flight_no', 'like', "%{$search}%")
-        //             ->orWhere('flight_name', 'like', "%{$search}%")
-        //             ->orWhereHas('delegate', function ($delegateQuery) use ($search) {
-        //                 $delegateQuery->where('name_en', 'like', "%{$search}%")
-        //                     ->orWhere('name_ar', 'like', "%{$search}%")
-        //                     ->orWhereHas('delegation', function ($delegationQuery) use ($search) {
-        //                         $delegationQuery->where('code', 'like', "%{$search}%");
-        //                     });
-        //             });
-        //     });
-        // }
+        if ($searchKey = $request->input('search_key')) {
+            $query->where(function ($q) use ($searchKey) {
+                $q->where('flight_no', 'like', "%{$searchKey}%")
+                    ->orWhere('flight_name', 'like', "%{$searchKey}%")
+                    ->orWhereHas('delegate', function ($delegateQuery) use ($searchKey) {
+                        $delegateQuery->where('name_en', 'like', "%{$searchKey}%")
+                            ->orWhere('name_ar', 'like', "%{$searchKey}%")
+                            ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
+                                $delegationQuery->where('code', 'like', "%{$searchKey}%");
+                            });
+                    });
+            });
+        }
+
+        if ($eventId = $request->input('event_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($eventId) {
+                $delegationQuery->where('event_id', $eventId);
+            });
+        }
+
+        if ($fromDate = $request->input('from_date')) {
+            $query->whereDate('date_time', '>=', $fromDate);
+        }
+
+        if ($toDate = $request->input('to_date')) {
+            $query->whereDate('date_time', '<=', $toDate);
+        }
 
         $arrivals = $query->latest()->paginate(10);
 
         return view('admin.arrivals.index', compact('arrivals'));
+    }
+
+    public function departuresIndex(Request $request)
+    {
+        $query = DelegateTransport::where('type', 'departure')
+            ->with([
+                'delegate.delegation.country',
+                'delegate.delegation.continent',
+                // 'delegate.escort',
+                // 'delegate.driver',
+                'airport',
+                // 'status'
+            ]);
+
+        if ($searchKey = $request->input('search_key')) {
+            $query->where(function ($q) use ($searchKey) {
+                $q->where('flight_no', 'like', "%{$searchKey}%")
+                    ->orWhere('flight_name', 'like', "%{$searchKey}%")
+                    ->orWhereHas('delegate', function ($delegateQuery) use ($searchKey) {
+                        $delegateQuery->where('name_en', 'like', "%{$searchKey}%")
+                            ->orWhere('name_ar', 'like', "%{$searchKey}%")
+                            ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
+                                $delegationQuery->where('code', 'like', "%{$searchKey}%");
+                            });
+                    });
+            });
+        }
+
+        if ($eventId = $request->input('event_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($eventId) {
+                $delegationQuery->where('event_id', $eventId);
+            });
+        }
+
+        if ($fromDate = $request->input('from_date')) {
+            $query->whereDate('date_time', '>=', $fromDate);
+        }
+
+        if ($toDate = $request->input('to_date')) {
+            $query->whereDate('date_time', '<=', $toDate);
+        }
+
+        $departures = $query->latest()->paginate(10);
+
+        return view('admin.departures.index', compact('departures'));
+    }
+
+    public function updateTravel(Request $request, DelegateTransport $transport)
+    {
+        $validated = $request->validate([
+            'airport_id' => 'nullable|integer|exists:dropdown_options,id',
+            'flight_no' => 'nullable|string|max:255',
+            'flight_name' => 'nullable|string|max:255',
+            'date_time' => 'nullable|date',
+            'status_id' => 'nullable|string|max:255|exists:dropdown_options,id',
+        ]);
+
+        $relationsToCompare = [
+            'airport_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'status_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+        ];
+
+        $confirmationResult = $this->processUpdate($request, $transport, $validated, $relationsToCompare);
+
+        if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
+            return $confirmationResult;
+        }
+
+        $dataToSave = $confirmationResult['data'];
+        $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
+        try {
+            $transport->update($dataToSave);
+
+            // Log activity if there were changes and it was confirmed
+            if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
+                $changes = json_decode($request->input('changed_fields_json'), true);
+                if (!empty($changes)) {
+                    $this->logActivity(
+                        module: 'Travel',
+                        action: 'update',
+                        model: $transport,
+                        changedFields: $changes,
+                        submoduleId: $transport->id,
+                        delegationId: $transport->delegate->delegation_id ?? null
+                    );
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Record updated successfully.']);
+        } catch (\Throwable $e) {
+            Log::error('Travel update failed: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'transport_id' => $transport->id,
+                'validated_data' => $validated,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to update record.'], 500);
+        }
+    }
+
+    public function getTravelDetails(DelegateTransport $transport)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $transport,
+        ]);
     }
 
     public function addTravel($id, Request $request)
@@ -1142,6 +1276,7 @@ class DelegationController extends Controller
             return response()->json(['message' => 'A critical error occurred while saving.'], 500);
         }
     }
+    
 
     public function destroyDelegate(Delegation $delegation, Delegate $delegate)
     {

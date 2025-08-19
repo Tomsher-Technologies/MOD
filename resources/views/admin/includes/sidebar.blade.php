@@ -55,39 +55,54 @@
                 </li>
             @endcan
 
-            {{-- @can('manage_escorts') --}}
+
+            @can('manage_travels')
                 <li>
-                    <a href="{{ route('escorts.index') }}"
-                        class="{{ areActiveRoutes(['escorts.index', 'escorts.create', 'escorts.edit']) }}">
-                        <svg class="pe-2" width="30" height="30" viewBox="0 0 29 29" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M20.5249 24.7773H8.55908C3.77275 24.7773 2.57617 23.6107 2.57617 18.944V9.61068C2.57617 4.94401 3.77275 3.77734 8.55908 3.77734H20.5249C25.3112 3.77734 26.5078 4.94401 26.5078 9.61068V18.944C26.5078 23.6107 25.3112 24.7773 20.5249 24.7773Z"
-                                stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M16.9355 9.61084H22.9185" stroke="#292D32" stroke-width="1.75"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M18.1328 14.2773H22.9191" stroke="#292D32" stroke-width="1.75"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                            <path d="M20.5254 18.9438H22.9186" stroke="#292D32" stroke-width="1.75"
-                                stroke-linecap="round" stroke-linejoin="round" />
-                            <path
-                                d="M10.3553 13.4489C11.5514 13.4489 12.5211 12.5035 12.5211 11.3373C12.5211 10.171 11.5514 9.22559 10.3553 9.22559C9.15912 9.22559 8.18945 10.171 8.18945 11.3373C8.18945 12.5035 9.15912 13.4489 10.3553 13.4489Z"
-                                stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                            <path
-                                d="M14.5421 19.3289C14.3746 17.6372 12.9985 16.3072 11.2635 16.1556C10.6652 16.0972 10.0549 16.0972 9.44465 16.1556C7.70961 16.3189 6.33354 17.6372 6.16602 19.3289"
-                                stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                    <a href="{{ route('delegations.arrivalsIndex') }}"
+                        class="{{ areActiveRoutes(['delegations.arrivalsIndex']) }}">
+                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
-                        <span class="text-md">Escorts </span>
+                        <span class="text-lg">{{ __db('arrivals') }}</span>
                     </a>
                 </li>
+            @endcan
+
+            {{-- @can('manage_escorts') --}}
+            <li>
+                <a href="{{ route('escorts.index') }}"
+                    class="{{ areActiveRoutes(['escorts.index', 'escorts.create', 'escorts.edit']) }}">
+                    <svg class="pe-2" width="30" height="30" viewBox="0 0 29 29" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20.5249 24.7773H8.55908C3.77275 24.7773 2.57617 23.6107 2.57617 18.944V9.61068C2.57617 4.94401 3.77275 3.77734 8.55908 3.77734H20.5249C25.3112 3.77734 26.5078 4.94401 26.5078 9.61068V18.944C26.5078 23.6107 25.3112 24.7773 20.5249 24.7773Z"
+                            stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M16.9355 9.61084H22.9185" stroke="#292D32" stroke-width="1.75" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M18.1328 14.2773H22.9191" stroke="#292D32" stroke-width="1.75" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M20.5254 18.9438H22.9186" stroke="#292D32" stroke-width="1.75" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path
+                            d="M10.3553 13.4489C11.5514 13.4489 12.5211 12.5035 12.5211 11.3373C12.5211 10.171 11.5514 9.22559 10.3553 9.22559C9.15912 9.22559 8.18945 10.171 8.18945 11.3373C8.18945 12.5035 9.15912 13.4489 10.3553 13.4489Z"
+                            stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M14.5421 19.3289C14.3746 17.6372 12.9985 16.3072 11.2635 16.1556C10.6652 16.0972 10.0549 16.0972 9.44465 16.1556C7.70961 16.3189 6.33354 17.6372 6.16602 19.3289"
+                            stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="text-md">Escorts </span>
+                </a>
+            </li>
             {{-- @endcan --}}
 
             @can('manage_dropdowns')
                 <li>
                     <a href="{{ route('dropdowns.index') }}"
                         class="{{ areActiveRoutes(['dropdowns.index', 'dropdowns.options.show', 'dropdowns.bulk.import']) }}">
-                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
@@ -100,8 +115,8 @@
                 <li>
                     <a href="{{ route('staffs.index') }}"
                         class="{{ areActiveRoutes(['staffs.index', 'staffs.create', 'staffs.edit']) }}">
-                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
@@ -114,8 +129,8 @@
                 <li>
                     <a href="{{ route('roles.index') }}"
                         class="{{ areActiveRoutes(['roles.create', 'roles.edit', 'roles.index']) }}">
-                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
@@ -128,8 +143,8 @@
                 <li>
                     <a href="{{ route('other-interview-members.index') }}"
                         class="{{ areActiveRoutes(['other_interview_members.create', 'other_interview_members.edit', 'other_interview_members.index']) }}">
-                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>

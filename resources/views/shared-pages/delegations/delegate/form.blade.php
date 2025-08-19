@@ -157,6 +157,7 @@
 
 @push('scripts')
     <script>
+
         document.addEventListener('DOMContentLoaded', function() {
             const setupTransportModeToggle = (sectionType) => {
                 const transportSection = document.querySelector(`[data-transport-section="${sectionType}"]`);

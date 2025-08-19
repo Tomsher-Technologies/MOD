@@ -101,6 +101,13 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Arrivals
     Route::get('/arrivals', [DelegationController::class, 'arrivalsIndex'])->name('delegations.arrivalsIndex');
+
+    // Departures
+    Route::get('/departures', [DelegationController::class, 'departuresIndex'])->name('delegations.departuresIndex');
+
+    // Update Travel (Arrival/Departure)
+    Route::post('/travels/{transport}', [DelegationController::class, 'updateTravel'])->name('delegations.updateTravel');
+
     
     // Escorts
     Route::resource('escorts', EscortController::class);
