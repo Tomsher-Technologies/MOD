@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HandlesUpdateConfirmation;
 use App\Models\Delegate;
+use App\Models\DelegateTransport;
 use App\Models\Delegation;
 use App\Models\DelegationAttachment;
 use App\Models\Dropdown;
@@ -52,11 +53,15 @@ class DelegationController extends Controller
         ]);
 
         $this->middleware('permission:edit_delegate', [
-            'only' => ['editDelegate']
+            'only' => ['editDelegate', 'updateAttachments', 'destroyAttachment']
         ]);
 
         $this->middleware('permission:add_interviews', [
-            'only' => ['addInterview', 'storeInterview']
+            'only' => ['storeOrUpdateInterview']
+        ]);
+
+        $this->middleware('permission:edit_interviews', [
+            'only' => ['editInterview', 'storeOrUpdateInterview']
         ]);
 
         $this->middleware('permission:delete_interviews', [
@@ -65,6 +70,10 @@ class DelegationController extends Controller
 
         $this->middleware('permission:add_travels', [
             'only' => ['addTravel', 'storeTravel']
+        ]);
+
+        $this->middleware('permission:view_travels', [
+            'only' => ['arrivalsIndex', 'departuresIndex']
         ]);
     }
 
@@ -187,6 +196,37 @@ class DelegationController extends Controller
         // ]);
 
         return view('admin.delegations.show', compact('delegation'));
+    }
+
+    public function arrivalsIndex(Request $request)
+    {
+        $query = DelegateTransport::where('type', 'arrival')
+            ->with([
+                'delegate.delegation.country',
+                'delegate.delegation.continent',
+                // 'delegate.escort',
+                // 'delegate.driver',
+                'airport',
+                // 'status'
+            ]);
+
+        // if ($search = $request->input('search')) {
+        //     $query->where(function ($q) use ($search) {
+        //         $q->where('flight_no', 'like', "%{$search}%")
+        //             ->orWhere('flight_name', 'like', "%{$search}%")
+        //             ->orWhereHas('delegate', function ($delegateQuery) use ($search) {
+        //                 $delegateQuery->where('name_en', 'like', "%{$search}%")
+        //                     ->orWhere('name_ar', 'like', "%{$search}%")
+        //                     ->orWhereHas('delegation', function ($delegationQuery) use ($search) {
+        //                         $delegationQuery->where('code', 'like', "%{$search}%");
+        //                     });
+        //             });
+        //     });
+        // }
+
+        $arrivals = $query->latest()->paginate(10);
+
+        return view('admin.arrivals.index', compact('arrivals'));
     }
 
     public function addTravel($id, Request $request)
