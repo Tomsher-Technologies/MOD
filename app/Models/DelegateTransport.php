@@ -72,7 +72,7 @@ class DelegateTransport extends Model
     {
         return $this->belongsTo(DropdownOption::class, 'airport_id')
             ->whereHas('dropdown', function ($query) {
-                $query->where('code', 'airport');
+                $query->where('code', 'airports');
             });
     }
 

@@ -54,7 +54,7 @@
                 @php
                     $columns = [
                         [
-                            'label' => __db('delegates'),
+                            'label' => __db('delegation'),
                             'key' => 'id',
                             'render' => fn($delegation) => e($delegation->code),
                         ],
@@ -103,17 +103,20 @@
                             'key' => 'note',
                             'label' => __db('note'),
                             'render' => function ($d) {
-                                if (empty($d->note)) {
+                                if (empty($d->note1) && empty($d->note2)) {
                                     return '-';
                                 }
                                 return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
-                                        data-modal-target="note-modal" data-modal-toggle="note-modal"
-                                        data-note-content="' .
-                                    e($d->note) .
+                                    data-modal-target="note-modal" data-modal-toggle="note-modal"
+                                    data-note1="' .
+                                    e($d->note1) .
                                     '"
-                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
-                                    </svg>';
+                                    data-note2="' .
+                                    e($d->note2) .
+                                    '"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
+                                </svg>';
                             },
                         ],
                         [
@@ -267,8 +270,10 @@
 
     <div id="note-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative w-full max-w-lg mx-auto">
-            <div class="bg-white rounded-lg shadow">
+        <div class="relative w-full max-w-2xl mx-auto">
+            <!-- Modal content -->
+            <div class="bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
                     <button type="button"
@@ -280,12 +285,14 @@
                         </svg>
                     </button>
                 </div>
-                <div class="p-6 space-y-6">
-                    <p class="text-base leading-relaxed text-gray-600" id="note-modal-content"></p>
+                <!-- Modal body -->
+                <div class="p-6 space-y-6 text-gray-700 dark:text-gray-300" id="note-modal-content">
+                    <!-- Content will be dynamically inserted here by JS -->
                 </div>
             </div>
         </div>
     </div>
+
 
 </div>
 
@@ -293,10 +300,37 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const noteModalContent = document.getElementById('note-modal-content');
+
             document.querySelectorAll('.note-icon').forEach(icon => {
                 icon.addEventListener('click', function() {
-                    const noteText = this.getAttribute('data-note-content');
-                    noteModalContent.textContent = noteText || 'No note available.';
+                    const note1 = this.getAttribute('data-note1') || '';
+                    const note2 = this.getAttribute('data-note2') || '';
+
+                    let html = '';
+
+                    if (note1.trim() !== '') {
+                        html += `
+                    <h3 class="mb-2 font-medium">Note 1:</h3>
+                    <div class="border p-5 rounded-lg">
+                        <p>${note1}</p>
+                    </div>
+                `;
+                    }
+
+                    if (note2.trim() !== '') {
+                        html += `
+                    <h3 class="mb-2 font-medium">Note 2:</h3>
+                    <div class="border p-5 rounded-lg">
+                        <p>${note2}</p>
+                    </div>
+                `;
+                    }
+
+                    if (html === '') {
+                        html = '<p>No notes available.</p>';
+                    }
+
+                    noteModalContent.innerHTML = html;
                 });
             });
 

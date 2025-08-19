@@ -82,18 +82,17 @@ class DelegationController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q
-                    ->where('code', 'like', "%{$search}%")
+                $q->where('code', 'like', "%{$search}%")
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
-                        $delegateQuery->where('name_en', 'like', "%{$search}%")
-                            ->orWhereHas('escorts', function ($escortQuery) use ($search) {
-                                $escortQuery->where('name_en', 'like', "%{$search}%")
-                                    ->orWhere('name_ar', 'like', "%{$search}%");
-                            });
-                        // ->orWhere('drivers', 'like', "%{$search}%");
+                        $delegateQuery->where('name_en', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('escorts', function ($escortQuery) use ($search) {
+                        $escortQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%");
                     });
             });
         }
+
 
         if ($invitationFrom = $request->input('invitation_from')) {
             $query->whereIn('invitation_from_id', $invitationFrom);
@@ -301,14 +300,14 @@ class DelegationController extends Controller
             'participation_status_id' => 'required|exists:dropdown_options,id',
             'note1' => 'nullable|string',
             'note2' => 'nullable|string',
-            'delegates' => 'sometimes|array',
-            'delegates.*.tmp_id' => 'required',
+            'delegates' => 'nullable|array',
+            'delegates.*.tmp_id' => 'required_with:delegates',
             'delegates.*.title_id' => 'nullable|string',
             'delegates.*.name_ar' => 'nullable|string',
-            'delegates.*.name_en' => 'required|string',
+            'delegates.*.name_en' => 'required_with:delegates|string',
             'delegates.*.designation_en' => 'nullable|string',
             'delegates.*.designation_ar' => 'nullable|string',
-            'delegates.*.gender_id' => 'required|exists:dropdown_options,id',
+            'delegates.*.gender_id' => 'required_with:delegates|exists:dropdown_options,id',
             'delegates.*.parent_id' => 'nullable|exists:delegates,id',
             'delegates.*.relationship' => 'nullable|string',
             'delegates.*.internal_ranking_id' => 'nullable|string',

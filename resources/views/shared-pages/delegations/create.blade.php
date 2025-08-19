@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <form action="{{  getRouteForPage('delegation.store') ?? '#'  }}" method="POST" autocomplete="off" enctype="multipart/form-data"
+    <form id="create-delegation-form" action="{{  getRouteForPage('delegation.store') ?? '#'  }}" method="POST" autocomplete="off" enctype="multipart/form-data"
         class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
@@ -191,13 +191,7 @@
                                 'document_date' => $att['document_date'] ?? '',
                             ];
                         }, old('attachments'))
-                        : [
-                            [
-                                'title_id' => '',
-                                'file' => null,
-                                'document_date' => '',
-                            ],
-                        ];
+                        : [];
                 @endphp
 
 
@@ -241,7 +235,7 @@
                                     <button type="button"
                                         class="delete-row bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
                                         @click="removeAttachment(index)"
-                                        x-show="attachments.length > 1">{{ __db('delete') ?: 'Delete' }}</button>
+                                        x-show="attachments.length > 0">{{ __db('delete') ?: 'Delete' }}</button>
                                 </div>
                             </div>
                         </template>
@@ -323,23 +317,7 @@
                         array_keys(old('delegates')),
                     ),
                 )
-                : [
-                    [
-                        'tmp_id' => 1,
-                        'title_id' => '',
-                        'name_ar' => '',
-                        'name_en' => '',
-                        'designation_en' => '',
-                        'designation_ar' => '',
-                        'gender_id' => '',
-                        'parent_id' => '',
-                        'relationship' => '',
-                        'internal_ranking_id' => '',
-                        'note' => '',
-                        'team_head' => false,
-                        'badge_printed' => false,
-                    ],
-                ];
+                : [];
         @endphp
 
         <div class="space-y-4" x-data="delegateComponent()">
@@ -353,7 +331,7 @@
                             <button type="button"
                                 class="delete-row absolute top-2 end-2 text-red-600 hover:text-red-800"
                                 title="Remove delegate" @click="removeDelegate(index)"
-                                x-show="delegates.length > 1">&times;</button>
+                                x-show="delegates.length > 0">&times;</button>
 
                             <!-- Title -->
                             <div class="col-span-3">
@@ -528,11 +506,11 @@
 
                 <div class="flex gap-4">
                     <button type="submit" name="submit_exit"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit') }}</button>
+                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
                     <button type="submit" name="submit_add_travel" value="1"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8">{{ __db('submit_add_flight') }}</button>
+                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
                     <button type="submit" name="submit_add_interview" value="1"
-                        class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8">{{ __db('submit_add_interview') }}</button>
+                        class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
                 </div>
             </div>
         </div>
@@ -547,27 +525,24 @@
         window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
         window.delegatesData = @json($delegatesData);
         window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('create-delegation-form');
+            const submitButtons = form.querySelectorAll('.submit-btn');
+
+            form.addEventListener('submit', function() {
+                submitButtons.forEach(button => {
+                    button.disabled = true;
+                });
+            });
+        });
     </script>
 
     <script>
         function delegateComponent() {
             return {
                 delegates: window.delegatesData && window.delegatesData.length > 0 ?
-                    window.delegatesData : [{
-                        tmp_id: 1,
-                        title_id: '',
-                        name_ar: '',
-                        name_en: '',
-                        designation_en: '',
-                        designation_ar: '',
-                        gender_id: '',
-                        parent_id: '',
-                        relationship: '',
-                        internal_ranking_id: '',
-                        note: '',
-                        team_head: false,
-                        badge_printed: false
-                    }],
+                    window.delegatesData : [],
                 addDelegate() {
                     // Generate a unique tmp_id based on existing tmp_ids
                     const maxTmpId = Math.max(...this.delegates.map(d => d.tmp_id || 0), 0);
@@ -589,9 +564,7 @@
                     });
                 },
                 removeDelegate(idx) {
-                    if (this.delegates.length > 1) {
-                        this.delegates.splice(idx, 1);
-                    }
+                    this.delegates.splice(idx, 1);
                 }
             }
         }
@@ -600,11 +573,8 @@
     <script>
         function attachmentsComponent() {
             return {
-                attachments: window.attachmentsData || [{
-                    title_id: '',
-                    file: null,
-                    document_date: ''
-                }],
+                attachments: window.attachmentsData && window.attachmentsData.length > 0 ?
+                    window.attachmentsData : [],
                 addAttachment() {
                     this.attachments.push({
                         title_id: '',
@@ -613,7 +583,9 @@
                     });
                 },
                 removeAttachment(idx) {
-                    this.attachments.splice(idx, 1);
+                    if (this.attachments.length > 1) {
+                        this.attachments.splice(idx, 1);
+                    }
                 }
             }
         }
