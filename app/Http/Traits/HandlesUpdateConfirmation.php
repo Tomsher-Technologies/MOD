@@ -182,6 +182,44 @@ trait HandlesUpdateConfirmation
                         ];
                     }
                 }
+            } elseif (isset($config['relation']) && isset($config['find_by'])) {
+                $relationQuery = $model->{$relationName}();
+                foreach ($config['find_by'] as $field => $value) {
+                    $relationQuery->where($field, $value);
+                }
+                $existingRelatedModel = $relationQuery->first();
+                $submittedRelationData = $validatedData[$requestKey];
+
+                if (is_array($submittedRelationData)) {
+                    foreach ($submittedRelationData as $field => $value) {
+                        $originalValue = $existingRelatedModel ? $existingRelatedModel->{$field} : null;
+
+                        if ($field === 'date_time' && ($originalValue || $value)) {
+                            if (!$originalValue || !Carbon::parse($originalValue)->eq(Carbon::parse($value))) {
+                                $changedFields["{$requestKey}.{$field}"] = [
+                                    'label' => Str::headline($requestKey . ' Date Time'),
+                                    'old' => $originalValue ? Carbon::parse($originalValue)->format('Y-m-d h:i A') : 'N/A',
+                                    'new' => $value ? Carbon::parse($value)->format('Y-m-d h:i A') : 'N/A',
+                                ];
+                            }
+                        } elseif ($originalValue != $value) {
+                            $displayOld = $originalValue;
+                            $displayNew = $value;
+
+                            if (isset($config['display_with'][$field])) {
+                                $dw = $config['display_with'][$field];
+                                $displayOld = $this->getDisplayLabel($dw['model'], $dw['key'], $dw['label'], $originalValue);
+                                $displayNew = $this->getDisplayLabel($dw['model'], $dw['key'], $dw['label'], $value);
+                            }
+                            
+                            $changedFields["{$requestKey}.{$field}"] = [
+                                'label' => Str::headline($requestKey . ' ' . str_replace('_id', '', $field)),
+                                'old' => $this->formatDisplayValue($displayOld),
+                                'new' => $this->formatDisplayValue($displayNew),
+                            ];
+                        }
+                    }
+                }
             }
         }
 

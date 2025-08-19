@@ -404,8 +404,12 @@
                         [
                             'label' => __db('arrival_status'),
                             'render' => function ($row) {
-                                $transport = $row->delegateTransports->first();
-                                return $transport ? e($transport->arrival_status ?? '-') : '-';
+                                $id = $row->id ?? uniqid();
+                                return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' . 
+                                    $id .
+                                    '" data-modal-toggle="delegate-transport-modal-' . 
+                                    $id .
+                                    '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
                             },
                         ],
                         [
@@ -453,6 +457,83 @@
                 @endphp
 
                 <x-reusable-table :data="$delegation->delegates" :columns="$columns" :no-data-message="__db('no_data_found')" />
+
+                @foreach ($delegation->delegates as $delegate)
+                    <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
+                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                        <div class="relative w-full max-w-2xl mx-auto">
+                            <div class="bg-white rounded-lg shadow dark:bg-gray-700">
+                                <div class="flex items-start justify-between p-4 border-b rounded-t">
+                                    <h3 class="text-xl font-semibold text-gray-900">{{ __db('transport_information_for') }}
+                                        {{ $delegate->name_en ?? '-' }}</h3>
+                                    <button type="button"
+                                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                                        data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="p-6 space-y-6">
+                                    <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
+                                    @php
+                                        $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                                    @endphp
+                                    <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
+                                        @if ($arrival)
+                                            <div class="border-b py-4">
+                                                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                                                <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
+                                            </div>
+                                            <div class="border-b py-4">
+                                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                                <p class="text-base">{{ $arrival->flight_no ?? '-' }}</p>
+                                            </div>
+                                            <div class="py-4 border-b md:border-b-0">
+                                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                                <p class="text-base">{{ $arrival->flight_name ?? '-' }}</p>
+                                            </div>
+                                            <div class="py-4 !pb-0">
+                                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                                <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
+                                            </div>
+                                        @else
+                                            <p class="col-span-2 text-gray-500">No arrival information available.</p>
+                                        @endif
+                                    </div>
+
+                                    <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
+                                    @php
+                                        $departure = $delegate->delegateTransports->where('type', 'departure')->first();
+                                    @endphp
+                                    <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
+                                        @if ($departure)
+                                            <div class="border-b py-4">
+                                                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                                <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
+                                            </div>
+                                            <div class="border-b py-4">
+                                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                                <p class="text-base">{{ $departure->flight_no ?? '-' }}</p>
+                                            </div>
+                                            <div class="py-4 border-b md:border-b-0">
+                                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                                <p class="text-base">{{ $departure->flight_name ?? '-' }}</p>
+                                            </div>
+                                            <div class="py-4 !pb-0">
+                                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                                <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
+                                            </div>
+                                        @else
+                                            <p class="col-span-2 text-gray-500">No departure information available.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>

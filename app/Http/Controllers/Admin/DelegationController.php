@@ -1044,8 +1044,38 @@ class DelegationController extends Controller
                     'label' => 'value',
                 ],
             ],
-            'arrival' => ['relation' => 'delegateTransports', 'find_by' => ['type' => 'arrival']],
-            'departure' => ['relation' => 'delegateTransports', 'find_by' => ['type' => 'departure']]
+            'arrival' => [
+                'relation' => 'delegateTransports', 
+                'find_by' => ['type' => 'arrival'],
+                'display_with' => [
+                    'status_id' => [
+                        'model' => \App\Models\DropdownOption::class,
+                        'key' => 'id',
+                        'label' => 'value',
+                    ],
+                    'airport_id' => [
+                        'model' => \App\Models\DropdownOption::class,
+                        'key' => 'id',
+                        'label' => 'value',
+                    ]
+                ]
+            ],
+            'departure' => [
+                'relation' => 'delegateTransports', 
+                'find_by' => ['type' => 'departure'],
+                'display_with' => [
+                    'status_id' => [
+                        'model' => \App\Models\DropdownOption::class,
+                        'key' => 'id',
+                        'label' => 'value',
+                    ],
+                    'airport_id' => [
+                        'model' => \App\Models\DropdownOption::class,
+                        'key' => 'id',
+                        'label' => 'value',
+                    ]
+                ]
+            ]
         ];
 
         $confirmationResult = $this->processUpdate($request, $delegate, $dataToProcess, $relationsToCompare);
