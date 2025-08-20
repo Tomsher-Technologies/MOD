@@ -1,143 +1,117 @@
 <div class="dashboard-main-body ">
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
-        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('edit_escort') }}</h2>
-        <a href="{{ route('escorts.index') }}" id="add-attachment-btn" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+        <h2 class="font-semibold mb-0 !text-[22px]">Edit Escorts</h2>
+        <a href="delegates.html" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
             </svg>
-            <span>{{ __db('back') }}</span>
+            <span>Back</span>
         </a>
     </div>
+    <!-- Delegates -->
+    <div class="bg-white h-full w-full rounded-lg border-0 p-6">
+        <div class="grid grid-cols-12 gap-5">
+            <div class="col-span-4">
+                <label class="form-label">Military Number:</label>
+                <input type="text"
+                    class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                    value="123456789">
 
-    <form action="{{ route('escorts.update', $escort->id) }}" method="POST" data-ajax-form="true" autocomplete="off">
-        @csrf
-        @method('PUT')
-        <div class="bg-white rounded-lg p-6 mb-10 mt-4">
-            <div class="bg-white p-6 grid grid-cols-1 gap-5 mb-4">
-                <div>
-                    <h2 class="font-semibold mb-0 !text-[22px] mb-3 mt-5">{{ __db('escort_details') }}
-                    </h2>
-                    <div class="delegate-row border bg-white p-6 rounded bg-gray-100 mb-2">
-                        <div class="grid grid-cols-12 gap-5">
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('name_en') }} <span class="text-red-600">*</span></label>
-                                <input type="text" id="name_en" name="name_en" class="form-control" value="{{ old('name_en', $escort->name_en) }}">
-                                @error('name_en')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('name_ar') }} <span class="text-red-600">*</span></label>
-                                <input type="text" id="name_ar" name="name_ar" class="form-control" value="{{ old('name_ar', $escort->name_ar) }}">
-                                @error('name_ar')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('delegation') }}</label>
-                                <select name="delegation_id" id="delegation_id" class="form-control">
-                                    <option value="">{{ __db('choose_option') }}</option>
-                                    @foreach($delegations as $delegation)
-                                        <option value="{{ $delegation->id }}" {{ (old('delegation_id', $escort->delegation_id) == $delegation->id) ? 'selected' : '' }}>{{ $delegation->code }}</option>
-                                    @endforeach
-                                </select>
-                                @error('delegation_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('phone_number') }}</label>
-                                <input type="text" id="phone_number" name="phone_number" class="form-control" value="{{ old('phone_number', $escort->phone_number) }}">
-                                @error('phone_number')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('email') }}</label>
-                                <input type="email" id="email" name="email" class="form-control" value="{{ old('email', $escort->email) }}">
-                                @error('email')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('gender') }}</label>
-                                <select name="gender_id" id="gender_id" class="form-control">
-                                    <option value="">{{ __db('choose_option') }}</option>
-                                    @foreach($dropdowns['genders'] as $gender)
-                                        <option value="{{ $gender->id }}" {{ (old('gender_id', $escort->gender_id) == $gender->id) ? 'selected' : '' }}>{{ $gender->value }}</option>
-                                    @endforeach
-                                </select>
-                                @error('gender_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('nationality') }}</label>
-                                <select name="nationality_id" id="nationality_id" class="form-control">
-                                    <option value="">{{ __db('choose_option') }}</option>
-                                    @foreach($dropdowns['nationalities'] as $nationality)
-                                        <option value="{{ $nationality->id }}" {{ (old('nationality_id', $escort->nationality_id) == $nationality->id) ? 'selected' : '' }}>{{ $nationality->value }}</option>
-                                    @endforeach
-                                </select>
-                                @error('nationality_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('date_of_birth') }}</label>
-                                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="{{ old('date_of_birth', $escort->date_of_birth) }}">
-                                @error('date_of_birth')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('id_number') }}</label>
-                                <input type="text" id="id_number" name="id_number" class="form-control" value="{{ old('id_number', $escort->id_number) }}">
-                                @error('id_number')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('id_issue_date') }}</label>
-                                <input type="date" id="id_issue_date" name="id_issue_date" class="form-control" value="{{ old('id_issue_date', $escort->id_issue_date) }}">
-                                @error('id_issue_date')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('id_expiry_date') }}</label>
-                                <input type="date" id="id_expiry_date" name="id_expiry_date" class="form-control" value="{{ old('id_expiry_date', $escort->id_expiry_date) }}">
-                                @error('id_expiry_date')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
             </div>
-            <div class="flex justify-start items-center gap-5">
-                <button type="submit" class="btn text-md  !bg-[#B68A35] text-white rounded-lg h-12 mr-4">{{
-                    __db('submit') }}</button>
-
-                <a href="{{ route('escorts.index') }}" class="btn text-md  !bg-[#637a85] border !border-[#637a85] !text-[#fff] rounded-lg h-12 mr-1">{{
-                    __db('cancel') }}</a>
+            <div class="col-span-4">
+                <label class="form-label">Name AR:</label>
+                <input type="text"
+                    class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                    value="عبد الله محمد">
             </div>
+            <div class="col-span-4">
+                <label class="form-label">Name EN:</label>
+                <input type="text"
+                    class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                    value="Abdullah Mohammed">
+            </div>
+
+            <div class="col-span-4">
+                <label class="form-label">Gender:</label>
+                <select
+                    class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    <option selected disabled> Select Gender</option>
+                    <option selected>Male</option>
+                    <option>Female</option>
+                </select>
+            </div>
+            <div class="col-span-4">
+                <label class="form-label">Spoken Languages:</label>
+                <select id="multiSelect" multiple placeholder="Select Languages"
+                    class="w-full p-3 rounded-lg border border-gray-300 text-sm">
+                    <option value="English" selected>English</option>
+                    <option value="Arabic" selected>Arabic</option>
+                    <option value="japan">Hindi</option>
+                </select>
+
+
+
+            </div>
+
+            <div class="col-span-4">
+                <label class="form-label">Rank:</label>
+                <select
+                    class=" p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    <option selected disabled> Select Rank</option>
+                    <option>General</option>
+                    <option>Captain</option>
+                    <option selected>Major</option>
+
+                </select>
+            </div>
+
+
+
+
         </div>
 
-    </form>
+        <div class="flex justify-between items-center mt-8">
+            <!-- Add Delegate Button -->
+            <button type="button" id="add-delegates"
+                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">Save</button>
+
+        </div>
+
+    </div>
+
+    <h2 class="font-semibold mb-0 !text-[22px] mt-6">Reassign</h2>
+    <div class="bg-white h-full w-full rounded-lg border-0 p-6 mt-4">
+
+        <div class="flex col-span-2 items-end gap-3" id="delegation-input">
+            <div class="max-w-lg w-full">
+                <div class="flex justify-between ">
+                    <label class="form-label block text-gray-700 font-semibold">Delegation ID:</label>
+                </div>
+                <input type="text"
+                    class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                    placeholder="Enter Delegation ID" value="DA25-001" />
+            </div>
+            <button type="button" data-modal-target="search-delegation-modal"
+                data-modal-toggle="search-delegation-modal"
+                class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12 flex items-center gap-2">
+                <svg class="pe-1 text-[#FFF]" width="25" height="25" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                        d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+                </svg>
+                <span class="w-[150px]">Search Delegation ID</span>
+            </button>
+        </div>
+
+        <button type="button"
+            class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12 mt-6">Reassign</button>
+
+
+    </div>
+
+
+    <!-- Add Delegate Container (Initially Hidden) -->
+    <!-- Hidden Template Row -->
 
 </div>

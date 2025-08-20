@@ -17,21 +17,21 @@ class EscortController extends Controller
     {
         $this->middleware('auth');
 
-        // $this->middleware('permission:manage_escorts', [
-        //     'only' => ['index', 'search']
-        // ]);
+        $this->middleware('permission:manage_escorts', [
+            'only' => ['index', 'search']
+        ]);
 
-        // $this->middleware('permission:add_escorts', [
-        //     'only' => ['create', 'store']
-        // ]);
+        $this->middleware('permission:add_escorts', [
+            'only' => ['create', 'store']
+        ]);
 
-        // $this->middleware('permission:edit_escorts', [
-        //     'only' => ['edit', 'update']
-        // ]);
+        $this->middleware('permission:edit_escorts', [
+            'only' => ['edit', 'update']
+        ]);
 
-        // $this->middleware('permission:delete_escorts', [
-        //     'only' => ['destroy']
-        // ]);
+        $this->middleware('permission:delete_escorts', [
+            'only' => ['destroy']
+        ]);
     }
 
     /**
@@ -212,14 +212,48 @@ class EscortController extends Controller
         return redirect()->route('escorts.index')->with('success', __db('Escort deleted successfully.'));
     }
 
+    public function assign(Request $request, Escort $escort)
+    {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'delegation_id' => 'required|exists:delegations,id',
+            ]);
+
+            $escort->update([
+                'delegation_id' => $request->delegation_id,
+            ]);
+
+            return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
+        }
+
+        $delegations = Delegation::with('country', 'continent')->get();
+        $countries = Dropdown::with('options')->where('code', 'country')->first();
+        $languages = Dropdown::with('options')->where('code', 'language')->first();
+
+        return view('admin.escorts.assign', compact('escort', 'delegations', 'countries', 'languages'));
+    }
+
+    public function unassign(Escort $escort)
+    {
+        $escort->update([
+            'delegation_id' => null,
+        ]);
+
+        return redirect()->route('escorts.index')->with('success', __db('Escort unassigned successfully.'));
+    }
+
     protected function loadDropdownOptions()
     {
         $gender = Dropdown::with('options')->where('code', 'gender')->first();
         $nationality = Dropdown::with('options')->where('code', 'nationality')->first();
+        $languages = Dropdown::with('options')->where('code', 'language')->first();
+        $ranks = Dropdown::with('options')->where('code', 'rank')->first();
 
         return [
             'genders' => $gender ? $gender->options : collect(),
             'nationalities' => $nationality ? $nationality->options : collect(),
+            'languages' => $languages ? $languages->options : collect(),
+            'ranks' => $ranks ? $ranks->options : collect(),
         ];
     }
 }

@@ -99,15 +99,15 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::put('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.updateDelegate');
     Route::delete('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'destroyDelegate'])->name('delegations.destroyDelegate');
 
-    // Arrivals
+    // Arrivals and Departures
     Route::get('/arrivals', [DelegationController::class, 'arrivalsIndex'])->name('delegations.arrivalsIndex');
-    Route::post('/travel-update/{transport}', [DelegationController::class, 'updateTravel'])->name('delegations.updateTravel');
-
-    // Departures
     Route::get('/departures', [DelegationController::class, 'departuresIndex'])->name('delegations.departuresIndex');
+    Route::post('/travel-update/{transport}', [DelegationController::class, 'updateTravel'])->name('delegations.updateTravel');
 
     // Escorts
     Route::resource('escorts', EscortController::class);
+    Route::match(['get', 'post'], 'escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
+    Route::get('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

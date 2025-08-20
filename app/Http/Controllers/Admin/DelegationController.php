@@ -342,7 +342,7 @@ class DelegationController extends Controller
                 }
             }
 
-            return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => route('delegations.arrivalsIndex')]);
+            return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => $transport->type == 'arrival' ? route('delegations.arrivalsIndex') : route('delegations.departuresIndex')]);
             
         } catch (\Throwable $e) {
             Log::error('Travel update failed: ' . $e->getMessage(), [

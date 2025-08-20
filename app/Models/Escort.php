@@ -15,16 +15,29 @@ class Escort extends Model
         'name_en',
         'military_number',
         'delegation_id',
+        'gender_id',
+        'spoken_languages',
+        'internal_ranking_id',
+        'status',
+        'title',
+        'rank',
         'phone_number',
         'email',
-        'gender_id',
         'nationality_id',
         'date_of_birth',
         'id_number',
         'id_issue_date',
         'id_expiry_date',
-        'status',
     ];
+
+    protected $casts = [
+        'spoken_languages' => 'array',
+    ];
+
+    // public function languages()
+    // {
+    //     return $this->belongsToMany(DropdownOption::class, 'escort_language', 'escort_id', 'language_id');
+    // }
 
     public function delegation()
     {
@@ -33,11 +46,24 @@ class Escort extends Model
 
     public function gender()
     {
-        return $this->belongsTo(DropdownOption::class, 'gender_id');
+        return $this->belongsTo(DropdownOption::class, 'gender_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'gender');
+            });
+    }
+    public function internalRanking()
+    {
+        return $this->belongsTo(DropdownOption::class, 'internal_ranking_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'internal_ranking');
+            });
     }
 
     public function nationality()
     {
-        return $this->belongsTo(DropdownOption::class, 'nationality_id');
+        return $this->belongsTo(DropdownOption::class, 'nationality_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'nationality');
+            });
     }
 }
