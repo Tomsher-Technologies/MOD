@@ -106,6 +106,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Escorts
     Route::resource('escorts', EscortController::class);
+    Route::post('/escorts/status', [EscortController::class, 'updateStatus'])->name('escorts.status');
     Route::get('/escorts/assign/{escort}', [EscortController::class, 'assignIndex'])->name('escorts.assignIndex');
 
     Route::post('escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');

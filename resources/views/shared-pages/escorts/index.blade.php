@@ -62,6 +62,8 @@
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Assigned Delegation</th>
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                Status</th>
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 Actions</th>
                         </tr>
                     </thead>
@@ -76,14 +78,27 @@
                                     {{ $escort->phone_number }}</td>
                                 <td class="px-4 py-3 border border-gray-200">{{ $escort->gender?->name_en }}</td>
                                 <td class="px-4 py-3 border border-gray-200">
-                                    {{-- @foreach ($escort->languages as $language)
-                                    {{ $language->name_en }}{{ !$loop->last ? ', ' : '' }}
-                                @endforeach --}}
+                                    @php
+                                        $spokenLanguageIds = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
+                                        $spokenLanguageNames = \App\Models\DropdownOption::whereIn('id', $spokenLanguageIds)->pluck('value')->toArray();
+                                    @endphp
+                                    {{ implode(', ', $spokenLanguageNames) }}
                                 </td>
                                 <td class="px-4 py-3 !text-[#B68A35] border border-gray-200 ">
                                     @foreach ($escort->delegations->where('pivot.status', 1) as $delegation)
                                         {{ $delegation->code }}{{ !$loop->last ? ', ' : '' }}
                                     @endforeach
+                                </td>
+                                <td class="px-4 py-3 border border-gray-200">
+                                    <div class="flex items-center">
+                                        <label for="switch-{{ $escort->id }}" class="relative inline-block w-11 h-6">
+                                            <input type="checkbox" id="switch-{{ $escort->id }}" onchange="update_status(this)" value="{{ $escort->id }}"
+                                                class="sr-only peer" {{ $escort->status == 1 ? 'checked' : '' }} />
+
+                                            <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
+                                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+                                        </label>
+                                    </div>
                                 </td>
                                 <td class="px-4 py-2 border border-gray-200">
                                     <div class="flex align-center gap-4">
@@ -96,53 +111,40 @@
                                                     fill="#B68A35" />
                                             </svg>
                                         </a>
-                                        <form action="{{ route('escorts.destroy', $escort->id) }}" method="POST"
-                                            class="delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit">
-                                                <svg class="w-5.5 h-5.5 " aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    fill="none" viewBox="0 0 24 24">
-                                                    <path stroke="#B68A35" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="1.5"
-                                                        d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z">
-                                                    </path>
-                                                </svg>
-                                            </button>
-                                        </form>
-                                        @if ($escort->delegations->where('pivot.status', 1)->count() > 0)
-                                            @foreach ($escort->delegations->where('pivot.status', 1) as $delegation)
-                                                <form action="{{ route('escorts.unassign', $escort->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="delegation_id"
-                                                        value="{{ $delegation->id }}">
-                                                    <button type="submit"
-                                                        class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                                                        <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true"
-                                                            xmlns="http://www.w3.org/2000/svg" width="24"
-                                                            height="24" fill="none" viewBox="0 0 24 24">
-                                                            <path stroke="currentColor" stroke-linecap="round"
-                                                                stroke-linejoin="round" stroke-width="2"
-                                                                d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                        </svg>
-                                                        <span> Unassign from {{ $delegation->code }}</span>
-                                                    </button>
-                                                </form>
-                                            @endforeach
-                                        @else
-                                            <a href="{{ route('escorts.assignIndex', $escort->id) }}"
-                                                class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                                                <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    fill="none" viewBox="0 0 24 24">
-                                                    <path stroke="currentColor" stroke-linecap="round"
-                                                        stroke-linejoin="round" stroke-width="2"
-                                                        d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                </svg>
-                                                <span> Assign</span>
-                                            </a>
+                                        @if ($escort->status == 1)
+                                            @if ($escort->delegations->where('pivot.status', 1)->count() > 0)
+                                                @foreach ($escort->delegations->where('pivot.status', 1) as $delegation)
+                                                    <form action="{{ route('escorts.unassign', $escort->id) }}"
+                                                        method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="delegation_id"
+                                                            value="{{ $delegation->id }}">
+                                                        <button type="submit"
+                                                            class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                                                            <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true"
+                                                                xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" fill="none" viewBox="0 0 24 24">
+                                                                <path stroke="currentColor" stroke-linecap="round"
+                                                                    stroke-linejoin="round" stroke-width="2"
+                                                                    d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
+                                                            <span> Unassign from {{ $delegation->code }}</span>
+                                                        </button>
+                                                    </form>
+                                                @endforeach
+                                            @else
+                                                <a href="{{ route('escorts.assignIndex', $escort->id) }}"
+                                                    class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                                                    <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true"
+                                                        xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                        fill="none" viewBox="0 0 24 24">
+                                                        <path stroke="currentColor" stroke-linecap="round"
+                                                            stroke-linejoin="round" stroke-width="2"
+                                                            d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    </svg>
+                                                    <span> Assign</span>
+                                                </a>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
@@ -162,3 +164,33 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function update_status(el) {
+        if (el.checked) {
+            var status = 1;
+        } else {
+            var status = 0;
+        }
+        $.post('{{ route('escorts.status') }}', {
+            _token: '{{ csrf_token() }}',
+            id: el.value,
+            status: status
+        }, function(data) {
+            if (data.status == 'success') {
+                toastr.success("{{ __db('status_updated') }}");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+
+            } else {
+                toastr.error("{{ __db('something_went_wrong') }}");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1000);
+            }
+        });
+    }
+</script>
+@endpush

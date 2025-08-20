@@ -61,6 +61,21 @@ class EscortController extends Controller
         return view('admin.escorts.index', compact('escorts'));
     }
 
+    public function updateStatus(Request $request)
+    {
+        $escort = Escort::findOrFail($request->id);
+        $escort->status = $request->status;
+        $escort->save();
+
+        if ($request->status == 0) {
+            $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
+                'status' => 0,
+            ]);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -90,15 +105,20 @@ class EscortController extends Controller
             'id_issue_date' => 'nullable|date',
             'id_expiry_date' => 'nullable|date',
             'status' => 'nullable|string|max:255',
+            'language_id' => 'nullable|array',
         ]);
 
         $currentEvent = \App\Models\Event::where('is_default', true)->first();
         $eventId = $currentEvent ? $currentEvent->id : null;
 
-        $escortData = array_merge(
-            $request->all(),
-            ['event_id' => $eventId]
-        );
+        $escortData = $request->all();
+        $escortData['event_id'] = $eventId;
+
+        if ($request->has('language_id')) {
+            $escortData['spoken_languages'] = implode(',', $request->input('language_id'));
+        } else {
+            $escortData['spoken_languages'] = null;
+        }
 
         $escort = Escort::create($escortData);
 
@@ -137,23 +157,7 @@ class EscortController extends Controller
 
     public function assignIndex(Request $request, Escort $escort)
     {
-        if ($request->isMethod('post')) {
-            $request->validate([
-                'delegation_id' => 'required|exists:delegations,id',
-            ]);
-
-            $escort->update([
-                'delegation_id' => $request->delegation_id,
-            ]);
-
-            return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
-        }
-
-        $delegations = collect(); // No need to fetch all delegations initially
-        $countries = Dropdown::with('options')->where('code', 'country')->first();
-        $languages = Dropdown::with('options')->where('code', 'language')->first();
-
-        return view('admin.escorts.assign', compact('escort', 'delegations', 'countries', 'languages'));
+        return view('admin.escorts.assign', compact('escort'));
     }
 
     /**
@@ -173,7 +177,8 @@ class EscortController extends Controller
             'id_number' => 'nullable|string|max:255',
             'id_issue_date' => 'nullable|date',
             'id_expiry_date' => 'nullable|date',
-            'status' => 'nullable|string|max:255', // Add status to validation
+            'status' => 'nullable|string|max:255',
+            'language_id' => 'nullable|array',
         ]);
 
         $escort = Escort::findOrFail($id);
@@ -192,6 +197,13 @@ class EscortController extends Controller
 
         $dataToSave = $confirmationResult['data'];
         $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
+        if (isset($dataToSave['language_id'])) {
+            $dataToSave['spoken_languages'] = implode(',', $dataToSave['language_id']);
+            unset($dataToSave['language_id']); // Remove original language_id as it's not a column
+        } else {
+            $dataToSave['spoken_languages'] = null;
+        }
 
         $escort->update($dataToSave);
 
@@ -228,7 +240,7 @@ class EscortController extends Controller
     public function destroy(string $id)
     {
         $escort = Escort::findOrFail($id);
-        $escort->delete();
+        $escort->update(['status' => 0]);
 
         // Log activity
         $this->logActivity(
