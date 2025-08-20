@@ -39,7 +39,7 @@ class EscortController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Escort::with('delegation', 'gender', 'nationality')->latest();
+        $query = Escort::with('delegations', 'gender', 'nationality')->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -48,13 +48,16 @@ class EscortController extends Controller
                     ->orWhere('military_number', 'like', "%{$search}%")
                     ->orWhere('phone_number', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('delegation', function ($delegationQuery) use ($search) {
+                    ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
             });
         }
 
         $escorts = $query->paginate(10);
+
+        // return response()->json(['sss' => $escorts]);
+
         return view('admin.escorts.index', compact('escorts'));
     }
 
@@ -116,7 +119,7 @@ class EscortController extends Controller
      */
     public function show(string $id)
     {
-        $escort = Escort::with('delegation', 'gender', 'nationality')->findOrFail($id);
+        $escort = Escort::with('delegations', 'gender', 'nationality')->findOrFail($id);
         return view('admin.escorts.show', compact('escort'));
     }
 
@@ -130,6 +133,27 @@ class EscortController extends Controller
         $dropdowns = $this->loadDropdownOptions();
 
         return view('admin.escorts.edit', compact('escort', 'delegations', 'dropdowns'));
+    }
+
+    public function assignIndex(Request $request, Escort $escort)
+    {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'delegation_id' => 'required|exists:delegations,id',
+            ]);
+
+            $escort->update([
+                'delegation_id' => $request->delegation_id,
+            ]);
+
+            return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
+        }
+
+        $delegations = collect(); // No need to fetch all delegations initially
+        $countries = Dropdown::with('options')->where('code', 'country')->first();
+        $languages = Dropdown::with('options')->where('code', 'language')->first();
+
+        return view('admin.escorts.assign', compact('escort', 'delegations', 'countries', 'languages'));
     }
 
     /**

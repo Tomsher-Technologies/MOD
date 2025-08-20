@@ -73,6 +73,6 @@ class Escort extends Model
 
     public function delegations()
     {
-        return $this->belongsToMany(Delegation::class, 'delegation_escorts');
+        return $this->belongsToMany(Delegation::class, 'delegation_escorts')->withPivot('status', 'assigned_by');
     }
 }
