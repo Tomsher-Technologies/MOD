@@ -1,0 +1,394 @@
+<div>
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all_delegations') }}</h2>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <div class=" mb-4 flex items-center justify-between gap-3">
+                    <form class="w-[50%] me-4" action="{{ getRouteForPage('delegations.index') }}" method="GET">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
+                            </div>
+                            <input type="search" id="default-search" name="search" value="{{ request('search') }}"
+                                class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
+                                placeholder="Search by ID, Escorts, Drivers, Team Head" />
+                            <button type="submit"
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">Search</button>
+                        </div>
+                    </form>
+
+                    <button data-modal-target="column-visibility-modal" data-modal-toggle="column-visibility-modal"
+                        type="button"
+                        class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg me-auto">
+                        <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+                        </svg>
+                        <span>{{ __db('column_list') }}</span>
+                    </button>
+
+                    <div class="text-center">
+                        <button
+                            class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                            type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
+                            aria-controls="filter-drawer">
+                            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                                    d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z" />
+                            </svg>
+                            <span>{{ __db('filter') }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                @php
+                    $columns = [
+                        [
+                            'label' => __db('delegation'),
+                            'key' => 'id',
+                            'render' => fn($delegation) => e($delegation->code),
+                        ],
+                        [
+                            'label' => __db('invitation_from'),
+                            'key' => 'invitation_from',
+                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('team_head'),
+                            'key' => 'team_head',
+                            'render' => function ($delegation) {
+                                $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
+                                return $teamHeads->isNotEmpty()
+                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
+                                    : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('escorts'),
+                            'key' => 'escorts',
+                            'render' => function ($delegation) {
+                                $escorts = $delegation->delegates->pluck('escorts')->filter()->unique();
+                                return $escorts->isNotEmpty() ? $escorts->map(fn($e) => e($e))->implode('<br>') : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('drivers'),
+                            'key' => 'drivers',
+                            'render' => function ($delegation) {
+                                $drivers = $delegation->delegates->pluck('drivers')->filter()->unique();
+                                return $drivers->isNotEmpty() ? $drivers->map(fn($d) => e($d))->implode('<br>') : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('invitation_status'),
+                            'key' => 'invitation_status',
+                            'render' => fn($delegation) => e($delegation->invitationStatus->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('participation_status'),
+                            'key' => 'participation_status',
+                            'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
+                        ],
+                        [
+                            'key' => 'note',
+                            'label' => __db('note'),
+                            'render' => function ($d) {
+                                if (empty($d->note1) && empty($d->note2)) {
+                                    return '-';
+                                }
+                                return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
+                                    data-modal-target="note-modal" data-modal-toggle="note-modal"
+                                    data-note1="' .
+                                    e($d->note1) .
+                                    '"
+                                    data-note2="' .
+                                    e($d->note2) .
+                                    '"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
+                                </svg>';
+                            },
+                        ],
+                        [
+                            'label' => __db('actions'),
+                            'key' => 'actions',
+                            'render' => function ($delegation) {
+                                $buttons = '';
+                                if (auth()->user() && auth()->user()->can('edit_delegations')) {
+                                    $buttons .=
+                                        '<a href="' .
+                                        route('delegations.edit', $delegation->id) .
+                                        '" title="' .
+                                        __db('edit') .
+                                        '"
+                                        class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
+                                        <svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 512 512\'><path d=\'M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z\' fill=\'#B68A35\'></path></svg>
+                                    </a>';
+                                }
+                                if (auth()->user() && auth()->user()->can('view_delegations')) {
+                                    $buttons .=
+                                        '<a href="' .
+                                        route('delegations.show', $delegation->id) .
+                                        '" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
+                                        <svg xmlns=\'http://www.w3.org/2000/svg\' width=\'18\' height=\'18\' viewBox=\'0 0 16 12\' fill=\'none\'><path d=\'M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z\' stroke=\'#7C5E24\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' /><path d=\'M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z\' stroke=\'#7C5E24\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' /></svg>
+                                    </a>';
+                                }
+                                return $buttons;
+                            },
+                        ],
+                    ];
+                @endphp
+
+                <x-reusable-table :data="$delegations" :columns="$columns" :no-data-message="__db('no_data_found')" />
+
+                <div class="mt-4">
+                    {{ $delegations->appends(request()->input())->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="filter-drawer"
+        class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
+        tabindex="-1" aria-labelledby="drawer-label">
+        <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
+            {{ __db('filter') }}</h5>
+        <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+            </svg>
+            <span class="sr-only">{{ __db('close_menu') }}</span>
+        </button>
+
+        <form action="{{ getRouteForPage('delegations.index') }}" method="GET">
+            <div class="flex flex-col gap-4 mt-4">
+                <select name="invitation_from[]" placeholder="Invitation From" multiple
+                    class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getDropDown('internal_ranking')->options as $option)
+                        <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
+                            {{ $option->value }}</option>
+                    @endforeach
+                </select>
+                <select name="continent_id"
+                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    <option value="">{{ __db('all_continents') }}</option>
+                    @foreach (getDropDown('continents')->options as $continent)
+                        <option value="{{ $continent->id }}"
+                            {{ request('continent_id') == $continent->id ? 'selected' : '' }}>{{ $continent->value }}
+                        </option>
+                    @endforeach
+                </select>
+                <select name="country_id"
+                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    <option value="">{{ __db('all_countries') }}</option>
+                    @foreach (getDropDown('country')->options as $country)
+                        <option value="{{ $country->id }}"
+                            {{ request('country_id') == $country->id ? 'selected' : '' }}>
+                            {{ $country->value }}</option>
+                    @endforeach
+                </select>
+                <select name="invitation_status_id"
+                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    <option value="">{{ __db('all_invitation_statuses') }}</option>
+                    @foreach (getDropDown('invitation_status')->options as $status)
+                        <option value="{{ $status->id }}"
+                            {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
+                            {{ $status->value }}
+                        </option>
+                    @endforeach
+                </select>
+                <select name="participation_status_id"
+                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    <option value="">{{ __db('all_participation_statuses') }}</option>
+                    @foreach (getDropDown('participation_status')->options as $status)
+                        <option value="{{ $status->id }}"
+                            {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
+                            {{ $status->value }}
+                        </option>
+                    @endforeach
+                </select>
+                {{-- <select name="hotel_name"
+                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    <option value="">{{ __db('all_hotel_names') }}</option>
+                    @foreach ($filterData['hotelNames'] as $hotel)
+                        <option value="{{ $hotel }}" {{ request('hotel_name') == $hotel ? 'selected' : '' }}>
+                            {{ $hotel }}</option>
+                    @endforeach
+                </select> --}}
+            </div>
+            <div class="grid grid-cols-2 gap-4 mt-6">
+                <a href="{{ getRouteForPage('delegations.index') }}"
+                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+                <button type="submit"
+                    class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="column-visibility-modal" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow">
+                <div class="flex items-start justify-between p-4 border-b rounded-t">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
+                    <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                        data-modal-hide="column-visibility-modal">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div class="space-y-3 grid grid-cols-3" id="column-toggles">
+                        @foreach ($columns as $column)
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="form-checkbox text-blue-600 me-2 column-toggle-checkbox"
+                                    value="{{ $column['key'] }}" checked>
+                                <span>{{ $column['label'] }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="note-modal" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-2xl mx-auto">
+            <!-- Modal content -->
+            <div class="bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-start justify-between p-4 border-b rounded-t">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
+                    <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                        data-modal-hide="note-modal">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-6 space-y-6 text-gray-700 dark:text-gray-300" id="note-modal-content">
+                    <!-- Content will be dynamically inserted here by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const noteModalContent = document.getElementById('note-modal-content');
+
+            document.querySelectorAll('.note-icon').forEach(icon => {
+                icon.addEventListener('click', function() {
+                    const note1 = this.getAttribute('data-note1') || '';
+                    const note2 = this.getAttribute('data-note2') || '';
+
+                    let html = '';
+
+                    if (note1.trim() !== '') {
+                        html += `
+                    <h3 class="mb-2 font-medium">Note 1:</h3>
+                    <div class="border p-5 rounded-lg">
+                        <p>${note1}</p>
+                    </div>
+                `;
+                    }
+
+                    if (note2.trim() !== '') {
+                        html += `
+                    <h3 class="mb-2 font-medium">Note 2:</h3>
+                    <div class="border p-5 rounded-lg">
+                        <p>${note2}</p>
+                    </div>
+                `;
+                    }
+
+                    if (html === '') {
+                        html = '<p>No notes available.</p>';
+                    }
+
+                    noteModalContent.innerHTML = html;
+                });
+            });
+
+            const storageKey = 'delegation_column_visibility';
+            const checkboxes = document.querySelectorAll('.column-toggle-checkbox');
+
+            const applyVisibility = () => {
+                let preferences = {};
+                checkboxes.forEach(checkbox => {
+                    const columnKey = checkbox.value;
+                    const isVisible = checkbox.checked;
+                    preferences[columnKey] = isVisible;
+                    document.querySelectorAll(
+                            `th[data-column-key='${columnKey}'], td[data-column-key='${columnKey}']`)
+                        .forEach(el => {
+                            el.style.display = isVisible ? '' : 'none';
+                        });
+                });
+                localStorage.setItem(storageKey, JSON.stringify(preferences));
+            };
+
+            const loadPreferences = () => {
+                const savedPrefs = JSON.parse(localStorage.getItem(storageKey));
+                if (savedPrefs) {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = savedPrefs[checkbox.value] !== false;
+                    });
+                }
+            };
+
+            const table = document.querySelector('table');
+            if (table) {
+                const headers = table.querySelectorAll('thead th');
+                const rows = table.querySelectorAll('tbody tr');
+                const columnKeys = @json(array_column($columns, 'key'));
+
+                headers.forEach((th, index) => {
+                    if (columnKeys[index]) {
+                        th.setAttribute('data-column-key', columnKeys[index]);
+                    }
+                });
+
+                rows.forEach(row => {
+                    row.querySelectorAll('td').forEach((td, index) => {
+                        if (columnKeys[index]) {
+                            td.setAttribute('data-column-key', columnKeys[index]);
+                        }
+                    });
+                });
+            }
+
+
+            loadPreferences();
+            applyVisibility();
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyVisibility);
+            });
+        });
+    </script>
+@endsection

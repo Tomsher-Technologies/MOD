@@ -2,13 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Flowbite support (tailwind plugin version) */
-@import 'flowbite';
+@import "flowbite";
 
 .select2-container {
     width: 100% !important;
 }
-.select2-container .selection{
+.select2-container .selection {
     width: 100% !important;
 }
 
@@ -25,6 +24,25 @@
     width: 100% !important;
 }
 
-.select2-container--default .select2-selection--single .select2-selection__arrow{
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow {
     top: 8px !important;
+}
+
+[x-cloak] { display: none !important; }
+
+.arrival-time-red {
+    background-color: #f8d7da; /* light red */
+    color: #721c24;
+}
+
+.arrival-time-green {
+    background-color: #d4edda; /* light green */
+    color: #155724;
+}
+
+.arrival-time-white {
+    background-color: #ffffff; /* white/default */
+    color: #000000;
 }
