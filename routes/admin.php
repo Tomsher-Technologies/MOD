@@ -106,8 +106,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Escorts
     Route::resource('escorts', EscortController::class);
-    Route::match(['get', 'post'], 'escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
-    Route::get('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
+    Route::post('escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
+    Route::post('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

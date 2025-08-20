@@ -306,8 +306,8 @@ if (!function_exists('getRouteForPage')) {
                 'del_add_delegate' => 'delegations.storeDelegate',
             ],
             'delegation.editDelegate' => [
-                'manage_delegates' => 'delegations.editDelegate',
-                'del_manage_delegates' => 'delegations.editDelegate',
+                'edit_delegate' => 'delegations.editDelegate',
+                'del_edit_delegate' => 'delegations.editDelegate',
             ],
             'delegation.destroyDelegate' => [
                 'delete_delegate' => 'delegations.destroyDelegate',

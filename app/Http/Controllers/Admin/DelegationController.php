@@ -343,7 +343,6 @@ class DelegationController extends Controller
             }
 
             return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => $transport->type == 'arrival' ? route('delegations.arrivalsIndex') : route('delegations.departuresIndex')]);
-            
         } catch (\Throwable $e) {
             Log::error('Travel update failed: ' . $e->getMessage(), [
                 'user_id' => auth()->id(),
@@ -1277,7 +1276,7 @@ class DelegationController extends Controller
             return response()->json(['message' => 'A critical error occurred while saving.'], 500);
         }
     }
-    
+
 
     public function destroyDelegate(Delegation $delegation, Delegate $delegate)
     {
@@ -1369,15 +1368,25 @@ class DelegationController extends Controller
             $query->where('country_id', $countryId);
         }
 
-        $delegations = $query->with('invitationFrom')->get();
+        if ($request->query('delegates') == '1') {
+            $query->with(['invitationFrom', 'delegates']);
+        } else {
+            $query->with('invitationFrom');
+        }
+
+
+        $delegations = $query->with('invitationFrom', 'country', 'continent')->get();
 
         return response()->json([
             'success' => true,
-            'delegations' => $delegations->map(fn($d) => [
-                'id' => $d->id,
-                'code' => $d->code,
-                'invitationFrom_value' => $d->invitationFrom->value ?? '',
-            ]),
+            'delegations' => $delegations->map(fn($d) => array_merge(
+                $d->toArray(),
+                [
+                    'id' => $d->id,
+                    'code' => $d->code,
+                    'invitationFrom_value' => $d->invitationFrom->value ?? '',
+                ]
+            )),
         ]);
     }
 

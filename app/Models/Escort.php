@@ -11,6 +11,7 @@ class Escort extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'event_id',
         'name_ar',
         'name_en',
         'military_number',
@@ -25,9 +26,6 @@ class Escort extends Model
         'email',
         'nationality_id',
         'date_of_birth',
-        'id_number',
-        'id_issue_date',
-        'id_expiry_date',
     ];
 
     protected $casts = [
@@ -38,6 +36,12 @@ class Escort extends Model
     // {
     //     return $this->belongsToMany(DropdownOption::class, 'escort_language', 'escort_id', 'language_id');
     // }
+
+
+    public function event()
+    {
+        return $this->belongsTo(Event::class);
+    }
 
     public function delegation()
     {
@@ -65,5 +69,10 @@ class Escort extends Model
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'nationality');
             });
+    }
+
+    public function delegations()
+    {
+        return $this->belongsToMany(Delegation::class, 'delegation_escorts');
     }
 }

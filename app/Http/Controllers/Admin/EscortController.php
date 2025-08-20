@@ -89,9 +89,16 @@ class EscortController extends Controller
             'status' => 'nullable|string|max:255',
         ]);
 
-        $escort = Escort::create($request->all());
+        $currentEvent = \App\Models\Event::where('is_default', true)->first();
+        $eventId = $currentEvent ? $currentEvent->id : null;
 
-        // Log activity
+        $escortData = array_merge(
+            $request->all(),
+            ['event_id' => $eventId]
+        );
+
+        $escort = Escort::create($escortData);
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'managing_members',
@@ -214,29 +221,44 @@ class EscortController extends Controller
 
     public function assign(Request $request, Escort $escort)
     {
-        if ($request->isMethod('post')) {
-            $request->validate([
-                'delegation_id' => 'required|exists:delegations,id',
-            ]);
+        $request->validate([
+            'delegation_id' => 'required|exists:delegations,id',
+        ]);
 
-            $escort->update([
-                'delegation_id' => $request->delegation_id,
-            ]);
+        $delegationId = $request->delegation_id;
 
-            return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
+        // Check if the escort is already assigned to this delegation
+        $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
+
+        if ($existingAssignment) {
+            // If the assignment exists and is marked as unassigned, update the status
+            if (!$existingAssignment->pivot->status) {
+                $escort->delegations()->updateExistingPivot($delegationId, [
+                    'status' => 1,
+                    'assigned_by' => auth()->id(),
+                ]);
+            }
+        } else {
+            // If no assignment exists, create a new one
+            $escort->delegations()->attach($delegationId, [
+                'status' => 1,
+                'assigned_by' => auth()->id(),
+            ]);
         }
 
-        $delegations = Delegation::with('country', 'continent')->get();
-        $countries = Dropdown::with('options')->where('code', 'country')->first();
-        $languages = Dropdown::with('options')->where('code', 'language')->first();
-
-        return view('admin.escorts.assign', compact('escort', 'delegations', 'countries', 'languages'));
+        return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
 
-    public function unassign(Escort $escort)
+    public function unassign(Request $request, Escort $escort)
     {
-        $escort->update([
-            'delegation_id' => null,
+        $request->validate([
+            'delegation_id' => 'required|exists:delegations,id',
+        ]);
+
+        $delegationId = $request->delegation_id;
+
+        $escort->delegations()->updateExistingPivot($delegationId, [
+            'status' => 0,
         ]);
 
         return redirect()->route('escorts.index')->with('success', __db('Escort unassigned successfully.'));
