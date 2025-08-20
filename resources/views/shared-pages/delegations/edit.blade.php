@@ -967,7 +967,7 @@
                 });
             });
         });
-    </script>
+    </script>   
 
     <script>
         function attachmentsComponent() {

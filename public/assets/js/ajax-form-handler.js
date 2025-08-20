@@ -58,6 +58,8 @@ async function handleFormSubmit(form) {
                 promptForConfirmation(form, result.changed_fields);
             } else if (result.status === "success") {
                 await Swal.fire("Success!", result.message, "success");
+                // Dispatch a custom event with the success result
+                window.dispatchEvent(new CustomEvent('ajaxFormSuccess', { detail: result }));
                 if (result.redirect_url) {
                     window.location.href = result.redirect_url;
                 }

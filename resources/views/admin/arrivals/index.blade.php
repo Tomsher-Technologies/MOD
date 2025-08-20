@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('arrivals')])
 
 @section('content')
-    <div>
+    <div x-data="{ isArrivalEditModalOpen: false }">
         <div class="flex items-center justify-between gap-12 mb-4">
 
             <input type="date"
@@ -88,38 +88,43 @@
                             [
                                 'label' => 'Action',
                                 'render' => function ($row) {
-                                    return '<a href="#" class="edit-arrival-btn" 
-                                    data-airport-id="' .
-                                        e($row->airport_id) .
-                                        '" 
-                                    data-flight-no="' .
-                                        e($row->flight_no) .
-                                        '" 
-                                    data-flight-name="' .
-                                        e($row->flight_name) .
-                                        '" 
-                                    data-date-time="' .
-                                        e(
-                                            $row->date_time
-                                                ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
-                                                : '',
-                                        ) .
-                                        '" 
-                                    data-status-id="' .
-                                        e($row->status_id) .
-                                        '"
-                                    data-arrival-id="' .
-                                        e($row->id) .
-                                        '"
-                                    data-modal-target="ActionModal" data-modal-toggle="ActionModal"
-                                    >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#000"></path></svg>
-                                </a>';
+                                    $arrivalData = [
+                                        'id' => $row->id,
+                                        'airport_id' => $row->airport_id,
+                                        'flight_no' => $row->flight_no,
+                                        'flight_name' => $row->flight_name,
+                                        'date_time' => $row->date_time
+                                            ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
+                                            : '',
+                                        'status_id' => $row->status_id,
+                                    ];
+                                   $json = htmlspecialchars(json_encode($arrivalData), ENT_QUOTES, 'UTF-8');
+                                    return '<button type="button" class="edit-arrival-btn text-[#B68A35]" data-arrival=\'' .
+                                        $json .
+                                        '\'>                                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#000"></path></svg>
+                                </button>';
                                 },
                             ],
                         ];
+                        $rowClass = function ($row) {
+                            if (!$row->date_time) {
+                                return 'bg-white';
+                            }
+                            $now = \Carbon\Carbon::now();
+                            $oneHourAgo = $now->copy()->subHour();
+                            $oneHourHence = $now->copy()->addHour();
+                            $rowDateTime = \Carbon\Carbon::parse($row->date_time);
+
+                            if ($rowDateTime->isPast() && $rowDateTime->diffInHours($now) > 1) {
+                                return 'bg-green-200';
+                            } elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
+                                return 'bg-red-200';
+                            } else {
+                                return 'bg-white';
+                            }
+                        };
                     @endphp
-                    <x-reusable-table :columns="$columns" :data="$arrivals" />
+                    <x-reusable-table :columns="$columns" :data="$arrivals" :row-class="$rowClass" />
                 </div>
             </div>
         </div>
@@ -127,63 +132,67 @@
     </div>
 
     <!-- Arrival Edit Modal -->
-    <div id="ActionModal" tabindex="-1" aria-hidden="true"
-        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-        <div class="relative !w-[70%] mx-auto">
-            <!-- Modal content -->
-            <div class="bg-white rounded-lg shadow dark:bg-gray-700">
-                <!-- Modal header -->
-                <div class="flex items-start justify-between p-4 border-b rounded-t">
-                    <h3 class="text-xl font-semibold text-gray-900">Edit Arrival</h3>
-                    <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                        data-modal-hide="ActionModal" id="close-modal-btn">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                            </path>
-                        </svg>
+
+    <div x-data="{
+        isArrivalEditModalOpen: false,
+        arrival: {},
+        open(data) {
+            this.arrival = data;
+            this.isArrivalEditModalOpen = true;
+        },
+        close() {
+            this.isArrivalEditModalOpen = false;
+        }
+    }" x-on:open-edit-arrival.window="open($event.detail)">
+        <div x-show="isArrivalEditModalOpen" x-transition
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50" style="display: none;">
+            <div class="bg-white rounded-lg w-[70%] p-6">
+                <div class="flex items-start justify-between border-b pb-2 mb-4">
+                    <h3 class="text-xl font-semibold">Edit Arrival</h3>
+                    <button @click="close" class="text-gray-400 hover:text-gray-900">
+                        ✕
                     </button>
                 </div>
-                <!-- Modal body -->
-                <form id="arrival-form" action="" data-ajax-form="true" method="POST" class="p-6 space-y-6">
+
+                <form :action="`{{ url('mod-admin/travel-update') }}/${arrival.id}`" method="POST" class="space-y-6"
+                    data-ajax-form="true">
                     @csrf
                     @method('POST')
 
-                    <div id="flight-inputs-arrival" class="grid grid-cols-5 gap-5">
+                    <div class="grid grid-cols-5 gap-5">
                         <div>
-                            <label for="arrival-airport-id" class="form-label block mb-1 text-gray-700 font-medium">Arrival
-                                Airport:</label>
-                            <select id="arrival-airport-id" name="airport_id" class="p-3 rounded-lg w-full border text-sm">
+                            <label class="form-label">Arrival Airport:</label>
+                            <select name="airport_id" x-model="arrival.airport_id"
+                                class="p-3 rounded-lg w-full border text-sm">
                                 <option value="">Select To Airport</option>
                                 @foreach (getDropdown('airports')->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
                                 @endforeach
                             </select>
                         </div>
+
                         <div>
-                            <label for="arrival-flight-no" class="form-label block mb-1 text-gray-700 font-medium">Flight
-                                No:</label>
-                            <input type="text" id="arrival-flight-no" name="flight_no"
-                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
-                                placeholder="Enter Flight No">
+                            <label class="form-label">Flight No:</label>
+                            <input type="text" name="flight_no" x-model="arrival.flight_no"
+                                class="p-3 rounded-lg w-full border text-sm">
                         </div>
+
                         <div>
-                            <label for="arrival-flight-name" class="form-label block mb-1 text-gray-700 font-medium">Flight
-                                Name:</label>
-                            <input type="text" id="arrival-flight-name" name="flight_name"
-                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
-                                placeholder="Enter Flight Name">
+                            <label class="form-label">Flight Name:</label>
+                            <input type="text" name="flight_name" x-model="arrival.flight_name"
+                                class="p-3 rounded-lg w-full border text-sm">
                         </div>
+
                         <div>
-                            <label for="arrival-date-time" class="form-label block mb-1 text-gray-700 font-medium">Date &
-                                Time:</label>
-                            <input type="datetime-local" id="arrival-date-time" name="date_time"
-                                class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm">
+                            <label class="form-label">Date & Time:</label>
+                            <input type="datetime-local" name="date_time" x-model="arrival.date_time"
+                                class="p-3 rounded-lg w-full border text-sm">
                         </div>
+
                         <div>
-                            <label for="arrival-status-id" class="form-label block mb-1 text-gray-700 font-medium">Arrival
-                                Status:</label>
-                            <select id="arrival-status-id" name="status_id" class="p-3 rounded-lg w-full border text-sm">
+                            <label class="form-label">Arrival Status:</label>
+                            <select name="status_id" x-model="arrival.status_id"
+                                class="p-3 rounded-lg w-full border text-sm">
                                 <option value="">Select Status</option>
                                 @foreach (getDropdown('arrival_status')->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -191,18 +200,31 @@
                             </select>
                         </div>
                     </div>
-                    <input type="hidden" id="arrival-id" name="id" value="">
-                    <button type="submit"
-                        class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-sm rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                        Update
-                    </button>
+
+                    <div class="flex justify-end gap-3">
+                        <button type="button" @click="close" class="btn border px-4 py-2">Cancel</button>
+                        <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2">Update</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 @endsection
 
-@push('scripts')
+@section('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.edit-arrival-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const arrival = JSON.parse(btn.getAttribute('data-arrival'));
+                    window.dispatchEvent(new CustomEvent('open-edit-arrival', {
+                        detail: arrival
+                    }));
+                });
+            });
+        });
+    </script>
+
     <script>
         // const fullscreenDiv = document.getElementById('fullDiv');
 
@@ -278,76 +300,5 @@
         //         $('#fullscreenToggleBtn').text('Go Fullscreen');
         //     }
         // });
-
-
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('ActionModal');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-
-            const airportSelect = document.getElementById('arrival-airport-id');
-            const flightNoInput = document.getElementById('arrival-flight-no');
-            const flightNameInput = document.getElementById('arrival-flight-name');
-            const dateTimeInput = document.getElementById('arrival-date-time');
-            const statusSelect = document.getElementById('arrival-status-id');
-            const arrivalIdInput = document.getElementById('arrival-id');
-
-
-            // Function to show modal
-            function showModal() {
-                modal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden'; // prevent background scroll
-            }
-
-            // Function to hide modal
-            function hideModal() {
-                modal.classList.add('hidden');
-                document.body.style.overflow = '';
-            }
-
-            // Setup close button
-            closeModalBtn.onclick = hideModal;
-
-            // Close modal on clicking outside content
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) hideModal();
-            });
-
-
-            // Handle clicks on all edit buttons
-            document.querySelectorAll('.edit-arrival-btn').forEach(button => {
-                button.addEventListener('click', e => {
-                    e.preventDefault();
-
-                    // Read data attributes from clicked row
-                    const airportId = button.getAttribute('data-airport-id');
-                    const statusId = button.getAttribute('data-status-id');
-                    const flightNo = button.getAttribute('data-flight-no');
-                    const flightName = button.getAttribute('data-flight-name');
-                    const dateTime = button.getAttribute('data-date-time');
-                    const arrivalId = button.getAttribute('data-arrival-id');
-
-
-                    // Set values for text inputs
-                    flightNoInput.value = flightNo;
-                    flightNameInput.value = flightName;
-                    dateTimeInput.value = dateTime;
-                    arrivalIdInput.value = arrivalId;
-
-                    // Set selected option for airport dropdown
-                    if (airportId) {
-                        airportSelect.value = airportId;
-                    }
-
-                    // Set selected option for status dropdown
-                    if (statusId) {
-                        statusSelect.value = statusId;
-                    }
-
-                    // Open modal
-                    showModal();
-                });
-            });
-        });
     </script>
-@endpush
+@endsection

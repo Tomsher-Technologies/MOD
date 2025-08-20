@@ -342,7 +342,8 @@ class DelegationController extends Controller
                 }
             }
 
-            return response()->json(['success' => true, 'message' => 'Record updated successfully.']);
+            return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => route('delegations.arrivalsIndex')]);
+            
         } catch (\Throwable $e) {
             Log::error('Travel update failed: ' . $e->getMessage(), [
                 'user_id' => auth()->id(),

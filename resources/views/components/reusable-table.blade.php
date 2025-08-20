@@ -1,3 +1,5 @@
+@props(['columns', 'data', 'noDataMessage' => null, 'rowClass' => null])
+
 <div>
     <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
         <thead>
@@ -11,9 +13,9 @@
         </thead>
         <tbody>
             @forelse ($data as $key => $row)
-                <tr class=" text-sm align-[middle]">
+                <tr class=" text-sm align-[middle] {{ $rowClass ? $rowClass($row) : '' }}" data-id="{{ $row->id }}">
                     @foreach ($columns as $column)
-                         <td class="px-4 py-2 border border-gray-200">
+                         <td class="px-4 py-2 border border-gray-200" data-column="{{ Str::slug($column['label']) }}">
                             {!! $column['render']($row, $key) !!}
                         </td>
                     @endforeach
