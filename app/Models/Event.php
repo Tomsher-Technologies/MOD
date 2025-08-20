@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'name_en',
         'code',
         'name_ar',
@@ -18,7 +18,6 @@ class Event extends Model
         'is_default',
     ];
 
-    // Scope for default event
     public function scopeDefault($query)
     {
         return $query->where('is_default', true);
@@ -29,13 +28,18 @@ class Event extends Model
         return $this->hasMany(EventUserRole::class);
     }
 
+    public function interviewMembers()
+    {
+        return $this->hasMany(InterviewMember::class);
+    }
+
 
     public function generateEventCode()
     {
         $lastEvent = Event::orderBy('created_at', 'desc')->first();
 
         if (!$lastEvent || !$lastEvent->code) {
-            return 'EVT0001';  
+            return 'EVT0001';
         }
 
         $lastNumber = (int) substr($lastEvent->code, 3);

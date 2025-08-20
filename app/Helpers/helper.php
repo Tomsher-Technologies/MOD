@@ -57,11 +57,12 @@ function __db($key, $replace = [], $locale = null)
     return $translation && trim($translation) !== ''
         ? strtr($translation, $replace)
         : ($translated !== $key && trim($translated) !== ''
-        ? $translated
-        : __($key, $replace, 'en'));
+            ? $translated
+            : __($key, $replace, 'en'));
 }
 
-function getAllActiveLanguages(){
+function getAllActiveLanguages()
+{
     $languages = Language::where('status', 1)->orderBy('id')->get();
     return $languages;
 }
@@ -74,20 +75,21 @@ function getActiveLanguage()
     return 'en';
 }
 
-function uploadImage($type, $imageUrl, $filename = null){
+function uploadImage($type, $imageUrl, $filename = null)
+{
     $data_url = '';
     $ext = $imageUrl->getClientOriginalExtension();
-    
-    $path = $type.'/';
-    
-    $filename = $path . $filename.'_'.time().'_'.rand(10, 9999) . '.' . $ext;
+
+    $path = $type . '/';
+
+    $filename = $path . $filename . '_' . time() . '_' . rand(10, 9999) . '.' . $ext;
 
     $imageContents = file_get_contents($imageUrl);
 
     // Save the original image in the storage folder
     Storage::disk('public')->put($filename, $imageContents);
     $data_url = Storage::url($filename);
-    
+
     return $data_url;
 }
 
@@ -105,7 +107,7 @@ function getUploadedImage(?string $path, string $default = 'assets/img/default_i
 
 function formatFilePathsWithFullUrl(array $files): array
 {
-     return array_values(array_filter(array_map(function ($path) {
+    return array_values(array_filter(array_map(function ($path) {
         // Strip starting slash to match disk paths
         $cleanPath = ltrim($path, '/');
 
@@ -131,12 +133,12 @@ function getUnreadNotifications()
 function getUsersWithPermissions(array $permissions, string $guard = 'web')
 {
     $users =  User::where(function ($query) use ($permissions, $guard) {
-                        $query->whereHas('permissions', function ($q) use ($permissions, $guard) {
-                            $q->whereIn('name', $permissions)->where('guard_name', $guard);
-                        })->orWhereHas('roles.permissions', function ($q) use ($permissions, $guard) {
-                            $q->whereIn('name', $permissions)->where('guard_name', $guard);
-                        });
-                    })->get();
+        $query->whereHas('permissions', function ($q) use ($permissions, $guard) {
+            $q->whereIn('name', $permissions)->where('guard_name', $guard);
+        })->orWhereHas('roles.permissions', function ($q) use ($permissions, $guard) {
+            $q->whereIn('name', $permissions)->where('guard_name', $guard);
+        });
+    })->get();
 
     return $users;
 }
@@ -150,10 +152,11 @@ function getUnreadNotificationCount()
     return $count;
 }
 
-function getAdminEventLogo(){
+function getAdminEventLogo()
+{
     $defaultEventLogo = Event::where('is_default', 1)->value('logo');
 
-     if ($defaultEventLogo) {
+    if ($defaultEventLogo) {
         $relativePath = str_replace('/storage/', '', $defaultEventLogo);
         if (Storage::disk('public')->exists($relativePath)) {
             return asset($defaultEventLogo);
@@ -163,7 +166,8 @@ function getAdminEventLogo(){
     return asset('assets/img/md-logo.svg');
 }
 
-function getModuleEventLogo(){
+function getModuleEventLogo()
+{
     $defaultEventLogo = Event::where('is_default', 1)->value('logo');
 
     if ($defaultEventLogo) {
@@ -176,7 +180,8 @@ function getModuleEventLogo(){
 }
 
 
-function getModuleAccountEventLogo(){
+function getModuleAccountEventLogo()
+{
     $id = session('current_event_id');
 
     $defaultEventLogo = Event::where('id', $id)->value('logo');
@@ -190,7 +195,8 @@ function getModuleAccountEventLogo(){
     return asset('assets/img/md-logo.svg');
 }
 
-function getloginImage(){
+function getloginImage()
+{
     $defaultEventImage = Event::where('is_default', 1)->value('image');
 
     if ($defaultEventImage) {
@@ -203,11 +209,12 @@ function getloginImage(){
     return asset('assets/img/login-img.jpg');
 }
 
-function generateEventCode(){
+function generateEventCode()
+{
     $lastEvent = Event::orderBy('created_at', 'desc')->first();
 
     if (!$lastEvent || !$lastEvent->code) {
-        return 'EVT0001';  
+        return 'EVT0001';
     }
 
     $lastNumber = (int) substr($lastEvent->code, 3);
@@ -217,6 +224,158 @@ function generateEventCode(){
     return 'EVT' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
 }
 
-function getDefaultEventId() {
+function getDefaultEventId()
+{
     return \App\Models\Event::where('is_default', true)->value('id');
+}
+
+function getAllEvents()
+{
+    return \App\Models\Event::all();
+}
+
+function getDropDown($key)
+{
+    return \App\Models\Dropdown::where('code', $key)->with('options')->first() ?? [];
+}
+
+function storeUploadedFileToModuleFolder($file, $folder, $parentId, $subDir = 'files')
+{
+    $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+    $extension = $file->getClientOriginalExtension();
+    $date = date('YmdHis');
+    $random = rand(1000, 9999);
+    $filename = $originalName . '_' . $date . '_' . $random . '.' . $extension;
+    $storageFolder = $folder . '/' . $parentId . '/' . $subDir;
+    return $file->storeAs($storageFolder, $filename, 'public');
+}
+
+
+if (!function_exists('getRouteForPage')) {
+    function getRouteForPage(string $pageKey, $params = null): ?string
+    {
+        $pageRoutes = [
+            'delegations.index' => [
+                'manage_delegations' => 'delegations.index',
+                'del_manage_delegations' => 'delegations.index',
+            ],
+            'delegation.store' => [
+                'add_delegations' => 'delegations.store',
+                'del_add_delegations' => 'delegations.store',
+            ],
+            'delegation.show' => [
+                'add_delegations' => 'delegations.show',
+                'del_add_delegations' => 'delegations.show',
+            ],
+            'delegation.update' => [
+                'add_delegations' => 'delegations.update',
+                'del_add_delegations' => 'delegations.update',
+            ],
+
+            //Interview
+            'delegation.storeInterview' => [
+                'add_interviews' => 'delegations.storeOrUpdateInterview',
+                'del_add_interviews' => 'delegations.storeOrUpdateInterview',
+            ],
+            'delegation.addInterview' => [
+                'add_interviews' => 'delegations.addInterview',
+                'del_add_interviews' => 'delegations.addInterview',
+            ],
+            'delegation.editInterview' => [
+                'manage_interviews' => 'delegations.editInterview',
+                'del_manage_interviews' => 'delegations.editInterview',
+            ],
+             'delegation.destroyInterview' => [
+                'delete_interviews' => 'delegations.destroyInterview',
+                'del_delete_interviews' => 'delegations.destroyInterview',
+            ],
+
+            //Travel
+            'delegation.addTravel' => [
+                'add_travels' => 'delegations.addTravel',
+                'add_travels' => 'delegations.addTravel',
+            ],
+            'delegation.storeTravel' => [
+                'add_travels' => 'delegations.storeTravel',
+                'del_add_travels' => 'delegations.storeTravel',
+            ],
+
+            //Delegate
+            'delegation.storeDelegate' => [
+                'add_delegate' => 'delegations.storeDelegate',
+                'del_add_delegate' => 'delegations.storeDelegate',
+            ],
+            'delegation.editDelegate' => [
+                'edit_delegate' => 'delegations.editDelegate',
+                'del_edit_delegate' => 'delegations.editDelegate',
+            ],
+            'delegation.destroyDelegate' => [
+                'delete_delegate' => 'delegations.destroyDelegate',
+                'del_delete_delegate' => 'delegations.destroyDelegate',
+            ],
+            'delegation.edit' => [
+                'edit_delegations' => 'delegations.edit',
+                'del_edit_delegations' => 'delegations.edit',
+            ],
+            'delegation.addDelegate' => [
+                'add_delegate' => 'delegations.addDelegate',
+                'del_add_delegate' => 'delegations.addDelegate',
+            ],
+
+
+            'delegation.searchByCode' => [
+                'manage_delegations' => 'delegations.searchByCode',
+                'del_manage_delegations' => 'delegations.searchByCode',
+            ],
+            'delegation.search' => [
+                'manage_delegations' => 'delegations.search',
+                'del_manage_delegations' => 'delegations.search',
+            ],
+
+            //Members
+            'delegation.members' => [
+                'add_interviews' => '/mod-admin/delegations/members',
+                'del_add_interviews' => '/mod-admin/delegations/members',
+            ],
+
+            //Attachments
+            'attachments.destroy' => [
+                'manage_delegations' => 'attachments.destroy',
+                'del_manage_delegations' => 'attachments.destroy',
+            ],
+            'attachments.edit' => [
+                'manage_delegations' => 'delegations.updateAttachment',
+                'del_manage_delegations' => 'delegations.updateAttachment',
+            ],
+        ];
+
+        $user = auth()->user();
+        if (!$user) {
+            return null;
+        }
+
+        if (!isset($pageRoutes[$pageKey])) {
+            return null;
+        }
+
+        foreach ($pageRoutes[$pageKey] as $permission => $routeNameOrUrl) {
+            if ($user->can($permission)) {
+                if (is_string($routeNameOrUrl) && str_starts_with($routeNameOrUrl, '/')) {
+                    return $routeNameOrUrl;
+                }
+
+                if ($params === null) {
+                    return route($routeNameOrUrl);
+                }
+
+                if (is_array($params)) {
+                    return route($routeNameOrUrl, $params);
+                }
+
+                return route($routeNameOrUrl, $params);
+            }
+        }
+
+        return "#";
+    }
 }

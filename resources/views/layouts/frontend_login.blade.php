@@ -12,16 +12,17 @@
 
     <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
 
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     @yield('style')
 </head>
 
 <body class="bg-[#FFFCEE]" dir="rtl">
     @yield('content')
-    
+
     <script>
-       
+
     </script>
     @yield('script')
 
