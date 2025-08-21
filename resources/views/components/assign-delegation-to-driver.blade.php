@@ -1,6 +1,6 @@
 <div class="bg-white h-full w-full rounded-lg border-0 p-6">
     @props(['driver'])
-    <form action="{{ route('drivers.assign', $driver->id) }}" method="POST">
+    <form action="{{ getRouteForPage('drivers.assign', $driver->id) }}" method="POST">
         @csrf
         <div class="p-4 md:p-5 space-y-6 px-0">
             <div class="grid  grid-cols-12 gap-2 items-end">
@@ -9,22 +9,22 @@
                         <div class="w-full">
                             <div class="flex justify-between ">
                                 <label
-                                    class="form-label block text-gray-700 font-semibold">{{ __db('Delegation ID') }}:</label>
+                                    class="form-label block text-gray-700 font-semibold">{{ __db('delegation') . ' ' . __db('id') }}:</label>
                             </div>
                             <input type="text" id="delegation_code"
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                                placeholder="{{ __db('Enter Delegation ID') }}" />
+                                placeholder="{{ __db('enter') . __db('delegation') . ' ' . __db('id') }}" />
                         </div>
                     </div>
                 </div>
                 <div class="col-span-1 text-center">
-                    <span class="mb-3 font-semibold"> {{ __db('OR') }} </span>
+                    <span class="mb-3 font-semibold"> {{ __db('or') }} </span>
                 </div>
                 <div class="col-span-6">
                     <div class="grid grid-cols-2 gap-5 items-end">
                         <div>
                             <label
-                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('Country') }}:</label>
+                                class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
                             <select id="country_id" class="p-3 rounded-lg w-full border text-sm">
                                 <option selected="" disabled="">{{ __db('Select Country') }}</option>
                                 @foreach (getDropDown('country')->options as $country)
@@ -39,7 +39,7 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                     d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
                             </svg>
-                            <span class="w-[150px]">{{ __db('Search Delegation ID') }}</span>
+                            <span class="w-[150px]">{{ __db('search') . " " . __db('delegation') . " " . __db('id') }}</span>
                         </button>
                     </div>
                 </div>
@@ -53,10 +53,10 @@
                 <thead>
                     <tr>
                         <th class="p-3 !bg-[#B68A35] text-start text-white"></th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('Delegation ID') }}</th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('Continent') }}</th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('Country') }}</th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('Team Head') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('delegation') . " " . __db('id') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('continent') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('country') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('team_head') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,7 +67,7 @@
         </div>
         <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
             <button type="submit"
-                class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('Assign') }}</button>
+                class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('assign') }}</button>
         </div>
     </form>
 </div>
@@ -81,8 +81,8 @@
 
         // Define pageRoutes here or ensure they are globally available
         const pageRoutes = {
-            delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
-            delegationSearch: "{{ route('delegations.search') }}",
+            delegationSearchByCode: "{{ getRouteForPage('delegation.searchByCode') }}",
+            delegationSearch: "{{ getRouteForPage('delegation.search') }}",
         };
 
         searchBtn.addEventListener('click', function() {

@@ -120,8 +120,8 @@
                             },
                         ],
                         [
-                            'label' => __db('actions'),
-                            'key' => 'actions',
+                            'label' => __db(__db('actions')),
+                            'key' => __db('actions'),
                             'render' => function ($delegation) {
                                 $buttons = '';
                                 if (auth()->user() && auth()->user()->can('edit_delegations')) {

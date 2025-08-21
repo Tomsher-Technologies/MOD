@@ -12,14 +12,20 @@ use Illuminate\Support\Str;
 
 trait HandlesUpdateConfirmation
 {
-    private function formatDisplayValue($value, $isBoolean = false)
+    private function formatDisplayValue($value, $field = null)
     {
-        if ($isBoolean) {
+        if ($field === 'status') {
+            return $value == 1 ? 'Active' : 'Inactive';
+        }
+
+        if (is_bool($value)) {
             return $value ? 'Yes' : 'No';
         }
+
         if ($value === null || $value === '') {
             return 'N/A';
         }
+
         return $value;
     }
 
@@ -71,16 +77,16 @@ trait HandlesUpdateConfirmation
                     $displayNew = $this->getDisplayLabel($dw['model'], $dw['key'], $dw['label'], $newValue);
                     $changedFields[$key] = [
                         'label' => Str::headline(str_replace('_id', '', $key)),
-                        'old' => $this->formatDisplayValue($displayOld, $isBooleanField),
-                        'new' => $this->formatDisplayValue($displayNew, $isBooleanField),
+                        'old' => $this->formatDisplayValue($displayOld, $key),
+                        'new' => $this->formatDisplayValue($displayNew, $key),
                     ];
                     continue;
                 }
 
                 $changedFields[$key] = [
                     'label' => Str::headline(str_replace('_id', '', $key)),
-                    'old' => $this->formatDisplayValue($originalValue, $isBooleanField),
-                    'new' => $this->formatDisplayValue($newValue, $isBooleanField),
+                    'old' => $this->formatDisplayValue($originalValue, $key),
+                    'new' => $this->formatDisplayValue($newValue, $key),
                 ];
             }
         }
@@ -211,7 +217,7 @@ trait HandlesUpdateConfirmation
                                 $displayOld = $this->getDisplayLabel($dw['model'], $dw['key'], $dw['label'], $originalValue);
                                 $displayNew = $this->getDisplayLabel($dw['model'], $dw['key'], $dw['label'], $value);
                             }
-                            
+
                             $changedFields["{$requestKey}.{$field}"] = [
                                 'label' => Str::headline($requestKey . ' ' . str_replace('_id', '', $field)),
                                 'old' => $this->formatDisplayValue($displayOld),
@@ -251,7 +257,7 @@ trait HandlesUpdateConfirmation
     ): void {
         // Try to get the current event ID from various sources
         $eventId = $currentEventId;
-        
+
         if (!$eventId && $model) {
             // If the model has an event_id field, use it
             if ($model->hasAttribute('event_id') && $model->event_id) {
@@ -260,15 +266,13 @@ trait HandlesUpdateConfirmation
             // For delegation-related models, try to get event from delegation
             elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
-            }
-            elseif ($model instanceof \App\Models\Interview && $model->delegation && $model->delegation->event_id) {
+            } elseif ($model instanceof \App\Models\Interview && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
-            }
-            elseif ($model instanceof \App\Models\DelegationAttachment && $model->delegation && $model->delegation->event_id) {
+            } elseif ($model instanceof \App\Models\DelegationAttachment && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
             }
         }
-        
+
         // If still no event ID, try to get the default event
         if (!$eventId) {
             $defaultEvent = \App\Models\Event::where('is_default', true)->first();
