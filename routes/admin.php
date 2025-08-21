@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DelegationController;
 use App\Http\Controllers\Admin\DropdownController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EscortController;
+use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OtherMemberController;
 use App\Http\Controllers\Admin\RoleController;
@@ -111,6 +112,14 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     Route::post('escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
     Route::post('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
+
+    // Drivers
+    Route::resource('drivers', DriverController::class);
+    Route::post('/drivers/status', [DriverController::class, 'updateStatus'])->name('drivers.status');
+    Route::get('/drivers/assign/{driver}', [DriverController::class, 'assignIndex'])->name('drivers.assignIndex');
+
+    Route::post('drivers/{driver}/assign', [DriverController::class, 'assign'])->name('drivers.assign');
+    Route::post('drivers/{driver}/unassign', [DriverController::class, 'unassign'])->name('drivers.unassign');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

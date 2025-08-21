@@ -97,8 +97,8 @@
                             stroke-linejoin="round" />
                         <path d="M18.1328 14.2773H22.9191" stroke="#292D32" stroke-width="1.75" stroke-linecap="round"
                             stroke-linejoin="round" />
-                        <path d="M20.5254 18.9438H22.9186" stroke="#292D32" stroke-width="1.75" stroke-linecap="round"
-                            stroke-linejoin="round" />
+                        <path d="M20.5254 18.9438H22.9186" stroke="#292D32" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round" />
                         <path
                             d="M10.3553 13.4489C11.5514 13.4489 12.5211 12.5035 12.5211 11.3373C12.5211 10.171 11.5514 9.22559 10.3553 9.22559C9.15912 9.22559 8.18945 10.171 8.18945 11.3373C8.18945 12.5035 9.15912 13.4489 10.3553 13.4489Z"
                             stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
@@ -107,6 +107,33 @@
                             stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <span class="text-md">Escorts </span>
+                </a>
+            </li>
+            {{-- @endcan --}}
+
+            {{-- @can('manage_drivers') --}}
+            <li>
+                <a href="{{ route('drivers.index') }}"
+                    class="{{ areActiveRoutes(['drivers.index', 'drivers.create', 'drivers.edit']) }}">
+                    <svg class="pe-2" width="30" height="30" viewBox="0 0 29 29" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M20.5249 24.7773H8.55908C3.77275 24.7773 2.57617 23.6107 2.57617 18.944V9.61068C2.57617 4.94401 3.77275 3.77734 8.55908 3.77734H20.5249C25.3112 3.77734 26.5078 4.94401 26.5078 9.61068V18.944C26.5078 23.6107 25.3112 24.7773 20.5249 24.7773Z"
+                            stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M16.9355 9.61084H22.9185" stroke="#292D32" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M18.1328 14.2773H22.9191" stroke="#292D32" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M20.5254 18.9438H22.9186" stroke="#292D32" stroke-width="1.75"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M10.3553 13.4489C11.5514 13.4489 12.5211 12.5035 12.5211 11.3373C12.5211 10.171 11.5514 9.22559 10.3553 9.22559C9.15912 9.22559 8.18945 10.171 8.18945 11.3373C8.18945 12.5035 9.15912 13.4489 10.3553 13.4489Z"
+                            stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                        <path
+                            d="M14.5421 19.3289C14.3746 17.6372 12.9985 16.3072 11.2635 16.1556C10.6652 16.0972 10.0549 16.0972 9.44465 16.1556C7.70961 16.3189 6.33354 17.6372 6.16602 19.3289"
+                            stroke="#292D32" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="text-md">Drivers</span>
                 </a>
             </li>
             {{-- @endcan --}}
