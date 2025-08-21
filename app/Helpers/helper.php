@@ -285,7 +285,7 @@ if (!function_exists('getRouteForPage')) {
                 'manage_interviews' => 'delegations.editInterview',
                 'del_manage_interviews' => 'delegations.editInterview',
             ],
-             'delegation.destroyInterview' => [
+            'delegation.destroyInterview' => [
                 'delete_interviews' => 'delegations.destroyInterview',
                 'del_delete_interviews' => 'delegations.destroyInterview',
             ],
@@ -337,9 +337,29 @@ if (!function_exists('getRouteForPage')) {
                 'manage_escorts' => 'escorts.index',
                 'del_manage_escorts' => 'escorts.index',
             ],
-            'escorts.index' => [
-                'manage_escorts' => 'escorts.index',
-                'del_manage_escorts' => 'escorts.index',
+            'escorts.show' => [
+                'manage_escorts' => 'escorts.show',
+                'del_manage_escorts' => 'escorts.show',
+            ],
+            'escorts.create' => [
+                'add_escorts' => 'escorts.create',
+                'del_add_escorts' => 'escorts.create',
+            ],
+            'escorts.edit' => [
+                'edit_escorts' => 'escorts.edit',
+                'del_edit_escorts' => 'escorts.edit',
+            ],
+            'escorts.unassign' => [
+                'edit_escorts' => 'escorts.unassign', // Assuming permission to edit escorts allows unassigning
+                'del_edit_escorts' => 'escorts.unassign',
+            ],
+            'escorts.assignIndex' => [
+                'edit_escorts' => 'escorts.assignIndex', // Assuming permission to edit escorts allows assigning
+                'del_edit_escorts' => 'escorts.assignIndex',
+            ],
+            'escorts.status' => [
+                'edit_escorts' => 'escorts.status', // Assuming permission to edit escorts allows changing status
+                'del_edit_escorts' => 'escorts.status',
             ],
 
             // Drivers
@@ -350,6 +370,26 @@ if (!function_exists('getRouteForPage')) {
             'drivers.show' => [
                 'manage_drivers' => 'drivers.show',
                 'del_manage_drivers' => 'drivers.show',
+            ],
+            'drivers.create' => [
+                'add_drivers' => 'drivers.create',
+                'del_add_drivers' => 'drivers.create',
+            ],
+            'drivers.edit' => [
+                'edit_drivers' => 'drivers.edit',
+                'del_edit_drivers' => 'drivers.edit',
+            ],
+            'drivers.unassign' => [
+                'edit_drivers' => 'drivers.unassign', // Assuming permission to edit drivers allows unassigning
+                'del_edit_drivers' => 'drivers.unassign',
+            ],
+            'drivers.assignIndex' => [
+                'edit_drivers' => 'drivers.assignIndex', // Assuming permission to edit drivers allows assigning
+                'del_edit_drivers' => 'drivers.assignIndex',
+            ],
+            'drivers.status' => [
+                'edit_drivers' => 'drivers.status', // Assuming permission to edit drivers allows changing status
+                'del_edit_drivers' => 'drivers.status',
             ],
 
             //Members

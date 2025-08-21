@@ -26,9 +26,6 @@ class Escort extends Model
         'email',
         'nationality_id',
         'date_of_birth',
-        'id_number',
-        'id_issue_date',
-        'id_expiry_date',
     ];
 
     protected $casts = [

@@ -9,7 +9,7 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
-                    <form class="w-[50%] me-4" action="{{ route('escorts.index') }}" method="GET">
+                    <form class="w-[50%] me-4" action="{{ getRouteForPage('escorts.index') }}" method="GET">
                         <div class="relative">
 
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -30,7 +30,7 @@
                     </form>
 
                     <div class="text-center">
-                        <a href="{{ route('escorts.create') }}"
+                        <a href="{{ getRouteForPage('escorts.create') }}"
                             class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-sm rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                             type="button">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +102,7 @@
                                 <td class="px-4 py-2 border border-gray-200">
                                     <div class="flex align-center gap-4">
 
-                                        <a href="{{ route('escorts.edit', $escort->id) }}">
+                                        <a href="{{ getRouteForPage('escorts.edit', $escort->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
                                                 <path
@@ -113,7 +113,7 @@
                                         @if ($escort->status == 1)
                                             @if ($escort->delegations->where('pivot.status', 1)->count() > 0)
                                                 @foreach ($escort->delegations->where('pivot.status', 1) as $delegation)
-                                                    <form action="{{ route('escorts.unassign', $escort->id) }}"
+                                                    <form action="{{ getRouteForPage('escorts.unassign', $escort->id) }}"
                                                         method="POST">
                                                         @csrf
                                                         <input type="hidden" name="delegation_id"

@@ -101,9 +101,6 @@ class EscortController extends Controller
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
-            'id_number' => 'nullable|string|max:255',
-            'id_issue_date' => 'nullable|date',
-            'id_expiry_date' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
         ]);
@@ -174,9 +171,6 @@ class EscortController extends Controller
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
-            'id_number' => 'nullable|string|max:255',
-            'id_issue_date' => 'nullable|date',
-            'id_expiry_date' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
         ]);

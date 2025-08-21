@@ -123,7 +123,7 @@ class DriverController extends Controller
             delegationId: $driver->delegation_id
         );
 
-        return redirect()->route('drivers.index')->with('success', __db('Driver created successfully.'));
+        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver created successfully.'));
     }
 
     /**
@@ -259,7 +259,7 @@ class DriverController extends Controller
             delegationId: $driver->delegation_id
         );
 
-        return redirect()->route('drivers.index')->with('success', __db('Driver deleted successfully.'));
+        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver deleted successfully.'));
     }
 
     public function assign(Request $request, Driver $driver)
@@ -287,7 +287,7 @@ class DriverController extends Controller
             ]);
         }
 
-        return redirect()->route('drivers.index')->with('success', __db('Driver assigned successfully.'));
+        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
     }
 
     public function unassign(Request $request, Driver $driver)
@@ -302,7 +302,7 @@ class DriverController extends Controller
             'status' => 0,
         ]);
 
-        return redirect()->route('drivers.index')->with('success', __db('Driver unassigned successfully.'));
+        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver unassigned successfully.'));
     }
 
     protected function loadDropdownOptions()
