@@ -379,6 +379,10 @@ if (!function_exists('getRouteForPage')) {
                 'edit_drivers' => 'drivers.edit',
                 'del_edit_drivers' => 'drivers.edit',
             ],
+            'drivers.update' => [
+                'edit_drivers' => 'drivers.update',
+                'del_edit_drivers' => 'drivers.update',
+            ],
             'drivers.unassign' => [
                 'edit_drivers' => 'drivers.unassign', // Assuming permission to edit drivers allows unassigning
                 'del_edit_drivers' => 'drivers.unassign',
