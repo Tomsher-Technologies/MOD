@@ -11,7 +11,6 @@ class Delegation extends Model
     use HasFactory;
     protected $fillable = [
         'updated_by',
-        'code',
         'invitation_from_id',
         'continent_id',
         'country_id',
@@ -28,6 +27,10 @@ class Delegation extends Model
             if (Auth::check()) {
                 $delegation->created_by = Auth::id();
             }
+            $year = date('y');
+            $latestDelegation = self::whereYear('created_at', date('Y'))->latest('id')->first();
+            $newId = $latestDelegation ? (int)substr($latestDelegation->code, -3) + 1 : 1;
+            $delegation->code = 'DA' . $year . '-' . str_pad($newId, 3, '0', STR_PAD_LEFT);
         });
 
         static::updating(function ($delegation) {
@@ -106,6 +109,11 @@ class Delegation extends Model
     public function escorts()
     {
         return $this->belongsToMany(Escort::class, 'delegation_escorts')->withPivot('status', 'assigned_by');
+    }
+
+    public function drivers()
+    {
+        return $this->belongsToMany(Driver::class, 'delegation_drivers');
     }
 
     public function event()

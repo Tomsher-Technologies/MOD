@@ -114,7 +114,22 @@
             ],
             [
                 'label' => __db('participation_status'),
-                'render' => fn($row) => $row->delegation->participationStatus->value ?? '-',
+                'render' => function ($row) {
+                    $arrival = $row->delegateTransports->where('type', 'arrival')->first();
+                    $departure = $row->delegateTransports->where('type', 'departure')->first();
+
+
+                    $departureStatus = $departure && $departure->status ? $departure->status->value : null;
+                    $arrivalStatus = $arrival && $arrival->status ? $arrival->status->value : null;
+
+                    if ($departureStatus === 'departed') {
+                        return __db('Departed');
+                    } elseif ($arrivalStatus === 'arrived') {
+                        return __db('Arrived');
+                    } else {
+                        return __db('Not yet arrived');
+                    }
+                },
             ],
             [
                 'label' => __db('accommodation'),

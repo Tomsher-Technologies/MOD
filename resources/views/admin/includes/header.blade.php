@@ -60,7 +60,12 @@
                         'link' => route('escorts.create'),
                         // 'permission' => 'add_escorts',
                         'permission' => 'add_delegations',
-                        
+                    ],
+                    'drivers.index' => [
+                        'text' => __db('add_driver'),
+                        'link' => route('drivers.create'),
+                        // 'permission' => 'add_escorts',
+                        'permission' => 'add_drivers',
                     ],
                 ];
             @endphp

@@ -75,6 +75,10 @@ class DelegationController extends Controller
         $this->middleware('permission:view_travels', [
             'only' => ['arrivalsIndex', 'departuresIndex']
         ]);
+
+        // $this->middleware('permission:view_interviews', [
+        //     'only' => ['interviews']
+        // ]);
     }
 
     public function index(Request $request)
@@ -129,14 +133,64 @@ class DelegationController extends Controller
         return view('admin.delegations.index', compact('delegations'));
     }
 
+    public function interviews(Request $request)
+    {
+        $query = Interview::with([
+            'delegation.continent',
+            'delegation.country',
+            'status',
+            'interviewWithDelegation',
+            'fromMembers.fromDelegate',  // explicitly load fromDelegate
+            'toMembers.toDelegate',      // explicitly load toDelegate
+            'toMembers.otherMember',     // also load otherMember if needed for del_others type
+        ]);
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('delegation', function ($delegationQuery) use ($search) {
+                    $delegationQuery->where('code', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('fromMembers.fromDelegate', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('toMembers.toDelegate', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('toMembers.otherMember', function ($otherMemberQuery) use ($search) {
+                        $otherMemberQuery->where('name_en', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($continentId = $request->input('continent_id')) {
+            $query->whereHas('delegation', function ($delegationQuery) use ($continentId) {
+                $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            $query->whereHas('delegation', function ($delegationQuery) use ($countryId) {
+                $delegationQuery->where('country_id', $countryId);
+            });
+        }
+
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
+        }
+
+        $interviews = $query->paginate(20);
+
+        return view('admin.delegations.interviews', compact('interviews'));
+    }
+
     public function create()
     {
-        $delegateId = $this->generateNextDelegateId();
-
         $dropdowns = $this->loadDropdownOptions();
 
         return view('admin.delegations.create', array_merge($dropdowns, [
-            'uniqueDelegateId' => $delegateId,
+            'uniqueDelegateId' => '',
         ]));
     }
 
@@ -149,7 +203,7 @@ class DelegationController extends Controller
             'invitationStatus',
             'participationStatus',
             'delegates' => function ($query) {
-                $query->with(['gender', 'parent', 'delegateTransports']);
+                $query->with(['gender', 'parent', 'delegateTransports.status']);
             },
             'attachments',
             'interviews' => function ($query) {
@@ -180,7 +234,7 @@ class DelegationController extends Controller
                 $query->with([
                     'gender',
                     'parent',
-                    'delegateTransports',
+                    'delegateTransports.status',
                 ]);
             },
             'attachments',
@@ -238,6 +292,26 @@ class DelegationController extends Controller
             $query->whereDate('date_time', '<=', $toDate);
         }
 
+        if ($continentId = $request->input('continent_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
+                $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
+                $delegationQuery->where('country_id', $countryId);
+            });
+        }
+
+        if ($airportId = $request->input('airport_id')) {
+            $query->where('airport_id', $airportId);
+        }
+
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
+        }
+
         $arrivals = $query->latest()->paginate(10);
 
         return view('admin.arrivals.index', compact('arrivals'));
@@ -281,6 +355,26 @@ class DelegationController extends Controller
 
         if ($toDate = $request->input('to_date')) {
             $query->whereDate('date_time', '<=', $toDate);
+        }
+
+        if ($continentId = $request->input('continent_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
+                $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
+                $delegationQuery->where('country_id', $countryId);
+            });
+        }
+
+        if ($airportId = $request->input('airport_id')) {
+            $query->where('airport_id', $airportId);
+        }
+
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
         }
 
         $departures = $query->latest()->paginate(10);
@@ -466,7 +560,6 @@ class DelegationController extends Controller
         // return response()->json($request->all());
 
         $validated = $request->validate([
-            'code' => 'required|string|unique:delegations,code',
             'invitation_from_id' => 'required|exists:dropdown_options,id',
             'continent_id' => 'required|exists:dropdown_options,id',
             'country_id' => 'required|exists:dropdown_options,id',
@@ -502,7 +595,6 @@ class DelegationController extends Controller
             $eventId = $currentEvent ? $currentEvent->id : null;
 
             $delegation = Delegation::create([
-                'code' => $validated['code'],
                 'invitation_from_id' => $validated['invitation_from_id'],
                 'continent_id' => $validated['continent_id'],
                 'country_id' => $validated['country_id'],
@@ -832,7 +924,7 @@ class DelegationController extends Controller
             foreach ($validated['delegate_ids'] as $delegateId) {
                 $delegate = $delegation->delegates()->findOrFail($delegateId);
 
-                if (isset($validated['arrival']['status_id']) && $validated['arrival']['status_id']) {
+                if (isset($validated['arrival']['date_time']) && $validated['arrival']['date_time']) {
                     $delegate->delegateTransports()->create([
                         'type' => 'arrival',
                         'mode' => $validated['arrival']['mode'],
@@ -845,7 +937,7 @@ class DelegationController extends Controller
                     ]);
                 }
 
-                if (isset($validated['departure']['status_id']) && $validated['departure']['status_id']) {
+                if (isset($validated['departure']['date_time']) && $validated['departure']['date_time']) {
                     $delegate->delegateTransports()->create([
                         'type' => 'departure',
                         'mode' => $validated['departure']['mode'],
@@ -1421,28 +1513,11 @@ class DelegationController extends Controller
         ];
     }
 
-    protected function generateNextDelegateId()
-    {
-        $lastDelegate = \App\Models\Delegation::where('code', 'like', 'DA%')
-            ->orderBy('code', 'desc')
-            ->first();
 
-        if (!$lastDelegate) {
-            return 'DA000001';
-        }
-
-        $lastId = $lastDelegate->code;
-        $number = intval(substr($lastId, 2));
-
-        $nextNumber = $number + 1;
-        $nextDelegateId = 'DA' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
-
-        return $nextDelegateId;
-    }
 
     private function syncTransportInfo(Delegate $delegate, ?array $transportData, string $type): void
     {
-        if (empty($transportData) || (empty($transportData['status_id']) && empty($transportData['mode']))) {
+        if (empty($transportData) || (empty($transportData['date_time']) || empty($transportData['mode']))) {
             return;
         }
 

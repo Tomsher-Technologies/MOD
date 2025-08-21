@@ -121,6 +121,9 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('drivers/{driver}/assign', [DriverController::class, 'assign'])->name('drivers.assign');
     Route::post('drivers/{driver}/unassign', [DriverController::class, 'unassign'])->name('drivers.unassign');
 
+    // Interviews
+    Route::get('/interviews', [DelegationController::class, 'interviews'])->name('delegations.interviews');
+
     // Manage Accommodations
     Route::resource('accommodations', AccommodationController::class);
     

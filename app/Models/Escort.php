@@ -11,6 +11,7 @@ class Escort extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'code',
         'event_id',
         'name_ar',
         'name_en',
@@ -31,6 +32,15 @@ class Escort extends Model
     protected $casts = [
         'spoken_languages' => 'array',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($escort) {
+            $latestEscort = self::withTrashed()->latest('id')->first();
+            $newId = $latestEscort ? $latestEscort->id + 1 : 1;
+            $escort->code = 'EC' . str_pad($newId, 3, '0', STR_PAD_LEFT);
+        });
+    }
 
     public function getSpokenLanguagesLabelsAttribute()
     {

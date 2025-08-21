@@ -31,7 +31,7 @@
             <div class="grid grid-cols-12 gap-5">
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('code') }}:</label>
-                    <input type="text" name="code" value="{{ old('code', $uniqueDelegateId) }}"
+                    <input type="text" name="code" value="{{ old('code', 'Auto-Generated') }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0 bg-gray-200"
                         readonly />
                 </div>

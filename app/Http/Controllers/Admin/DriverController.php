@@ -56,9 +56,32 @@ class DriverController extends Controller
             });
         }
 
-        $drivers = $query->paginate(10);
+        if ($request->has('title') && !empty($request->title)) {
+            $query->whereIn('title', $request->title);
+        }
 
-        return view('admin.drivers.index', compact('drivers'));
+        if ($request->has('car_type') && !empty($request->car_type)) {
+            $query->whereIn('car_type', $request->car_type);
+        }
+
+        if ($request->has('car_number') && !empty($request->car_number)) {
+            $query->whereIn('car_number', $request->car_number);
+        }
+
+        if ($request->has('capacity') && !empty($request->capacity)) {
+            $query->whereIn('capacity', $request->capacity);
+        }
+
+        if ($request->has('delegation_id') && !empty($request->delegation_id)) {
+            $query->whereHas('delegations', function ($q) use ($request) {
+                $q->where('delegations.id', $request->delegation_id);
+            });
+        }
+
+        $drivers = $query->paginate(10);
+        $delegations = Delegation::all();
+
+        return view('admin.drivers.index', compact('drivers', 'delegations'));
     }
 
     public function updateStatus(Request $request)
@@ -96,6 +119,7 @@ class DriverController extends Controller
             'military_number' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
+            'military_number' => 'nullable|string|max:255',
             'name_en' => 'required|string|max:255',
             'mobile_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',

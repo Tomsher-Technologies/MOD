@@ -54,11 +54,28 @@ class EscortController extends Controller
             });
         }
 
+        if ($request->has('title') && !empty($request->title)) {
+            $query->whereIn('internal_ranking_id', $request->title);
+        }
+
+        if ($request->has('gender_id') && !empty($request->gender_id)) {
+            $query->where('gender_id', $request->gender_id);
+        }
+
+        if ($request->has('language_id') && !empty($request->language_id)) {
+            $query->where('spoken_languages', 'like', '%' . $request->language_id . '%');
+        }
+
+        if ($request->has('delegation_id') && !empty($request->delegation_id)) {
+            $query->whereHas('delegations', function ($q) use ($request) {
+                $q->where('delegations.id', $request->delegation_id);
+            });
+        }
+
         $escorts = $query->paginate(10);
+        $delegations = Delegation::all();
 
-        // return response()->json(['sss' => $escorts]);
-
-        return view('admin.escorts.index', compact('escorts'));
+        return view('admin.escorts.index', compact('escorts', 'delegations'));
     }
 
     public function updateStatus(Request $request)
@@ -92,10 +109,14 @@ class EscortController extends Controller
      */
     public function store(Request $request)
     {
+
+
         $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
+            'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
+            'military_number' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
@@ -111,8 +132,9 @@ class EscortController extends Controller
         $escortData = $request->all();
         $escortData['event_id'] = $eventId;
 
-        if ($request->has('language_id')) {
-            $escortData['spoken_languages'] = implode(',', $request->input('language_id'));
+        if (isset($escortData['language_id'])) {
+            $escortData['spoken_languages'] = implode(',', $escortData['language_id']);
+            unset($escortData['language_id']);
         } else {
             $escortData['spoken_languages'] = null;
         }
@@ -164,8 +186,10 @@ class EscortController extends Controller
     {
         $validated = $request->validate([
             'name_en' => 'required|string|max:255',
+            'military_number' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
+            'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
@@ -193,14 +217,25 @@ class EscortController extends Controller
                     'label' => 'value',
                 ],
             ],
-            'delegation_id' => [
+            'nationality_id' => [
                 'display_with' => [
-                    'model' => \App\Models\Delegation::class,
+                    'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',
-                    'label' => 'code',
+                    'label' => 'value',
                 ],
             ],
-
+            'internal_ranking_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'military_number' => [],
+            'title' => [],
+            'name_ar' => [],
+            'name_en' => [],
+            'status' => [],
         ];
 
         // Manually handle spoken_languages comparison
@@ -243,7 +278,7 @@ class EscortController extends Controller
 
         if (isset($validated['language_id'])) {
             $validated['spoken_languages'] = implode(',', $validated['language_id']);
-            unset($validated['language_id']); 
+            unset($validated['language_id']);
         } else {
             $validated['spoken_languages'] = null;
         }
