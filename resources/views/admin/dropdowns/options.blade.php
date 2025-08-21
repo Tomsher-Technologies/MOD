@@ -114,7 +114,6 @@
                                 @endcan
                             </td>
 
-                             {{-- Edit Option Modal --}}
                             <div id="edit-option-{{ $option->id }}" tabindex="-1" aria-hidden="true"
                                 class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
                                 <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
@@ -132,7 +131,7 @@
                                         </div>
                                         <div class="mb-4">
                                             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sort Order</label>
-                                            <input type="number" name="sort_order" value="{{ $option->sort_order }}"
+                                            <input type="number" name="sort_order" value="{{ $option->sort_order ?? 0 }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
@@ -168,8 +167,7 @@
              <div class="mt-4">
                 {{ $options->links() }}
             </div>
-           
-            {{-- Add Option Modal --}}
+
             <div id="add-option" tabindex="-1" aria-hidden="true"
                 class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
                 <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
@@ -186,7 +184,7 @@
                         <input type="text" name="value" required class="w-full border p-2 rounded mb-4">
 
                         <label class="block mb-2 font-medium">Sort Order</label>
-                        <input type="number" name="sort_order" class="w-full border p-2 rounded mb-4">
+                        <input type="number" name="sort_order" class="w-full border p-2 rounded mb-4" value="0">
 
                         <div class="text-right">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
@@ -205,7 +203,6 @@
 
 @section('script')
     <script>
-        // Modal toggle and hide handlers
         document.querySelectorAll('[data-modal-toggle]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const modalId = btn.getAttribute('data-modal-toggle');
