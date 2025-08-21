@@ -32,7 +32,7 @@ class TranslationController extends Controller
             });
         }
 
-        $translations = $query->paginate(30);
+        $translations = $query->orderBy('id', 'desc')->paginate(30);
 
         return view('admin.translations.index', compact('translations'));
     }

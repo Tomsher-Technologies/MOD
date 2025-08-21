@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        $events = Event::where('status', 1)->orderByDesc('is_default')->get();
+        $events = Event::orderByDesc('is_default')->get();
         return view('frontend.auth.login', compact('events'));
     }
 
