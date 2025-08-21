@@ -20,6 +20,7 @@ class Driver extends Model
         'car_number',
         'capacity',
         'note1',
+        'status',
         'delegation_id',
         'event_id',
     ];

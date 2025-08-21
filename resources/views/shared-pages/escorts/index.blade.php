@@ -1,6 +1,6 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">Escorts</h2>
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }}</h2>
     </div>
     <!-- Escorts -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -39,7 +39,7 @@
                                     stroke-width="2"
                                     d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                            <span>Add Escort</span>
+                            <span>{{ __db('add') . " " . __db('escort') }}</span>
                         </a>
                     </div>
                 </div>
@@ -101,7 +101,7 @@
                             },
                         ],
                         [
-                            'label' => 'Actions',
+                            'label' => __db('actions'),
                             'render' => function ($escort) {
                                 $editUrl = getRouteForPage('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
@@ -134,7 +134,7 @@
                         </form>';
                                         }
                                     } else {
-                                        $assignUrl = route('escorts.assignIndex', $escort->id);
+                                        $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
                                         $output .=
                                             '<a href="' .
                                             $assignUrl .
@@ -152,8 +152,6 @@
                 @endphp
 
 
-
-
                 <x-reusable-table :columns="$columns" :data="$escorts" noDataMessage="No escorts found."
                     :rowClass="function ($row) {
                         return $row->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
@@ -161,7 +159,7 @@
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
-                    <span class="text-gray-800 text-sm">Unassigned Escorts</span>
+                    <span class="text-gray-800 text-sm">{{ __db('unassigned') . " " . __db('escorts') }}</span>
                 </div>
                 <div class="mt-4">
                     {{-- {{ $escorts->links() }} --}}

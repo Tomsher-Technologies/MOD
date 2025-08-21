@@ -170,7 +170,7 @@
                                 },
                             ],
                             [
-                                'label' => __db('actions'),
+                                'label' => __db(__db('actions')),
                                 'render' => function ($row) {
                                     $attachmentData = [
                                         'id' => $row->id,
