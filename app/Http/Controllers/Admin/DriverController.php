@@ -168,6 +168,7 @@ class DriverController extends Controller
             'car_number' => 'nullable|string|max:255',
             'capacity' => 'nullable|string|max:255',
             'note1' => 'nullable|string',
+            'status' => 'nullable|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
         ]);
 
@@ -182,7 +183,6 @@ class DriverController extends Controller
                     'label' => 'code',
                 ],
             ],
-            // Add other scalar fields that need comparison
             'military_number' => [],
             'title' => [],
             'name_ar' => [],
@@ -193,13 +193,7 @@ class DriverController extends Controller
             'car_number' => [],
             'capacity' => [],
             'note1' => [],
-            'status' => [
-                'display_with' => [
-                    'model' => \App\Models\DropdownOption::class,
-                    'key' => 'id',
-                    'label' => 'value',
-                ],
-            ],
+            'status' => [],
         ];
 
         // Use the processUpdate method for confirmation dialog

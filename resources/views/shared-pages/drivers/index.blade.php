@@ -1,6 +1,6 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">Drivers</h2>
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
     </div>
     <!-- Drivers -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -24,7 +24,7 @@
                                 placeholder="Search by Military Number, Name, Mobile Number, Driver ID, Car Type, Car Number"
                                 value="{{ request('search') }}" />
                             <button type="submit"
-                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
 
                         </div>
                     </form>
@@ -39,7 +39,7 @@
                                     stroke-width="2"
                                     d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                            <span>Add Driver</span>
+                            <span>{{ __db('add') . ' ' . __db('driver') }}</span>
                         </a>
                     </div>
                 </div>
@@ -47,45 +47,45 @@
                 @php
                     $columns = [
                         [
-                            'label' => 'Military Number',
+                            'label' => __db('military_number'),
                             'render' => fn($driver) => e($driver->military_number),
                         ],
                         [
-                            'label' => 'Title',
+                            'label' => __db('title'),
                             'render' => fn($driver) => e($driver->title),
                         ],
                         [
-                            'label' => 'Name',
+                            'label' => __db('name_en'),
                             'render' => fn($driver) => e($driver->name_en),
                         ],
                         [
-                            'label' => 'Mobile Number',
+                            'label' => __db('mobile_number'),
                             'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
                         ],
                         [
-                            'label' => 'Driver ID',
+                            'label' => __db('driver') . ' ' . __db('id'),
                             'render' => fn($driver) => e($driver->driver_id),
                         ],
                         [
-                            'label' => 'Car Type',
+                            'label' => __db('car') . ' ' . __db('type'),
                             'render' => fn($driver) => e($driver->car_type),
                         ],
                         [
-                            'label' => 'Car Number',
+                            'label' => __db('car') . ' ' . __db('number'),
                             'render' => fn($driver) => e($driver->car_number),
                         ],
                         [
-                            'label' => 'Capacity',
+                            'label' => __db('capacity'),
                             'render' => fn($driver) => e($driver->capacity),
                         ],
                         [
-                            'label' => 'Assigned Delegation',
+                            'label' => __db('assigned') . ' ' . __db('delegation'),
                             'render' => function ($driver) {
                                 return e($driver->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
                             },
                         ],
                         [
-                            'label' => 'Status',
+                            'label' => __db('status'),
                             'render' => function ($driver) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -105,7 +105,7 @@
                             },
                         ],
                         [
-                            'label' => 'Actions',
+                            'label' => __db('actions'),
                             'render' => function ($driver) {
                                 $editUrl = getRouteForPage('drivers.edit', $driver->id);
                                 $output = '<div class="flex align-center gap-4">';
@@ -163,7 +163,7 @@
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#f2eccf] rounded"></div>
-                    <span class="text-gray-800 text-sm">Unassigned Drivers</span>
+                    <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('drivers') }}</span>
                 </div>
                 <div class="mt-4">
                     {{-- {{ $drivers->links() }} --}}
