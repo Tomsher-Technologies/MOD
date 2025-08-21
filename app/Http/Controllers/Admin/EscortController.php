@@ -39,7 +39,7 @@ class EscortController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Escort::with('delegations', 'gender', 'nationality')->latest();
+        $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -139,8 +139,8 @@ class EscortController extends Controller
      */
     public function show(string $id)
     {
-        $escort = Escort::with('delegations', 'gender', 'nationality')->findOrFail($id);
-        return view('admin.escorts.show', compact('escort'));
+        $escorts = Escort::with('delegations', 'gender', 'nationality')->findOrFail($id);
+        return view('admin.escorts.index', compact('escorts'));
     }
 
     /**
@@ -185,27 +185,76 @@ class EscortController extends Controller
 
         // Define relations to compare for confirmation dialog
         $relationsToCompare = [
-            'status' => [], // Simple string comparison for 'status' field
+            'gender_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'nationality_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'delegation_id' => [
+                'display_with' => [
+                    'model' => \App\Models\Delegation::class,
+                    'key' => 'id',
+                    'label' => 'code',
+                ],
+            ],
+
         ];
 
+        // Manually handle spoken_languages comparison
+        $originalSpokenLanguages = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
+        $newSpokenLanguages = $validated['language_id'] ?? [];
+
+        $customChangedFields = [];
+
+        // Compare and format for display
+        $oldLanguageLabels = \App\Models\DropdownOption::whereIn('id', $originalSpokenLanguages)->pluck('value')->implode(', ');
+        $newLanguageLabels = \App\Models\DropdownOption::whereIn('id', $newSpokenLanguages)->pluck('value')->implode(', ');
+
+        if ($oldLanguageLabels !== $newLanguageLabels) {
+            $customChangedFields['spoken_languages'] = [
+                'label' => 'Spoken Languages',
+                'old' => $oldLanguageLabels ?: 'N/A',
+                'new' => $newLanguageLabels ?: 'N/A',
+            ];
+        }
+
+        // Remove language_id from validated data before passing to processUpdate
+        $validatedDataForProcessUpdate = $validated;
+        unset($validatedDataForProcessUpdate['language_id']);
+
         // Use the processUpdate method for confirmation dialog
-        $confirmationResult = $this->processUpdate($request, $escort, $validated, $relationsToCompare);
+        $confirmationResult = $this->processUpdate($request, $escort, $validatedDataForProcessUpdate, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
             return $confirmationResult;
         }
 
-        $dataToSave = $confirmationResult['data'];
-        $fieldsToNotify = $confirmationResult['notify'] ?? [];
+        // Merge custom changes with changes from processUpdate
+        $confirmationResult['changed_fields'] = array_merge($customChangedFields, $confirmationResult['changed_fields'] ?? []);
 
-        if (isset($dataToSave['language_id'])) {
-            $dataToSave['spoken_languages'] = implode(',', $dataToSave['language_id']);
-            unset($dataToSave['language_id']); // Remove original language_id as it's not a column
-        } else {
-            $dataToSave['spoken_languages'] = null;
+        if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
+            return $confirmationResult;
         }
 
-        $escort->update($dataToSave);
+        $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
+        if (isset($validated['language_id'])) {
+            $validated['spoken_languages'] = implode(',', $validated['language_id']);
+            unset($validated['language_id']); 
+        } else {
+            $validated['spoken_languages'] = null;
+        }
+
+        $escort->update($validated);
 
         // Log activity with changed fields
         if ($request->has('changed_fields_json')) {
@@ -230,7 +279,7 @@ class EscortController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => __db('Escort updated successfully.'),
-            'redirect_url' => route('escorts.index'), // Or escorts.show if there is one
+            'redirect_url' => route('escorts.index'),
         ]);
     }
 

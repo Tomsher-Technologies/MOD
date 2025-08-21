@@ -175,7 +175,31 @@ class DriverController extends Controller
 
         // Define relations to compare for confirmation dialog
         $relationsToCompare = [
-            'status' => [], // Simple string comparison for 'status' field
+            'delegation_id' => [
+                'display_with' => [
+                    'model' => \App\Models\Delegation::class,
+                    'key' => 'id',
+                    'label' => 'code',
+                ],
+            ],
+            // Add other scalar fields that need comparison
+            'military_number' => [],
+            'title' => [],
+            'name_ar' => [],
+            'name_en' => [],
+            'mobile_number' => [],
+            'driver_id' => [],
+            'car_type' => [],
+            'car_number' => [],
+            'capacity' => [],
+            'note1' => [],
+            'status' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
         ];
 
         // Use the processUpdate method for confirmation dialog
@@ -213,7 +237,7 @@ class DriverController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => __db('Driver updated successfully.'),
-            'redirect_url' => route('drivers.index'), // Or drivers.show if there is one
+            'redirect_url' => getRouteForPage('drivers.show', $driver->id),
         ]);
     }
 

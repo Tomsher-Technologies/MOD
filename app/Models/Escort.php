@@ -26,11 +26,22 @@ class Escort extends Model
         'email',
         'nationality_id',
         'date_of_birth',
+        'id_number',
+        'id_issue_date',
+        'id_expiry_date',
     ];
 
     protected $casts = [
         'spoken_languages' => 'array',
     ];
+
+    public function getSpokenLanguagesLabelsAttribute()
+    {
+        if (empty($this->spoken_languages)) {
+            return null;
+        }
+        return DropdownOption::whereIn('id', $this->spoken_languages)->pluck('value')->implode(', ');
+    }
 
     // public function languages()
     // {

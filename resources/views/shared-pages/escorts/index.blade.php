@@ -69,14 +69,13 @@
                     </thead>
                     <tbody>
                         @foreach ($escorts as $escort)
-                            <tr
-                                class=" text-sm align-[middle] {{ $escort->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]' }}">
+                            <tr class=" text-sm align-[middle] {{ $escort->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]' }}">
                                 <td class="px-4 py-3 border border-gray-200">{{ $escort->military_number }}</td>
                                 <td class="px-4 py-3 border border-gray-200">{{ $escort->title }}</td>
                                 <td class="px-4 py-3 border border-gray-200">{{ $escort->name_en }}</td>
                                 <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">
                                     {{ $escort->phone_number }}</td>
-                                <td class="px-4 py-3 border border-gray-200">{{ $escort->gender?->name_en }}</td>
+                                <td class="px-4 py-3 border border-gray-200">{{ $escort->gender?->value }}</td>
                                 <td class="px-4 py-3 border border-gray-200">
                                     @php
                                         $spokenLanguageIds = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];

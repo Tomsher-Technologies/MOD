@@ -332,6 +332,26 @@ if (!function_exists('getRouteForPage')) {
                 'del_manage_delegations' => 'delegations.search',
             ],
 
+            // Escorts
+            'escorts.index' => [
+                'manage_escorts' => 'escorts.index',
+                'del_manage_escorts' => 'escorts.index',
+            ],
+            'escorts.index' => [
+                'manage_escorts' => 'escorts.index',
+                'del_manage_escorts' => 'escorts.index',
+            ],
+
+            // Drivers
+            'drivers.index' => [
+                'manage_drivers' => 'drivers.index',
+                'del_manage_drivers' => 'drivers.index',
+            ],
+            'drivers.show' => [
+                'manage_drivers' => 'drivers.show',
+                'del_manage_drivers' => 'drivers.show',
+            ],
+
             //Members
             'delegation.members' => [
                 'add_interviews' => '/mod-admin/delegations/members',
