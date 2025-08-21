@@ -32,6 +32,14 @@ class Escort extends Model
         'spoken_languages' => 'array',
     ];
 
+    public function getSpokenLanguagesLabelsAttribute()
+    {
+        if (empty($this->spoken_languages)) {
+            return null;
+        }
+        return DropdownOption::whereIn('id', $this->spoken_languages)->pluck('value')->implode(', ');
+    }
+
     // public function languages()
     // {
     //     return $this->belongsToMany(DropdownOption::class, 'escort_language', 'escort_id', 'language_id');
@@ -73,6 +81,6 @@ class Escort extends Model
 
     public function delegations()
     {
-        return $this->belongsToMany(Delegation::class, 'delegation_escorts');
+        return $this->belongsToMany(Delegation::class, 'delegation_escorts')->withPivot('status', 'assigned_by');
     }
 }

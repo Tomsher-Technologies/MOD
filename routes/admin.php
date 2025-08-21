@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DelegationController;
 use App\Http\Controllers\Admin\DropdownController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EscortController;
+use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OtherMemberController;
 use App\Http\Controllers\Admin\RoleController;
@@ -75,6 +76,13 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
 
+    // Delegate
+    Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
+    Route::get('/delegations/edit-delegate/{delegation}/{delegate}', [DelegationController::class, 'editDelegate'])->name('delegations.editDelegate');
+    Route::post('/delegations/{delegation}/delegates', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.storeDelegate');
+    Route::put('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.updateDelegate');
+    Route::delete('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'destroyDelegate'])->name('delegations.destroyDelegate');
+
     // Travel
     Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegations.addTravel');
     Route::post('/delegations/submit-add-travel/{id}', [DelegationController::class, 'storeTravel'])->name('delegations.storeTravel');
@@ -92,13 +100,6 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::post('/delegations/attachments-update/{id}', [DelegationController::class, 'updateAttachments'])->name('delegations.updateAttachment');
     Route::delete('/attachments/destroy/{id}', [DelegationController::class, 'destroyAttachment'])->name('attachments.destroy');
 
-    // Delegate
-    Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
-    Route::get('/delegations/edit-delegate/{delegation}/{delegate}', [DelegationController::class, 'editDelegate'])->name('delegations.editDelegate');
-    Route::post('/delegations/{delegation}/delegates', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.storeDelegate');
-    Route::put('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.updateDelegate');
-    Route::delete('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'destroyDelegate'])->name('delegations.destroyDelegate');
-
     // Arrivals and Departures
     Route::get('/arrivals', [DelegationController::class, 'arrivalsIndex'])->name('delegations.arrivalsIndex');
     Route::get('/departures', [DelegationController::class, 'departuresIndex'])->name('delegations.departuresIndex');
@@ -106,8 +107,19 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Escorts
     Route::resource('escorts', EscortController::class);
+    Route::post('/escorts/status', [EscortController::class, 'updateStatus'])->name('escorts.status');
+    Route::get('/escorts/assign/{escort}', [EscortController::class, 'assignIndex'])->name('escorts.assignIndex');
+
     Route::post('escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
     Route::post('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
+
+    // Drivers
+    Route::resource('drivers', DriverController::class);
+    Route::post('/drivers/status', [DriverController::class, 'updateStatus'])->name('drivers.status');
+    Route::get('/drivers/assign/{driver}', [DriverController::class, 'assignIndex'])->name('drivers.assignIndex');
+
+    Route::post('drivers/{driver}/assign', [DriverController::class, 'assign'])->name('drivers.assign');
+    Route::post('drivers/{driver}/unassign', [DriverController::class, 'unassign'])->name('drivers.unassign');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

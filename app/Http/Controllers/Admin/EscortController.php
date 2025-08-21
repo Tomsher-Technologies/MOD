@@ -39,7 +39,7 @@ class EscortController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Escort::with('delegation', 'gender', 'nationality')->latest();
+        $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -48,14 +48,32 @@ class EscortController extends Controller
                     ->orWhere('military_number', 'like', "%{$search}%")
                     ->orWhere('phone_number', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhereHas('delegation', function ($delegationQuery) use ($search) {
+                    ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
             });
         }
 
         $escorts = $query->paginate(10);
+
+        // return response()->json(['sss' => $escorts]);
+
         return view('admin.escorts.index', compact('escorts'));
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $escort = Escort::findOrFail($request->id);
+        $escort->status = $request->status;
+        $escort->save();
+
+        if ($request->status == 0) {
+            $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
+                'status' => 0,
+            ]);
+        }
+
+        return response()->json(['status' => 'success']);
     }
 
     /**
@@ -83,19 +101,21 @@ class EscortController extends Controller
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
-            'id_number' => 'nullable|string|max:255',
-            'id_issue_date' => 'nullable|date',
-            'id_expiry_date' => 'nullable|date',
             'status' => 'nullable|string|max:255',
+            'language_id' => 'nullable|array',
         ]);
 
         $currentEvent = \App\Models\Event::where('is_default', true)->first();
         $eventId = $currentEvent ? $currentEvent->id : null;
 
-        $escortData = array_merge(
-            $request->all(),
-            ['event_id' => $eventId]
-        );
+        $escortData = $request->all();
+        $escortData['event_id'] = $eventId;
+
+        if ($request->has('language_id')) {
+            $escortData['spoken_languages'] = implode(',', $request->input('language_id'));
+        } else {
+            $escortData['spoken_languages'] = null;
+        }
 
         $escort = Escort::create($escortData);
 
@@ -116,8 +136,8 @@ class EscortController extends Controller
      */
     public function show(string $id)
     {
-        $escort = Escort::with('delegation', 'gender', 'nationality')->findOrFail($id);
-        return view('admin.escorts.show', compact('escort'));
+        $escorts = Escort::with('delegations', 'gender', 'nationality')->findOrFail($id);
+        return view('admin.escorts.index', compact('escorts'));
     }
 
     /**
@@ -130,6 +150,11 @@ class EscortController extends Controller
         $dropdowns = $this->loadDropdownOptions();
 
         return view('admin.escorts.edit', compact('escort', 'delegations', 'dropdowns'));
+    }
+
+    public function assignIndex(Request $request, Escort $escort)
+    {
+        return view('admin.escorts.assign', compact('escort'));
     }
 
     /**
@@ -146,30 +171,84 @@ class EscortController extends Controller
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
-            'id_number' => 'nullable|string|max:255',
-            'id_issue_date' => 'nullable|date',
-            'id_expiry_date' => 'nullable|date',
-            'status' => 'nullable|string|max:255', // Add status to validation
+            'status' => 'nullable|string|max:255',
+            'language_id' => 'nullable|array',
         ]);
 
         $escort = Escort::findOrFail($id);
 
         // Define relations to compare for confirmation dialog
         $relationsToCompare = [
-            'status' => [], // Simple string comparison for 'status' field
+            'gender_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'nationality_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'delegation_id' => [
+                'display_with' => [
+                    'model' => \App\Models\Delegation::class,
+                    'key' => 'id',
+                    'label' => 'code',
+                ],
+            ],
+
         ];
 
+        // Manually handle spoken_languages comparison
+        $originalSpokenLanguages = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
+        $newSpokenLanguages = $validated['language_id'] ?? [];
+
+        $customChangedFields = [];
+
+        // Compare and format for display
+        $oldLanguageLabels = \App\Models\DropdownOption::whereIn('id', $originalSpokenLanguages)->pluck('value')->implode(', ');
+        $newLanguageLabels = \App\Models\DropdownOption::whereIn('id', $newSpokenLanguages)->pluck('value')->implode(', ');
+
+        if ($oldLanguageLabels !== $newLanguageLabels) {
+            $customChangedFields['spoken_languages'] = [
+                'label' => 'Spoken Languages',
+                'old' => $oldLanguageLabels ?: 'N/A',
+                'new' => $newLanguageLabels ?: 'N/A',
+            ];
+        }
+
+        // Remove language_id from validated data before passing to processUpdate
+        $validatedDataForProcessUpdate = $validated;
+        unset($validatedDataForProcessUpdate['language_id']);
+
         // Use the processUpdate method for confirmation dialog
-        $confirmationResult = $this->processUpdate($request, $escort, $validated, $relationsToCompare);
+        $confirmationResult = $this->processUpdate($request, $escort, $validatedDataForProcessUpdate, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
             return $confirmationResult;
         }
 
-        $dataToSave = $confirmationResult['data'];
+        // Merge custom changes with changes from processUpdate
+        $confirmationResult['changed_fields'] = array_merge($customChangedFields, $confirmationResult['changed_fields'] ?? []);
+
+        if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
+            return $confirmationResult;
+        }
+
         $fieldsToNotify = $confirmationResult['notify'] ?? [];
 
-        $escort->update($dataToSave);
+        if (isset($validated['language_id'])) {
+            $validated['spoken_languages'] = implode(',', $validated['language_id']);
+            unset($validated['language_id']); 
+        } else {
+            $validated['spoken_languages'] = null;
+        }
+
+        $escort->update($validated);
 
         // Log activity with changed fields
         if ($request->has('changed_fields_json')) {
@@ -194,7 +273,7 @@ class EscortController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => __db('Escort updated successfully.'),
-            'redirect_url' => route('escorts.index'), // Or escorts.show if there is one
+            'redirect_url' => route('escorts.index'),
         ]);
     }
 
@@ -204,7 +283,7 @@ class EscortController extends Controller
     public function destroy(string $id)
     {
         $escort = Escort::findOrFail($id);
-        $escort->delete();
+        $escort->update(['status' => 0]);
 
         // Log activity
         $this->logActivity(
