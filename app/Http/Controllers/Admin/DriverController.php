@@ -130,11 +130,7 @@ class DriverController extends Controller
             'delegation_id' => 'nullable|exists:delegations,id',
         ]);
 
-        $currentEvent = \App\Models\Event::where('is_default', true)->first();
-        $eventId = $currentEvent ? $currentEvent->id : null;
-
         $driverData = $request->all();
-        $driverData['event_id'] = $eventId;
 
         $driver = Driver::create($driverData);
 
@@ -289,21 +285,21 @@ class DriverController extends Controller
         $delegationId = $request->delegation_id;
 
         // Check if the driver is already assigned to this delegation
-        $existingAssignment = $driver->delegations()->where('delegation_id', $delegationId)->first();
+        // $existingAssignment = $driver->delegations()->where('delegation_id', $delegationId)->first();
 
-        if ($existingAssignment) {
-            // If the assignment exists, ensure its status is 1 (assigned)
-            $driver->delegations()->updateExistingPivot($delegationId, [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ]);
-        } else {
-            // If no assignment exists, create a new one
-            $driver->delegations()->attach($delegationId, [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ]);
-        }
+        // if ($existingAssignment) {
+        //     // If the assignment exists, ensure its status is 1 (assigned)
+        //     $driver->delegations()->updateExistingPivot($delegationId, [
+        //         'status' => 1,
+        //         'assigned_by' => auth()->id(),
+        //     ]);
+        // } else {
+        // If no assignment exists, create a new one
+        $driver->delegations()->attach($delegationId, [
+            'status' => 1,
+            'assigned_by' => auth()->id(),
+        ]);
+        // }
 
         return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
     }
@@ -320,7 +316,7 @@ class DriverController extends Controller
             'status' => 0,
         ]);
 
-        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver unassigned successfully.'));
+        return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }
 
     protected function loadDropdownOptions()

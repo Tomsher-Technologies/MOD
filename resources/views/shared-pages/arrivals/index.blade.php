@@ -79,8 +79,26 @@
                             'render' => fn($row) => $row->delegate->delegation->country->value ?? '-',
                         ],
                         ['label' => __db('delegates'), 'render' => fn($row) => $row->delegate->name_en ?? '-'],
-                        ['label' => __db('escorts'), 'render' => fn($row) => $row->delegate->escort->name_en ?? '-'],
-                        ['label' => __db('drivers'), 'render' => fn($row) => $row->delegate->driver->name_en ?? '-'],
+                        [
+                            'label' => __db('escorts'),
+                            'render' => function ($row) {
+                                return $row->delegate->delegation->escorts->isNotEmpty()
+                                    ? $row->delegate->delegation->escorts
+                                        ->map(fn($escort) => e($escort->code))
+                                        ->implode('<br>')
+                                    : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('drivers'),
+                            'render' => function ($row) {
+                                return $row->delegate->delegation->drivers->isNotEmpty()
+                                    ? $row->delegate->delegation->drivers
+                                        ->map(fn($drivers) => e($drivers->code))
+                                        ->implode('<br>')
+                                    : '-';
+                            },
+                        ],
                         ['label' => __db('to_airport'), 'render' => fn($row) => $row->airport->value ?? '-'],
                         [
                             'label' => __db('date_time'),

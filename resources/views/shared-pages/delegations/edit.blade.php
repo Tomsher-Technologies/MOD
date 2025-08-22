@@ -476,7 +476,7 @@
                     <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
                         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                         <div class="relative w-full max-w-2xl mx-auto">
-                            <div class="bg-white rounded-lg shadow dark:bg-gray-700">
+                            <div class="bg-white rounded-lg shadow ">
                                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                                     <h3 class="text-xl font-semibold text-gray-900">
                                         {{ __db('transport_information_for') }}
@@ -554,187 +554,267 @@
         </div>
     </div>
 
-    {{-- <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">Escorts</h2>
+
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
-                    <thead>
-                        <tr>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Sl.No</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Military
-                                Number</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Title</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Name</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Mobile
-                                Number</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Gender
-                            </th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Known
-                                Languages</th>
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold text-lg">{{  __db('escorts') }}</h4>
+                    <a href={{ getRouteForPage('escorts.index') }}
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+                </div>
+                @php
+                    $columns = [
+                        [
+                            'label' => __db('military_number'),
+                            'key' => 'military_number',
+                            'render' => fn($escort) => e($escort->military_number),
+                        ],
+                        [
+                            'label' => __db('title'),
+                            'key' => 'title',
+                            'render' => fn($escort) => e($escort->title),
+                        ],
+                        [
+                            'label' => __db('name_en'),
+                            'key' => 'name',
+                            'render' => fn($escort) => e($escort->name_en),
+                        ],
+                        [
+                            'label' => __db('mobile_number'),
+                            'key' => 'mobile_number',
+                            'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
+                        ],
+                        [
+                            'label' => __db('gender'),
+                            'key' => 'gender',
+                            'render' => fn($escort) => e(optional($escort->gender)->value),
+                        ],
+                        [
+                            'label' => __db('spoken_languages'),
+                            'key' => 'known_languages',
+                            'render' => function ($escort) {
+                                $ids = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
+                                $names = \App\Models\DropdownOption::whereIn('id', $ids)->pluck('value')->toArray();
+                                return e(implode(', ', $names));
+                            },
+                        ],
+                        [
+                            'label' => __db('assigned') . ' ' . __db('delegation'),
+                            'key' => 'assigned_delegation',
+                            'render' => function ($escort) {
+                                return e($escort->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
+                            },
+                        ],
+                        [
+                            'label' => __db('status'),
+                            'key' => 'status',
+                            'render' => function ($escort) {
+                                return '<div class="flex items-center">
+                <label for="switch-' .
+                                    $escort->id .
+                                    '" class="relative inline-block w-11 h-6">
+                    <input type="checkbox" id="switch-' .
+                                    $escort->id .
+                                    '" onchange="update_escort_status(this)" value="' .
+                                    $escort->id .
+                                    '" class="sr-only peer" ' .
+                                    ($escort->status == 1 ? 'checked' : '') .
+                                    ' />
+                    <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
+                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+                </label>
+            </div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('actions'),
+                            'key' => 'actions',
+                            'render' => function ($escort) {
+                                $editUrl = getRouteForPage('escorts.edit', $escort->id);
+                                $output = '<div class="flex align-center gap-4">';
+                                $output .=
+                                    '<a href="' .
+                                    $editUrl .
+                                    '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
+                                if ($escort->status == 1) {
+                                    if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
+                                        foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
+                                            $unassignUrl = getRouteForPage('escorts.unassign', $escort->id);
+                                            $output .=
+                                                '<form action="' .
+                                                $unassignUrl .
+                                                '" method="POST" style="display:inline;">' .
+                                                csrf_field() .
+                                                '<input type="hidden" name="delegation_id" value="' .
+                                                $delegation->id .
+                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
+                                                e($delegation->code) .
+                                                '</span></button></form>';
+                                        }
+                                    } else {
+                                        $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
+                                        $output .=
+                                            '<a href="' .
+                                            $assignUrl .
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
+                                    }
+                                }
+                                $output .= '</div>';
+                                return $output;
+                            },
+                        ],
+                    ];
+                @endphp
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">1</td>
-                            <td class="px-4 py-3 border border-gray-200">UM123</td>
-                            <td class="px-4 py-3 border border-gray-200">Captain</td>
-                            <td class="px-4 py-3 border border-gray-200">Amar Preet Singh</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 50 123 4567
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Male</td>
-                            <td class="px-4 py-3 border border-gray-200">Arabic, English</td>
-
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">2</td>
-                            <td class="px-4 py-3 border border-gray-200">DX456</td>
-                            <td class="px-4 py-3 border border-gray-200">HH</td>
-                            <td class="px-4 py-3 border border-gray-200">Laila Al Kaabi</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 55 234 7890
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Female</td>
-                            <td class="px-4 py-3 border border-gray-200">Arabic</td>
-
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">3</td>
-                            <td class="px-4 py-3 border border-gray-200">AB789</td>
-                            <td class="px-4 py-3 border border-gray-200">Major</td>
-                            <td class="px-4 py-3 border border-gray-200">Yousef Al Ali</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 52 345 6789
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Male</td>
-                            <td class="px-4 py-3 border border-gray-200">Arabic, English, French</td>
-
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">4</td>
-                            <td class="px-4 py-3 border border-gray-200">SH321</td>
-                            <td class="px-4 py-3 border border-gray-200">Ms</td>
-                            <td class="px-4 py-3 border border-gray-200">Sara Mansour</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 56 987 6543
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Female</td>
-                            <td class="px-4 py-3 border border-gray-200">English</td>
-
-                        </tr>
-                    </tbody>
-                </table>
+                <x-reusable-table :data="$delegation->escorts" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
+
         </div>
-    </div> --}}
+    </div>
 
-
-    {{-- <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">Drivers
-    </h2>
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
-                    <thead>
-                        <tr>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Sl.No</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Military
-                                Number</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Title</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Name</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Mobile
-                                Number</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Vehicle
-                                Type</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Plate
-                                Number</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                Capacity
-                            </th>
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold text-lg">{{  __db('drivers') }}</h4>
+                    <a href={{ getRouteForPage('drivers.index') }}
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+                </div>
+                @php
+                    $columns = [
+                        [
+                            'label' => __db('military_number'),
+                            'key' => 'military_number',
+                            'render' => fn($driver) => e($driver->military_number),
+                        ],
+                        [
+                            'label' => __db('title'),
+                            'key' => 'title',
+                            'render' => fn($driver) => e($driver->title),
+                        ],
+                        [
+                            'label' => __db('name_en'),
+                            'key' => 'name_en',
+                            'render' => fn($driver) => e($driver->name_en),
+                        ],
+                        [
+                            'label' => __db('mobile_number'),
+                            'key' => 'mobile_number',
+                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
+                        ],
+                        [
+                            'label' => __db('driver') . ' ' . __db('id'),
+                            'key' => 'driver_id',
+                            'render' => fn($driver) => e($driver->driver_id),
+                        ],
+                        [
+                            'label' => __db('car') . ' ' . __db('type'),
+                            'key' => 'car_type',
+                            'render' => fn($driver) => e($driver->car_type),
+                        ],
+                        [
+                            'label' => __db('car') . ' ' . __db('number'),
+                            'key' => 'car_number',
+                            'render' => fn($driver) => e($driver->car_number),
+                        ],
+                        [
+                            'label' => __db('capacity'),
+                            'key' => 'capacity',
+                            'render' => fn($driver) => e($driver->capacity),
+                        ],
+                        [
+                            'label' => __db('assigned') . ' ' . __db('delegation'),
+                            'key' => 'assigned_delegation',
+                            'render' => function ($driver) {
+                                return e($driver->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
+                            },
+                        ],
+                        [
+                            'label' => __db('status'),
+                            'key' => 'status',
+                            'render' => function ($driver) {
+                                return '<div class="flex items-center">
+                <label for="switch-driver' .
+                                    $driver->id .
+                                    '" class="relative inline-block w-11 h-6">
+                    <input type="checkbox" id="switch-driver' .
+                                    $driver->id .
+                                    '" onchange="update_driver_status(this)" value="' .
+                                    $driver->id .
+                                    '" class="sr-only peer" ' .
+                                    ($driver->status == 1 ? 'checked' : '') .
+                                    ' />
+                    <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
+                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+                </label>
+            </div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('actions'),
+                            'key' => 'actions',
+                            'render' => function ($driver) {
+                                $editUrl = getRouteForPage('drivers.edit', $driver->id);
+                                $output = '<div class="flex align-center gap-4">';
+                                $output .=
+                                    '<a href="' .
+                                    $editUrl .
+                                    '">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
+            </a>';
+                                if ($driver->status == 1) {
+                                    if ($driver->delegations->where('pivot.status', 1)->count() > 0) {
+                                        foreach ($driver->delegations->where('pivot.status', 1) as $delegation) {
+                                            $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
+                                            $output .=
+                                                '<form action="' .
+                                                $unassignUrl .
+                                                '" method="POST" style="display:inline;">' .
+                                                csrf_field() .
+                                                '<input type="hidden" name="delegation_id" value="' .
+                                                $delegation->id .
+                                                '" />
+                            <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                                <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                                <span> Unassign from ' .
+                                                e($delegation->code) .
+                                                '</span>
+                            </button>
+                        </form>';
+                                        }
+                                    } else {
+                                        $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
+                                        $output .=
+                                            '<a href="' .
+                                            $assignUrl .
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                        <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                        <span> Assign</span>
+                    </a>';
+                                    }
+                                }
+                                $output .= '</div>';
+                                return $output;
+                            },
+                        ],
+                    ];
 
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">1</td>
-                            <td class="px-4 py-3 border border-gray-200">MIL-1024</td>
-                            <td class="px-4 py-3 border border-gray-200">Captain</td>
-                            <td class="px-4 py-3 border border-gray-200">Saeed Al Kaabi</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 55 789 3210
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">SUV</td>
-                            <td class="px-4 py-3 border border-gray-200">DXB 4567</td>
-                            <td class="px-4 py-3 border border-gray-200">5</td>
+                    $rowClass = function ($driver) {
+                        return $driver->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
+                    };
+                @endphp
 
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">2</td>
-                            <td class="px-4 py-3 border border-gray-200">MIL-2548</td>
-                            <td class="px-4 py-3 border border-gray-200">Mr</td>
-                            <td class="px-4 py-3 border border-gray-200">Mohammed Al Obaidi</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 50 112 3344
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Sedan</td>
-                            <td class="px-4 py-3 border border-gray-200">AUH 2345</td>
-                            <td class="px-4 py-3 border border-gray-200">4</td>
 
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">3</td>
-                            <td class="px-4 py-3 border border-gray-200">MIL-8789</td>
-                            <td class="px-4 py-3 border border-gray-200">Ms</td>
-                            <td class="px-4 py-3 border border-gray-200">Fatima Al Zahra</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 52 223 4455
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Hatchback</td>
-                            <td class="px-4 py-3 border border-gray-200">SHJ 9876</td>
-                            <td class="px-4 py-3 border border-gray-200">5</td>
-                        </tr>
-                        <tr class="text-sm align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">4</td>
-                            <td class="px-4 py-3 border border-gray-200">MIL-0024</td>
-                            <td class="px-4 py-3 border border-gray-200">Captain</td>
-                            <td class="px-4 py-3 border border-gray-200">John Doe</td>
-                            <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">+971 58 667 8899
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">Crossover</td>
-                            <td class="px-4 py-3 border border-gray-200">RAK 1234</td>
-                            <td class="px-4 py-3 border border-gray-200">4</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <x-reusable-table :data="$delegation->drivers" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
+
         </div>
-    </div> --}}
+    </div>
 
 
     @php
@@ -904,7 +984,7 @@
             class="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-modal md:h-full flex justify-center items-center bg-gray-900/50"
             style="display: none;">
             <div class="relative w-full max-w-lg max-h-full">
-                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <div class="relative bg-white rounded-lg shadow ">
                     <button @click="isAttachmentEditModalOpen = false" type="button"
                         class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center">
                         <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -1074,5 +1154,59 @@
             });
 
         });
+
+
+        function update_escort_status(el) {
+            if (el.checked) {
+                var status = 1;
+            } else {
+                var status = 0;
+            }
+            $.post('{{ getRouteForPage('escorts.status') }}', {
+                _token: '{{ csrf_token() }}',
+                id: el.value,
+                status: status
+            }, function(data) {
+                if (data.status == 'success') {
+                    toastr.success("{{ __db('status_updated') }}");
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+
+                } else {
+                    toastr.error("{{ __db('something_went_wrong') }}");
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                }
+            });
+        }
+
+
+        function update_driver_status(el) {
+            if (el.checked) {
+                var status = 1;
+            } else {
+                var status = 0;
+            }
+            $.post('{{ getRouteForPage('drivers.status') }}', {
+                _token: '{{ csrf_token() }}',
+                id: el.value,
+                status: status
+            }, function(data) {
+                if (data.status == 'success') {
+                    toastr.success("{{ __db('status_updated') }}");
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+
+                } else {
+                    toastr.error("{{ __db('something_went_wrong') }}");
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                }
+            });
+        }
     </script>
 @endsection

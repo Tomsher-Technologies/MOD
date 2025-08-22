@@ -54,7 +54,14 @@
                 @php
                     $columns = [
                         [
-                            'label' => __db('delegation'),
+                            'label' => __db('sl_no'),
+                            'key' => 'sl_no',
+                            'render' => fn($row, $key) => $key +
+                                1 +
+                                ($delegations->currentPage() - 1) * $delegations->perPage(),
+                        ],
+                        [
+                            'label' => __db('delegation') . ' ' . __db('id'),
                             'key' => 'id',
                             'render' => fn($delegation) => e($delegation->code),
                         ],
@@ -274,7 +281,7 @@
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl mx-auto">
             <!-- Modal content -->
-            <div class="bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="bg-white rounded-lg shadow ">
                 <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
@@ -288,7 +295,7 @@
                     </button>
                 </div>
                 <!-- Modal body -->
-                <div class="p-6 space-y-6 text-gray-700 dark:text-gray-300" id="note-modal-content">
+                <div class="p-6 space-y-6 text-gray-700 " id="note-modal-content">
                     <!-- Content will be dynamically inserted here by JS -->
                 </div>
             </div>

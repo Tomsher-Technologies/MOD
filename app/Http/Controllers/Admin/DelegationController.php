@@ -133,7 +133,7 @@ class DelegationController extends Controller
         return view('admin.delegations.index', compact('delegations'));
     }
 
-    public function interviews(Request $request)
+    public function interviewsIndex(Request $request)
     {
         $query = Interview::with([
             'delegation.continent',
@@ -212,7 +212,9 @@ class DelegationController extends Controller
                     'interviewWithDelegation',
                     'interviewMembers'
                 ]);
-            }
+            },
+            'escorts',
+            'drivers'
         ])->findOrFail($id);
 
         // return response()->json([
@@ -238,6 +240,8 @@ class DelegationController extends Controller
                 ]);
             },
             'attachments',
+            'escorts',
+            'drivers'
         ])->findOrFail($id);
 
         $interviews = Interview::with(['interviewMembers', 'interviewMembers.fromDelegate', 'interviewMembers.toDelegate', 'interviewWithDelegation'])
@@ -246,7 +250,6 @@ class DelegationController extends Controller
 
         // return response()->json([
         //     'delegation' => $delegation,
-        //     'ssss' => $interviews,
         // ]);
 
         return view('admin.delegations.show', compact('delegation'));
@@ -258,8 +261,8 @@ class DelegationController extends Controller
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
-                // 'delegate.escort',
-                // 'delegate.driver',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
                 'airport',
                 // 'status'
             ]);
@@ -313,6 +316,7 @@ class DelegationController extends Controller
         }
 
         $arrivals = $query->latest()->paginate(10);
+
 
         return view('admin.arrivals.index', compact('arrivals'));
     }
@@ -590,10 +594,6 @@ class DelegationController extends Controller
         DB::beginTransaction();
 
         try {
-            // Get the current event ID (default event if none specified)
-            $currentEvent = \App\Models\Event::where('is_default', true)->first();
-            $eventId = $currentEvent ? $currentEvent->id : null;
-
             $delegation = Delegation::create([
                 'invitation_from_id' => $validated['invitation_from_id'],
                 'continent_id' => $validated['continent_id'],
@@ -602,10 +602,7 @@ class DelegationController extends Controller
                 'participation_status_id' => $validated['participation_status_id'],
                 'note1' => $validated['note1'] ?? null,
                 'note2' => $validated['note2'] ?? null,
-                'event_id' => $eventId,
             ]);
-
-            // $tmpIdToDbId = [];
 
             if (!empty($validated['delegates'])) {
                 foreach ($validated['delegates'] as $delegateData) {
@@ -635,16 +632,6 @@ class DelegationController extends Controller
                 }
             }
 
-            // if (!empty($validated['delegates'])) {
-            //     foreach ($validated['delegates'] as $delegateData) {
-            //         $delegateData['delegation_id'] = $delegation->id;
-            //         $delegateData['team_head'] = !empty($delegateData['team_head']);
-            //         $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
-            //         $delegateData['internal_ranking_id'] = $delegation->internal_ranking_id ?? null;
-            //         $delegation->delegates()->create($delegateData);
-            //     }
-            // }
-
             if ($request->has('attachments')) {
                 foreach ($request->attachments as $idx => $attachment) {
                     if ($request->file("attachments.$idx.file")) {
@@ -662,7 +649,6 @@ class DelegationController extends Controller
 
             DB::commit();
 
-            // Log delegation creation activity
             $this->logActivity(
                 module: 'Delegation',
                 action: 'create',

@@ -148,7 +148,7 @@
                         </form>';
                                         }
                                     } else {
-                                        $assignUrl = route('drivers.assignIndex', $driver->id);
+                                        $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
                                         $output .=
                                             '<a href="' .
                                             $assignUrl .

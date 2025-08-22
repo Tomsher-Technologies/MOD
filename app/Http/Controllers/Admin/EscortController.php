@@ -126,11 +126,7 @@ class EscortController extends Controller
             'language_id' => 'nullable|array',
         ]);
 
-        $currentEvent = \App\Models\Event::where('is_default', true)->first();
-        $eventId = $currentEvent ? $currentEvent->id : null;
-
         $escortData = $request->all();
-        $escortData['event_id'] = $eventId;
 
         if (isset($escortData['language_id'])) {
             $escortData['spoken_languages'] = implode(',', $escortData['language_id']);
@@ -342,23 +338,23 @@ class EscortController extends Controller
         $delegationId = $request->delegation_id;
 
         // Check if the escort is already assigned to this delegation
-        $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
+        // $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
 
-        if ($existingAssignment) {
-            // If the assignment exists and is marked as unassigned, update the status
-            if (!$existingAssignment->pivot->status) {
-                $escort->delegations()->updateExistingPivot($delegationId, [
-                    'status' => 1,
-                    'assigned_by' => auth()->id(),
-                ]);
-            }
-        } else {
-            // If no assignment exists, create a new one
-            $escort->delegations()->attach($delegationId, [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ]);
-        }
+        // if ($existingAssignment) {
+        //     // If the assignment exists and is marked as unassigned, update the status
+        //     if (!$existingAssignment->pivot->status) {
+        //         $escort->delegations()->updateExistingPivot($delegationId, [
+        //             'status' => 1,
+        //             'assigned_by' => auth()->id(),
+        //         ]);
+        //     }
+        // } else {
+        // If no assignment exists, create a new one
+        $escort->delegations()->attach($delegationId, [
+            'status' => 1,
+            'assigned_by' => auth()->id(),
+        ]);
+        // }
 
         return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
@@ -375,7 +371,7 @@ class EscortController extends Controller
             'status' => 0,
         ]);
 
-        return redirect()->route('escorts.index')->with('success', __db('Escort unassigned successfully.'));
+        return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
     }
 
     protected function loadDropdownOptions()

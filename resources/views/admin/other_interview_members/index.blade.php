@@ -52,7 +52,7 @@
                 @php
                     $columns = [
                         [
-                            'label' => '#',
+                            'label' => __db('sl_no'),
                             'render' => function ($member, $key) use ($other_interview_members) {
                                 return $key +
                                     1 +
