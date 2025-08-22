@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ArrivalController;
+use App\Http\Controllers\Admin\AccommodationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {

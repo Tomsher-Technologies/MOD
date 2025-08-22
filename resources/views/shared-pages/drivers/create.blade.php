@@ -20,7 +20,7 @@
                     <label class="form-label">{{ __db('military_number') }}:</label>
                     <input type="text" name="military_number"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Military Number') }}">
+                        placeholder="{{ __db('enter') }}">
 
                 </div>
 
@@ -36,35 +36,35 @@
 
                     <input type="text" name="name_en"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Name Here') }}">
+                        placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('mobile_number') }}:</label>
                     <input type="text" name="mobile_number"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Mobile Number') }}">
+                        placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('driver') . ' ' . __db('id') }}:</label>
                     <input type="text" name="driver_id"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Driver ID') }}">
+                        placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('car') . ' ' . __db('type') }}:</label>
                     <input type="text" name="car_type"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Car Type') }}">
+                        placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('car') . ' ' . __db('number') }}:</label>
                     <input type="text" name="car_number"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Car Number') }}">
+                        placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-4">

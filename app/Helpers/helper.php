@@ -415,6 +415,24 @@ if (!function_exists('getRouteForPage')) {
                 'manage_delegations' => 'delegations.updateAttachment',
                 'del_manage_delegations' => 'delegations.updateAttachment',
             ],
+
+            // Accommodation
+            'accommodations.index' => [
+                'manage_accommodations' => 'accommodations.index',
+                'del_manage_accommodations' => 'accommodations.index',
+            ],
+            'accommodations.show' => [
+                'manage_accommodations' => 'accommodations.show',
+                'del_manage_accommodations' => 'accommodations.show',
+            ],
+            'accommodations.create' => [
+                'add_accommodations' => 'accommodations.create',
+                'del_add_accommodations' => 'accommodations.create',
+            ],
+            'accommodations.edit' => [
+                'edit_accommodations' => 'accommodations.edit',
+                'del_edit_accommodations' => 'accommodations.edit',
+            ],
         ];
 
         $user = auth()->user();

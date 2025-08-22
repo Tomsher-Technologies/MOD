@@ -46,7 +46,7 @@
                     <label class="form-label">{{ __db('name_en') }}:</label>
                     <input type="text" name="name_en"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('Enter Name Here') }}">
+                        placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-3">
