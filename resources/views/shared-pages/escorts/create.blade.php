@@ -11,6 +11,18 @@
             <span>{{ __db('back') }}</span>
         </a>
     </div>
+
+    @if ($errors->any())
+        <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
+            <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    
     <div class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         <form action="{{ getRouteForPage('escorts.store') }}" method="POST">
             @csrf
@@ -61,24 +73,37 @@
                 </div>
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('spoken_languages') }}:</label>
-                    <select name="spoken_languages[]" id="multiSelect" multiple
-                        placeholder="{{ __db('Select Languages') }}"
+                    <select name="language_id[]" id="multiSelect" multiple placeholder="{{ __db('Select Languages') }}"
                         class="w-full p-3 rounded-lg border border-gray-300 text-sm">
-                        {{-- @foreach (getDropDown('languages')->options as $language)
-                            <option value="{{ $language->id }}">{{ $language->value }}</option>
-                        @endforeach --}}
+                        @foreach (getDropDown('spoken_languages')->options as $language)
+                            <option value="{{ $language->id }}">
+                                {{ $language->value }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('rank') }}:</label>
-                    <select name="rank"
+                    <select name="internal_ranking_id"
                         class=" p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('Select Rank') }}</option>
                         {{-- Assuming rank is a dropdown option --}}
                         @foreach (getDropDown('internal_ranking')->options as $rank)
                             <option value="{{ $rank->id }}">{{ $rank->value }}</option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('status') }}:</label>
+                    <select name="status"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option value="1" {{ old('status') == 1 ? 'selected' : '' }}>
+                            {{ __db('active') }}
+                        </option>
+                        <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>
+                            {{ __db('inactive') }}
+                        </option>
                     </select>
                 </div>
 

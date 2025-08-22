@@ -282,8 +282,8 @@ if (!function_exists('getRouteForPage')) {
                 'del_add_interviews' => 'delegations.addInterview',
             ],
             'delegation.editInterview' => [
-                'manage_interviews' => 'delegations.editInterview',
-                'del_manage_interviews' => 'delegations.editInterview',
+                'edit_interviews' => 'delegations.editInterview',
+                'del_edit_interviews' => 'delegations.editInterview',
             ],
             'delegation.destroyInterview' => [
                 'delete_interviews' => 'delegations.destroyInterview',
@@ -299,6 +299,11 @@ if (!function_exists('getRouteForPage')) {
                 'add_travels' => 'delegations.storeTravel',
                 'del_add_travels' => 'delegations.storeTravel',
             ],
+            'delegation.arrivalsIndex' => [
+                'view_travels' => 'delegations.arrivalsIndex',
+                'del_view_travels' => 'delegations.arrivalsIndex',
+            ],
+
 
             //Delegate
             'delegation.storeDelegate' => [
@@ -345,9 +350,17 @@ if (!function_exists('getRouteForPage')) {
                 'add_escorts' => 'escorts.create',
                 'del_add_escorts' => 'escorts.create',
             ],
+            'escorts.store' => [
+                'add_escorts' => 'escorts.store',
+                'del_add_escorts' => 'escorts.store',
+            ],
             'escorts.edit' => [
                 'edit_escorts' => 'escorts.edit',
                 'del_edit_escorts' => 'escorts.edit',
+            ],
+            'escorts.update' => [
+                'edit_escorts' => 'escorts.update',
+                'del_edit_escorts' => 'escorts.update',
             ],
             'escorts.unassign' => [
                 'edit_escorts' => 'escorts.unassign', // Assuming permission to edit escorts allows unassigning

@@ -14,3 +14,9 @@
 -- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'assign_accommodations', 'Assign Accommodations', 'web', '1', '2025-08-21 14:59:05', '2025-08-21 14:59:05');
 
 
+
+-- ALTER TABLE `escorts`
+-- ADD COLUMN `code` VARCHAR(255) UNIQUE AFTER `id`;
+
+-- ALTER TABLE `drivers`
+-- ADD COLUMN `code` VARCHAR(255) UNIQUE AFTER `id`;

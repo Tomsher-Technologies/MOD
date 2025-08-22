@@ -11,6 +11,18 @@
             <span>Back</span>
         </a>
     </div>
+
+    @if ($errors->any())
+        <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
+            <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <!-- Escorts -->
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
         <form id="escort-form" action="{{ getRouteForPage('escorts.update', $escort->id) }}" method="POST"
@@ -67,12 +79,12 @@
                 </div>
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('rank') }}:</label>
-                    <select name="rank_id"
+                    <select name="internal_ranking_id"
                         class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('select') . ' ' . __db('rank') }}</option>
                         @foreach (getDropDown('internal_ranking')->options as $rank)
                             <option value="{{ $rank->id }}"
-                                {{ old('rank_id', $escort->rank_id) == $rank->id ? 'selected' : '' }}>
+                                {{ old('internal_ranking_id', $escort->internal_ranking_id) == $rank->id ? 'selected' : '' }}>
                                 {{ $rank->value }}</option>
                         @endforeach
                     </select>
@@ -81,10 +93,12 @@
                     <label class="form-label">{{ __db('status') }}:</label>
                     <select name="status"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        @foreach (getDropdown('escort_status')->options as $status)
-                            {{ old('status', $escort->status) == $status->id ? 'selected' : '' }}>
-                            {{ $status->value }}</option>
-                        @endforeach
+                        <option value="1" {{ old('status', $escort->status) == 1 ? 'selected' : '' }}>
+                            {{ __db('active') }}
+                        </option>
+                        <option value="0" {{ old('status', $escort->status) == 0 ? 'selected' : '' }}>
+                            {{ __db('inactive') }}
+                        </option>
                     </select>
                 </div>
             </div>
