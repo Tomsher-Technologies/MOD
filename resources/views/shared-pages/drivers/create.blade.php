@@ -11,6 +11,18 @@
             <span>{{ __db('back') }}</span>
         </a>
     </div>
+
+    @if ($errors->any())
+        <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
+            <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         <form action="{{ getRouteForPage('drivers.store') }}" method="POST">
             @csrf

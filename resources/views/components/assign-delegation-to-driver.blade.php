@@ -1,5 +1,17 @@
 <div class="bg-white h-full w-full rounded-lg border-0 p-6">
     @props(['driver'])
+
+    @if ($errors->any())
+        <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
+            <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
+            <ul class="list-disc list-inside">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ getRouteForPage('drivers.assign', $driver->id) }}" method="POST">
         @csrf
         <div class="p-4 md:p-5 space-y-6 px-0">
@@ -39,7 +51,8 @@
                                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                     d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
                             </svg>
-                            <span class="w-[150px]">{{ __db('search') . " " . __db('delegation') . " " . __db('id') }}</span>
+                            <span
+                                class="w-[150px]">{{ __db('search') . ' ' . __db('delegation') . ' ' . __db('id') }}</span>
                         </button>
                     </div>
                 </div>
@@ -53,7 +66,8 @@
                 <thead>
                     <tr>
                         <th class="p-3 !bg-[#B68A35] text-start text-white"></th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('delegation') . " " . __db('id') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('delegation') . ' ' . __db('id') }}
+                        </th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('continent') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('country') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('team_head') }}</th>

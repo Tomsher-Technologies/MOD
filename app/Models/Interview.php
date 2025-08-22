@@ -51,12 +51,12 @@ class Interview extends Model
 
     public function fromMembers()
     {
-        return $this->interviewMembers()->where('type', 'from');
+        return $this->hasMany(InterviewMember::class)->where('type', 'from');
     }
 
     public function toMembers()
     {
-        return $this->interviewMembers()->where('type', 'to');
+        return $this->hasMany(InterviewMember::class)->where('type', 'to');
     }
 
 
