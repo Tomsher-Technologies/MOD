@@ -27,59 +27,59 @@
             </form>
 
             @php
-                $currentRoute = Route::currentRouteName();
+            $currentRoute = Route::currentRouteName();
 
-                $buttonConfig = [
-                    'roles.index' => [
-                        'text' => __db('add_new_role'),
-                        'link' => route('roles.create'),
-                        'permission' => 'add_role',
-                    ],
-                    'staffs.index' => [
-                        'text' => __db('add_new_staff'),
-                        'link' => route('staffs.create'),
-                        'permission' => 'add_staff',
-                    ],
-                    'events.index' => [
-                        'text' => __db('add_new_event'),
-                        'link' => route('events.create'),
-                        'permission' => 'add_event',
-                    ],
-                    'other-interview-members.index' => [
-                        'text' => __db('add_new_member'),
-                        'link' => route('other-interview-members.create'),
-                        'permission' => 'add_other_interview_members',
-                    ],
-                    'delegations.index' => [
-                        'text' => __db('add_new_delegation'),
-                        'link' => route('delegations.create'),
-                        'permission' => 'add_delegations',
-                    ],
-                    'escorts.index' => [
-                        'text' => __db('add_escort'),
-                        'link' => route('escorts.create'),
-                        // 'permission' => 'add_escorts',
-                        'permission' => 'add_delegations',
-                    ],
-                    'drivers.index' => [
-                        'text' => __db('add_driver'),
-                        'link' => route('drivers.create'),
-                        // 'permission' => 'add_escorts',
-                        'permission' => 'add_drivers',
-                    ],
-                ];
+            $buttonConfig = [
+            'roles.index' => [
+            'text' => __db('add_new_role'),
+            'link' => route('roles.create'),
+            'permission' => 'add_role',
+            ],
+            'staffs.index' => [
+            'text' => __db('add_new_staff'),
+            'link' => route('staffs.create'),
+            'permission' => 'add_staff',
+            ],
+            'events.index' => [
+            'text' => __db('add_new_event'),
+            'link' => route('events.create'),
+            'permission' => 'add_event',
+            ],
+            'other-interview-members.index' => [
+            'text' => __db('add_new_member'),
+            'link' => route('other-interview-members.create'),
+            'permission' => 'add_other_interview_members',
+            ],
+            'delegations.index' => [
+            'text' => __db('add_new_delegation'),
+            'link' => route('delegations.create'),
+            'permission' => 'add_delegations',
+            ],
+            'escorts.index' => [
+            'text' => __db('add_escort'),
+            'link' => route('escorts.create'),
+            // 'permission' => 'add_escorts',
+            'permission' => 'add_delegations',
+            ],
+            'drivers.index' => [
+            'text' => __db('add_driver'),
+            'link' => route('drivers.create'),
+            // 'permission' => 'add_escorts',
+            'permission' => 'add_drivers',
+            ],
+            ];
             @endphp
 
             @if (isset($buttonConfig[$currentRoute]) && auth()->user()->can($buttonConfig[$currentRoute]['permission']))
-                <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
-                    class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
-                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        width="24" height="24" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 12h14m-7 7V5" />
-                    </svg>
-                    <span>{{ $buttonConfig[$currentRoute]['text'] }}</span>
-                </a>
+            <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
+                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 12h14m-7 7V5" />
+                </svg>
+                <span>{{ $buttonConfig[$currentRoute]['text'] }}</span>
+            </a>
             @endif
         </div>
         <div class="col-auto ml-4">
@@ -94,15 +94,15 @@
                     class="hidden absolute right-0 z-20 mt-2 w-36 rounded-lg bg-white shadow-lg border border-gray-200">
                     <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="languageToggleBtn">
                         @php
-                            $languages = getAllActiveLanguages();
+                        $languages = getAllActiveLanguages();
                         @endphp
                         @foreach ($languages as $lang)
-                            <li>
-                                <a href="{{ route('lang.switch', ['lang' => $lang->code]) }}"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ app()->getLocale() == $lang->code ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
-                                    {{ $lang->name }}
-                                </a>
-                            </li>
+                        <li>
+                            <a href="{{ route('lang.switch', ['lang' => $lang->code]) }}"
+                                class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white {{ app()->getLocale() == $lang->code ? 'bg-gray-200 font-semibold' : 'hover:bg-gray-100' }}">
+                                {{ $lang->name }}
+                            </a>
+                        </li>
                         @endforeach
 
                     </ul>
