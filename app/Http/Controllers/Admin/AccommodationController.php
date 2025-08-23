@@ -25,7 +25,7 @@ class AccommodationController extends Controller
             $accommodations = $accommodations->where('hotel_name', 'like', '%' . request('search') . '%');
         }
 
-        $accommodations = $accommodations->latest()->paginate(10);
+        $accommodations = $accommodations->latest()->paginate(15);
         return view('admin.accommodations.index', compact('accommodations'));
     }
 
