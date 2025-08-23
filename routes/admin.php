@@ -127,7 +127,14 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Manage Accommodations
     Route::resource('accommodations', AccommodationController::class);
-    
+    Route::get('/accommodations/edit/{id}', [AccommodationController::class, 'edit'])->name('accommodations.edit');
+    Route::post('/accommodation-rooms/destroy/{id}', [AccommodationController::class, 'destroyRooms'])->name('accommodation-rooms.destroy');
+    Route::get('/accommodation/import', [AccommodationController::class, 'showImportForm'])->name('accommodations.import.form');
+    Route::post('/accommodation/import', [AccommodationController::class, 'import'])->name('accommodations.import');
+    Route::get('/export-room-types', [AccommodationController::class, 'exportRoomTypes'])->name('export.room.types');
+
+
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

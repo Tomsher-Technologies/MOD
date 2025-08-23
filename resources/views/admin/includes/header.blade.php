@@ -7,7 +7,7 @@
         <div class="col-auto ms-auto flex items-center gap-4">
             @php
                 $events = getAllEvents();
-                $currentEventId = session('current_event_id', $events->first()?->id ?? null);
+                $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
             @endphp
 
             <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="inline-block">

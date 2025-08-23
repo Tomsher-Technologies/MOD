@@ -308,6 +308,9 @@ trait HandlesUpdateConfirmation
         if ($action === 'create') {
             return "{$module} was created by {$userName}.";
         }
+        if ($action === 'create-excel') {
+            return "{$module} was created by {$userName} from an Excel file.";
+        }
         if ($action === 'update' && $changedFields) {
             $changesSummary = collect($changedFields)
                 ->map(fn($change, $key) => "{$change['label']}: '{$change['old']}' => '{$change['new']}'")
