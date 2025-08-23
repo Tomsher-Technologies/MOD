@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Session;
 
 class Escort extends Model
 {
@@ -36,9 +37,19 @@ class Escort extends Model
     protected static function booted()
     {
         static::creating(function ($escort) {
-            $latestEscort = self::withTrashed()->latest('id')->first();
+            $latestEscort = self::latest('id')->first();
             $newId = $latestEscort ? $latestEscort->id + 1 : 1;
             $escort->code = 'EC' . str_pad($newId, 3, '0', STR_PAD_LEFT);
+
+            if (!$escort->event_id) {
+                $sessionEventId = Session::get('current_event_id');
+                if ($sessionEventId) {
+                    $escort->event_id = $sessionEventId;
+                } else {
+                    $defaultEventId = getDefaultEventId();
+                    $escort->event_id = $defaultEventId ? $defaultEventId : null;
+                }
+            }
         });
     }
 
@@ -91,6 +102,6 @@ class Escort extends Model
 
     public function delegations()
     {
-        return $this->belongsToMany(Delegation::class, 'delegation_escorts')->withPivot('status', 'assigned_by');
+        return $this->belongsToMany(Delegation::class, 'delegation_escorts', 'escort_id', 'delegation_id')->withPivot('status', 'assigned_by');
     }
 }

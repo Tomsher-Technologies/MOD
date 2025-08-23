@@ -20,15 +20,21 @@
                         class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
                         placeholder="{{ __db('Search by Delegation ID, Escorts, Drivers, Flight Number, Flight Name') }}" />
                     <button type="submit"
-                        class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('Search') }}</button>
+                        class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
                 </div>
             </form>
             <div class="text-center">
                 <button
-                    class="text-white !bg-[#B68A35] hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-sm rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                    class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
                     type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
                     aria-controls="filter-drawer">
-                    Filter</button>
+                    <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                        height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                            d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z" />
+                    </svg>
+                    <span>{{ __db('filter') }}</span>
+                </button>
             </div>
         </div>
 
@@ -36,20 +42,17 @@
             <div class="xl:col-span-12 h-full">
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-
                     <div class="flex items-center justify-between mb-5">
-
-                        <h2 class="font-semibold mb-0 !text-[22px] mb-10 pb-4">Departure</h2>
-
+                        <h2 class="font-semibold mb-0 !text-[22px] mb-10 pb-4">{{ __db('departures') }}</h2>
                         <div class="full-screen-logo flex items-center gap-8 hidden">
-                            <img src="{{ asset('assets/img/logo.svg') }}" alt="">
+                            <img src="{{ getAdminEventLogo() }}" alt="">
                             <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
                         </div>
 
 
                         <a href="#" id="fullscreenToggleBtn"
-                            class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-[#B68A35] dark:border-[#B68A35] dark:hover:text-white dark:hover:bg-[#B68A35]">
-                            <span> Go Fullscreen</span>
+                            class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-100 ">
+                            <span>{{ __db('go_fullscreen') }}</span>
                         </a>
 
                     </div>
@@ -58,35 +61,59 @@
                     @php
                         $columns = [
                             [
-                                'label' => 'Sl.No',
+                                'label' => __db('sl_no'),
                                 'render' => fn($row, $key) => $key +
                                     1 +
                                     ($departures->currentPage() - 1) * $departures->perPage(),
                             ],
-                            ['label' => 'Delegation', 'render' => fn($row) => $row->delegate->delegation->code ?? '-'],
                             [
-                                'label' => 'Continent',
+                                'label' => __db('delegation'),
+                                'render' => fn($row) => $row->delegate->delegation->code ?? '-',
+                            ],
+                            [
+                                'label' => __db('continent'),
                                 'render' => fn($row) => $row->delegate->delegation->continent->value ?? '-',
                             ],
                             [
-                                'label' => 'Country',
+                                'label' => __db('country'),
                                 'render' => fn($row) => $row->delegate->delegation->country->value ?? '-',
                             ],
-                            ['label' => 'Delegates', 'render' => fn($row) => $row->delegate->name_en ?? '-'],
-                            ['label' => 'Escort', 'render' => fn($row) => $row->delegate->escort->name_en ?? '-'],
-                            ['label' => 'Driver', 'render' => fn($row) => $row->delegate->driver->name_en ?? '-'],
-                            ['label' => 'From Airport', 'render' => fn($row) => $row->airport->value ?? '-'],
                             [
-                                'label' => 'Date & Time',
+                                'label' => __db('delegates'),
+                                'render' => fn($row) => $row->delegate->name_en ?? '-',
+                            ],
+                            [
+                                'label' => __db('escorts'),
+                                'render' => fn($row) => $row->delegate->escort->name_en ?? '-',
+                            ],
+                            [
+                                'label' => __db('drivers'),
+                                'render' => fn($row) => $row->delegate->driver->name_en ?? '-',
+                            ],
+                            [
+                                'label' => __db('from_airport'),
+                                'render' => fn($row) => $row->airport->value ?? '-',
+                            ],
+                            [
+                                'label' => __db('date_time'),
                                 'render' => fn($row) => $row->date_time
                                     ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
                                     : '-',
                             ],
-                            ['label' => 'Flight Number', 'render' => fn($row) => $row->flight_no ?? '-'],
-                            ['label' => 'Flight Name', 'render' => fn($row) => $row->flight_name ?? '-'],
-                            ['label' => 'Departure Status', 'render' => fn($row) => $row->status->value ?? '-'],
                             [
-                                'label' => 'Action',
+                                'label' => __db('flight') . ' ' . __db('number'),
+                                'render' => fn($row) => $row->flight_no ?? '-',
+                            ],
+                            [
+                                'label' => __db('flight') . ' ' . __db('name'),
+                                'render' => fn($row) => $row->flight_name ?? '-',
+                            ],
+                            [
+                                'label' => __db('departure') . ' ' . __db('status'),
+                                'render' => fn($row) => $row->status->value ?? '-',
+                            ],
+                            [
+                                'label' => __db('actions'),
                                 'render' => function ($row) {
                                     $departureData = [
                                         'id' => $row->id,
@@ -108,19 +135,22 @@
                         ];
                         $rowClass = function ($row) {
                             if (!$row->date_time) {
-                                return 'bg-white';
+                                return 'bg-[#ffffff]';
                             }
+
                             $now = \Carbon\Carbon::now();
                             $oneHourAgo = $now->copy()->subHour();
                             $oneHourHence = $now->copy()->addHour();
                             $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
-                            if ($rowDateTime->isPast() && $rowDateTime->diffInHours($now) > 1) {
-                                return 'bg-green-200';
-                            } elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
-                                return 'bg-red-200';
-                            } else {
-                                return 'bg-white';
+                            if ($rowDateTime->lt($oneHourAgo)) {
+                                return 'bg-[#b7e9b2]'; 
+                            }
+                            elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
+                                return 'bg-[#ffc5c5]'; 
+                            }
+                            else {
+                                return 'bg-[#ffffff]'; 
                             }
                         };
                     @endphp
@@ -147,7 +177,7 @@
             class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50" style="display: none;">
             <div class="bg-white rounded-lg w-[70%] p-6">
                 <div class="flex items-start justify-between border-b pb-2 mb-4">
-                    <h3 class="text-xl font-semibold">Edit Departure</h3>
+                    <h3 class="text-xl font-semibold">{{ __db('edit') . ' ' . __db('departure') }}</h3>
                     <button @click="close" class="text-gray-400 hover:text-gray-900">
                         ✕
                     </button>
@@ -160,10 +190,11 @@
 
                     <div class="grid grid-cols-5 gap-5">
                         <div>
-                            <label class="form-label">Departure Airport:</label>
+                            <label class="form-label">{{ __db('departure') . ' ' . __db('airport') }}:</label>
                             <select name="airport_id" x-model="departure.airport_id"
                                 class="p-3 rounded-lg w-full border text-sm">
-                                <option value="">Select To Airport</option>
+                                <option value="">{{ __db('select') . ' ' . __db('from') . ' ' . __db('airport') }}
+                                </option>
                                 @foreach (getDropdown('airports')->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
                                 @endforeach
@@ -171,28 +202,28 @@
                         </div>
 
                         <div>
-                            <label class="form-label">Flight No:</label>
+                            <label class="form-label">{{ __db('flight') . ' ' . __db('number') }}:</label>
                             <input type="text" name="flight_no" x-model="departure.flight_no"
                                 class="p-3 rounded-lg w-full border text-sm">
                         </div>
 
                         <div>
-                            <label class="form-label">Flight Name:</label>
+                            <label class="form-label">{{ __db('flight') . ' ' . __db('name') }}:</label>
                             <input type="text" name="flight_name" x-model="departure.flight_name"
                                 class="p-3 rounded-lg w-full border text-sm">
                         </div>
 
                         <div>
-                            <label class="form-label">Date & Time:</label>
+                            <label class="form-label">{{ __db('date_time') }}:</label>
                             <input type="datetime-local" name="date_time" x-model="departure.date_time"
                                 class="p-3 rounded-lg w-full border text-sm">
                         </div>
 
                         <div>
-                            <label class="form-label">Departure Status:</label>
+                            <label class="form-label">{{ __db('departure') . ' ' . __db('status') }}:</label>
                             <select name="status_id" x-model="departure.status_id"
                                 class="p-3 rounded-lg w-full border text-sm">
-                                <option value="">Select Status</option>
+                                <option value="">{{ __db('select_status') }}</option>
                                 @foreach (getDropdown('departure_status')->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
                                 @endforeach
@@ -201,8 +232,9 @@
                     </div>
 
                     <div class="flex justify-end gap-3">
-                        <button type="button" @click="close" class="btn border px-4 py-2">Cancel</button>
-                        <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2">Update</button>
+                        <button type="button" @click="close" class="btn border px-4 py-2">{{ __db('cancel') }}</button>
+                        <button type="submit"
+                            class="btn !bg-[#B68A35] text-white px-6 py-2">{{ __db('update') }}</button>
                     </div>
                 </form>
             </div>
@@ -278,7 +310,7 @@
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
                 <a href="{{ getRouteForPage('delegations.departuresIndex') }}"
-                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
                 <button type="submit"
                     class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
             </div>
@@ -287,6 +319,8 @@
 @endsection
 
 @section('script')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.edit-departure-btn').forEach(btn => {
@@ -301,68 +335,71 @@
     </script>
 
     <script>
-        // const fullscreenDiv = document.getElementById('fullDiv');
+        const fullscreenDiv = document.getElementById('fullDiv');
 
-        // $('#fullscreenToggleBtn').on('click', function() {
-        //     const isInFullscreen =
-        //         document.fullscreenElement ||
-        //         document.webkitFullscreenElement ||
-        //         document.mozFullScreenElement ||
-        //         document.msFullscreenElement;
+        $('#fullscreenToggleBtn').on('click', function() {
+            const isInFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
 
-        //     if (!isInFullscreen) {
-        //         // Enter fullscreen
-        //         if (fullscreenDiv.requestFullscreen) {
-        //             console.log("standard fullscreen");
-        //             fullscreenDiv.requestFullscreen();
-        //         } else if (fullscreenDiv.webkitRequestFullscreen) {
-        //             console.log("webkit fullscreen");
-        //             fullscreenDiv.webkitRequestFullscreen();
-        //         } else if (fullscreenDiv.mozRequestFullScreen) {
-        //             console.log("moz fullscreen");
-        //             fullscreenDiv.mozRequestFullScreen();
-        //         } else if (fullscreenDiv.msRequestFullscreen) {
-        //             fullscreenDiv.msRequestFullscreen();
-        //             console.log("ms fullscreen");
-        //         }
-        //     }
-        // });
+            if (!isInFullscreen) {
+                // Enter fullscreen
+                if (fullscreenDiv.requestFullscreen) {
+                    fullscreenDiv.requestFullscreen();
+                } else if (fullscreenDiv.webkitRequestFullscreen) {
+                    fullscreenDiv.webkitRequestFullscreen();
+                } else if (fullscreenDiv.msRequestFullscreen) {
+                    fullscreenDiv.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        });
 
-        // // Listen for fullscreen changes
-        // $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-        //     const isInFullscreen =
-        //         document.fullscreenElement ||
-        //         document.webkitFullscreenElement ||
-        //         document.mozFullScreenElement ||
-        //         document.msFullscreenElement;
+        // Listen for fullscreen changes
+        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
+            const isInFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
 
-        //     if (isInFullscreen) {
-        //         $('.hide-when-fullscreen').hide();
-        //         $('#fullscreenToggleBtn').text('Exit Fullscreen');
-        //     } else {
-        //         $('.hide-when-fullscreen').show();
-        //         $('#fullscreenToggleBtn').text('Go Fullscreen');
-        //     }
-        // });
+            if (isInFullscreen) {
+                $('.hide-when-fullscreen').hide();
+                $('#fullscreenToggleBtn').text('Exit Fullscreen');
+            } else {
+                $('.hide-when-fullscreen').show();
+                $('#fullscreenToggleBtn').text('Go Fullscreen');
+            }
+        });
 
 
-        // // Listen for fullscreen changes
-        // $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-        //     const isInFullscreen =
-        //         document.fullscreenElement ||
-        //         document.webkitFullscreenElement ||
-        //         document.mozFullScreenElement ||
-        //         document.msFullscreenElement;
+        // Listen for fullscreen changes
+        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
+            const isInFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
 
-        //     if (isInFullscreen) {
-        //         $('.hide-when-fullscreen').hide();
-        //         $('.full-screen-logo').removeClass('hidden'); // SHOW during fullscreen
-        //         $('#fullscreenToggleBtn').text('Exit Fullscreen');
-        //     } else {
-        //         $('.hide-when-fullscreen').show();
-        //         $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
-        //         $('#fullscreenToggleBtn').text('Go Fullscreen');
-        //     }
-        // });
+            if (isInFullscreen) {
+                $('.hide-when-fullscreen').hide();
+                $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
+                $('#fullscreenToggleBtn').text('Exit Fullscreen');
+            } else {
+                $('.hide-when-fullscreen').show();
+                $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
+                $('#fullscreenToggleBtn').text('Go Fullscreen');
+            }
+        });
     </script>
 @endsection

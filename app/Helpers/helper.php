@@ -289,6 +289,11 @@ if (!function_exists('getRouteForPage')) {
                 'delete_interviews' => 'delegations.destroyInterview',
                 'del_delete_interviews' => 'delegations.destroyInterview',
             ],
+            'delegation.interviewsIndex' => [
+                'view_interviews' => 'delegations.interviewsIndex',
+                'del_view_interviews' => 'delegations.interviewsIndex',
+            ],
+
 
             //Travel
             'delegation.addTravel' => [
@@ -412,6 +417,11 @@ if (!function_exists('getRouteForPage')) {
                 'edit_drivers' => 'drivers.status', // Assuming permission to edit drivers allows changing status
                 'del_edit_drivers' => 'drivers.status',
             ],
+            'drivers.store' => [
+                'edit_drivers' => 'drivers.store', // Assuming permission to edit drivers allows changing status
+                'del_edit_drivers' => 'drivers.store',
+            ],
+
 
             //Members
             'delegation.members' => [
