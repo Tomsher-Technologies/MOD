@@ -164,7 +164,7 @@ button,
 [type='reset'],
 [type='submit'] {
   -webkit-appearance: button; /* 1 */
-  /* background-color: transparent;  */
+  background-color: transparent; /* 2 */
   background-image: none; /* 2 */
 }
 /*
@@ -5126,6 +5126,13 @@ svg.radial-progress text.percentage {
 }
 .p-10{
   padding: 2.5rem;
+}
+.p-20{
+  padding: 5rem;
+}
+
+.p-30{
+  padding: 7.5rem;
 }
 .p-2{
   padding: 0.5rem;

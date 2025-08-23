@@ -438,6 +438,50 @@ if (!function_exists('getRouteForPage')) {
                 'manage_delegations' => 'delegations.updateAttachment',
                 'del_manage_delegations' => 'delegations.updateAttachment',
             ],
+
+            // Accommodation
+            'accommodations.index' => [
+                'manage_accommodations' => 'accommodations.index',
+                'hotel_manage_accommodations' => 'accommodations.index',
+            ],
+            'accommodations.show' => [
+                'manage_accommodations' => 'accommodations.show',
+                'hotel_manage_accommodations' => 'accommodations.show',
+            ],
+            'accommodations.create' => [
+                'add_accommodations' => 'accommodations.create',
+                'hotel_add_accommodations' => 'accommodations.create',
+            ],
+            'accommodations.store' => [
+                'add_accommodations' => 'accommodations.store',
+                'hotel_add_accommodations' => 'accommodations.store',
+            ],
+            'accommodations.edit' => [
+                'edit_accommodations' => 'accommodations.edit',
+                'hotel_edit_accommodations' => 'accommodations.edit',
+            ],
+            'accommodations.update' => [
+                'edit_accommodations' => 'accommodations.update',
+                'hotel_edit_accommodations' => 'accommodations.update',
+            ],
+            'accommodations.import.form' => [
+                'import_accommodations' => 'accommodations.import.form',
+                'hotel_import_accommodations' => 'accommodations.import.form',
+            ],
+            'accommodations.import' => [
+                'import_accommodations' => 'accommodations.import',
+                'hotel_import_accommodations' => 'accommodations.import',
+            ],
+            'accommodations.assign' => [
+                'assign_accommodations' => 'accommodations.edit',
+                'hotel_assign_accommodations' => 'accommodations.edit',
+            ],
+            'accommodation-rooms.destroy' => [
+                'edit_accommodations' => 'accommodation-rooms.destroy',
+                'hotel_edit_accommodations' => 'accommodation-rooms.destroy',
+            ],
+            
+            
         ];
 
         $user = auth()->user();
