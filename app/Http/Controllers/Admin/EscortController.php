@@ -39,7 +39,12 @@ class EscortController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')->latest();
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        
+        $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
+            ->where('event_id', $currentEventId)
+            ->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -73,7 +78,7 @@ class EscortController extends Controller
         }
 
         $escorts = $query->paginate(10);
-        $delegations = Delegation::all();
+        $delegations = Delegation::where('event_id', $currentEventId)->get();
 
         return view('admin.escorts.index', compact('escorts', 'delegations'));
     }

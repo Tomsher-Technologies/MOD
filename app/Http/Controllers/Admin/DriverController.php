@@ -39,7 +39,12 @@ class DriverController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Driver::with('delegations')->latest();
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        
+        $query = Driver::with('delegations')
+            ->where('event_id', $currentEventId)
+            ->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -79,7 +84,7 @@ class DriverController extends Controller
         }
 
         $drivers = $query->paginate(10);
-        $delegations = Delegation::all();
+        $delegations = Delegation::where('event_id', $currentEventId)->get();
 
         return view('admin.drivers.index', compact('drivers', 'delegations'));
     }

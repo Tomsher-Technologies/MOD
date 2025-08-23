@@ -93,6 +93,9 @@ class DelegationController extends Controller
             'escorts'
         ])->orderBy('id', 'desc');
 
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $query->where('event_id', $currentEventId);
+
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -135,6 +138,9 @@ class DelegationController extends Controller
 
     public function interviewsIndex(Request $request)
     {
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
         $query = Interview::with([
             'delegation.continent',
             'delegation.country',
@@ -143,7 +149,9 @@ class DelegationController extends Controller
             'fromMembers.fromDelegate',  // explicitly load fromDelegate
             'toMembers.toDelegate',      // explicitly load toDelegate
             'toMembers.otherMember',     // also load otherMember if needed for del_others type
-        ]);
+        ])->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+            $delegationQuery->where('event_id', $currentEventId);
+        });
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -257,6 +265,9 @@ class DelegationController extends Controller
 
     public function arrivalsIndex(Request $request)
     {
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
         $query = DelegateTransport::where('type', 'arrival')
             ->with([
                 'delegate.delegation.country',
@@ -265,7 +276,9 @@ class DelegationController extends Controller
                 'delegate.delegation.drivers',
                 'airport',
                 // 'status'
-            ]);
+            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
@@ -281,6 +294,7 @@ class DelegationController extends Controller
             });
         }
 
+        // Override with explicit event_id if provided
         if ($eventId = $request->input('event_id')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($eventId) {
                 $delegationQuery->where('event_id', $eventId);
@@ -323,6 +337,9 @@ class DelegationController extends Controller
 
     public function departuresIndex(Request $request)
     {
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        
         $query = DelegateTransport::where('type', 'departure')
             ->with([
                 'delegate.delegation.country',
@@ -331,7 +348,9 @@ class DelegationController extends Controller
                 // 'delegate.driver',
                 'airport',
                 // 'status'
-            ]);
+            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
@@ -1502,7 +1521,10 @@ class DelegationController extends Controller
             return response()->json(['success' => false, 'message' => 'Code required.']);
         }
 
-        $delegation = Delegation::with('delegates')->where('code', $code)->first();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $delegation = Delegation::with('delegates')->where('code', $code)->where('event_id', $currentEventId)->first();
 
         if (!$delegation) {
             return response()->json(['success' => false, 'message' => 'Delegation not found.']);
@@ -1519,6 +1541,10 @@ class DelegationController extends Controller
     public function search(Request $request)
     {
         $query = Delegation::query();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query->where('event_id', $currentEventId);
 
         if ($continentId = $request->query('continent_id')) {
             $query->where('continent_id', $continentId);
@@ -1552,7 +1578,9 @@ class DelegationController extends Controller
 
     public function members($delegationId)
     {
-        $delegation = Delegation::with('delegates')->findOrFail($delegationId);
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $delegation = Delegation::with('delegates')->where('event_id', $currentEventId)->findOrFail($delegationId);
 
         $members = $delegation->delegates->map(fn($d) => [
             'id' => $d->id,
