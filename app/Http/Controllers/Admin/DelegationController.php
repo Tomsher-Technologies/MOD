@@ -702,14 +702,14 @@ class DelegationController extends Controller
             );
 
             if ($request->has('submit_exit')) {
-                return redirect()->route('delegations.index')->with('success', 'Delegation created.');
+                return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
             } elseif ($request->has('submit_add_interview')) {
                 return redirect()->route('delegations.addInterview', ['delegation_id' => $delegation->id]);
             } elseif ($request->has('submit_add_travel')) {
                 return redirect()->route('delegations.addTravel', ['delegation_id' => $delegation->id]);
             }
 
-            return redirect()->route('delegations.index')->with('success', 'Delegation created.');
+            return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Delegation creation failed: ' . $e->getMessage(), [
@@ -915,7 +915,7 @@ class DelegationController extends Controller
 
         return redirect()
             ->route('delegations.edit', $delegationId)
-            ->with('success', 'Attachments updated successfully.');
+            ->with('success', __db('attachments_updated_successfully'));
     }
 
     public function destroyAttachment($id)
@@ -938,7 +938,7 @@ class DelegationController extends Controller
 
         $attachment->delete();
 
-        return redirect()->back()->with('success', 'Attachment deleted successfully.');
+        return redirect()->back()->with('success', __db('attachment_deleted_successfully'));
     }
 
     public function storeTravel(Request $request, $delegationId)
@@ -1014,7 +1014,7 @@ class DelegationController extends Controller
 
             return redirect()
                 ->route('delegations.show', $delegationId)
-                ->with('success', 'Travel details assigned to selected delegates successfully.');
+                ->with('success', __db('travel_details_assigned_successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -1125,7 +1125,7 @@ class DelegationController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Interview created successfully.',
+                    'message' => __db('interview_created_successfully'),
                     'redirect_url' => route('delegations.show', $delegation->id)  // Adjust as needed
                 ]);
             } catch (\Exception $e) {
@@ -1323,7 +1323,7 @@ class DelegationController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Delegate created successfully.',
+                    'message' => __db('delegate_created_successfully'),
                     'redirect_url' => route('delegations.edit', $delegation->id)
                 ]);
             } catch (\Exception $e) {
@@ -1518,7 +1518,7 @@ class DelegationController extends Controller
     {
         $code = $request->query('code');
         if (!$code) {
-            return response()->json(['success' => false, 'message' => 'Code required.']);
+            return response()->json(['success' => false, 'message' => __db('code_required')]);
         }
 
 
@@ -1527,7 +1527,7 @@ class DelegationController extends Controller
         $delegation = Delegation::with('delegates')->where('code', $code)->where('event_id', $currentEventId)->first();
 
         if (!$delegation) {
-            return response()->json(['success' => false, 'message' => 'Delegation not found.']);
+            return response()->json(['success' => false, 'message' => __db('delegation_not_found')]);
         }
 
         $members = $delegation->delegates->map(fn($d) => [
