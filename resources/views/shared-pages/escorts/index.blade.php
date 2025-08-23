@@ -1,6 +1,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">Escorts</h2>
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }}</h2>
+
     </div>
     <!-- Escorts -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -9,6 +10,7 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
+
                     <form class="w-[50%] me-4" action="{{ getRouteForPage('escorts.index') }}" method="GET">
                         <div class="relative">
 
@@ -29,45 +31,63 @@
                         </div>
                     </form>
 
+                    {{-- <button data-modal-target="column-visibility-modal" data-modal-toggle="column-visibility-modal"
+                        type="button"
+                        class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg me-auto">
+                        <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+                        </svg>
+                        <span>{{ __db('column_list') }}</span>
+                    </button> --}}
+
                     <div class="text-center">
-                        <a href="{{ getRouteForPage('escorts.create') }}"
-                            class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-sm rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                            type="button">
+                        <button
+                            class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                            type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
+                            aria-controls="filter-drawer">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                                    d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z" />
                             </svg>
-                            <span>Add Escort</span>
-                        </a>
+                            <span>{{ __db('filter') }}</span>
+                        </button>
                     </div>
                 </div>
 
                 @php
                     $columns = [
                         [
-                            'label' => 'Military Number',
+                            'label' => __db('military_number'),
+                            'key' => 'military_number',
                             'render' => fn($escort) => e($escort->military_number),
                         ],
                         [
-                            'label' => 'Title',
+                            'label' => __db('title'),
+                            'key' => 'title',
                             'render' => fn($escort) => e($escort->title),
                         ],
                         [
-                            'label' => 'Name',
+                            'label' => __db('name_en'),
+                            'key' => 'name',
                             'render' => fn($escort) => e($escort->name_en),
                         ],
                         [
-                            'label' => 'Mobile Number',
+                            'label' => __db('mobile_number'),
+                            'key' => 'mobile_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
                         [
-                            'label' => 'Gender',
+                            'label' => __db('gender'),
+                            'key' => 'gender',
                             'render' => fn($escort) => e(optional($escort->gender)->value),
                         ],
                         [
-                            'label' => 'Known Languages',
+                            'label' => __db('spoken_languages'),
+                            'key' => 'known_languages',
                             'render' => function ($escort) {
                                 $ids = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
                                 $names = \App\Models\DropdownOption::whereIn('id', $ids)->pluck('value')->toArray();
@@ -75,13 +95,15 @@
                             },
                         ],
                         [
-                            'label' => 'Assigned Delegation',
+                            'label' => __db('assigned') . ' ' . __db('delegation'),
+                            'key' => 'assigned_delegation',
                             'render' => function ($escort) {
                                 return e($escort->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
                             },
                         ],
                         [
-                            'label' => 'Status',
+                            'label' => __db('status'),
+                            'key' => 'status',
                             'render' => function ($escort) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -101,16 +123,15 @@
                             },
                         ],
                         [
-                            'label' => 'Actions',
+                            'label' => __db('actions'),
+                            'key' => 'actions',
                             'render' => function ($escort) {
                                 $editUrl = getRouteForPage('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
                                 $output .=
                                     '<a href="' .
                                     $editUrl .
-                                    '">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
-            </a>';
+                                    '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
                                 if ($escort->status == 1) {
                                     if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
                                         foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
@@ -118,30 +139,20 @@
                                             $output .=
                                                 '<form action="' .
                                                 $unassignUrl .
-                                                '" method="POST" style="display:inline;">
-                            ' .
+                                                '" method="POST" style="display:inline;">' .
                                                 csrf_field() .
-                                                '
-                            <input type="hidden" name="delegation_id" value="' .
+                                                '<input type="hidden" name="delegation_id" value="' .
                                                 $delegation->id .
-                                                '" />
-                            <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                                <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                                <span> Unassign from ' .
+                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
                                                 e($delegation->code) .
-                                                '</span>
-                            </button>
-                        </form>';
+                                                '</span></button></form>';
                                         }
                                     } else {
-                                        $assignUrl = route('escorts.assignIndex', $escort->id);
+                                        $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
                                         $output .=
                                             '<a href="' .
                                             $assignUrl .
-                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                        <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                        <span> Assign</span>
-                    </a>';
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
                                     }
                                 }
                                 $output .= '</div>';
@@ -151,9 +162,6 @@
                     ];
                 @endphp
 
-
-
-
                 <x-reusable-table :columns="$columns" :data="$escorts" noDataMessage="No escorts found."
                     :rowClass="function ($row) {
                         return $row->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
@@ -161,10 +169,99 @@
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
-                    <span class="text-gray-800 text-sm">Unassigned Escorts</span>
+                    <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('escorts') }}</span>
                 </div>
                 <div class="mt-4">
-                    {{-- {{ $escorts->links() }} --}}
+                    {{ $escorts->appends(request()->input())->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="filter-drawer"
+    class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
+    tabindex="-1" aria-labelledby="drawer-label">
+    <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
+        {{ __db('filter') }}</h5>
+    <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
+        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{{ __db('close_menu') }}</span>
+    </button>
+
+    <form action="{{ getRouteForPage('escorts.index') }}" method="GET">
+        <div class="flex flex-col gap-4 mt-4">
+            <select name="title[]" placeholder="Title" 
+                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                @foreach (getDropDown('title')->options as $option)
+                    <option value="{{ $option->id }}" @if (in_array($option->id, request('title', []))) selected @endif>
+                        {{ $option->value }}</option>
+                @endforeach
+            </select>
+            <select name="gender_id" class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                <option value="">{{ __db('all_genders') }}</option>
+                @foreach (getDropDown('gender')->options as $gender)
+                    <option value="{{ $gender->id }}" {{ request('gender_id') == $gender->id ? 'selected' : '' }}>
+                        {{ $gender->value }}
+                    </option>
+                @endforeach
+            </select>
+            <select name="language_id"
+                class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                <option value="">{{ __db('all_languages') }}</option>
+                @foreach (getDropDown('spoken_languages')->options as $language)
+                    <option value="{{ $language->id }}"
+                        {{ request('language_id') == $language->id ? 'selected' : '' }}>
+                        {{ $language->value }}</option>
+                @endforeach
+            </select>
+            <select name="delegation_id"
+                class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                <option value="">{{ __db('all_delegations') }}</option>
+                @foreach ($delegations as $delegation)
+                    <option value="{{ $delegation->id }}"
+                        {{ request('delegation_id') == $delegation->id ? 'selected' : '' }}>
+                        {{ $delegation->code }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-6">
+            <a href="{{ getRouteForPage('escorts.index') }}"
+                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+            <button type="submit"
+                class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div id="column-visibility-modal" tabindex="-1" aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow">
+            <div class="flex items-start justify-between p-4 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
+                <button type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                    data-modal-hide="column-visibility-modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="space-y-3 grid grid-cols-3" id="column-toggles">
+                    @foreach ($columns as $column)
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-blue-600 me-2 column-toggle-checkbox"
+                                value="{{ $column['key'] }}" checked>
+                            <span>{{ $column['label'] }}</span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -198,5 +295,63 @@
                 }
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const storageKey = 'escort_column_visibility';
+            const checkboxes = document.querySelectorAll('.column-toggle-checkbox');
+
+            const applyVisibility = () => {
+                let preferences = {};
+                checkboxes.forEach(checkbox => {
+                    const columnKey = checkbox.value;
+                    const isVisible = checkbox.checked;
+                    preferences[columnKey] = isVisible;
+                    document.querySelectorAll(
+                            `th[data-column-key='${columnKey}'], td[data-column-key='${columnKey}']`)
+                        .forEach(el => {
+                            el.style.display = isVisible ? '' : 'none';
+                        });
+                });
+                localStorage.setItem(storageKey, JSON.stringify(preferences));
+            };
+
+            const loadPreferences = () => {
+                const savedPrefs = JSON.parse(localStorage.getItem(storageKey));
+                if (savedPrefs) {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = savedPrefs[checkbox.value] !== false;
+                    });
+                }
+            };
+
+            const table = document.querySelector('table');
+            if (table) {
+                const headers = table.querySelectorAll('thead th');
+                const rows = table.querySelectorAll('tbody tr');
+                const columnKeys = @json(array_column($columns, 'key'));
+
+                headers.forEach((th, index) => {
+                    if (columnKeys[index]) {
+                        th.setAttribute('data-column-key', columnKeys[index]);
+                    }
+                });
+
+                rows.forEach(row => {
+                    row.querySelectorAll('td').forEach((td, index) => {
+                        if (columnKeys[index]) {
+                            td.setAttribute('data-column-key', columnKeys[index]);
+                        }
+                    });
+                });
+            }
+
+
+            loadPreferences();
+            applyVisibility();
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyVisibility);
+            });
+        });
     </script>
 @endpush

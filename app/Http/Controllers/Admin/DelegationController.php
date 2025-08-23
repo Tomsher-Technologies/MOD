@@ -75,6 +75,10 @@ class DelegationController extends Controller
         $this->middleware('permission:view_travels', [
             'only' => ['arrivalsIndex', 'departuresIndex']
         ]);
+
+        // $this->middleware('permission:view_interviews', [
+        //     'only' => ['interviews']
+        // ]);
     }
 
     public function index(Request $request)
@@ -88,6 +92,9 @@ class DelegationController extends Controller
             'delegates',
             'escorts'
         ])->orderBy('id', 'desc');
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $query->where('event_id', $currentEventId);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -129,14 +136,69 @@ class DelegationController extends Controller
         return view('admin.delegations.index', compact('delegations'));
     }
 
+    public function interviewsIndex(Request $request)
+    {
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query = Interview::with([
+            'delegation.continent',
+            'delegation.country',
+            'status',
+            'interviewWithDelegation',
+            'fromMembers.fromDelegate',  // explicitly load fromDelegate
+            'toMembers.toDelegate',      // explicitly load toDelegate
+            'toMembers.otherMember',     // also load otherMember if needed for del_others type
+        ])->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+            $delegationQuery->where('event_id', $currentEventId);
+        });
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('delegation', function ($delegationQuery) use ($search) {
+                    $delegationQuery->where('code', 'like', "%{$search}%");
+                })
+                    ->orWhereHas('fromMembers.fromDelegate', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('toMembers.toDelegate', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('toMembers.otherMember', function ($otherMemberQuery) use ($search) {
+                        $otherMemberQuery->where('name_en', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($continentId = $request->input('continent_id')) {
+            $query->whereHas('delegation', function ($delegationQuery) use ($continentId) {
+                $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            $query->whereHas('delegation', function ($delegationQuery) use ($countryId) {
+                $delegationQuery->where('country_id', $countryId);
+            });
+        }
+
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
+        }
+
+        $interviews = $query->paginate(20);
+
+        return view('admin.delegations.interviews', compact('interviews'));
+    }
+
     public function create()
     {
-        $delegateId = $this->generateNextDelegateId();
-
         $dropdowns = $this->loadDropdownOptions();
 
         return view('admin.delegations.create', array_merge($dropdowns, [
-            'uniqueDelegateId' => $delegateId,
+            'uniqueDelegateId' => '',
         ]));
     }
 
@@ -149,7 +211,7 @@ class DelegationController extends Controller
             'invitationStatus',
             'participationStatus',
             'delegates' => function ($query) {
-                $query->with(['gender', 'parent', 'delegateTransports']);
+                $query->with(['gender', 'parent', 'delegateTransports.status']);
             },
             'attachments',
             'interviews' => function ($query) {
@@ -158,7 +220,9 @@ class DelegationController extends Controller
                     'interviewWithDelegation',
                     'interviewMembers'
                 ]);
-            }
+            },
+            'escorts',
+            'drivers'
         ])->findOrFail($id);
 
         // return response()->json([
@@ -180,10 +244,12 @@ class DelegationController extends Controller
                 $query->with([
                     'gender',
                     'parent',
-                    'delegateTransports',
+                    'delegateTransports.status',
                 ]);
             },
             'attachments',
+            'escorts',
+            'drivers'
         ])->findOrFail($id);
 
         $interviews = Interview::with(['interviewMembers', 'interviewMembers.fromDelegate', 'interviewMembers.toDelegate', 'interviewWithDelegation'])
@@ -192,7 +258,6 @@ class DelegationController extends Controller
 
         // return response()->json([
         //     'delegation' => $delegation,
-        //     'ssss' => $interviews,
         // ]);
 
         return view('admin.delegations.show', compact('delegation'));
@@ -200,15 +265,20 @@ class DelegationController extends Controller
 
     public function arrivalsIndex(Request $request)
     {
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
         $query = DelegateTransport::where('type', 'arrival')
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
-                // 'delegate.escort',
-                // 'delegate.driver',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
                 'airport',
                 // 'status'
-            ]);
+            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
@@ -224,6 +294,7 @@ class DelegationController extends Controller
             });
         }
 
+        // Override with explicit event_id if provided
         if ($eventId = $request->input('event_id')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($eventId) {
                 $delegationQuery->where('event_id', $eventId);
@@ -238,13 +309,37 @@ class DelegationController extends Controller
             $query->whereDate('date_time', '<=', $toDate);
         }
 
+        if ($continentId = $request->input('continent_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
+                $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
+                $delegationQuery->where('country_id', $countryId);
+            });
+        }
+
+        if ($airportId = $request->input('airport_id')) {
+            $query->where('airport_id', $airportId);
+        }
+
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
+        }
+
         $arrivals = $query->latest()->paginate(10);
+
 
         return view('admin.arrivals.index', compact('arrivals'));
     }
 
     public function departuresIndex(Request $request)
     {
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        
         $query = DelegateTransport::where('type', 'departure')
             ->with([
                 'delegate.delegation.country',
@@ -253,7 +348,9 @@ class DelegationController extends Controller
                 // 'delegate.driver',
                 'airport',
                 // 'status'
-            ]);
+            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
@@ -281,6 +378,26 @@ class DelegationController extends Controller
 
         if ($toDate = $request->input('to_date')) {
             $query->whereDate('date_time', '<=', $toDate);
+        }
+
+        if ($continentId = $request->input('continent_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
+                $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
+                $delegationQuery->where('country_id', $countryId);
+            });
+        }
+
+        if ($airportId = $request->input('airport_id')) {
+            $query->where('airport_id', $airportId);
+        }
+
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
         }
 
         $departures = $query->latest()->paginate(10);
@@ -296,6 +413,12 @@ class DelegationController extends Controller
             'flight_name' => 'nullable|string|max:255',
             'date_time' => 'nullable|date',
             'status_id' => 'nullable|string|max:255|exists:dropdown_options,id',
+        ], [
+            'airport_id.exists' => __db('airport_id_exists'),
+            'flight_no.max' => __db('flight_no_max', ['max' => 255]),
+            'flight_name.max' => __db('flight_name_max', ['max' => 255]),
+            'date_time.date' => __db('date_time_date'),
+            'status_id.exists' => __db('status_id_exists'),
         ]);
 
         $relationsToCompare = [
@@ -466,7 +589,6 @@ class DelegationController extends Controller
         // return response()->json($request->all());
 
         $validated = $request->validate([
-            'code' => 'required|string|unique:delegations,code',
             'invitation_from_id' => 'required|exists:dropdown_options,id',
             'continent_id' => 'required|exists:dropdown_options,id',
             'country_id' => 'required|exists:dropdown_options,id',
@@ -492,17 +614,32 @@ class DelegationController extends Controller
             'attachments.*.title_id' => 'nullable|string',
             'attachments.*.file' => 'nullable|file|max:5120',
             'attachments.*.document_date' => 'nullable|date',
+        ], [
+            'invitation_from_id.required' => __db('invitation_from_id_required'),
+            'invitation_from_id.exists' => __db('invitation_from_id_exists'),
+            'continent_id.required' => __db('continent_id_required'),
+            'continent_id.exists' => __db('continent_id_exists'),
+            'country_id.required' => __db('country_id_required'),
+            'country_id.exists' => __db('country_id_exists'),
+            'invitation_status_id.required' => __db('invitation_status_id_required'),
+            'invitation_status_id.exists' => __db('invitation_status_id_exists'),
+            'participation_status_id.required' => __db('participation_status_id_required'),
+            'participation_status_id.exists' => __db('participation_status_id_exists'),
+            'delegates.*.tmp_id.required_with' => __db('delegates_tmp_id_required_with'),
+            'delegates.*.name_en.required_with' => __db('delegates_name_en_required_with'),
+            'delegates.*.gender_id.required_with' => __db('delegates_gender_id_required_with'),
+            'delegates.*.gender_id.exists' => __db('delegates_gender_id_exists'),
+            'delegates.*.parent_id.exists' => __db('delegates_parent_id_exists'),
+            'attachments.*.title_id.exists' => __db('attachments_title_id_exists'),
+            'attachments.*.file.file' => __db('attachments_file_file'),
+            'attachments.*.file.max' => __db('attachments_file_max'),
+            'attachments.*.document_date.date' => __db('attachments_document_date_date'),
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Get the current event ID (default event if none specified)
-            $currentEvent = \App\Models\Event::where('is_default', true)->first();
-            $eventId = $currentEvent ? $currentEvent->id : null;
-
             $delegation = Delegation::create([
-                'code' => $validated['code'],
                 'invitation_from_id' => $validated['invitation_from_id'],
                 'continent_id' => $validated['continent_id'],
                 'country_id' => $validated['country_id'],
@@ -510,10 +647,7 @@ class DelegationController extends Controller
                 'participation_status_id' => $validated['participation_status_id'],
                 'note1' => $validated['note1'] ?? null,
                 'note2' => $validated['note2'] ?? null,
-                'event_id' => $eventId,
             ]);
-
-            // $tmpIdToDbId = [];
 
             if (!empty($validated['delegates'])) {
                 foreach ($validated['delegates'] as $delegateData) {
@@ -543,16 +677,6 @@ class DelegationController extends Controller
                 }
             }
 
-            // if (!empty($validated['delegates'])) {
-            //     foreach ($validated['delegates'] as $delegateData) {
-            //         $delegateData['delegation_id'] = $delegation->id;
-            //         $delegateData['team_head'] = !empty($delegateData['team_head']);
-            //         $delegateData['badge_printed'] = !empty($delegateData['badge_printed']);
-            //         $delegateData['internal_ranking_id'] = $delegation->internal_ranking_id ?? null;
-            //         $delegation->delegates()->create($delegateData);
-            //     }
-            // }
-
             if ($request->has('attachments')) {
                 foreach ($request->attachments as $idx => $attachment) {
                     if ($request->file("attachments.$idx.file")) {
@@ -570,7 +694,6 @@ class DelegationController extends Controller
 
             DB::commit();
 
-            // Log delegation creation activity
             $this->logActivity(
                 module: 'Delegation',
                 action: 'create',
@@ -579,14 +702,14 @@ class DelegationController extends Controller
             );
 
             if ($request->has('submit_exit')) {
-                return redirect()->route('delegations.index')->with('success', 'Delegation created.');
+                return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
             } elseif ($request->has('submit_add_interview')) {
                 return redirect()->route('delegations.addInterview', ['delegation_id' => $delegation->id]);
             } elseif ($request->has('submit_add_travel')) {
                 return redirect()->route('delegations.addTravel', ['delegation_id' => $delegation->id]);
             }
 
-            return redirect()->route('delegations.index')->with('success', 'Delegation created.');
+            return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Delegation creation failed: ' . $e->getMessage(), [
@@ -611,6 +734,17 @@ class DelegationController extends Controller
             'participation_status_id' => 'required|exists:dropdown_options,id',
             'note1' => 'nullable|string',
             'note2' => 'nullable|string',
+        ], [
+            'invitation_from_id.required' => __db('invitation_from_id_required'),
+            'invitation_from_id.exists' => __db('invitation_from_id_exists'),
+            'continent_id.required' => __db('continent_id_required'),
+            'continent_id.exists' => __db('continent_id_exists'),
+            'country_id.required' => __db('country_id_required'),
+            'country_id.exists' => __db('country_id_exists'),
+            'invitation_status_id.required' => __db('invitation_status_id_required'),
+            'invitation_status_id.exists' => __db('invitation_status_id_exists'),
+            'participation_status_id.required' => __db('participation_status_id_required'),
+            'participation_status_id.exists' => __db('participation_status_id_exists'),
         ]);
 
         // Define relations with display labels for confirmation dialog
@@ -724,6 +858,14 @@ class DelegationController extends Controller
             'attachments.*.title_id' => ['required', 'exists:dropdown_options,id'],
             'attachments.*.document_date' => ['nullable', 'date'],
             'attachments.*.file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png'],
+        ], [
+            'attachments.required' => __db('attachments_required'),
+            'attachments.array' => __db('attachments_array'),
+            'attachments.*.id.exists' => __db('delegation_attachments_id_exists'),
+            'attachments.*.title_id.required' => __db('attachments_title_id_exists'),
+            'attachments.*.title_id.exists' => __db('attachments_title_id_exists'),
+            'attachments.*.document_date.date' => __db('attachments_document_date_date'),
+            'attachments.*.file.file' => __db('attachments_file_file'),
         ]);
 
         $inputAttachments = $validatedData['attachments'];
@@ -773,7 +915,7 @@ class DelegationController extends Controller
 
         return redirect()
             ->route('delegations.edit', $delegationId)
-            ->with('success', 'Attachments updated successfully.');
+            ->with('success', __db('attachments_updated_successfully'));
     }
 
     public function destroyAttachment($id)
@@ -796,7 +938,7 @@ class DelegationController extends Controller
 
         $attachment->delete();
 
-        return redirect()->back()->with('success', 'Attachment deleted successfully.');
+        return redirect()->back()->with('success', __db('attachment_deleted_successfully'));
     }
 
     public function storeTravel(Request $request, $delegationId)
@@ -832,7 +974,7 @@ class DelegationController extends Controller
             foreach ($validated['delegate_ids'] as $delegateId) {
                 $delegate = $delegation->delegates()->findOrFail($delegateId);
 
-                if (isset($validated['arrival']['status_id']) && $validated['arrival']['status_id']) {
+                if (isset($validated['arrival']['date_time']) && $validated['arrival']['date_time']) {
                     $delegate->delegateTransports()->create([
                         'type' => 'arrival',
                         'mode' => $validated['arrival']['mode'],
@@ -845,7 +987,7 @@ class DelegationController extends Controller
                     ]);
                 }
 
-                if (isset($validated['departure']['status_id']) && $validated['departure']['status_id']) {
+                if (isset($validated['departure']['date_time']) && $validated['departure']['date_time']) {
                     $delegate->delegateTransports()->create([
                         'type' => 'departure',
                         'mode' => $validated['departure']['mode'],
@@ -872,7 +1014,7 @@ class DelegationController extends Controller
 
             return redirect()
                 ->route('delegations.show', $delegationId)
-                ->with('success', 'Travel details assigned to selected delegates successfully.');
+                ->with('success', __db('travel_details_assigned_successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -900,6 +1042,24 @@ class DelegationController extends Controller
             'other_member_id' => 'required_if:interview_type,other|nullable|integer|exists:other_interview_members,id',
             'status_id' => 'required|integer|exists:dropdown_options,id',
             // 'comment' => 'nullable|string|max:5000',
+        ], [
+            'from_delegate_ids.required' => __db('from_delegate_ids_required'),
+            'from_delegate_ids.array' => __db('from_delegate_ids_array'),
+            'from_delegate_ids.min' => __db('from_delegate_ids_min'),
+            'from_delegate_ids.*.exists' => __db('from_delegate_ids_exists'),
+            'date_time.required' => __db('date_time_required'),
+            'date_time.date' => __db('date_time_date'),
+            'interview_type.required' => __db('interview_type_required'),
+            'interview_type.in' => __db('interview_type_in'),
+            'interview_with_delegation_code.required_if' => __db('interview_with_delegation_code_required_if'),
+            'interview_with_delegation_code.exists' => __db('interview_with_delegation_code_exists'),
+            'to_delegate_id.required_if' => __db('to_delegate_id_required_if'),
+            'to_delegate_id.exists' => __db('to_delegate_id_exists'),
+            'other_member_id.required_if' => __db('other_member_id_required_if'),
+            'other_member_id.exists' => __db('other_member_id_exists'),
+            'status_id.required' => __db('status_id_required'),
+            'status_id.integer' => __db('status_id_integer'),
+            'status_id.exists' => __db('status_id_exists'),
         ]);
 
         if ($validator->fails()) {
@@ -965,7 +1125,7 @@ class DelegationController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Interview created successfully.',
+                    'message' => __db('interview_created_successfully'),
                     'redirect_url' => route('delegations.show', $delegation->id)  // Adjust as needed
                 ]);
             } catch (\Exception $e) {
@@ -1107,6 +1267,25 @@ class DelegationController extends Controller
             'departure.date_time' => 'nullable|date',
             'departure.status_id' => 'nullable|string|max:255|exists:dropdown_options,id',
             'departure.comment' => 'nullable|string',
+        ], [
+            'title_id.exists' => __db('title_id_exists'),
+            'name_ar.required' => __db('name_ar_required'),
+            'name_en.required' => __db('name_en_required'),
+            'gender_id.required' => __db('gender_id_required'),
+            'gender_id.exists' => __db('delegates_gender_id_exists'),
+            'parent_id.exists' => __db('delegates_parent_id_exists'),
+            'relationship_id.exists' => __db('relationship_id_exists'),
+            'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
+            'arrival.airport_id.exists' => __db('airport_id_exists'),
+            'arrival.flight_no.max' => __db('flight_no_max', ['max' => 255]),
+            'arrival.flight_name.max' => __db('flight_name_max', ['max' => 255]),
+            'arrival.date_time.date' => __db('date_time_date'),
+            'arrival.status_id.exists' => __db('status_id_exists'),
+            'departure.airport_id.exists' => __db('airport_id_exists'),
+            'departure.flight_no.max' => __db('flight_no_max', ['max' => 255]),
+            'departure.flight_name.max' => __db('flight_name_max', ['max' => 255]),
+            'departure.date_time.date' => __db('date_time_date'),
+            'departure.status_id.exists' => __db('status_id_exists'),
         ]);
 
         if ($validator->fails()) {
@@ -1144,7 +1323,7 @@ class DelegationController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'Delegate created successfully.',
+                    'message' => __db('delegate_created_successfully'),
                     'redirect_url' => route('delegations.edit', $delegation->id)
                 ]);
             } catch (\Exception $e) {
@@ -1339,13 +1518,16 @@ class DelegationController extends Controller
     {
         $code = $request->query('code');
         if (!$code) {
-            return response()->json(['success' => false, 'message' => 'Code required.']);
+            return response()->json(['success' => false, 'message' => __db('code_required')]);
         }
 
-        $delegation = Delegation::with('delegates')->where('code', $code)->first();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $delegation = Delegation::with('delegates')->where('code', $code)->where('event_id', $currentEventId)->first();
 
         if (!$delegation) {
-            return response()->json(['success' => false, 'message' => 'Delegation not found.']);
+            return response()->json(['success' => false, 'message' => __db('delegation_not_found')]);
         }
 
         $members = $delegation->delegates->map(fn($d) => [
@@ -1359,6 +1541,10 @@ class DelegationController extends Controller
     public function search(Request $request)
     {
         $query = Delegation::query();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query->where('event_id', $currentEventId);
 
         if ($continentId = $request->query('continent_id')) {
             $query->where('continent_id', $continentId);
@@ -1392,7 +1578,9 @@ class DelegationController extends Controller
 
     public function members($delegationId)
     {
-        $delegation = Delegation::with('delegates')->findOrFail($delegationId);
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $delegation = Delegation::with('delegates')->where('event_id', $currentEventId)->findOrFail($delegationId);
 
         $members = $delegation->delegates->map(fn($d) => [
             'id' => $d->id,
@@ -1421,28 +1609,11 @@ class DelegationController extends Controller
         ];
     }
 
-    protected function generateNextDelegateId()
-    {
-        $lastDelegate = \App\Models\Delegation::where('code', 'like', 'DA%')
-            ->orderBy('code', 'desc')
-            ->first();
 
-        if (!$lastDelegate) {
-            return 'DA000001';
-        }
-
-        $lastId = $lastDelegate->code;
-        $number = intval(substr($lastId, 2));
-
-        $nextNumber = $number + 1;
-        $nextDelegateId = 'DA' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
-
-        return $nextDelegateId;
-    }
 
     private function syncTransportInfo(Delegate $delegate, ?array $transportData, string $type): void
     {
-        if (empty($transportData) || (empty($transportData['status_id']) && empty($transportData['mode']))) {
+        if (empty($transportData) || (empty($transportData['date_time']) || empty($transportData['mode']))) {
             return;
         }
 

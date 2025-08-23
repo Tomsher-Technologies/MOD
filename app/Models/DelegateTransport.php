@@ -76,16 +76,17 @@ class DelegateTransport extends Model
             });
     }
 
-    public function getStatus()
+    public function status()
     {
-        if ($this->type === 'arrival') {
+        if ($this->type == 'arrival') {
             return $this->arrivalStatus();
         }
 
-        if ($this->type === 'departure') {
+        if ($this->type == 'departure') {
             return $this->departureStatus();
         }
 
-        return null;
+        // Return a default relation to an empty DropdownOption instance to avoid errors
+        return $this->belongsTo(DropdownOption::class, 'status_id')->whereRaw('0 = 1');
     }
 }

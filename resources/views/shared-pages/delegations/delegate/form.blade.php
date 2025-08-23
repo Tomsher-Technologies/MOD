@@ -18,7 +18,8 @@
     @endif
 
     <form method="POST"
-        action="{{ $isEditMode ? route('delegations.updateDelegate', [$delegation, $delegate]) : route('delegations.storeDelegate', $delegation) }}" data-ajax-form="true">
+        action="{{ $isEditMode ? route('delegations.updateDelegate', [$delegation, $delegate]) : route('delegations.storeDelegate', $delegation) }}"
+        data-ajax-form="true">
         @csrf
         @if ($isEditMode)
             @method('PUT')
@@ -64,6 +65,13 @@
                 </div>
 
                 <div class="col-span-4">
+                    <label class="form-label">{{ __db('designation_ar') }} :</label>
+                    <input type="text" name="designation_ar"
+                        value="{{ old('designation_ar', $delegate->designation_ar) }}"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
+                </div>
+
+                <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}: <span class="text-red-600">*</span></label>
                     <select name="gender_id" required class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="" disabled>{{ __db('select_gender') }}</option>
@@ -101,6 +109,21 @@
                         @endforeach
                     </select>
                 </div>
+
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('internal_ranking') }}:</label>
+                    <select name="internal_ranking_id" class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                        <option value="">{{ __db('select_ranking') }}</option>
+                        @foreach (getDropDown('internal_ranking')->options as $option)
+                            <option value="{{ $option->id }}" @if (old('internal_ranking_id', $delegate->internal_ranking_id) == $option->id) selected @endif>
+                                {{ $option->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+
 
                 <div class="col-span-12">
                     <label class="form-label">{{ __db('note') }}:</label>
@@ -157,7 +180,6 @@
 
 @push('scripts')
     <script>
-
         document.addEventListener('DOMContentLoaded', function() {
             const setupTransportModeToggle = (sectionType) => {
                 const transportSection = document.querySelector(`[data-transport-section="${sectionType}"]`);

@@ -282,13 +282,18 @@ if (!function_exists('getRouteForPage')) {
                 'del_add_interviews' => 'delegations.addInterview',
             ],
             'delegation.editInterview' => [
-                'manage_interviews' => 'delegations.editInterview',
-                'del_manage_interviews' => 'delegations.editInterview',
+                'edit_interviews' => 'delegations.editInterview',
+                'del_edit_interviews' => 'delegations.editInterview',
             ],
             'delegation.destroyInterview' => [
                 'delete_interviews' => 'delegations.destroyInterview',
                 'del_delete_interviews' => 'delegations.destroyInterview',
             ],
+            'delegation.interviewsIndex' => [
+                'view_interviews' => 'delegations.interviewsIndex',
+                'del_view_interviews' => 'delegations.interviewsIndex',
+            ],
+
 
             //Travel
             'delegation.addTravel' => [
@@ -299,6 +304,11 @@ if (!function_exists('getRouteForPage')) {
                 'add_travels' => 'delegations.storeTravel',
                 'del_add_travels' => 'delegations.storeTravel',
             ],
+            'delegation.arrivalsIndex' => [
+                'view_travels' => 'delegations.arrivalsIndex',
+                'del_view_travels' => 'delegations.arrivalsIndex',
+            ],
+
 
             //Delegate
             'delegation.storeDelegate' => [
@@ -345,9 +355,17 @@ if (!function_exists('getRouteForPage')) {
                 'add_escorts' => 'escorts.create',
                 'del_add_escorts' => 'escorts.create',
             ],
+            'escorts.store' => [
+                'add_escorts' => 'escorts.store',
+                'del_add_escorts' => 'escorts.store',
+            ],
             'escorts.edit' => [
                 'edit_escorts' => 'escorts.edit',
                 'del_edit_escorts' => 'escorts.edit',
+            ],
+            'escorts.update' => [
+                'edit_escorts' => 'escorts.update',
+                'del_edit_escorts' => 'escorts.update',
             ],
             'escorts.unassign' => [
                 'edit_escorts' => 'escorts.unassign', // Assuming permission to edit escorts allows unassigning
@@ -383,6 +401,10 @@ if (!function_exists('getRouteForPage')) {
                 'edit_drivers' => 'drivers.update',
                 'del_edit_drivers' => 'drivers.update',
             ],
+            'drivers.assign' => [
+                'edit_drivers' => 'drivers.assign', // Assuming permission to edit drivers allows assigning
+                'del_edit_drivers' => 'drivers.assign',
+            ],
             'drivers.unassign' => [
                 'edit_drivers' => 'drivers.unassign', // Assuming permission to edit drivers allows unassigning
                 'del_edit_drivers' => 'drivers.unassign',
@@ -395,6 +417,11 @@ if (!function_exists('getRouteForPage')) {
                 'edit_drivers' => 'drivers.status', // Assuming permission to edit drivers allows changing status
                 'del_edit_drivers' => 'drivers.status',
             ],
+            'drivers.store' => [
+                'edit_drivers' => 'drivers.store', // Assuming permission to edit drivers allows changing status
+                'del_edit_drivers' => 'drivers.store',
+            ],
+
 
             //Members
             'delegation.members' => [

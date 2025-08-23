@@ -39,7 +39,12 @@ class EscortController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')->latest();
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        
+        $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
+            ->where('event_id', $currentEventId)
+            ->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -54,11 +59,28 @@ class EscortController extends Controller
             });
         }
 
+        if ($request->has('title') && !empty($request->title)) {
+            $query->whereIn('internal_ranking_id', $request->title);
+        }
+
+        if ($request->has('gender_id') && !empty($request->gender_id)) {
+            $query->where('gender_id', $request->gender_id);
+        }
+
+        if ($request->has('language_id') && !empty($request->language_id)) {
+            $query->where('spoken_languages', 'like', '%' . $request->language_id . '%');
+        }
+
+        if ($request->has('delegation_id') && !empty($request->delegation_id)) {
+            $query->whereHas('delegations', function ($q) use ($request) {
+                $q->where('delegations.id', $request->delegation_id);
+            });
+        }
+
         $escorts = $query->paginate(10);
+        $delegations = Delegation::where('event_id', $currentEventId)->get();
 
-        // return response()->json(['sss' => $escorts]);
-
-        return view('admin.escorts.index', compact('escorts'));
+        return view('admin.escorts.index', compact('escorts', 'delegations'));
     }
 
     public function updateStatus(Request $request)
@@ -92,10 +114,14 @@ class EscortController extends Controller
      */
     public function store(Request $request)
     {
+
+
         $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
+            'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
+            'military_number' => 'nullable|string|max:255',
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
@@ -103,16 +129,29 @@ class EscortController extends Controller
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
+        ], [
+            'name_en.required' => __db('escort_name_en_required'),
+            'name_ar.required' => __db('escort_name_ar_required'),
+            'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
+            'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
+            'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 255]),
+            'email.max' => __db('escort_email_max', ['max' => 255]),
+            'email.email' => __db('escort_email_email'),
+            'gender_id.exists' => __db('gender_id_exists'),
+            'nationality_id.exists' => __db('nationality_id_exists'),
+            'date_of_birth.date' => __db('date_of_birth_date'),
+            'status.max' => __db('escort_status_max', ['max' => 255]),
+            'language_id.array' => __db('language_id_array'),
         ]);
 
-        $currentEvent = \App\Models\Event::where('is_default', true)->first();
-        $eventId = $currentEvent ? $currentEvent->id : null;
-
         $escortData = $request->all();
-        $escortData['event_id'] = $eventId;
 
-        if ($request->has('language_id')) {
-            $escortData['spoken_languages'] = implode(',', $request->input('language_id'));
+        if (isset($escortData['language_id'])) {
+            $escortData['spoken_languages'] = implode(',', $escortData['language_id']);
+            unset($escortData['language_id']);
         } else {
             $escortData['spoken_languages'] = null;
         }
@@ -164,8 +203,10 @@ class EscortController extends Controller
     {
         $validated = $request->validate([
             'name_en' => 'required|string|max:255',
+            'military_number' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
+            'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
@@ -173,6 +214,22 @@ class EscortController extends Controller
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
+        ], [
+            'name_en.required' => __db('escort_name_en_required'),
+            'name_ar.required' => __db('escort_name_ar_required'),
+            'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
+            'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
+            'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 255]),
+            'email.max' => __db('escort_email_max', ['max' => 255]),
+            'email.email' => __db('escort_email_email'),
+            'gender_id.exists' => __db('gender_id_exists'),
+            'nationality_id.exists' => __db('nationality_id_exists'),
+            'date_of_birth.date' => __db('date_of_birth_date'),
+            'status.max' => __db('escort_status_max', ['max' => 255]),
+            'language_id.array' => __db('language_id_array'),
         ]);
 
         $escort = Escort::findOrFail($id);
@@ -193,14 +250,25 @@ class EscortController extends Controller
                     'label' => 'value',
                 ],
             ],
-            'delegation_id' => [
+            'nationality_id' => [
                 'display_with' => [
-                    'model' => \App\Models\Delegation::class,
+                    'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',
-                    'label' => 'code',
+                    'label' => 'value',
                 ],
             ],
-
+            'internal_ranking_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'military_number' => [],
+            'title' => [],
+            'name_ar' => [],
+            'name_en' => [],
+            'status' => [],
         ];
 
         // Manually handle spoken_languages comparison
@@ -243,7 +311,7 @@ class EscortController extends Controller
 
         if (isset($validated['language_id'])) {
             $validated['spoken_languages'] = implode(',', $validated['language_id']);
-            unset($validated['language_id']); 
+            unset($validated['language_id']);
         } else {
             $validated['spoken_languages'] = null;
         }
@@ -307,23 +375,23 @@ class EscortController extends Controller
         $delegationId = $request->delegation_id;
 
         // Check if the escort is already assigned to this delegation
-        $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
+        // $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
 
-        if ($existingAssignment) {
-            // If the assignment exists and is marked as unassigned, update the status
-            if (!$existingAssignment->pivot->status) {
-                $escort->delegations()->updateExistingPivot($delegationId, [
-                    'status' => 1,
-                    'assigned_by' => auth()->id(),
-                ]);
-            }
-        } else {
-            // If no assignment exists, create a new one
-            $escort->delegations()->attach($delegationId, [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ]);
-        }
+        // if ($existingAssignment) {
+        //     // If the assignment exists and is marked as unassigned, update the status
+        //     if (!$existingAssignment->pivot->status) {
+        //         $escort->delegations()->updateExistingPivot($delegationId, [
+        //             'status' => 1,
+        //             'assigned_by' => auth()->id(),
+        //         ]);
+        //     }
+        // } else {
+        // If no assignment exists, create a new one
+        $escort->delegations()->attach($delegationId, [
+            'status' => 1,
+            'assigned_by' => auth()->id(),
+        ]);
+        // }
 
         return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
@@ -340,7 +408,7 @@ class EscortController extends Controller
             'status' => 0,
         ]);
 
-        return redirect()->route('escorts.index')->with('success', __db('Escort unassigned successfully.'));
+        return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
     }
 
     protected function loadDropdownOptions()

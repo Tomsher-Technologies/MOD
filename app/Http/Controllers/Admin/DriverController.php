@@ -39,7 +39,12 @@ class DriverController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Driver::with('delegations')->latest();
+        // Get current event ID from session or default event
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        
+        $query = Driver::with('delegations')
+            ->where('event_id', $currentEventId)
+            ->latest();
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -56,9 +61,32 @@ class DriverController extends Controller
             });
         }
 
-        $drivers = $query->paginate(10);
+        if ($request->has('title') && !empty($request->title)) {
+            $query->whereIn('title', $request->title);
+        }
 
-        return view('admin.drivers.index', compact('drivers'));
+        if ($request->has('car_type') && !empty($request->car_type)) {
+            $query->whereIn('car_type', $request->car_type);
+        }
+
+        if ($request->has('car_number') && !empty($request->car_number)) {
+            $query->whereIn('car_number', $request->car_number);
+        }
+
+        if ($request->has('capacity') && !empty($request->capacity)) {
+            $query->whereIn('capacity', $request->capacity);
+        }
+
+        if ($request->has('delegation_id') && !empty($request->delegation_id)) {
+            $query->whereHas('delegations', function ($q) use ($request) {
+                $q->where('delegations.id', $request->delegation_id);
+            });
+        }
+
+        $drivers = $query->paginate(10);
+        $delegations = Delegation::where('event_id', $currentEventId)->get();
+
+        return view('admin.drivers.index', compact('drivers', 'delegations'));
     }
 
     public function updateStatus(Request $request)
@@ -96,6 +124,7 @@ class DriverController extends Controller
             'military_number' => 'nullable|string|max:255',
             'title' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
+            'military_number' => 'nullable|string|max:255',
             'name_en' => 'required|string|max:255',
             'mobile_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
@@ -104,13 +133,22 @@ class DriverController extends Controller
             'capacity' => 'nullable|string|max:255',
             'note1' => 'nullable|string',
             'delegation_id' => 'nullable|exists:delegations,id',
+        ], [
+            'name_ar.required' => __db('driver_name_ar_required'),
+            'name_en.required' => __db('driver_name_en_required'),
+            'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
+            'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
+            'title.max' => __db('driver_title_max', ['max' => 255]),
+            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'driver_id.max' => __db('driver_id_max', ['max' => 255]),
+            'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
+            'car_number.max' => __db('driver_car_number_max', ['max' => 255]),
+            'capacity.max' => __db('driver_capacity_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
         ]);
 
-        $currentEvent = \App\Models\Event::where('is_default', true)->first();
-        $eventId = $currentEvent ? $currentEvent->id : null;
-
         $driverData = $request->all();
-        $driverData['event_id'] = $eventId;
 
         $driver = Driver::create($driverData);
 
@@ -168,7 +206,22 @@ class DriverController extends Controller
             'car_number' => 'nullable|string|max:255',
             'capacity' => 'nullable|string|max:255',
             'note1' => 'nullable|string',
+            'status' => 'nullable|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
+        ], [
+            'name_ar.required' => __db('driver_name_ar_required'),
+            'name_en.required' => __db('driver_name_en_required'),
+            'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
+            'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
+            'title.max' => __db('driver_title_max', ['max' => 255]),
+            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'driver_id.max' => __db('driver_id_max', ['max' => 255]),
+            'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
+            'car_number.max' => __db('driver_car_number_max', ['max' => 255]),
+            'capacity.max' => __db('driver_capacity_max', ['max' => 255]),
+            'status.max' => __db('driver_status_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
         ]);
 
         $driver = Driver::findOrFail($id);
@@ -182,7 +235,6 @@ class DriverController extends Controller
                     'label' => 'code',
                 ],
             ],
-            // Add other scalar fields that need comparison
             'military_number' => [],
             'title' => [],
             'name_ar' => [],
@@ -193,13 +245,7 @@ class DriverController extends Controller
             'car_number' => [],
             'capacity' => [],
             'note1' => [],
-            'status' => [
-                'display_with' => [
-                    'model' => \App\Models\DropdownOption::class,
-                    'key' => 'id',
-                    'label' => 'value',
-                ],
-            ],
+            'status' => [],
         ];
 
         // Use the processUpdate method for confirmation dialog
@@ -271,21 +317,21 @@ class DriverController extends Controller
         $delegationId = $request->delegation_id;
 
         // Check if the driver is already assigned to this delegation
-        $existingAssignment = $driver->delegations()->where('delegation_id', $delegationId)->first();
+        // $existingAssignment = $driver->delegations()->where('delegation_id', $delegationId)->first();
 
-        if ($existingAssignment) {
-            // If the assignment exists, ensure its status is 1 (assigned)
-            $driver->delegations()->updateExistingPivot($delegationId, [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ]);
-        } else {
-            // If no assignment exists, create a new one
-            $driver->delegations()->attach($delegationId, [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ]);
-        }
+        // if ($existingAssignment) {
+        //     // If the assignment exists, ensure its status is 1 (assigned)
+        //     $driver->delegations()->updateExistingPivot($delegationId, [
+        //         'status' => 1,
+        //         'assigned_by' => auth()->id(),
+        //     ]);
+        // } else {
+        // If no assignment exists, create a new one
+        $driver->delegations()->attach($delegationId, [
+            'status' => 1,
+            'assigned_by' => auth()->id(),
+        ]);
+        // }
 
         return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
     }
@@ -302,7 +348,7 @@ class DriverController extends Controller
             'status' => 0,
         ]);
 
-        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver unassigned successfully.'));
+        return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }
 
     protected function loadDropdownOptions()

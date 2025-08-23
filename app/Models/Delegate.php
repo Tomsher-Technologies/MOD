@@ -19,8 +19,6 @@ class Delegate extends Model
         'note',
         'relationship_id',
         'internal_ranking_id',
-        'driver_id',
-        'escort_id',
         'accommodation_id',
         'accommodation',
         'team_head',

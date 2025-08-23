@@ -1,6 +1,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">Drivers</h2>
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
+       
     </div>
     <!-- Drivers -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -24,68 +25,78 @@
                                 placeholder="Search by Military Number, Name, Mobile Number, Driver ID, Car Type, Car Number"
                                 value="{{ request('search') }}" />
                             <button type="submit"
-                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
 
                         </div>
                     </form>
 
                     <div class="text-center">
-                        <a href="{{ getRouteForPage('drivers.create') }}"
-                            class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-sm rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                            type="button">
+                        <button
+                            class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                            type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
+                            aria-controls="filter-drawer">
                             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                                    d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z" />
                             </svg>
-                            <span>Add Driver</span>
-                        </a>
+                            <span>{{ __db('filter') }}</span>
+                        </button>
                     </div>
                 </div>
 
                 @php
                     $columns = [
                         [
-                            'label' => 'Military Number',
+                            'label' => __db('military_number'),
+                            'key' => 'military_number',
                             'render' => fn($driver) => e($driver->military_number),
                         ],
                         [
-                            'label' => 'Title',
+                            'label' => __db('title'),
+                            'key' => 'title',
                             'render' => fn($driver) => e($driver->title),
                         ],
                         [
-                            'label' => 'Name',
+                            'label' => __db('name_en'),
+                            'key' => 'name_en',
                             'render' => fn($driver) => e($driver->name_en),
                         ],
                         [
-                            'label' => 'Mobile Number',
+                            'label' => __db('mobile_number'),
+                            'key' => 'mobile_number',
                             'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
                         ],
                         [
-                            'label' => 'Driver ID',
+                            'label' => __db('driver') . ' ' . __db('id'),
+                            'key' => 'driver_id',
                             'render' => fn($driver) => e($driver->driver_id),
                         ],
                         [
-                            'label' => 'Car Type',
+                            'label' => __db('car') . ' ' . __db('type'),
+                            'key' => 'car_type',
                             'render' => fn($driver) => e($driver->car_type),
                         ],
                         [
-                            'label' => 'Car Number',
+                            'label' => __db('car') . ' ' . __db('number'),
+                            'key' => 'car_number',
                             'render' => fn($driver) => e($driver->car_number),
                         ],
                         [
-                            'label' => 'Capacity',
+                            'label' => __db('capacity'),
+                            'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
                         ],
                         [
-                            'label' => 'Assigned Delegation',
+                            'label' => __db('assigned') . ' ' . __db('delegation'),
+                            'key' => 'assigned_delegation',
                             'render' => function ($driver) {
                                 return e($driver->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
                             },
                         ],
                         [
-                            'label' => 'Status',
+                            'label' => __db('status'),
+                            'key' => 'status',
                             'render' => function ($driver) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -105,7 +116,8 @@
                             },
                         ],
                         [
-                            'label' => 'Actions',
+                            'label' => __db('actions'),
+                            'key' => 'actions',
                             'render' => function ($driver) {
                                 $editUrl = getRouteForPage('drivers.edit', $driver->id);
                                 $output = '<div class="flex align-center gap-4">';
@@ -136,7 +148,7 @@
                         </form>';
                                         }
                                     } else {
-                                        $assignUrl = route('drivers.assignIndex', $driver->id);
+                                        $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
                                         $output .=
                                             '<a href="' .
                                             $assignUrl .
@@ -163,10 +175,103 @@
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#f2eccf] rounded"></div>
-                    <span class="text-gray-800 text-sm">Unassigned Drivers</span>
+                    <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('drivers') }}</span>
                 </div>
                 <div class="mt-4">
-                    {{-- {{ $drivers->links() }} --}}
+                    {{ $drivers->appends(request()->input())->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="filter-drawer"
+    class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
+    tabindex="-1" aria-labelledby="drawer-label">
+    <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
+        {{ __db('filter') }}</h5>
+    <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
+        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">{{ __db('close_menu') }}</span>
+    </button>
+
+    <form action="{{ getRouteForPage('drivers.index') }}" method="GET">
+        <div class="flex flex-col gap-4 mt-4">
+            <select name="title[]" placeholder="Title" 
+                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                @foreach (getDropDown('title')->options as $option)
+                    <option value="{{ $option->value }}" @if (in_array($option->value, request('title', []))) selected @endif>
+                        {{ $option->value }}</option>
+                @endforeach
+            </select>
+            <select name="car_type[]" placeholder="Vehicle Type" 
+                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                @foreach (getDropDown('vehicle_type')->options as $option)
+                    <option value="{{ $option->value }}" @if (in_array($option->value, request('car_type', []))) selected @endif>
+                        {{ $option->value }}</option>
+                @endforeach
+            </select>
+            <select name="car_number[]" placeholder="Plate Number" 
+                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                @foreach ($drivers as $driver)
+                    <option value="{{ $driver->car_number }}" @if (in_array($driver->car_number, request('car_number', []))) selected @endif>
+                        {{ $driver->car_number }}</option>
+                @endforeach
+            </select>
+            <select name="capacity[]" placeholder="Capacity" 
+                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                @foreach ($drivers as $driver)
+                    <option value="{{ $driver->capacity }}" @if (in_array($driver->capacity, request('capacity', []))) selected @endif>
+                        {{ $driver->capacity }}</option>
+                @endforeach
+            </select>
+            <select name="delegation_id"
+                class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                <option value="">{{ __db('all_delegations') }}</option>
+                @foreach ($delegations as $delegation)
+                    <option value="{{ $delegation->id }}"
+                        {{ request('delegation_id') == $delegation->id ? 'selected' : '' }}>
+                        {{ $delegation->code }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mt-6">
+            <a href="{{ getRouteForPage('drivers.index') }}"
+                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+            <button type="submit"
+                class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
+        </div>
+    </form>
+</div>
+
+<div id="column-visibility-modal" tabindex="-1" aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow">
+            <div class="flex items-start justify-between p-4 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
+                <button type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                    data-modal-hide="column-visibility-modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="space-y-3 grid grid-cols-3" id="column-toggles">
+                    @foreach ($columns as $column)
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" class="form-checkbox text-blue-600 me-2 column-toggle-checkbox"
+                                value="{{ $column['key'] }}" checked>
+                            <span>{{ $column['label'] }}</span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -200,5 +305,63 @@
                 }
             });
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const storageKey = 'driver_column_visibility';
+            const checkboxes = document.querySelectorAll('.column-toggle-checkbox');
+
+            const applyVisibility = () => {
+                let preferences = {};
+                checkboxes.forEach(checkbox => {
+                    const columnKey = checkbox.value;
+                    const isVisible = checkbox.checked;
+                    preferences[columnKey] = isVisible;
+                    document.querySelectorAll(
+                            `th[data-column-key='${columnKey}'], td[data-column-key='${columnKey}']`)
+                        .forEach(el => {
+                            el.style.display = isVisible ? '' : 'none';
+                        });
+                });
+                localStorage.setItem(storageKey, JSON.stringify(preferences));
+            };
+
+            const loadPreferences = () => {
+                const savedPrefs = JSON.parse(localStorage.getItem(storageKey));
+                if (savedPrefs) {
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = savedPrefs[checkbox.value] !== false;
+                    });
+                }
+            };
+
+            const table = document.querySelector('table');
+            if (table) {
+                const headers = table.querySelectorAll('thead th');
+                const rows = table.querySelectorAll('tbody tr');
+                const columnKeys = @json(array_column($columns, 'key'));
+
+                headers.forEach((th, index) => {
+                    if (columnKeys[index]) {
+                        th.setAttribute('data-column-key', columnKeys[index]);
+                    }
+                });
+
+                rows.forEach(row => {
+                    row.querySelectorAll('td').forEach((td, index) => {
+                        if (columnKeys[index]) {
+                            td.setAttribute('data-column-key', columnKeys[index]);
+                        }
+                    });
+                });
+            }
+
+
+            loadPreferences();
+            applyVisibility();
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', applyVisibility);
+            });
+        });
     </script>
 @endpush

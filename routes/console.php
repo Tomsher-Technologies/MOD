@@ -15,3 +15,5 @@ Schedule::command('membership:send-expiry-reminders')->everyMinute();
 Schedule::command('queue:work --stop-when-empty')
         ->everyMinute()
         ->withoutOverlapping();
+        
+Schedule::command('flights:update-statuses')->everyMinute();

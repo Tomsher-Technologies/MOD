@@ -70,7 +70,7 @@
                                 },
                             ],
                             ['label' => __db('title'), 'render' => fn($row) => $row->title->value ?? ''],
-                            ['label' => __db('name'), 'render' => fn($row) => e($row->value_en ?? '-')],
+                            ['label' => __db('name'), 'render' => fn($row) => e($row->name_en ?? '-')],
                             ['label' => __db('designation'), 'render' => fn($row) => $row->designation_en ?? ''],
                             [
                                 'label' => __db('internal_ranking'),
