@@ -22,11 +22,11 @@
 -- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'import_accommodations', 'Bulk Import Accommodations', 'web', '1', '2025-08-21 14:59:05', '2025-08-21 14:59:05');
 
 
-INSERT INTO permissions (module, parent_id, name, title, guard_name, is_active) VALUES
-('admin', NULL, 'manage_other_interview_members', 'Manage Other Interview Members', 'web', 1);
+-- INSERT INTO permissions (module, parent_id, name, title, guard_name, is_active) VALUES
+-- ('admin', NULL, 'manage_other_interview_members', 'Manage Other Interview Members', 'web', 1);
 
 
-INSERT INTO permissions (module, parent_id, name, title, guard_name, is_active) VALUES
-('admin', 52, 'add_other_interview_members', 'Add Other Interview Members', 'web', 1),
-('admin', 52, 'edit_other_interview_members', 'Add Other Interview Members', 'web', 1),
-('admin', 52, 'view_other_interview_members', 'View Other Interview Members', 'web', 1);
+-- INSERT INTO permissions (module, parent_id, name, title, guard_name, is_active) VALUES
+-- ('admin', 52, 'add_other_interview_members', 'Add Other Interview Members', 'web', 1),
+-- ('admin', 52, 'edit_other_interview_members', 'Add Other Interview Members', 'web', 1),
+-- ('admin', 52, 'view_other_interview_members', 'View Other Interview Members', 'web', 1);

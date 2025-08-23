@@ -439,6 +439,21 @@ if (!function_exists('getRouteForPage')) {
                 'del_manage_delegations' => 'delegations.updateAttachment',
             ],
 
+            //Other Interview Members
+            'other-interview-members.index' => [
+                'manage_other_interview_members' => 'other-interview-members.index',
+                'del_manage_other_interview_members' => 'other-interview-members.index',
+            ],
+            'otherInterviewMembers.edit' => [
+                'edit_other_interview_members' => 'otherInterviewMembers.edit',
+                'del_edit_other_interview_members' => 'otherInterviewMembers.edit',
+            ],
+            'otherInterviewMembers.show' => [
+                'view_other_interview_members' => 'otherInterviewMembers.show',
+                'del_view_other_interview_members' => 'otherInterviewMembers.show',
+            ],
+
+
             // Accommodation
             'accommodations.index' => [
                 'manage_accommodations' => 'accommodations.index',
@@ -480,8 +495,8 @@ if (!function_exists('getRouteForPage')) {
                 'edit_accommodations' => 'accommodation-rooms.destroy',
                 'hotel_edit_accommodations' => 'accommodation-rooms.destroy',
             ],
-            
-            
+
+
         ];
 
         $user = auth()->user();

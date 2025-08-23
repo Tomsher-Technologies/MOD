@@ -133,7 +133,7 @@
                             'key' => __db('actions'),
                             'render' => function ($delegation) {
                                 $buttons = '';
-                                if (auth()->user() && auth()->user()->can('edit_delegations')) {
+                                if (auth()->user() && auth()->user()->canAny(['edit_delegations'])) {
                                     $buttons .= 
                                         '<a href="' .
                                         route('delegations.edit', $delegation->id) . 
