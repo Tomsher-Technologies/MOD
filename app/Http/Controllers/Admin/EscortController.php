@@ -124,6 +124,22 @@ class EscortController extends Controller
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
+        ], [
+            'name_en.required' => __db('escort_name_en_required'),
+            'name_ar.required' => __db('escort_name_ar_required'),
+            'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
+            'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
+            'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 255]),
+            'email.max' => __db('escort_email_max', ['max' => 255]),
+            'email.email' => __db('escort_email_email'),
+            'gender_id.exists' => __db('gender_id_exists'),
+            'nationality_id.exists' => __db('nationality_id_exists'),
+            'date_of_birth.date' => __db('date_of_birth_date'),
+            'status.max' => __db('escort_status_max', ['max' => 255]),
+            'language_id.array' => __db('language_id_array'),
         ]);
 
         $escortData = $request->all();
@@ -193,6 +209,22 @@ class EscortController extends Controller
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
+        ], [
+            'name_en.required' => __db('escort_name_en_required'),
+            'name_ar.required' => __db('escort_name_ar_required'),
+            'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
+            'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
+            'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 255]),
+            'email.max' => __db('escort_email_max', ['max' => 255]),
+            'email.email' => __db('escort_email_email'),
+            'gender_id.exists' => __db('gender_id_exists'),
+            'nationality_id.exists' => __db('nationality_id_exists'),
+            'date_of_birth.date' => __db('date_of_birth_date'),
+            'status.max' => __db('escort_status_max', ['max' => 255]),
+            'language_id.array' => __db('language_id_array'),
         ]);
 
         $escort = Escort::findOrFail($id);

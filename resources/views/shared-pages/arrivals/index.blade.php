@@ -45,13 +45,13 @@
                     <h2 class="font-semibold mb-0 !text-[22px] mb-10 pb-4">{{ __db('arrivals') }}</h2>
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
-                        <img src="{{ asset('assets/img/logo.svg') }}" alt="">
+                        <img src="{{ getAdminEventLogo() }}" alt="">
                         <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
                     </div>
 
 
                     <a href="#" id="fullscreenToggleBtn"
-                        class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-[#B68A35] dark:border-[#B68A35] dark:hover:text-white dark:hover:bg-[#B68A35]">
+                        class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
                         <span>{{ __db('go_fullscreen') }}</span>
                     </a>
 
@@ -139,22 +139,30 @@
                             },
                         ],
                     ];
-                    $rowClass = function ($row) {
-                        if (!$row->date_time) {
-                            return 'bg-white';
-                        }
+
+                    $bgClass = [
+                        'Arrived' => 'bg-[#b7e9b2]', 
+                        'Departed' => 'bg-[#c2e0ff]', 
+                        'Upcoming' => 'bg-[#fff9b2]', 
+                    ];
+
+                    $rowClass = function ($row) use ($bgClass) {
                         $now = \Carbon\Carbon::now();
-                        $oneHourAgo = $now->copy()->subHour();
-                        $oneHourHence = $now->copy()->addHour();
+                        $statusName = $row->status->value ?? null;
+
+                        if (!$row->date_time) {
+                            return $bgClass[$statusName] ?? 'bg-[#fff]';
+                        }
+
                         $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
-                        if ($rowDateTime->isPast() && $rowDateTime->diffInHours($now) > 1) {
-                            return 'bg-green-200';
-                        } elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
-                            return 'bg-red-200';
-                        } else {
-                            return 'bg-white';
+                        if ($rowDateTime->lt($now->copy()->subHour())) {
+                            return 'bg-[#b7e9b2]'; 
                         }
+                        if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
+                            return 'bg-[#ffc5c5]'; 
+                        }
+                        return $bgClass[$statusName] ?? 'bg-[#fff]';
                     };
                 @endphp
 
@@ -323,6 +331,8 @@
 
 
 @section('script')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.edit-arrival-btn').forEach(btn => {
@@ -336,80 +346,74 @@
         });
     </script>
 
+
+
     <script>
-        // const fullscreenDiv = document.getElementById('fullDiv');
+        const fullscreenDiv = document.getElementById('fullDiv');
 
-        // $('#fullscreenToggleBtn').on('click', function() {
-        //     const isInFullscreen =
-        //         document.fullscreenElement ||
-        //         document.webkitFullscreenElement ||
-        //         document.mozFullScreenElement ||
-        //         document.msFullscreenElement;
+        $('#fullscreenToggleBtn').on('click', function() {
+            const isInFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
 
-        //     if (!isInFullscreen) {
-        //         // Enter fullscreen
-        //         if (fullscreenDiv.requestFullscreen) {
-        //             console.log("standard fullscreen");
-        //             fullscreenDiv.requestFullscreen();
-        //         } else if (fullscreenDiv.webkitRequestFullscreen) {
-        //             console.log("webkit fullscreen");
-        //             fullscreenDiv.webkitRequestFullscreen();
-        //         } else if (fullscreenDiv.mozRequestFullScreen) {
-        //             console.log("moz fullscreen");
-        //             fullscreenDiv.mozRequestFullScreen();
-        //         } else if (fullscreenDiv.msRequestFullscreen) {
-        //             fullscreenDiv.msRequestFullscreen();
-        //             console.log("ms fullscreen");
-        //         }
-        //     } else {
-        //         // Exit fullscreen
-        //         if (document.exitFullscreen) {
-        //             document.exitFullscreen();
-        //         } else if (document.webkitExitFullscreen) {
-        //             document.webkitExitFullscreen();
-        //         } else if (document.msExitFullscreen) {
-        //             document.msExitFullscreen();
-        //         }
-        //     }
-        // });
+            if (!isInFullscreen) {
+                // Enter fullscreen
+                if (fullscreenDiv.requestFullscreen) {
+                    fullscreenDiv.requestFullscreen();
+                } else if (fullscreenDiv.webkitRequestFullscreen) {
+                    fullscreenDiv.webkitRequestFullscreen();
+                } else if (fullscreenDiv.msRequestFullscreen) {
+                    fullscreenDiv.msRequestFullscreen();
+                }
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
+        });
 
-        // // Listen for fullscreen changes
-        // $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-        //     const isInFullscreen =
-        //         document.fullscreenElement ||
-        //         document.webkitIsFullScreen ||
-        //         document.mozFullScreen ||
-        //         document.webkitFullscreenElement ||
-        //         document.mozFullScreenElement ||
-        //         document.msFullscreenElement;
+        // Listen for fullscreen changes
+        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
+            const isInFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
 
-        //     if (isInFullscreen) {
-        //         $('.hide-when-fullscreen').hide();
-        //         $('#fullscreenToggleBtn').text('Exit Fullscreen');
-        //     } else {
-        //         $('.hide-when-fullscreen').show();
-        //         $('#fullscreenToggleBtn').text('Go Fullscreen');
-        //     }
-        // });
+            if (isInFullscreen) {
+                $('.hide-when-fullscreen').hide();
+                $('#fullscreenToggleBtn').text('Exit Fullscreen');
+            } else {
+                $('.hide-when-fullscreen').show();
+                $('#fullscreenToggleBtn').text('Go Fullscreen');
+            }
+        });
 
 
-        // // Listen for fullscreen changes
-        // $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-        //     const isInFullscreen =
-        //         document.fullscreenElement ||
-        //         document.webkitFullscreenElement ||
-        //         document.mozFullScreenElement ||
-        //         document.msFullscreenElement;
+        // Listen for fullscreen changes
+        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
+            const isInFullscreen =
+                document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
+                document.msFullscreenElement;
 
-        //     if (isInFullscreen) {
-        //         $('.hide-when-fullscreen').hide();
-        //         $('.full-screen-logo').removeClass('hidden'); // SHOW during fullscreen
-        //         $('#fullscreenToggleBtn').text('Exit Fullscreen');
-        //     } else {
-        //         $('.hide-when-fullscreen').show();
-        //         $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
-        //         $('#fullscreenToggleBtn').text('Go Fullscreen');
-        //     }
-        // });
+            if (isInFullscreen) {
+                $('.hide-when-fullscreen').hide();
+                $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
+                $('#fullscreenToggleBtn').text('Exit Fullscreen');
+            } else {
+                $('.hide-when-fullscreen').show();
+                $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
+                $('#fullscreenToggleBtn').text('Go Fullscreen');
+            }
+        });
     </script>
 @endsection

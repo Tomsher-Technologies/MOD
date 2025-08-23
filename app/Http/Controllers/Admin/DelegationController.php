@@ -394,6 +394,12 @@ class DelegationController extends Controller
             'flight_name' => 'nullable|string|max:255',
             'date_time' => 'nullable|date',
             'status_id' => 'nullable|string|max:255|exists:dropdown_options,id',
+        ], [
+            'airport_id.exists' => __db('airport_id_exists'),
+            'flight_no.max' => __db('flight_no_max', ['max' => 255]),
+            'flight_name.max' => __db('flight_name_max', ['max' => 255]),
+            'date_time.date' => __db('date_time_date'),
+            'status_id.exists' => __db('status_id_exists'),
         ]);
 
         $relationsToCompare = [
@@ -589,6 +595,26 @@ class DelegationController extends Controller
             'attachments.*.title_id' => 'nullable|string',
             'attachments.*.file' => 'nullable|file|max:5120',
             'attachments.*.document_date' => 'nullable|date',
+        ], [
+            'invitation_from_id.required' => __db('invitation_from_id_required'),
+            'invitation_from_id.exists' => __db('invitation_from_id_exists'),
+            'continent_id.required' => __db('continent_id_required'),
+            'continent_id.exists' => __db('continent_id_exists'),
+            'country_id.required' => __db('country_id_required'),
+            'country_id.exists' => __db('country_id_exists'),
+            'invitation_status_id.required' => __db('invitation_status_id_required'),
+            'invitation_status_id.exists' => __db('invitation_status_id_exists'),
+            'participation_status_id.required' => __db('participation_status_id_required'),
+            'participation_status_id.exists' => __db('participation_status_id_exists'),
+            'delegates.*.tmp_id.required_with' => __db('delegates_tmp_id_required_with'),
+            'delegates.*.name_en.required_with' => __db('delegates_name_en_required_with'),
+            'delegates.*.gender_id.required_with' => __db('delegates_gender_id_required_with'),
+            'delegates.*.gender_id.exists' => __db('delegates_gender_id_exists'),
+            'delegates.*.parent_id.exists' => __db('delegates_parent_id_exists'),
+            'attachments.*.title_id.exists' => __db('attachments_title_id_exists'),
+            'attachments.*.file.file' => __db('attachments_file_file'),
+            'attachments.*.file.max' => __db('attachments_file_max'),
+            'attachments.*.document_date.date' => __db('attachments_document_date_date'),
         ]);
 
         DB::beginTransaction();
@@ -689,6 +715,17 @@ class DelegationController extends Controller
             'participation_status_id' => 'required|exists:dropdown_options,id',
             'note1' => 'nullable|string',
             'note2' => 'nullable|string',
+        ], [
+            'invitation_from_id.required' => __db('invitation_from_id_required'),
+            'invitation_from_id.exists' => __db('invitation_from_id_exists'),
+            'continent_id.required' => __db('continent_id_required'),
+            'continent_id.exists' => __db('continent_id_exists'),
+            'country_id.required' => __db('country_id_required'),
+            'country_id.exists' => __db('country_id_exists'),
+            'invitation_status_id.required' => __db('invitation_status_id_required'),
+            'invitation_status_id.exists' => __db('invitation_status_id_exists'),
+            'participation_status_id.required' => __db('participation_status_id_required'),
+            'participation_status_id.exists' => __db('participation_status_id_exists'),
         ]);
 
         // Define relations with display labels for confirmation dialog
@@ -802,6 +839,14 @@ class DelegationController extends Controller
             'attachments.*.title_id' => ['required', 'exists:dropdown_options,id'],
             'attachments.*.document_date' => ['nullable', 'date'],
             'attachments.*.file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png'],
+        ], [
+            'attachments.required' => __db('attachments_required'),
+            'attachments.array' => __db('attachments_array'),
+            'attachments.*.id.exists' => __db('delegation_attachments_id_exists'),
+            'attachments.*.title_id.required' => __db('attachments_title_id_exists'),
+            'attachments.*.title_id.exists' => __db('attachments_title_id_exists'),
+            'attachments.*.document_date.date' => __db('attachments_document_date_date'),
+            'attachments.*.file.file' => __db('attachments_file_file'),
         ]);
 
         $inputAttachments = $validatedData['attachments'];
@@ -978,6 +1023,24 @@ class DelegationController extends Controller
             'other_member_id' => 'required_if:interview_type,other|nullable|integer|exists:other_interview_members,id',
             'status_id' => 'required|integer|exists:dropdown_options,id',
             // 'comment' => 'nullable|string|max:5000',
+        ], [
+            'from_delegate_ids.required' => __db('from_delegate_ids_required'),
+            'from_delegate_ids.array' => __db('from_delegate_ids_array'),
+            'from_delegate_ids.min' => __db('from_delegate_ids_min'),
+            'from_delegate_ids.*.exists' => __db('from_delegate_ids_exists'),
+            'date_time.required' => __db('date_time_required'),
+            'date_time.date' => __db('date_time_date'),
+            'interview_type.required' => __db('interview_type_required'),
+            'interview_type.in' => __db('interview_type_in'),
+            'interview_with_delegation_code.required_if' => __db('interview_with_delegation_code_required_if'),
+            'interview_with_delegation_code.exists' => __db('interview_with_delegation_code_exists'),
+            'to_delegate_id.required_if' => __db('to_delegate_id_required_if'),
+            'to_delegate_id.exists' => __db('to_delegate_id_exists'),
+            'other_member_id.required_if' => __db('other_member_id_required_if'),
+            'other_member_id.exists' => __db('other_member_id_exists'),
+            'status_id.required' => __db('status_id_required'),
+            'status_id.integer' => __db('status_id_integer'),
+            'status_id.exists' => __db('status_id_exists'),
         ]);
 
         if ($validator->fails()) {
@@ -1185,6 +1248,25 @@ class DelegationController extends Controller
             'departure.date_time' => 'nullable|date',
             'departure.status_id' => 'nullable|string|max:255|exists:dropdown_options,id',
             'departure.comment' => 'nullable|string',
+        ], [
+            'title_id.exists' => __db('title_id_exists'),
+            'name_ar.required' => __db('name_ar_required'),
+            'name_en.required' => __db('name_en_required'),
+            'gender_id.required' => __db('gender_id_required'),
+            'gender_id.exists' => __db('delegates_gender_id_exists'),
+            'parent_id.exists' => __db('delegates_parent_id_exists'),
+            'relationship_id.exists' => __db('relationship_id_exists'),
+            'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
+            'arrival.airport_id.exists' => __db('airport_id_exists'),
+            'arrival.flight_no.max' => __db('flight_no_max', ['max' => 255]),
+            'arrival.flight_name.max' => __db('flight_name_max', ['max' => 255]),
+            'arrival.date_time.date' => __db('date_time_date'),
+            'arrival.status_id.exists' => __db('status_id_exists'),
+            'departure.airport_id.exists' => __db('airport_id_exists'),
+            'departure.flight_no.max' => __db('flight_no_max', ['max' => 255]),
+            'departure.flight_name.max' => __db('flight_name_max', ['max' => 255]),
+            'departure.date_time.date' => __db('date_time_date'),
+            'departure.status_id.exists' => __db('status_id_exists'),
         ]);
 
         if ($validator->fails()) {

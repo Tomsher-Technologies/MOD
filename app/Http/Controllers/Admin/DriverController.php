@@ -128,6 +128,19 @@ class DriverController extends Controller
             'capacity' => 'nullable|string|max:255',
             'note1' => 'nullable|string',
             'delegation_id' => 'nullable|exists:delegations,id',
+        ], [
+            'name_ar.required' => __db('driver_name_ar_required'),
+            'name_en.required' => __db('driver_name_en_required'),
+            'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
+            'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
+            'title.max' => __db('driver_title_max', ['max' => 255]),
+            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'driver_id.max' => __db('driver_id_max', ['max' => 255]),
+            'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
+            'car_number.max' => __db('driver_car_number_max', ['max' => 255]),
+            'capacity.max' => __db('driver_capacity_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
         ]);
 
         $driverData = $request->all();
@@ -190,6 +203,20 @@ class DriverController extends Controller
             'note1' => 'nullable|string',
             'status' => 'nullable|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
+        ], [
+            'name_ar.required' => __db('driver_name_ar_required'),
+            'name_en.required' => __db('driver_name_en_required'),
+            'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
+            'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
+            'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
+            'title.max' => __db('driver_title_max', ['max' => 255]),
+            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'driver_id.max' => __db('driver_id_max', ['max' => 255]),
+            'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
+            'car_number.max' => __db('driver_car_number_max', ['max' => 255]),
+            'capacity.max' => __db('driver_capacity_max', ['max' => 255]),
+            'status.max' => __db('driver_status_max', ['max' => 255]),
+            'delegation_id.exists' => __db('delegation_id_exists'),
         ]);
 
         $driver = Driver::findOrFail($id);
