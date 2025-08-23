@@ -164,6 +164,9 @@
                     </tbody>
                 </table>
 
+                <div class="mt-4">
+                    {{ $accommodations->appends(request()->input())->links() }}
+                </div>
             </div>
         </div>
     </div>
