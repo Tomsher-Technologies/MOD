@@ -83,7 +83,7 @@
                     </thead>
                     <tbody>
                         @forelse ( $accommodations as $key => $hotel )
-                            <tr class="text-[12px] align-[middle]">
+                            <tr class=" align-[middle]">
                                 <td class="px-4 py-3 border border-gray-200">
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
