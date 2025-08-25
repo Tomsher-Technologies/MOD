@@ -480,6 +480,14 @@ if (!function_exists('getRouteForPage')) {
                 'edit_accommodations' => 'accommodation-rooms.destroy',
                 'hotel_edit_accommodations' => 'accommodation-rooms.destroy',
             ],
+            'accommodation-delegations' => [
+                'view_accommodation_delegations' => 'accommodation-delegations',
+                'hotel_view_accommodation_delegations' => 'accommodation-delegations',
+            ],
+            'accommodation-delegation-view' => [
+                'view_accommodation_delegations' => 'accommodation-delegation-view',
+                'hotel_view_accommodation_delegations' => 'accommodation-delegation-view',
+            ],
             
             
         ];
