@@ -83,12 +83,12 @@
                     </thead>
                     <tbody>
                         @forelse ( $accommodations as $key => $hotel )
-                            <tr class="text-[12px] align-[middle]">
+                            <tr class=" align-[middle]">
                                 <td class="px-4 py-3 border border-gray-200">
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
                                 <td class="px-4 py-3 border border-gray-200 !text-[#B68A35]">
-                                    <a href="accommodation-view.html">
+                                    <a href="#">
                                         {{ $hotel->hotel_name ?? "-" }}
                                     </a>
                                 </td>

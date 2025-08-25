@@ -70,7 +70,7 @@ class DropdownController extends Controller
     public function storeCountry(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'value' => 'required|string|max:255',
         ]);
 
         // Get the Country dropdown
@@ -82,7 +82,7 @@ class DropdownController extends Controller
 
         // Check if country already exists
         $existingCountry = DropdownOption::where('dropdown_id', $countryDropdown->id)
-            ->where('value', $request->name)
+            ->where('value', $request->value)
             ->first();
             
         if ($existingCountry) {
@@ -92,7 +92,7 @@ class DropdownController extends Controller
         // Create the country option
         $country = DropdownOption::create([
             'dropdown_id' => $countryDropdown->id,
-            'value' => $request->name,
+            'value' => $request->value,
             'sort_order' => 0, // You can modify this as needed
             'status' => 1
         ]);

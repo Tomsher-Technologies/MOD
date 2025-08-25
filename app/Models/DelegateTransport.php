@@ -89,4 +89,17 @@ class DelegateTransport extends Model
         // Return a default relation to an empty DropdownOption instance to avoid errors
         return $this->belongsTo(DropdownOption::class, 'status_id')->whereRaw('0 = 1');
     }
+
+    public function getStatusAttribute()
+    {
+        if ($this->type === 'arrival') {
+            return $this->arrivalStatus;
+        }
+
+        if ($this->type === 'departure') {
+            return $this->departureStatus;
+        }
+
+        return null;
+    }
 }
