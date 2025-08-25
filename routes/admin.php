@@ -132,7 +132,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/accommodation/import', [AccommodationController::class, 'showImportForm'])->name('accommodations.import.form');
     Route::post('/accommodation/import', [AccommodationController::class, 'import'])->name('accommodations.import');
     Route::get('/export-room-types', [AccommodationController::class, 'exportRoomTypes'])->name('export.room.types');
-
+    Route::get('/accommodation-delegations', [AccommodationController::class, 'accommodationDelegations'])->name('accommodation-delegations');
+    Route::get('/accommodation-delegation-view/{id}', [AccommodationController::class, 'accommodationDelegationView'])->name('accommodation-delegation-view');
 
 
 });

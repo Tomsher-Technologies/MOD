@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dropdown;
+use App\Models\Delegation;
 use App\Models\Accommodation;
 use App\Models\AccommodationContact;
 use App\Models\AccommodationRoom;
@@ -149,6 +150,62 @@ class AccommodationController extends Controller
     public function exportRoomTypes()
     {
          return Excel::download(new RoomTypesExport, 'room_types.xlsx');
+    }
+
+    public function accommodationDelegations(Request $request)
+    {
+        $query = Delegation::with(['invitationFrom', 'continent','country','invitationStatus','participationStatus','delegates','escorts' ])->orderBy('id', 'desc');
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $query->where('event_id', $currentEventId);
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                    ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where('name_en', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('escorts', function ($escortQuery) use ($search) {
+                        $escortQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+
+        if ($invitationFrom = $request->input('invitation_from')) {
+            $query->whereIn('invitation_from_id', $invitationFrom);
+        }
+        if ($continentId = $request->input('continent_id')) {
+            $query->where('continent_id', $continentId);
+        }
+        if ($countryId = $request->input('country_id')) {
+            $query->where('country_id', $countryId);
+        }
+        if ($invitationStatusId = $request->input('invitation_status_id')) {
+            $query->where('invitation_status_id', $invitationStatusId);
+        }
+        if ($participationStatusId = $request->input('participation_status_id')) {
+            $query->where('participation_status_id', $participationStatusId);
+        }
+        if ($hotelName = $request->input('hotel_name')) {
+            $query->whereHas('delegates', function ($delegateQuery) use ($hotelName) {
+                $delegateQuery->where('hotel_name', $hotelName);
+            });
+        }
+
+        $delegations = $query->paginate(20);
+        return view('admin.accommodations.delegations', compact('delegations'));
+    }
+
+    public function accommodationDelegationView (Request $request, $id)
+    {
+         $delegation = Delegation::with([ 'invitationFrom', 'continent', 'country', 'invitationStatus', 'participationStatus',
+                                    'delegates' => function ($query) {
+                                        $query->with([ 'gender', 'parent', 'delegateTransports.status']);
+                                    }, 'attachments', 'escorts', 'drivers'
+                                ])->findOrFail($id);
+        return view('admin.accommodations.delegations-show', compact('delegation'));
     }
 
 }

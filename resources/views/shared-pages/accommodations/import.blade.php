@@ -1,7 +1,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('import') . ' ' . __db('accommodations') }}</h2>
-        <a href="delegates.html" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+        <a href="{{ getRouteForPage('accommodations.index') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
