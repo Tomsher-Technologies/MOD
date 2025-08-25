@@ -166,7 +166,7 @@
                     <label class="block text-sm mb-1 text-gray-600 font-medium" for="user_ids_{{ $module }}">Select
                         Users</label>
                     <select id="user_ids_{{ $module }}" name="user_ids[]" multiple required
-                        class="w-full rounded border border-gray-300 p-2 mb-4" style="min-height: 120px;">
+                        class="select2 w-full rounded border border-gray-300 p-2 mb-4" style="min-height: 120px;">
                         @foreach ($availableUsers as $user)
                         <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                         @endforeach
