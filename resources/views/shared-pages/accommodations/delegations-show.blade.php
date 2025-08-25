@@ -3,7 +3,7 @@
         <h2 class="font-semibold text-2xl">{{ __db('delegation') }}</h2>
         <div class="flex gap-3 ms-auto">
 
-            <x-back-btn class="" back-url="{{ getRouteForPage('delegation.index') }}" />
+            <x-back-btn class="" back-url="{{ getRouteForPage('accommodation-delegations') }}" />
         </div>
     </div>
 
