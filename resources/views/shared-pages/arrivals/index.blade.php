@@ -273,7 +273,7 @@
     <form action="{{ getRouteForPage('delegation.arrivalsIndex') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
             <select name="invitation_from[]" placeholder="Invitation From" multiple
-                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach (getDropDown('internal_ranking')->options as $option)
                     <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
                         {{ $option->value }}

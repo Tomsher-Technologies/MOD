@@ -81,7 +81,7 @@
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('spoken_languages') }}:</label>
                     <select name="language_id[]" id="multiSelect" multiple
-                        class="w-full p-3 rounded-lg border border-gray-300 text-sm"
+                        class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm"
                         placeholder="{{ __db('Select Languages') }}">
                         @php
                             $oldLanguageIds = old('language_id', []);
