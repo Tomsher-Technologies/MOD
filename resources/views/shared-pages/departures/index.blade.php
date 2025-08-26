@@ -143,13 +143,26 @@
                             $oneHourHence = $now->copy()->addHour();
                             $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
-                            if ($rowDateTime->lt($oneHourAgo)) {
-                                return 'bg-[#b7e9b2]';
-                            } elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
-                                return 'bg-[#ffc5c5]';
-                            } else {
+                            $statusName =
+                                is_object($row->status) && isset($row->status->value)
+                                    ? $row->status->value
+                                    : $row->status;
+
+                            if ($statusName === 'to_be_departed') {
+                                if ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
+                                    return 'bg-[#ffc5c5]';
+                                }
+                                if ($rowDateTime->gt($oneHourHence)) {
+                                    return 'bg-[#ffffff]';
+                                }
                                 return 'bg-[#ffffff]';
                             }
+
+                            if ($statusName === 'departed') {
+                                return 'bg-[#b7e9b2]';
+                            }
+
+                            return 'bg-[#ffffff]';
                         };
                     @endphp
                     <x-reusable-table :columns="$columns" :data="$departures" :row-class="$rowClass" />

@@ -25,6 +25,10 @@ class EscortController extends Controller
             'only' => ['create', 'store']
         ]);
 
+        $this->middleware('permission:assign_escorts', [
+            'only' => ['assign', 'unassign']
+        ]);
+
         $this->middleware('permission:edit_escorts', [
             'only' => ['edit', 'update']
         ]);
@@ -41,7 +45,7 @@ class EscortController extends Controller
     {
         // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
-        
+
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
             ->where('event_id', $currentEventId)
             ->latest();

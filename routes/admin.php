@@ -29,6 +29,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     // Manage countries
     Route::resource('countries', CountryController::class);
     Route::post('/countries/status', [CountryController::class, 'updateStatus'])->name('countries.status');
+    Route::get('/get-countries', [CountryController::class, 'getByContinents'])->name('countries.by-continent');
 
     // Manage staffs
     Route::resource('staffs', StaffController::class);
@@ -141,8 +142,6 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/export-room-types', [AccommodationController::class, 'exportRoomTypes'])->name('export.room.types');
     Route::get('/accommodation-delegations', [AccommodationController::class, 'accommodationDelegations'])->name('accommodation-delegations');
     Route::get('/accommodation-delegation-view/{id}', [AccommodationController::class, 'accommodationDelegationView'])->name('accommodation-delegation-view');
-
-
 });
 
 Route::get('/lang/{lang}', function ($lang) {

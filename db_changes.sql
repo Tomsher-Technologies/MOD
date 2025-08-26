@@ -62,3 +62,7 @@ ALTER TABLE delegate_transports DROP FOREIGN KEY delegate_transports_ibfk_4;
 ALTER TABLE delegate_transports CHANGE COLUMN status_id status VARCHAR(256);
 
 alter table delegates add column participation_status varchar(256);
+
+insert into permissions (module, parent_id, name, title, guard_name, is_active) VALUES 
+('admin', 38, 'assign_escorts', 'Assign Escorts', 'web', 1),
+('admin', 42, 'assign_drivers', 'Assign Drivers', 'web', 1);

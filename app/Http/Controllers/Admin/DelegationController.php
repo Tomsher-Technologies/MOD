@@ -585,7 +585,6 @@ class DelegationController extends Controller
 
     public function store(Request $request)
     {
-        // return response()->json($request->all());
 
         $validated = $request->validate([
             'invitation_from_id' => 'required|exists:dropdown_options,id',

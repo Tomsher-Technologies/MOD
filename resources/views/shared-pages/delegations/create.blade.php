@@ -23,8 +23,8 @@
         </div>
     @endif
 
-    <form id="create-delegation-form" action="{{  getRouteForPage('delegation.store') ?? '#'  }}" method="POST" autocomplete="off" enctype="multipart/form-data"
-        class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
+    <form id="create-delegation-form" action="{{ getRouteForPage('delegation.store') ?? '#' }}" method="POST"
+        autocomplete="off" enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
 
@@ -505,12 +505,23 @@
                 </button>
 
                 <div class="flex gap-4">
-                    <button type="submit" name="submit_exit"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
-                    <button type="submit" name="submit_add_travel" value="1"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
-                    <button type="submit" name="submit_add_interview" value="1"
-                        class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
+                    
+                    @canany(['add_delegations'])
+                        <button type="submit" name="submit_exit"
+                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
+                    @endcanany
+
+                    @canany(['add_travels'])
+                        <button type="submit" name="submit_add_travel" value="1"
+                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
+                    @endcanany
+
+
+                    @canany(['add_interviews'])
+                        <button type="submit" name="submit_add_interview" value="1"
+                            class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
+                    @endcanany
+
                 </div>
             </div>
         </div>
@@ -526,7 +537,7 @@
         window.delegatesData = @json($delegatesData);
         window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('create-delegation-form');
             const submitButtons = form.querySelectorAll('.submit-btn');
 

@@ -149,14 +149,15 @@
                     ];
 
                     $bgClass = [
-                        'Arrived' => 'bg-[#b7e9b2]',
-                        'Departed' => 'bg-[#c2e0ff]',
-                        'Upcoming' => 'bg-[#fff9b2]',
+                        'to_be_arrived' => 'bg-[#fff]', 
+                        'arrived' => 'bg-[#b7e9b2]', 
                     ];
 
                     $rowClass = function ($row) use ($bgClass) {
                         $now = \Carbon\Carbon::now();
-                        $statusName = $row->status->value ?? null;
+
+                        $statusName =
+                            is_object($row->status) && isset($row->status->value) ? $row->status->value : $row->status;
 
                         if (!$row->date_time) {
                             return $bgClass[$statusName] ?? 'bg-[#fff]';
@@ -164,12 +165,22 @@
 
                         $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
-                        if ($rowDateTime->lt($now->copy()->subHour())) {
-                            return 'bg-[#b7e9b2]';
+                        if ($statusName === 'to_be_arrived') {
+                            if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
+                                return 'bg-[#ffc5c5]';
+                            }
+
+                            if ($rowDateTime->gt($now->copy()->addHour())) {
+                                return 'bg-[#fff]';
+                            }
+
+                            return 'bg-[#fff]';
                         }
-                        if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
-                            return 'bg-[#ffc5c5]';
+
+                        if ($statusName === 'arrived') {
+                            return $bgClass['arrived'];
                         }
+
                         return $bgClass[$statusName] ?? 'bg-[#fff]';
                     };
                 @endphp

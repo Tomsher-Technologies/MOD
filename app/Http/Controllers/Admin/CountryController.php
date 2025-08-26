@@ -129,6 +129,19 @@ class CountryController extends Controller
         return 1;
     }
 
+    public function getByContinents(Request $request)
+    {
+        $continentIds = explode(',', $request->query('continent_ids'));
+
+        $countries = Country::whereIn('continent_id', $continentIds)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($countries);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      */

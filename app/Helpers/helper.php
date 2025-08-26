@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Country;
 use App\Models\User;
 use App\Models\Event;
 use App\Models\Language;
@@ -533,5 +534,15 @@ if (!function_exists('getRouteForPage')) {
         }
 
         return "#";
+    }
+}
+
+
+if (! function_exists('getCountriesByContinent')) {
+    function getCountriesByContinent($continentId)
+    {
+        return Country::where('continent_id', $continentId)
+            ->orderBy('name')
+            ->get();
     }
 }
