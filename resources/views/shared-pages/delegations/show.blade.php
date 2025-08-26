@@ -15,7 +15,28 @@
             ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? '-'],
             ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? '-'],
             ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? '-'],
-            ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? '-'],
+            [
+                'label' => __db('country'),
+                'key' => 'country',
+                'render' => function ($row) {
+                    if (!$row->country) {
+                        return '-';
+                    }
+
+                    $flag = $row->country->flag
+                        ? '<img src="' .
+                            getUploadedImage($row->country->flag) .
+                            '" 
+                                        alt="' .
+                            e($row->country->name) .
+                            ' flag" 
+                                        class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
+                        : '';
+
+                    return $flag . ' ' . e($row->country->name);
+                },
+            ],
+
             ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus->value ?? '-'],
             ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus->value ?? '-'],
         ];
@@ -49,79 +70,83 @@
 
     <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})</h2>
-    @php
-        $columns = [
-            [
-                'label' => __db('sl_no'),
-                'render' => fn($row, $key) => $key + 1,
-            ],
-            [
-                'label' => __db('title'),
-                'render' => fn($row) => $row->title->value ?? '-',
-            ],
-            [
-                'label' => __db('name'),
-                'render' => function ($row) {
-                    $badge = $row->team_head
-                        ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
-                        : '';
-                    $name = $row->name_en ?? ($row->name_ar ?? '-');
-                    return $badge . '<div class="block">' . e($name) . '</div>';
-                },
-            ],
-            [
-                'label' => __db('designation'),
-                'render' => fn($row) => $row->designation_en ?? ($row->designation_ar ?? '-'),
-            ],
-            [
-                'label' => __db('internal_ranking'),
-                'render' => fn($row) => $row->internalRanking->value ?? '-',
-            ],
-            [
-                'label' => __db('gender'),
-                'render' => fn($row) => $row->gender->value ?? '-',
-            ],
-            [
-                'label' => __db('parent_id'),
-                'render' => fn($row) => $row->parent->name_en ?? ($row->parent->name_ar ?? '-'),
-            ],
-            [
-                'label' => __db('relationship'),
-                'render' => fn($row) => $row->relationship->value ?? '-',
-            ],
-            [
-                'label' => __db('badge_printed'),
-                'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
-            ],
-            [
-                'label' => __db('participation_status'),
-                'render' => function ($row) {
-                    return $row->participation_status ?? '-';
-                },
-            ],
-            [
-                'label' => __db('accommodation'),
-                'render' => fn($row) => property_exists($row, 'accommodation') ? $row->accommodation ?? '-' : '-',
-            ],
-            [
-                'label' => __db('arrival_status'),
-                'render' => function ($row) {
-                    $id = $row->id ?? uniqid();
-                    return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
-                        $id .
-                        '" data-modal-toggle="delegate-transport-modal-' .
-                        $id .
-                        '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
-                },
-            ],
-        ];
-        $data = $delegation->delegates;
-        $noDataMessage = __db('no_delegates_found');
-    @endphp
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+
+                @php
+                    $columns = [
+                        [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('title'),
+                            'render' => fn($row) => $row->title->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('name'),
+                            'render' => function ($row) {
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                                    : '';
+                                $name = $row->name_en ?? ($row->name_ar ?? '-');
+                                return $badge . '<div class="block">' . e($name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('designation'),
+                            'render' => fn($row) => $row->designation_en ?? ($row->designation_ar ?? '-'),
+                        ],
+                        [
+                            'label' => __db('internal_ranking'),
+                            'render' => fn($row) => $row->internalRanking->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('gender'),
+                            'render' => fn($row) => $row->gender->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('parent_id'),
+                            'render' => fn($row) => $row->parent->name_en ?? ($row->parent->name_ar ?? '-'),
+                        ],
+                        [
+                            'label' => __db('relationship'),
+                            'render' => fn($row) => $row->relationship->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('badge_printed'),
+                            'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
+                        ],
+                        [
+                            'label' => __db('participation_status'),
+                            'render' => function ($row) {
+                                return $row->participation_status ?? '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('accommodation'),
+                            'render' => fn($row) => property_exists($row, 'accommodation')
+                                ? $row->accommodation ?? '-'
+                                : '-',
+                        ],
+                        [
+                            'label' => __db('arrival_status'),
+                            'render' => function ($row) {
+                                $id = $row->id ?? uniqid();
+                                return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
+                                    $id .
+                                    '" data-modal-toggle="delegate-transport-modal-' .
+                                    $id .
+                                    '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
+                            },
+                        ],
+                    ];
+                    $data = $delegation->delegates;
+                    $noDataMessage = __db('no_delegates_found');
+                @endphp
+
                 <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
             </div>
         </div>
@@ -177,27 +202,6 @@
                                 return e(implode(', ', $names));
                             },
                         ],
-                        //             [
-                        //                 'label' => __db('status'),
-                        //                 'key' => 'status',
-                        //                 'render' => function ($escort) {
-                        //                     return '<div class="flex items-center">
-    //     <label for="switch-' .
-                        //                         $escort->id .
-                        //                         '" class="relative inline-block w-11 h-6">
-    //         <input type="checkbox" id="switch-' .
-                        //                         $escort->id .
-                        //                         '" onchange="update_escort_status(this)" value="' .
-                        //                         $escort->id .
-                        //                         '" class="sr-only peer" ' .
-                        //                         ($escort->status == 1 ? 'checked' : '') .
-                        //                         ' />
-    //         <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
-    //         <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
-    //     </label>
-    // </div>';
-                        //                 },
-                        //             ],
                     ];
                 @endphp
 

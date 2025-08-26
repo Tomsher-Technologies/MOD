@@ -537,6 +537,12 @@ if (!function_exists('getRouteForPage')) {
     }
 }
 
+function getAllCountries()
+{
+    return Country::orderBy('name')
+        ->get();
+}
+
 
 if (! function_exists('getCountriesByContinent')) {
     function getCountriesByContinent($continentId)

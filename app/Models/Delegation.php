@@ -81,10 +81,7 @@ class Delegation extends Model
 
     public function country()
     {
-        return $this->belongsTo(DropdownOption::class, 'country_id')
-            ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'country');
-            });
+        return $this->belongsTo(Country::class);
     }
 
     public function invitationStatus()

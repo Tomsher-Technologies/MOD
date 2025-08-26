@@ -167,7 +167,7 @@
                                             auth()->user() &&
                                             auth()
                                                 ->user()
-                                                ->canAny(['assign_escort'])
+                                                ->canAny(['assign_escorts'])
                                         ) {
                                             $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
                                             $output .=
@@ -192,9 +192,6 @@
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
                     <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('escorts') }}</span>
-                </div>
-                <div class="mt-4">
-                    {{ $escorts->appends(request()->input())->links() }}
                 </div>
             </div>
         </div>

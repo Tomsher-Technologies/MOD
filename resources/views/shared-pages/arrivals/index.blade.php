@@ -224,7 +224,7 @@
                     <div>
                         <label class="form-label">{{ __db('arrival') . ' ' . __db('airport') }}:</label>
                         <select name="airport_id" x-model="arrival.airport_id"
-                            class="p-3 rounded-lg w-full border text-sm">
+                            class="select2 p-3 rounded-lg w-full border text-sm">
                             <option value="">{{ __db('select') . ' ' . __db('to') . ' ' . __db('airport') }}
                             </option>
                             @foreach (getDropdown('airports')->options as $option)

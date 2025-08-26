@@ -166,7 +166,7 @@
                                             auth()->user() &&
                                             auth()
                                                 ->user()
-                                                ->canAny(['assign_driver'])
+                                                ->canAny(['assign_drivers'])
                                         ) {
                                             $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
                                             $output .=
@@ -197,9 +197,6 @@
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#f2eccf] rounded"></div>
                     <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('drivers') }}</span>
-                </div>
-                <div class="mt-4">
-                    {{ $drivers->appends(request()->input())->links() }}
                 </div>
             </div>
         </div>

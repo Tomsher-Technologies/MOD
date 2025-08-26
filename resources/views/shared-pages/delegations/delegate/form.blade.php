@@ -35,7 +35,7 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('title') }}:</label>
-                    <select name="title_id" class="p-3 rounded-lg w-full text-sm border border-neutral-300">
+                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
                         <option value="" disabled>{{ __db('select_title') }}</option>
                         @foreach (getDropDown('title')->options as $option)
                             <option value="{{ $option->id }}" @if (old('title_id', $delegate->title_id) == $option->id) selected @endif>
@@ -73,7 +73,7 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}: <span class="text-red-600">*</span></label>
-                    <select name="gender_id" required class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="gender_id" required class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="" disabled>{{ __db('select_gender') }}</option>
                         @foreach (getDropDown('gender')->options as $option)
                             <option value="{{ $option->id }}" @if (old('gender_id', $delegate->gender_id) == $option->id) selected @endif>
@@ -85,7 +85,7 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('parent_id') }}:</label>
-                    <select name="parent_id" class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="parent_id" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="">{{ __db('select_parent') }}</option>
                         @foreach ($delegation->delegates as $parentDelegate)
                             @if ($parentDelegate->id !== $delegate->id)
@@ -100,7 +100,7 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('relationship') }}:</label>
-                    <select name="relationship_id" class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="relationship_id" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="">{{ __db('select_relationship') }}</option>
                         @foreach (getDropDown('relationship')->options as $option)
                             <option value="{{ $option->id }}" @if (old('relationship_id', $delegate->relationship_id) == $option->id) selected @endif>
@@ -113,7 +113,7 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('internal_ranking') }}:</label>
-                    <select name="internal_ranking_id" class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="internal_ranking_id" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="">{{ __db('select_ranking') }}</option>
                         @foreach (getDropDown('internal_ranking')->options as $option)
                             <option value="{{ $option->id }}" @if (old('internal_ranking_id', $delegate->internal_ranking_id) == $option->id) selected @endif>

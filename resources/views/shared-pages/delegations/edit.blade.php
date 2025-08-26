@@ -12,7 +12,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('delegate_id') }}:</label>
                     <input type="text" name="code"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0 bg-gray-200"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0 bg-gray-200"
                         value="{{ old('code', $delegation->code ?? '') }}" readonly disabled>
                     @error('code')
                         <div class="text-red-600">{{ $message }}</div>
@@ -22,7 +22,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('invitation_from') }}:</label>
                     <select name="invitation_from_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __db('select_invitation_from') }}</option>
                         @foreach (getDropDown('internal_ranking')->options as $option)
                             <option value="{{ $option->id }}"
@@ -39,7 +39,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('continent') }}:</label>
                     <select name="continent_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Continent') }}</option>
                         @foreach (getDropDown('continents')->options as $option)
                             <option value="{{ $option->id }}"
@@ -56,12 +56,12 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('country') }}:</label>
                     <select name="country_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Country') }}</option>
-                        @foreach (getDropDown('country')->options as $option)
+                        @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('country_id', $delegation->country_id) == $option->id ? 'selected' : '' }}>
-                                {{ $option->value }}
+                                {{ $option->name }}
                             </option>
                         @endforeach
                     </select>
@@ -73,7 +73,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('invitation_status') }}:</label>
                     <select name="invitation_status_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Invitation Status') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $option)
                             <option value="{{ $option->id }}"
@@ -90,7 +90,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('participation_status') }}:</label>
                     <select name="participation_status_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Participation Status') }}</option>
                         @foreach (getDropDown('participation_status')->options as $option)
                             <option value="{{ $option->id }}"

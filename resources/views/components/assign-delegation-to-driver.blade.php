@@ -37,7 +37,7 @@
                         <div>
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
-                            <select id="country_id" class="p-3 rounded-lg w-full border text-sm">
+                            <select id="country_id" class="select2 p-3 rounded-lg w-full border text-sm">
                                 <option selected="" disabled="">{{ __db('Select Country') }}</option>
                                 @foreach (getDropDown('country')->options as $country)
                                     <option value="{{ $country->id }}">{{ $country->value }}</option>

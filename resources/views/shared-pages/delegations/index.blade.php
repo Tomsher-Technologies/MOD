@@ -109,6 +109,32 @@
                             'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
                         ],
                         [
+                            'label' => __db('continent'),
+                            'key' => 'continent',
+                            'render' => fn($delegation) => e($delegation->continent->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('country'),
+                            'key' => 'country',
+                            'render' => function ($delegation) {
+                                if (!$delegation->country) {
+                                    return '-';
+                                }
+
+                                $flag = $delegation->country->flag
+                                    ? '<img src="' .
+                                        getUploadedImage($delegation->country->flag) .
+                                        '" 
+                                        alt="' .
+                                        e($delegation->country->name) .
+                                        ' flag" 
+                                        class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
+                                    : '';
+
+                                return $flag . ' ' . e($delegation->country->name);
+                            },
+                        ],
+                        [
                             'key' => 'note',
                             'label' => __db('note'),
                             'render' => function ($d) {
@@ -163,11 +189,7 @@
                     ];
                 @endphp
 
-                <x-reusable-table :data="$delegations" :columns="$columns" :no-data-message="__db('no_data_found')" />
-
-                <div class="mt-4">
-                    {{ $delegations->appends(request()->input())->links() }}
-                </div>
+                <x-reusable-table :data="$delegations" :enableRowLimit="true" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
     </div>
@@ -189,8 +211,9 @@
 
         <form action="{{ getRouteForPage('delegations.index') }}" method="GET">
             <div class="flex flex-col gap-4 mt-4">
-                <select name="invitation_from[]" placeholder="Invitation From" multiple
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                <select name="invitation_from[]" placeholder="Invitation From" data-placeholder="Hello"
+                    class=" w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    <option value="">{{ __db('all_rankings') }}</option>
                     @foreach (getDropDown('internal_ranking')->options as $option)
                         <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
                             {{ $option->value }}</option>

@@ -30,7 +30,7 @@
             <div>
                 <label class="form-label block mb-1 text-sm">{{ __db($type . '_airport') }}:</label>
                 <select name="{{ $type }}[airport_id]"
-                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                     <option value="">{{ __db('select_airport') }}</option>
                     @foreach (getDropdown('airports')->options as $airport)
                         <option value="{{ $airport->id }}" @if (old($type . '.airport_id', $transport->airport_id ?? '') == $airport->id) selected @endif>

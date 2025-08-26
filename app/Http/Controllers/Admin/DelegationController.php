@@ -131,7 +131,9 @@ class DelegationController extends Controller
         //     });
         // }
 
-        $delegations = $query->paginate(20);
+        $limit = $request->limit ? $request->limit : 20;
+
+        $delegations = $query->paginate($limit);
 
         return view('admin.delegations.index', compact('delegations'));
     }
@@ -704,9 +706,9 @@ class DelegationController extends Controller
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
             } elseif ($request->has('submit_add_interview')) {
-                return redirect()->route('delegations.addInterview', ['delegation_id' => $delegation->id]);
+                return redirect()->route('delegations.addInterview', ['delegation' => $delegation]);
             } elseif ($request->has('submit_add_travel')) {
-                return redirect()->route('delegations.addTravel', ['delegation_id' => $delegation->id]);
+                return redirect()->route('delegations.addTravel', ['id' => $delegation->id]);
             }
 
             return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
@@ -765,9 +767,9 @@ class DelegationController extends Controller
             ],
             'country_id' => [
                 'display_with' => [
-                    'model' => \App\Models\DropdownOption::class,
+                    'model' => \App\Models\Country::class,
                     'key' => 'id',
-                    'label' => 'value',
+                    'label' => 'name',
                 ],
             ],
             'invitation_status_id' => [
