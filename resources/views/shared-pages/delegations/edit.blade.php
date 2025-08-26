@@ -382,19 +382,7 @@
                         [
                             'label' => __db('participation_status'),
                             'render' => function ($row) {
-                                $arrival = $row->delegateTransports->where('type', 'arrival')->first();
-                                $departure = $row->delegateTransports->where('type', 'departure')->first();
-
-                                $departureStatus = $departure && $departure->status ? $departure->status->value : null;
-                                $arrivalStatus = $arrival && $arrival->status ? $arrival->status->value : null;
-
-                                if ($departureStatus === 'departed') {
-                                    return __db('Departed');
-                                } elseif ($arrivalStatus === 'arrived') {
-                                    return __db('Arrived');
-                                } else {
-                                    return __db('Not yet arrived');
-                                }
+                                    return $row->participation_status ?? "-";
                             },
                         ],
                         // [
@@ -561,7 +549,7 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{  __db('escorts') }}</h4>
+                    <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
                     <a href={{ getRouteForPage('escorts.index') }}
                         class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
                 </div>
@@ -681,7 +669,7 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{  __db('drivers') }}</h4>
+                    <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
                     <a href={{ getRouteForPage('drivers.index') }}
                         class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
                 </div>

@@ -59,6 +59,12 @@
 
                 <hr class="mx-6 border-neutral-200 h-5 ">
                 @php
+
+                    $statusLabels = [
+                        'arrived' => __db('arrived'),
+                        'to_be_arrived' => __db('to_be_arrived'),
+                    ];
+
                     $columns = [
                         [
                             'label' => __db('sl_no'),
@@ -116,7 +122,9 @@
                         ],
                         [
                             'label' => __db('arrival') . ' ' . __db('status'),
-                            'render' => fn($row) => $row->status->value ?? '-',
+                            'render' => function ($row) use ($statusLabels) {
+                                return $row->status ?? '-';
+                            },
                         ],
                         [
                             'label' => __db('actions'),
@@ -129,7 +137,7 @@
                                     'date_time' => $row->date_time
                                         ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
                                         : '',
-                                    'status_id' => $row->status_id,
+                                    'status' => $row->status,
                                 ];
                                 $json = htmlspecialchars(json_encode($arrivalData), ENT_QUOTES, 'UTF-8');
                                 return '<button type="button" class="edit-arrival-btn text-[#B68A35]" data-arrival=\'' .
@@ -141,9 +149,9 @@
                     ];
 
                     $bgClass = [
-                        'Arrived' => 'bg-[#b7e9b2]', 
-                        'Departed' => 'bg-[#c2e0ff]', 
-                        'Upcoming' => 'bg-[#fff9b2]', 
+                        'Arrived' => 'bg-[#b7e9b2]',
+                        'Departed' => 'bg-[#c2e0ff]',
+                        'Upcoming' => 'bg-[#fff9b2]',
                     ];
 
                     $rowClass = function ($row) use ($bgClass) {
@@ -157,10 +165,10 @@
                         $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
                         if ($rowDateTime->lt($now->copy()->subHour())) {
-                            return 'bg-[#b7e9b2]'; 
+                            return 'bg-[#b7e9b2]';
                         }
                         if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
-                            return 'bg-[#ffc5c5]'; 
+                            return 'bg-[#ffc5c5]';
                         }
                         return $bgClass[$statusName] ?? 'bg-[#fff]';
                     };
@@ -231,14 +239,21 @@
                         <input type="datetime-local" name="date_time" x-model="arrival.date_time"
                             class="p-3 rounded-lg w-full border text-sm">
                     </div>
-
                     <div>
+
                         <label class="form-label">{{ __db('arrival') . ' ' . __db('status') }}:</label>
-                        <select name="status_id" x-model="arrival.status_id"
-                            class="p-3 rounded-lg w-full border text-sm">
+                        @php
+                            $arrivalStatuses = [
+                                'arrived' => __db('arrived'),
+                                'to_be_arrived' => __db('to_be_arrived'),
+                            ];
+                        @endphp
+                        <select name="status" x-model="arrival.status"
+                            class="p-3 rounded-lg w-full border border-neutral-300 text-sm" required>
                             <option value="">{{ __db('select_status') }}</option>
-                            @foreach (getDropdown('arrival_status')->options as $option)
-                                <option value="{{ $option->id }}">{{ $option->value }}</option>
+                            @foreach ($arrivalStatuses as $value => $label)
+                                <option :selected="arrival.status === '{{ $value }}'"
+                                    value="{{ $value }}">{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>

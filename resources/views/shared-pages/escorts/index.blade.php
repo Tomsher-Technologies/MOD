@@ -61,6 +61,14 @@
                 @php
                     $columns = [
                         [
+                            'label' => __db('sl_no'),
+                            'key' => 'sl_no',
+                            'render' => function ($escort, $key) use ($escorts) {
+                                return $escorts->firstItem() + $key;
+                            },
+                        ],
+
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
                             'render' => fn($escort) => e($escort->military_number),
@@ -128,7 +136,12 @@
                             'render' => function ($escort) {
                                 $editUrl = getRouteForPage('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
-                                if (auth()->user() && auth()->user()->canAny(['edit_escorts'])) {
+                                if (
+                                    auth()->user() &&
+                                    auth()
+                                        ->user()
+                                        ->canAny(['edit_escorts'])
+                                ) {
                                     $output .=
                                         '<a href="' .
                                         $editUrl .
@@ -150,7 +163,12 @@
                                                 '</span></button></form>';
                                         }
                                     } else {
-                                        if (auth()->user() && auth()->user()->canAny(['assign_escort'])) {
+                                        if (
+                                            auth()->user() &&
+                                            auth()
+                                                ->user()
+                                                ->canAny(['assign_escort'])
+                                        ) {
                                             $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
                                             $output .=
                                                 '<a href="' .
@@ -199,7 +217,7 @@
 
     <form action="{{ getRouteForPage('escorts.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-            <select name="title[]" placeholder="Title" 
+            <select name="title[]" placeholder="Title"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach (getDropDown('title')->options as $option)
                     <option value="{{ $option->id }}" @if (in_array($option->id, request('title', []))) selected @endif>

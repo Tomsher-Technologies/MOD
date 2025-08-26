@@ -56,3 +56,9 @@ CREATE TABLE countries (
 
 ALTER TABLE countries 
 ADD COLUMN continent_id BIGINT UNSIGNED NULL AFTER name;
+
+
+ALTER TABLE delegate_transports DROP FOREIGN KEY delegate_transports_ibfk_4;
+ALTER TABLE delegate_transports CHANGE COLUMN status_id status VARCHAR(256);
+
+alter table delegates add column participation_status varchar(256);

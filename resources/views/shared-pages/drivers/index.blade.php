@@ -1,7 +1,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
-       
+
     </div>
     <!-- Drivers -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -47,6 +47,13 @@
 
                 @php
                     $columns = [
+                        [
+                            'label' => __db('sl_no'),
+                            'key' => 'sl_no',
+                            'render' => function ($driver, $key) use ($drivers) {
+                                return $drivers->firstItem() + $key;
+                            },
+                        ],
                         [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
@@ -121,7 +128,12 @@
                             'render' => function ($driver) {
                                 $editUrl = getRouteForPage('drivers.edit', $driver->id);
                                 $output = '<div class="flex align-center gap-4">';
-                                if (auth()->user() && auth()->user()->canAny(['edit_drivers'])) {
+                                if (
+                                    auth()->user() &&
+                                    auth()
+                                        ->user()
+                                        ->canAny(['edit_drivers'])
+                                ) {
                                     $output .=
                                         '<a href="' .
                                         $editUrl .
@@ -150,7 +162,12 @@
                         </form>';
                                         }
                                     } else {
-                                        if (auth()->user() && auth()->user()->canAny(['assign_driver'])) {
+                                        if (
+                                            auth()->user() &&
+                                            auth()
+                                                ->user()
+                                                ->canAny(['assign_driver'])
+                                        ) {
                                             $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
                                             $output .=
                                                 '<a href="' .
@@ -205,28 +222,28 @@
 
     <form action="{{ getRouteForPage('drivers.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-            <select name="title[]" placeholder="Title" 
+            <select name="title[]" placeholder="Title"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach (getDropDown('title')->options as $option)
                     <option value="{{ $option->value }}" @if (in_array($option->value, request('title', []))) selected @endif>
                         {{ $option->value }}</option>
                 @endforeach
             </select>
-            <select name="car_type[]" placeholder="Vehicle Type" 
+            <select name="car_type[]" placeholder="Vehicle Type"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach (getDropDown('vehicle_type')->options as $option)
                     <option value="{{ $option->value }}" @if (in_array($option->value, request('car_type', []))) selected @endif>
                         {{ $option->value }}</option>
                 @endforeach
             </select>
-            <select name="car_number[]" placeholder="Plate Number" 
+            <select name="car_number[]" placeholder="Plate Number"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach ($drivers as $driver)
                     <option value="{{ $driver->car_number }}" @if (in_array($driver->car_number, request('car_number', []))) selected @endif>
                         {{ $driver->car_number }}</option>
                 @endforeach
             </select>
-            <select name="capacity[]" placeholder="Capacity" 
+            <select name="capacity[]" placeholder="Capacity"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach ($drivers as $driver)
                     <option value="{{ $driver->capacity }}" @if (in_array($driver->capacity, request('capacity', []))) selected @endif>

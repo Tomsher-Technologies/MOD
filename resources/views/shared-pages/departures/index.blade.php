@@ -110,7 +110,7 @@
                             ],
                             [
                                 'label' => __db('departure') . ' ' . __db('status'),
-                                'render' => fn($row) => $row->status->value ?? '-',
+                                'render' => fn($row) => $row->status ?? '-',
                             ],
                             [
                                 'label' => __db('actions'),
@@ -123,7 +123,7 @@
                                         'date_time' => $row->date_time
                                             ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
                                             : '',
-                                        'status_id' => $row->status_id,
+                                        'status' => $row->status,
                                     ];
                                     $json = htmlspecialchars(json_encode($departureData), ENT_QUOTES, 'UTF-8');
                                     return '<button type="button" class="edit-departure-btn text-[#B68A35]" data-departure=\'' .
@@ -144,13 +144,11 @@
                             $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
                             if ($rowDateTime->lt($oneHourAgo)) {
-                                return 'bg-[#b7e9b2]'; 
-                            }
-                            elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
-                                return 'bg-[#ffc5c5]'; 
-                            }
-                            else {
-                                return 'bg-[#ffffff]'; 
+                                return 'bg-[#b7e9b2]';
+                            } elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
+                                return 'bg-[#ffc5c5]';
+                            } else {
+                                return 'bg-[#ffffff]';
                             }
                         };
                     @endphp
@@ -221,11 +219,18 @@
 
                         <div>
                             <label class="form-label">{{ __db('departure') . ' ' . __db('status') }}:</label>
-                            <select name="status_id" x-model="departure.status_id"
-                                class="p-3 rounded-lg w-full border text-sm">
+                            @php
+                                $departureStatuses = [
+                                    'departed' => __db('departed'),
+                                    'to_be_departed' => __db('to_be_departed'),
+                                ];
+                            @endphp
+                            <select name="status" x-model="departure.status"
+                                class="p-3 rounded-lg w-full border border-neutral-300 text-sm" required>
                                 <option value="">{{ __db('select_status') }}</option>
-                                @foreach (getDropdown('departure_status')->options as $option)
-                                    <option value="{{ $option->id }}">{{ $option->value }}</option>
+                                @foreach ($departureStatuses as $value => $label)
+                                    <option :selected="departure.status === '{{ $value }}'"
+                                        value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
