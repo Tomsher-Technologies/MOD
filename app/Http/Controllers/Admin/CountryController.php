@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Country;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CountryController extends Controller
 {
     function __construct()
     {
         $this->middleware('auth');
-       
-        $this->middleware('permission:add_dropdown_options',  ['only' => ['index','create','store','edit','update','destroy']]);
+
+        $this->middleware('permission:add_dropdown_options',  ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy']]);
         $this->middleware('permission:add_dropdown_options',  ['only' => ['index']]);
     }
 
@@ -27,7 +28,7 @@ class CountryController extends Controller
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('name', 'like', "%$keyword%")
-                  ->orWhere('short_code', 'like', "%$keyword%");
+                    ->orWhere('short_code', 'like', "%$keyword%");
             });
         }
 
@@ -36,11 +37,13 @@ class CountryController extends Controller
                 $query->where('status', 1);
             } elseif ($request->status == 2) {
                 $query->where('status', 0);
-            }    
+            }
         }
 
-        $countries = $query->orderBy('sort_order')->paginate(20)->appends($request->all());
-        
+        $countries = $query->with('continent')->orderBy('sort_order')->paginate(20)->appends($request->all());
+
+        // return response()->json(['ddd' => $countries]);
+
         return view('admin.countries.index', compact('countries'));
     }
 
@@ -49,34 +52,69 @@ class CountryController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:countries',
-            'short_code' => 'required|string|max:10|unique:countries',
-            'sort_order' => 'nullable|integer',
-            'flag' => 'nullable|string|max:255',
-        ]);
+        $data = $request->validate(
+            [
+                'name' => 'required|string|max:255|unique:countries',
+                'short_code' => 'required|string|max:10|unique:countries',
+                'sort_order' => 'nullable|integer',
+                'flag' => 'nullable|mimes:jpeg,png,jpg,webp,svg,avif|max:2048',
+                'continent_id' => 'required|integer|exists:dropdown_options,id'
+            ],
+            [
+                'name.exists' => __db('country_name_unique'),
+                'short_code' => __db('short_code_unique'),
+                'continent_id' => __db('continent_required')
+            ]
+        );
 
-        Country::create($request->only('name', 'short_code', 'sort_order', 'flag', 'status'));
+        if ($request->hasFile('flag')) {
+            $data['flag'] = uploadImage('countries', $request->flag, 'country');
+        }
 
-        return back()->with('success', 'Country added successfully');
+        try {
+            Country::create($data);
+            return back()->with('success', 'Country added successfully');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Failed to create country: ' . $e->getMessage());
+        }
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Country $country)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:countries,name,'.$country->id,
-            'short_code' => 'required|string|max:10|unique:countries,short_code,'.$country->id,
+        $data = $request->validate([
+            'name' => 'required|string|max:255|unique:countries,name,' . $country->id,
+            'short_code' => 'required|string|max:10|unique:countries,short_code,' . $country->id,
             'sort_order' => 'nullable|integer',
-            'flag' => 'nullable|string|max:255',
+            'flag' => 'nullable|mimes:jpeg,png,jpg,webp,svg,avif|max:2048',
+            'continent_id' => 'required|integer|exists:dropdown_options,id'
+        ], [
+            'name.exists' => __db('country_name_unique'),
+            'short_code' => __db('short_code_unique'),
+            'continent_id' => __db('continent_required')
         ]);
 
-        $country->update($request->only('name', 'short_code', 'sort_order', 'flag', 'status'));
+        try {
+            if ($request->hasFile('flag')) {
+                $data['flag'] = uploadImage('countries', $request->file('flag'), 'country');
+            } else {
+                unset($data['flag']);
+            }
 
-        return back()->with('success', 'Country updated successfully');
+            $country->update($data);
+
+            return back()->with('success', 'Country updated successfully');
+        } catch (\Exception $e) {
+            \Log::error('Country update failed: ' . $e->getMessage());
+
+            return back()->withInput()->with('error', 'Failed to update country: ' . $e->getMessage());
+        }
     }
+
+
 
     /**
      * Update the status of the specified resource.
@@ -84,10 +122,10 @@ class CountryController extends Controller
     public function updateStatus(Request $request)
     {
         $country = Country::findOrFail($request->id);
-        
+
         $country->status = $request->status;
         $country->save();
-       
+
         return 1;
     }
 
@@ -97,7 +135,7 @@ class CountryController extends Controller
     public function destroy(Country $country)
     {
         $country->delete();
-        
+
         return back()->with('success', 'Country deleted successfully');
     }
 }

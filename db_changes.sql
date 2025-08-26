@@ -52,3 +52,7 @@ CREATE TABLE countries (
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
 );
+
+
+ALTER TABLE countries 
+ADD COLUMN continent_id BIGINT UNSIGNED NULL AFTER name;

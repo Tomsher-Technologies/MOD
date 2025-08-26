@@ -22,6 +22,13 @@
 
     </div>
 
+
+    @if (session('error'))
+        <div class="mb-4 p-4 rounded-md bg-red-100 text-red-800">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
@@ -41,7 +48,7 @@
                                     {{ __db('inactive') }}</option>
                             </select>
                         </div>
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-2">
                             <button type="submit"
                                 class="bg-[#B68A35] text-white px-4 py-2 rounded mr-2">{{ __db('filter') }}</button>
                             <a href="{{ route('countries.index') }}"
@@ -60,6 +67,18 @@
                         ],
                         ['label' => __db('name'), 'render' => fn($country) => e($country->name)],
                         ['label' => __db('short_code'), 'render' => fn($country) => e($country->short_code)],
+                        ['label' => __db('continent'), 'render' => fn($country) => e($country->continent->value ?? '')],
+                        [
+                            'label' => __db('flag'),
+                            'render' => function ($country) {
+                                if ($country->flag) {
+                                    return '<img src="' .
+                                        e(getUploadedImage($country->flag)) .
+                                        '" alt="Flag" width="100" height="100" class="mb-2 mt-4" />';
+                                }
+                                return '';
+                            },
+                        ],
                         ['label' => __db('sort_order'), 'render' => fn($country) => e($country->sort_order ?? 0)],
                         [
                             'label' => __db('status'),
@@ -69,15 +88,15 @@
                                     return '
                                     <div class="items-center">
                                         <label for="switch-' .
-                                                            $country->id .
-                                                            '" class="relative inline-block w-11 h-6">
+                                        $country->id .
+                                        '" class="relative inline-block w-11 h-6">
                                             <input type="checkbox" id="switch-' .
-                                                            $country->id .
-                                                            '" onchange="update_status(this)" value="' .
-                                                            $country->id .
-                                                            '" class="sr-only peer" ' .
-                                                            $checked .
-                                                            ' />
+                                        $country->id .
+                                        '" onchange="update_status(this)" value="' .
+                                        $country->id .
+                                        '" class="sr-only peer" ' .
+                                        $checked .
+                                        ' />
                                             <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                         </label>
@@ -106,20 +125,7 @@
                                                     d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
                                                     fill="#B68A35"></path>
                                             </svg>
-                                        </button>
-                                        <button type="button" onclick="deleteCountry(' .
-                                        $country->id .
-                                        ', \'' .
-                                        addslashes($country->name) .
-                                        '\')" class="w-8 h-8 bg-[#FBF3D6] text-red-600 rounded-full inline-flex items-center justify-center ml-1">
-                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                viewBox="0 0 448 512">
-                                                <path
-                                                    d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"
-                                                    fill="#B68A35" />
-                                            </svg>
-                                        </button>
-                ';
+                                        </button> ';
                                 }
                                 return '';
                             },
@@ -141,7 +147,7 @@
 
                         <h2 class="text-xl font-semibold mb-4">{{ __db('add_new_country') }}</h2>
 
-                        <form method="POST" action="{{ route('countries.store') }}">
+                        <form method="POST" action="{{ route('countries.store') }}" enctype="multipart/form-data">
                             @csrf
 
                             <div class="mb-4">
@@ -156,18 +162,43 @@
                                 <input type="text" name="short_code" value="{{ old('short_code') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
+
+
+                            <div class="mb-4">
+                                <label class="form-label">{{ __db('continent') }}:</label>
+                                <select name="continent_id"
+                                    class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                    <option value="">{{ __db('select_continent') }}</option>
+                                    @foreach (getDropDown('continents')->options as $option)
+                                        <option value="{{ $option->id }}"
+                                            {{ old('continent_id', request('continent_id')) == $option->id ? 'selected' : '' }}>
+                                            {{ $option->value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('continent_id')
+                                    <div class="text-red-600">{{ $message }}</div>
+                                @enderror
+
+                            </div>
+
                             <div class="mb-4">
                                 <label
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('sort_order') }}</label>
                                 <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}"
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
-                            <div class="mb-4">
-                                <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('flag') }}</label>
-                                <input type="text" name="flag" value="{{ old('flag') }}"
-                                    class="w-full border border-gray-300 rounded p-2">
+
+                            <div class="col-span-3">
+                                <label class="form-label">{{ __db('flag') }}</label>
+                                <input type="file" name="flag" id="image"
+                                    class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                @error('flag')
+                                    <div class="text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
+
                             <div class="mb-4">
                                 <label
                                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('status') }}</label>
@@ -192,6 +223,100 @@
                 </div>
             </div>
         </div>
+
+
+
+        @foreach ($countries as $country)
+            <div id="edit-country-{{ $country->id }}" tabindex="-1" aria-hidden="true"
+                class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                    <button type="button"
+                        class="close-modal absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+
+                    <h2 class="text-xl font-semibold mb-4">{{ __db('edit') . ' ' . __db('country') }}</h2>
+
+                    <form method="POST" action="{{ route('countries.update', $country->id) }}"
+                        enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name') }}</label>
+                            <input type="text" name="name" value="{{ old('name', $country->name) }}" required
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('short_code') }}</label>
+                            <input type="text" name="short_code"
+                                value="{{ old('short_code', $country->short_code) }}" required
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
+
+
+                        <div class="mb-4">
+                            <label class="form-label">{{ __db('continent') }}:</label>
+                            <select name="continent_id"
+                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                <option disabled>{{ __('Select Continent') }}</option>
+                                @foreach (getDropDown('continents')->options as $option)
+                                    <option value="{{ $option->id }}"
+                                        {{ old('continent_id', $country->continent_id) == $option->id ? 'selected' : '' }}>
+                                        {{ $option->value }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('continent_id')
+                                <div class="text-red-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('sort_order') }}</label>
+                            <input type="number" name="sort_order"
+                                value="{{ old('sort_order', $country->sort_order ?? 0) }}"
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
+
+                        <div class="col-span-3">
+                            <label class="form-label">{{ __db('flag') }}</label>
+                            <input type="file" name="flag" id="flag"
+                                class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                            @error('flag')
+                                <div class="text-red-600">{{ $message }}</div>
+                            @enderror
+                            @if ($country->flag)
+                                <img src="{{ getUploadedImage($country->flag) }}" alt="Image" width="100"
+                                    height="100" class="mb-2 mt-4"><br>
+                            @endif
+                        </div>
+
+
+
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('Status') }}</label>
+                            <select name="status" class="w-full border border-gray-300 rounded p-2">
+                                <option value="1" {{ $country->status == 1 ? 'selected' : '' }}>{{ __db('active') }}
+                                </option>
+                                <option value="0" {{ $country->status == 0 ? 'selected' : '' }}>
+                                    {{ __db('inactive') }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="flex justify-start space-x-2 pt-4">
+                            <button type="submit"
+                                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('update') }}</button>
+                            <button type="button"
+                                class="close-modal btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">{{ __db('cancel') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endforeach
+
+
     </div>
 @endsection
 
@@ -228,6 +353,18 @@
                     document.body.classList.remove('overflow-hidden');
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            @if (session('error'))
+                toastr.error('{{ session('error') }}');
+            @endif
+
+            @if ($errors->any())
+                toastr.error('{{ $errors->first() }}');
+            @endif
+
         });
 
         function update_status(el) {
