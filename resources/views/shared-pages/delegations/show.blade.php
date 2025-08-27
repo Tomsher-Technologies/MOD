@@ -6,7 +6,7 @@
                 class="btn text-sm ms-auto !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-5">
                 {{ __db('edit') }}
             </a>
-            <x-back-btn class="" back-url="{{ getRouteForPage('delegation.index') }}" />
+            <x-back-btn class="" back-url="{{ getRouteForPage('delegations.index') }}" />
         </div>
     </div>
 
@@ -15,7 +15,28 @@
             ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? '-'],
             ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? '-'],
             ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? '-'],
-            ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? '-'],
+            [
+                'label' => __db('country'),
+                'key' => 'country',
+                'render' => function ($row) {
+                    if (!$row->country) {
+                        return '-';
+                    }
+
+                    $flag = $row->country->flag
+                        ? '<img src="' .
+                            getUploadedImage($row->country->flag) .
+                            '" 
+                                        alt="' .
+                            e($row->country->name) .
+                            ' flag" 
+                                        class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
+                        : '';
+
+                    return $flag . ' ' . e($row->country->name);
+                },
+            ],
+
             ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus->value ?? '-'],
             ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus->value ?? '-'],
         ];
@@ -49,91 +70,83 @@
 
     <hr class="mx-6 border-neutral-200 h-10">
     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})</h2>
-    @php
-        $columns = [
-            [
-                'label' => __db('sl_no'),
-                'render' => fn($row, $key) => $key + 1,
-            ],
-            [
-                'label' => __db('title'),
-                'render' => fn($row) => $row->title->value ?? '-',
-            ],
-            [
-                'label' => __db('name'),
-                'render' => function ($row) {
-                    $badge = $row->team_head
-                        ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
-                        : '';
-                    $name = $row->name_en ?? ($row->name_ar ?? '-');
-                    return $badge . '<div class="block">' . e($name) . '</div>';
-                },
-            ],
-            [
-                'label' => __db('designation'),
-                'render' => fn($row) => $row->designation_en ?? ($row->designation_ar ?? '-'),
-            ],
-            [
-                'label' => __db('internal_ranking'),
-                'render' => fn($row) => $row->internalRanking->value ?? '-',
-            ],
-            [
-                'label' => __db('gender'),
-                'render' => fn($row) => $row->gender->value ?? '-',
-            ],
-            [
-                'label' => __db('parent_id'),
-                'render' => fn($row) => $row->parent->name_en ?? ($row->parent->name_ar ?? '-'),
-            ],
-            [
-                'label' => __db('relationship'),
-                'render' => fn($row) => $row->relationship->value ?? '-',
-            ],
-            [
-                'label' => __db('badge_printed'),
-                'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
-            ],
-            [
-                'label' => __db('participation_status'),
-                'render' => function ($row) {
-                    $arrival = $row->delegateTransports->where('type', 'arrival')->first();
-                    $departure = $row->delegateTransports->where('type', 'departure')->first();
-
-                    $departureStatus = $departure && $departure->status ? $departure->status->value : null;
-                    $arrivalStatus = $arrival && $arrival->status ? $arrival->status->value : null;
-
-                    if ($departureStatus === 'departed') {
-                        return __db('Departed');
-                    } elseif ($arrivalStatus === 'arrived') {
-                        return __db('Arrived');
-                    } else {
-                        return __db('Not yet arrived');
-                    }
-                },
-            ],
-            [
-                'label' => __db('accommodation'),
-                'render' => fn($row) => property_exists($row, 'accommodation') ? $row->accommodation ?? '-' : '-',
-            ],
-            [
-                'label' => __db('arrival_status'),
-                'render' => function ($row) {
-                    $id = $row->id ?? uniqid();
-                    return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
-                        $id .
-                        '" data-modal-toggle="delegate-transport-modal-' .
-                        $id .
-                        '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
-                },
-            ],
-        ];
-        $data = $delegation->delegates;
-        $noDataMessage = __db('no_delegates_found');
-    @endphp
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+
+                @php
+                    $columns = [
+                        [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('title'),
+                            'render' => fn($row) => $row->title->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('name'),
+                            'render' => function ($row) {
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                                    : '';
+                                $name = $row->name_en ?? ($row->name_ar ?? '-');
+                                return $badge . '<div class="block">' . e($name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('designation'),
+                            'render' => fn($row) => $row->designation_en ?? ($row->designation_ar ?? '-'),
+                        ],
+                        [
+                            'label' => __db('internal_ranking'),
+                            'render' => fn($row) => $row->internalRanking->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('gender'),
+                            'render' => fn($row) => $row->gender->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('parent_id'),
+                            'render' => fn($row) => $row->parent->name_en ?? ($row->parent->name_ar ?? '-'),
+                        ],
+                        [
+                            'label' => __db('relationship'),
+                            'render' => fn($row) => $row->relationship->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('badge_printed'),
+                            'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
+                        ],
+                        [
+                            'label' => __db('participation_status'),
+                            'render' => function ($row) {
+                                return $row->participation_status ?? '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('accommodation'),
+                            'render' => fn($row) => property_exists($row, 'accommodation')
+                                ? $row->accommodation ?? '-'
+                                : '-',
+                        ],
+                        [
+                            'label' => __db('arrival_status'),
+                            'render' => function ($row) {
+                                $id = $row->id ?? uniqid();
+                                return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
+                                    $id .
+                                    '" data-modal-toggle="delegate-transport-modal-' .
+                                    $id .
+                                    '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
+                            },
+                        ],
+                    ];
+                    $data = $delegation->delegates;
+                    $noDataMessage = __db('no_delegates_found');
+                @endphp
+
                 <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
             </div>
         </div>
@@ -151,6 +164,10 @@
                 </div>
                 @php
                     $columns = [
+                        [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
                         [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
@@ -185,71 +202,6 @@
                                 return e(implode(', ', $names));
                             },
                         ],
-                        [
-                            'label' => __db('assigned') . ' ' . __db('delegation'),
-                            'key' => 'assigned_delegation',
-                            'render' => function ($escort) {
-                                return e($escort->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
-                            },
-                        ],
-                        //             [
-                        //                 'label' => __db('status'),
-                        //                 'key' => 'status',
-                        //                 'render' => function ($escort) {
-                        //                     return '<div class="flex items-center">
-    //     <label for="switch-' .
-                        //                         $escort->id .
-                        //                         '" class="relative inline-block w-11 h-6">
-    //         <input type="checkbox" id="switch-' .
-                        //                         $escort->id .
-                        //                         '" onchange="update_escort_status(this)" value="' .
-                        //                         $escort->id .
-                        //                         '" class="sr-only peer" ' .
-                        //                         ($escort->status == 1 ? 'checked' : '') .
-                        //                         ' />
-    //         <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
-    //         <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
-    //     </label>
-    // </div>';
-                        //                 },
-                        //             ],
-                        [
-                            'label' => __db('actions'),
-                            'key' => 'actions',
-                            'render' => function ($escort) {
-                                $editUrl = getRouteForPage('escorts.edit', $escort->id);
-                                $output = '<div class="flex align-center gap-4">';
-                                $output .=
-                                    '<a href="' .
-                                    $editUrl .
-                                    '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
-                                if ($escort->status == 1) {
-                                    if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
-                                        foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
-                                            $unassignUrl = getRouteForPage('escorts.unassign', $escort->id);
-                                            $output .=
-                                                '<form action="' .
-                                                $unassignUrl .
-                                                '" method="POST" style="display:inline;">' .
-                                                csrf_field() .
-                                                '<input type="hidden" name="delegation_id" value="' .
-                                                $delegation->id .
-                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
-                                                e($delegation->code) .
-                                                '</span></button></form>';
-                                        }
-                                    } else {
-                                        $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
-                                        $output .=
-                                            '<a href="' .
-                                            $assignUrl .
-                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
-                                    }
-                                }
-                                $output .= '</div>';
-                                return $output;
-                            },
-                        ],
                     ];
                 @endphp
 
@@ -271,6 +223,10 @@
                 </div>
                 @php
                     $columns = [
+                        [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
                         [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
@@ -311,13 +267,6 @@
                             'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
                         ],
-                        [
-                            'label' => __db('assigned') . ' ' . __db('delegation'),
-                            'key' => 'assigned_delegation',
-                            'render' => function ($driver) {
-                                return e($driver->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
-                            },
-                        ],
                         //             [
                         //                 'label' => __db('status'),
                         //                 'key' => 'status',
@@ -339,53 +288,6 @@
     // </div>';
                         //                 },
                         //             ],
-                        [
-                            'label' => __db('actions'),
-                            'key' => 'actions',
-                            'render' => function ($driver) {
-                                $editUrl = getRouteForPage('drivers.edit', $driver->id);
-                                $output = '<div class="flex align-center gap-4">';
-                                $output .=
-                                    '<a href="' .
-                                    $editUrl .
-                                    '">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
-            </a>';
-                                if ($driver->status == 1) {
-                                    if ($driver->delegations->where('pivot.status', 1)->count() > 0) {
-                                        foreach ($driver->delegations->where('pivot.status', 1) as $delegation) {
-                                            $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
-                                            $output .=
-                                                '<form action="' .
-                                                $unassignUrl .
-                                                '" method="POST" style="display:inline;">' .
-                                                csrf_field() .
-                                                '<input type="hidden" name="delegation_id" value="' .
-                                                $delegation->id .
-                                                '" />
-                            <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                                <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                                <span> Unassign from ' .
-                                                e($delegation->code) .
-                                                '</span>
-                            </button>
-                        </form>';
-                                        }
-                                    } else {
-                                        $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
-                                        $output .=
-                                            '<a href="' .
-                                            $assignUrl .
-                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                        <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                        <span> Assign</span>
-                    </a>';
-                                    }
-                                }
-                                $output .= '</div>';
-                                return $output;
-                            },
-                        ],
                     ];
 
                     $rowClass = function ($driver) {
@@ -433,28 +335,38 @@
                 },
             ],
             [
-                'label' => 'Interview With',
+                'label' => __db('interview_with'),
                 'render' => function ($row) {
-                    $interviewees = $row->interviewMembers->where('type', 'to');
-                    $names = $interviewees
-                        ->map(
-                            fn($im) => e(
-                                $im->resolveMemberForInterview($row)->name_en ??
-                                    ($im->resolveMemberForInterview($row)->name_ar ?? '-'),
-                            ),
-                        )
-                        ->filter()
-                        ->implode('<br>');
-                    $delegationLink = $row->interviewWithDelegation
-                        ? '<a href="#" class="!text-[#B68A35]" data-modal-target="interview-delegation-modal-' .
-                            $row->id .
-                            '" data-modal-toggle="interview-delegation-modal-' .
-                            $row->id .
-                            '"> Delegation ID : ' .
-                            e($row->interviewWithDelegation->code) .
-                            '</a>'
-                        : '';
-                    return $delegationLink . ($delegationLink && $names ? '<br>' : '') . $names;
+                    if (!empty($row->other_member_id) && $row->otherMember) {
+                        $otherMemberName = $row->otherMember->name ?? '';
+                        $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                        if ($otherMemberId) {
+                            $with =
+                                '<a href="' .
+                                route('other-interview-members.show', [
+                                    'other_interview_member' => base64_encode($otherMemberId),
+                                ]) .
+                                '" class="!text-[#B68A35]">
+                                    <span class="block">Other Member ID: ' .
+                                e($otherMemberId) .
+                                '</span>
+                                </a>';
+                        }
+                    } else {
+                        $with =
+                            '<a href="' .
+                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                            '" class="!text-[#B68A35]">' .
+                            'Delegation ID : ' .
+                            e($row->interviewWithDelegation->code ?? '') .
+                            '</a>';
+                    }
+
+                    $names = $row->interviewMembers
+                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                        ->implode('');
+
+                    return $with . $names;
                 },
             ],
             ['label' => 'Status', 'render' => fn($row) => e(ucfirst($row->status->value))],
@@ -562,7 +474,7 @@
                                     <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
                                 </div>
                             @else
-                                <p class="col-span-2 text-gray-500">No arrival information available.</p>
+                                <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
                             @endif
                         </div>
 
@@ -571,7 +483,6 @@
                             $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                         @endphp
                         <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            {{-- ✅ CORRECTED BLOCK --}}
                             @if ($departure)
                                 <div class="border-b py-4">
                                     <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
@@ -590,7 +501,7 @@
                                     <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
                                 </div>
                             @else
-                                <p class="col-span-2 text-gray-500">No departure information available.</p>
+                                <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
                             @endif
                         </div>
                     </div>

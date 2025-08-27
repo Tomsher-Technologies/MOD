@@ -30,6 +30,19 @@
             @csrf
             @method('PUT')
             <div class="grid grid-cols-12 gap-5">
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title') }}:</label>
+                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
+                        <option value="" disabled>{{ __db('select_title') }}</option>
+                        @foreach (getDropDown('title')->options as $option)
+                            <option value="{{ $option->id }}" @if (old('title_id', $escort->title_id) == $option->id) selected @endif>
+                                {{ $option->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
                     <input type="text" name="military_number"
@@ -48,10 +61,19 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('name_en', $escort->name_en) }}">
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('phone_number') }}:</label>
+                    <input type="text" name="phone_number"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}" value="{{ old('phone_number', $escort->phone_number) }}">
+                </div>
+
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}:</label>
                     <select name="gender_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('select') . ' ' . __db('gender') }}</option>
                         @foreach (getDropDown('gender')->options as $gender)
                             <option value="{{ $gender->id }}"
@@ -80,7 +102,7 @@
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('rank') }}:</label>
                     <select name="internal_ranking_id"
-                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('select') . ' ' . __db('rank') }}</option>
                         @foreach (getDropDown('internal_ranking')->options as $rank)
                             <option value="{{ $rank->id }}"
@@ -89,6 +111,20 @@
                         @endforeach
                     </select>
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('unit') }}:</label>
+                    <select name="unit"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option selected disabled>{{ __db('select') . ' ' . __db('unit') }}</option>
+                        @foreach (getDropDown('unit')->options ?? [] as $unit)
+                            <option value="{{ $unit->id }}"
+                                {{ old('unit', $escort->unit) == $unit->id ? 'selected' : '' }}>
+                                {{ $unit->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('status') }}:</label>
                     <select name="status"

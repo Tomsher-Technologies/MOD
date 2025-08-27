@@ -25,6 +25,10 @@ class EscortController extends Controller
             'only' => ['create', 'store']
         ]);
 
+        $this->middleware('permission:assign_escorts', [
+            'only' => ['assign', 'unassign']
+        ]);
+
         $this->middleware('permission:edit_escorts', [
             'only' => ['edit', 'update']
         ]);
@@ -41,7 +45,7 @@ class EscortController extends Controller
     {
         // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
-        
+
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
             ->where('event_id', $currentEventId)
             ->latest();
@@ -125,6 +129,7 @@ class EscortController extends Controller
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
@@ -141,6 +146,7 @@ class EscortController extends Controller
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
+            'unit_id.exists' => __db('unit_id_exists'),
             'nationality_id.exists' => __db('nationality_id_exists'),
             'date_of_birth.date' => __db('date_of_birth_date'),
             'status.max' => __db('escort_status_max', ['max' => 255]),
@@ -211,6 +217,7 @@ class EscortController extends Controller
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
@@ -226,6 +233,7 @@ class EscortController extends Controller
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
+            'unit_id.exists' => __db('unit_id_exists'),
             'nationality_id.exists' => __db('nationality_id_exists'),
             'date_of_birth.date' => __db('date_of_birth_date'),
             'status.max' => __db('escort_status_max', ['max' => 255]),
@@ -258,6 +266,13 @@ class EscortController extends Controller
                 ],
             ],
             'internal_ranking_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'unit_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',
@@ -374,27 +389,21 @@ class EscortController extends Controller
 
         $delegationId = $request->delegation_id;
 
-        // Check if the escort is already assigned to this delegation
-        // $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
-
-        // if ($existingAssignment) {
-        //     // If the assignment exists and is marked as unassigned, update the status
-        //     if (!$existingAssignment->pivot->status) {
-        //         $escort->delegations()->updateExistingPivot($delegationId, [
-        //             'status' => 1,
-        //             'assigned_by' => auth()->id(),
-        //         ]);
-        //     }
-        // } else {
-        // If no assignment exists, create a new one
-        $escort->delegations()->attach($delegationId, [
-            'status' => 1,
-            'assigned_by' => auth()->id(),
+        $escort->delegations()->update([
+            'delegation_escorts.status' => 0,
         ]);
-        // }
+
+        $escort->delegations()->attach([
+            $delegationId => [
+                'status' => 1,
+                'assigned_by' => auth()->id(),
+            ],
+        ]);
 
         return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
+
+
 
     public function unassign(Request $request, Escort $escort)
     {

@@ -16,8 +16,9 @@ class Driver extends Model
         'title',
         'name_ar',
         'name_en',
-        'mobile_number',
+        'phone_number',
         'driver_id',
+        'unit_id',
         'car_type',
         'car_number',
         'capacity',
@@ -46,9 +47,20 @@ class Driver extends Model
             }
         });
     }
+
+    public function unit()
+    {
+        return $this->belongsTo(DropdownOption::class, 'unit_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'unit');
+            });
+    }
+
     public function delegations()
     {
-        return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')->withPivot('status', 'assigned_by');
+        return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')
+            ->withPivot('status', 'assigned_by', 'start_date', 'end_date')
+            ->withTimestamps();
     }
 
     public function roomAssignments()

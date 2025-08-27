@@ -23,8 +23,8 @@
         </div>
     @endif
 
-    <form id="create-delegation-form" action="{{  getRouteForPage('delegation.store') ?? '#'  }}" method="POST" autocomplete="off" enctype="multipart/form-data"
-        class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
+    <form id="create-delegation-form" action="{{ getRouteForPage('delegation.store') ?? '#' }}" method="POST"
+        autocomplete="off" enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
 
@@ -35,21 +35,20 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0 bg-gray-200"
                         readonly />
                 </div>
-                <div class="col-span-3">
-                    <div class="flex align-center justify-between">
-                        <label class="form-label">{{ __db('invitation_from') }}:</label>
-                    </div>
 
-                    @php
-                        $departmentOptions = getDropDown('departments');
-                        $continentOptions = getDropDown('continents');
-                        $countryOptions = getDropDown('country');
-                        $invitationStatusOptions = getDropDown('invitation_status');
-                        $participationStatusOptions = getDropDown('participation_status');
-                    @endphp
+                @php
+                    $departmentOptions = getDropDown('departments');
+                    $continentOptions = getDropDown('continents');
+                    $countryOptions = getDropDown('country');
+                    $invitationStatusOptions = getDropDown('invitation_status');
+                    $participationStatusOptions = getDropDown('participation_status');
+                @endphp
+
+                <div class="col-span-3">
+                        <label class="form-label">{{ __db('invitation_from') }}:</label>
 
                     <select name="invitation_from_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_invitation_from') }}</option>
                         @if ($departmentOptions)
                             @foreach ($departmentOptions->options as $option)
@@ -70,7 +69,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('continent') }}:</label>
                     <select name="continent_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_continent') }}</option>
                         @if ($continentOptions)
                             @foreach ($continentOptions->options as $option)
@@ -91,16 +90,14 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('country') }}:</label>
                     <select name="country_id"
-                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_country') }}</option>
-                        @if ($countryOptions)
-                            @foreach ($countryOptions->options as $option)
-                                <option value="{{ $option->id }}"
-                                    {{ old('country_id', request('country_id')) == $option->id ? 'selected' : '' }}>
-                                    {{ $option->value }}
-                                </option>
-                            @endforeach
-                        @endif
+                        @foreach (getAllCountries() as $option)
+                            <option value="{{ $option->id }}"
+                                {{ old('country_id', request('country_id')) == $option->id ? 'selected' : '' }}>
+                                {{ $option->name }}
+                            </option>
+                        @endforeach
                     </select>
 
                     @error('country_id')
@@ -111,7 +108,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('invitation_status') }}:</label>
                     <select name="invitation_status_id"
-                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_invitation_status') }}</option>
                         @if ($invitationStatusOptions)
                             @foreach ($invitationStatusOptions->options as $option)
@@ -131,7 +128,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('participation_status') }}:</label>
                     <select name="participation_status_id"
-                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_participation_status') }}</option>
                         @if ($participationStatusOptions)
                             @foreach ($participationStatusOptions->options as $option)
@@ -505,12 +502,23 @@
                 </button>
 
                 <div class="flex gap-4">
-                    <button type="submit" name="submit_exit"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
-                    <button type="submit" name="submit_add_travel" value="1"
-                        class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
-                    <button type="submit" name="submit_add_interview" value="1"
-                        class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
+
+                    @canany(['add_delegations'])
+                        <button type="submit" name="submit_exit" value="1"
+                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
+                    @endcanany
+
+                    @canany(['add_travels'])
+                        <button type="submit" name="submit_add_travel" value="2"
+                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
+                    @endcanany
+
+
+                    @canany(['add_interviews'])
+                        <button type="submit" name="submit_add_interview" value="3"
+                            class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
+                    @endcanany
+
                 </div>
             </div>
         </div>
@@ -526,16 +534,16 @@
         window.delegatesData = @json($delegatesData);
         window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('create-delegation-form');
-            const submitButtons = form.querySelectorAll('.submit-btn');
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const form = document.getElementById('create-delegation-form');
+        //     const submitButtons = form.querySelectorAll('.submit-btn');
 
-            form.addEventListener('submit', function() {
-                submitButtons.forEach(button => {
-                    button.disabled = true;
-                });
-            });
-        });
+        //     form.addEventListener('submit', function() {
+        //         submitButtons.forEach(button => {
+        //             button.disabled = true;
+        //         });
+        //     });
+        // });
     </script>
 
     <script>

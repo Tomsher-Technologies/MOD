@@ -53,7 +53,8 @@
     <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }}
     </h2>
 
-    <form method="POST" action="{{ getRouteForPage('delegation.storeTravel', $delegation->id) }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ getRouteForPage('delegation.storeTravel', $delegation->id) }}"
+        enctype="multipart/form-data">
         @csrf
 
         @php
@@ -112,7 +113,7 @@
             @include('shared-pages.delegations.delegate.partials.transport_section', [
                 'type' => 'arrival',
                 'title' => __db('arrival'),
-                'transport' => null
+                'transport' => null,
             ])
         @endif
 
@@ -122,18 +123,30 @@
             @include('shared-pages.delegations.delegate.partials.transport_section', [
                 'type' => 'departure',
                 'title' => __db('departure'),
-                'transport' => null
+                'transport' => null,
             ])
         @endif
 
         <div class="flex justify-start gap-5 items-center mt-6">
-            <button type="submit" id="submit_add_transport"
+            <button type="submit" name="submit_add_transport" id="submit_add_transport" value="1"
                 class="btn text-md !bg-[#B68A35] text-white rounded-lg py-3 px-5">{{ __db('submit_and_add_new_flight_details') }}</button>
 
-            <button type="submit" id="submit_exit"
-                class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_and_exit') }}</button>
+            @if ($showArrival)
+                <button type="submit" name="submit_add_departure" id="submit_add_departure" value="1"
+                    class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_add_departure') }}</button>
+            @endif
 
-            <button type="submit" id="submit_add_interview"
+            @if ($showDeparture)
+                <button type="submit" name="submit_add_arrival" id="submit_add_arrival" value="1"
+                    class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_add_arrival') }}</button>
+            @endif
+
+            @if (!$showArrival && !$showDeparture)
+                <button type="submit" name="submit_exit" id="submit_exit" value="1"
+                    class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_and_exit') }}</button>
+            @endif
+
+            <button type="submit" name="submit_add_interview" id="submit_add_interview" value="1"
                 class="btn text-md !bg-[#D7BC6D] text-white rounded-lg py-3 px-5">{{ __db('submit_add_interview') }}</button>
         </div>
 
@@ -154,7 +167,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             function toggleFields(transportType) {
                 const mode = document.querySelector(`input[name="${transportType}[mode]"]:checked`).value;
-                const flightFields = document.querySelector(`[data-transport-section='${transportType}'] [data-mode-fields='flight']`);
+                const flightFields = document.querySelector(
+                    `[data-transport-section='${transportType}'] [data-mode-fields='flight']`);
 
                 if (mode === 'flight') {
                     flightFields.style.display = 'grid';
@@ -164,7 +178,8 @@
             }
 
             ['arrival', 'departure'].forEach(transportType => {
-                const transportSection = document.querySelector(`[data-transport-section='${transportType}']`);
+                const transportSection = document.querySelector(
+                    `[data-transport-section='${transportType}']`);
                 if (transportSection) {
                     toggleFields(transportType);
                     document.querySelectorAll(`input[name="${transportType}[mode]"]`).forEach(radio => {

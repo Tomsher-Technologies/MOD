@@ -14,6 +14,7 @@
 
     <form action="{{ route('escorts.assign', $escort->id) }}" method="POST">
         @csrf
+
         <div class="p-4 md:p-5 space-y-6 px-0">
             <div class="grid  grid-cols-12 gap-2 items-end">
                 <div class="col-span-5">
@@ -37,8 +38,8 @@
                         <div>
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
-                            <select id="country_id" class="p-3 rounded-lg w-full border text-sm">
-                                <option selected="" disabled="">{{ __db('select') . ' ' . __db('country') }}
+                            <select id="country_id" class="select2 p-3 rounded-lg w-full border text-sm">
+                                <option value="" selected="" disabled="">{{ __db('select') . ' ' . __db('country') }}
                                 </option>
                                 @foreach (getDropDown('country')->options as $country)
                                     <option value="{{ $country->id }}">{{ $country->value }}</option>
@@ -106,6 +107,8 @@
 
             let url = new URL(pageRoutes.delegationSearch, window.location.origin);
             url.searchParams.append('delegates', '1');
+            url.searchParams.append('escort_id', "{{ $escort->id }}");
+
 
             if (delegationCode) {
                 url = new URL(pageRoutes.delegationSearchByCode, window.location.origin);
@@ -139,7 +142,7 @@
                                         </td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.code}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.value || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name || ''}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
                                     </tr>
                                 `;

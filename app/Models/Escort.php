@@ -23,6 +23,7 @@ class Escort extends Model
         'internal_ranking_id',
         'status',
         'title',
+        'unit_id',
         'rank',
         'phone_number',
         'email',
@@ -82,6 +83,13 @@ class Escort extends Model
         return $this->belongsTo(DropdownOption::class, 'gender_id')
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'gender');
+            });
+    }
+    public function unit()
+    {
+        return $this->belongsTo(DropdownOption::class, 'unit_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'unit');
             });
     }
     public function internalRanking()

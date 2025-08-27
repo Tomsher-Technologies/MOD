@@ -67,6 +67,9 @@
     "nationality_id_exists" : "Invalid nationality",
     "date_of_birth_date" : "Date of birth must be a valid date",
     "gender_id_exists" : "Invalid gender",
+    "unit_id_exists": "Invalid Unit",
+    "no_arrival_information": "No arrival information available",
+    "no_departure_information": "No departure information available",
 
     "invitation_from_id_required" : "Invitation from is required",
     "invitation_from_id_exists" : "Invalid invitation from",
@@ -155,6 +158,8 @@
     "room_assigned" : "Room assigned successfully",
     "room_already_assigned" : "Room already assigned",
     "please_select_room_details" : "Please select room details first.",
+     "driver_already_has_assignment" : "Driver already has an assignment",
+    "reassign_or_replace_assignment" : "Do you want to reassign or replace the assignments",
     "" : "",
     "" : "",
     "" : "",

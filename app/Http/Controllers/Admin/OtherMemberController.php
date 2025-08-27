@@ -44,7 +44,8 @@ class OtherMemberController extends Controller
             }
         }
 
-        $other_interview_members = $query->paginate(20);
+        $other_interview_members = $query->paginate(20) ?? collect([]);
+
 
         return view('admin.other_interview_members.index', compact('other_interview_members'));
     }
@@ -63,14 +64,6 @@ class OtherMemberController extends Controller
             'name_ar' => 'required|string|max:255',
             'status' => 'required|boolean',
         ]);
-
-        $defaultEvent = Event::default()->first();
-
-        if (!$defaultEvent) {
-            return redirect()->back()->withErrors(['event_id' => __db('no_default_event_found')])->withInput();
-        }
-
-        $data['event_id'] = $defaultEvent->id;
 
         OtherInterviewMember::create($data);
 

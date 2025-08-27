@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ArrivalController;
 use App\Http\Controllers\Admin\AccommodationController;
+use App\Http\Controllers\Admin\CountryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -24,6 +25,11 @@ Route::prefix('mod-admin')->group(function () {
 
 Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('admin.dashboard');
+
+    // Manage countries
+    Route::resource('countries', CountryController::class);
+    Route::post('/countries/status', [CountryController::class, 'updateStatus'])->name('countries.status');
+    Route::get('/get-countries', [CountryController::class, 'getByContinents'])->name('countries.by-continent');
 
     // Manage staffs
     Route::resource('staffs', StaffController::class);
@@ -44,6 +50,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
 
     // Manage dynamic dropdowns
     Route::get('/dropdowns', [DropdownController::class, 'index'])->name('dropdowns.index');
+    Route::get('/dropdowns/countries', [DropdownController::class, 'countries'])->name('dropdowns.countries');
+    Route::post('/dropdowns/countries', [DropdownController::class, 'storeCountry'])->name('dropdowns.countries.store');
     Route::get('/dropdowns/{dropdown}/options', [DropdownController::class, 'showOptions'])->name('dropdowns.options.show');
     Route::post('/dropdowns/options', [DropdownController::class, 'storeOption'])->name('dropdowns.options.store');
     Route::put('/dropdowns/options/{option}', [DropdownController::class, 'updateOption'])->name('dropdowns.options.update');
