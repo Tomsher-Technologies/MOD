@@ -24,7 +24,7 @@ class Driver extends Model
         'note1',
         'status',
         'delegation_id',
-        'event_id',
+        'event_id', 'current_room_assignment_id'
     ];
 
     protected static function booted()
@@ -49,5 +49,15 @@ class Driver extends Model
     public function delegations()
     {
         return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')->withPivot('status', 'assigned_by');
+    }
+
+    public function roomAssignments()
+    {
+        return $this->morphMany(RoomAssignment::class, 'assignable');
+    }
+
+    public function currentRoomAssignment()
+    {
+        return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
     }
 }

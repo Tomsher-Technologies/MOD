@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Dropdown;
+use App\Models\Delegate;
+use App\Models\Escort;
+use App\Models\Driver;
 use App\Models\Delegation;
 use App\Models\Accommodation;
 use App\Models\AccommodationContact;
@@ -13,6 +16,8 @@ use App\Imports\AccommodationsImport;
 use App\Exports\RoomTypesExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Traits\HandlesUpdateConfirmation;
+use Hash;
+use DB;
 
 class AccommodationController extends Controller
 {
@@ -200,12 +205,129 @@ class AccommodationController extends Controller
 
     public function accommodationDelegationView (Request $request, $id)
     {
-         $delegation = Delegation::with([ 'invitationFrom', 'continent', 'country', 'invitationStatus', 'participationStatus',
+        $delegation = Delegation::with([ 'invitationFrom', 'continent', 'country', 'invitationStatus', 'participationStatus',
                                     'delegates' => function ($query) {
-                                        $query->with([ 'gender', 'parent', 'delegateTransports.status']);
+                                        $query->with([ 'gender', 'parent', 'delegateTransports.status','currentRoomAssignment']);
                                     }, 'attachments', 'escorts', 'drivers'
                                 ])->findOrFail($id);
-        return view('admin.accommodations.delegations-show', compact('delegation'));
+
+        $hotels = Accommodation::where('status', 1)->orderBy('hotel_name', 'asc')->get();
+        return view('admin.accommodations.delegations-show', compact('delegation','hotels'));
     }
+
+    public function getHotelRooms($id)
+    {
+        $rooms = AccommodationRoom::with('roomType')
+            ->where('accommodation_id', $id)
+            ->get();
+
+        return response()->json($rooms);
+    }
+
+     public function assignRoom(Request $request)
+    {
+        $request->validate([
+            'assignable_type' => 'required|in:Delegate,Escort,Driver',
+            'assignable_id'   => 'required|integer',
+            'hotel_id'        => 'required|integer',
+            'room_type_id'    => 'nullable|integer',
+            'room_number'     => 'nullable|string',
+        ]);
+
+        $model = "App\\Models\\" . $request->assignable_type;
+        $user  = $model::findOrFail($request->assignable_id);
+
+        $current = $user->roomAssignments()
+                    ->where('hotel_id', $request->hotel_id)
+                    ->where('room_type_id', $request->room_type_id)
+                    ->where('room_number', $request->room_number)
+                    ->where('active_status', 1)
+                    ->latest()
+                    ->first();
+
+        if (!$current) {
+             $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
+                                    ->where('room_type_id', $request->room_type_id)
+                                    ->where('room_number', $request->room_number)
+                                    ->where('assignable_id', '!=', $user->id)
+                                    ->where('active_status', 1)
+                                    ->exists();
+
+            if ($user->current_room_assignment_id) {
+                $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
+
+                if ($oldAssignment) {
+                    $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
+                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        $oldRoom->save();
+                    }
+                }
+            }
+
+            if (!$alreadyAssigned) {
+                $newRoom = AccommodationRoom::find($request->room_type_id);
+                if ($newRoom) {
+                    $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
+                    $newRoom->save();
+                }
+            }
+
+            $user->roomAssignments()->update(['active_status' => 0]);
+            
+            $assignment = $user->roomAssignments()->create([
+                'hotel_id'     => $request->hotel_id,
+                'room_type_id' => $request->room_type_id,
+                'room_number'  => $request->room_number,
+                'assigned_by'  => auth()->user()->id,
+                'active_status' => 1
+            ]);
+
+            $user->update(['current_room_assignment_id' => $assignment->id]);
+
+            $accommodation = Accommodation::findOrFail($request->hotel_id);
+            if ($request->assignable_type === 'Escort') {
+                $escort = Escort::findOrFail($request->assignable_id);
+                $name = $escort->name_en ?? $escort->name_ar;
+            }elseif ($request->assignable_type === 'Driver') {
+                $driver = Driver::findOrFail($request->assignable_id);
+                $name = $driver->name_en ?? $driver->name_ar;
+            }else{
+                $delegate = Delegate::findOrFail($request->assignable_id);
+                $name = $delegate->name_en ?? $delegate->name_ar;
+            }
+            
+            $hotel = Accommodation::findOrFail($request->hotel_id);
+
+            $changes = [
+                        'member_name' => $name,
+                        'hotel_name' => $hotel->hotel_name ?? NULL,
+                        'room_number' => $request->room_number ?? NULL,
+                        ];
+            $this->logActivity(
+                module: 'Accommodations',
+                action: 'assign-room',
+                model: $accommodation,
+                delegationId: $request->delegation_id,
+                changedFields: $changes,
+            );
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false]);
+    }
+
+    public function hotelOccupancy($hotelId)
+    {
+        $rooms = RoomAssignment::with(['assignable', 'roomType'])
+            ->where('hotel_id', $hotelId)
+            ->orderBy('room_type_id')
+            ->get();
+
+        return response()->json($rooms);
+    }
+
+    
 
 }

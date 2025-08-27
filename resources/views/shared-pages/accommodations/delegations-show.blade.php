@@ -10,11 +10,11 @@
     @php
     $columns = [
     ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? '-'],
-    ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? '-'],
-    ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? '-'],
-    ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? '-'],
-    ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus->value ?? '-'],
-    ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus->value ?? '-'],
+    ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom?->value ?? '-'],
+    ['label' => __db('continent'), 'render' => fn($row) => $row->continent?->value ?? '-'],
+    ['label' => __db('country'), 'render' => fn($row) => $row->country?->value ?? '-'],
+    ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus?->value ?? '-'],
+    ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus?->value ?? '-'],
     ];
 
     $data = [$delegation];
@@ -43,33 +43,38 @@
         </div>
     </div>
 
-
     <hr class="mx-6 border-neutral-200 h-10">
     <div class="flex items-center justify-between mt-12">
         <h2 class="font-semibold mb-0 text-[18px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})</h2>
-        <div class="flex items-center gap-3 ">
-            <a href="#" id="add-attachment-btn"
-                class="text-sm !bg-[#B68A35] w-xs text-center text-white rounded-lg py-3 px-5">
-                <span>{{ __db('assign_hotel') }} </span>
-            </a>
-
-            <select id="hotelSelect" class="p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                <option selected disabled>{{ __db('select_hotel') }}</option>
-                
+        @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+        <div class="items-center gap-3 ">
+            <select id="hotelDelegate" name="hotelDelegate"
+                class="select2 p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                <option selected value="">{{ __db('select_hotel') }}</option>
+                @foreach ($hotels as $hot)
+                <option value="{{ $hot->id }}">{{ $hot->hotel_name }}</option>
+                @endforeach
             </select>
         </div>
-
+        @endcanany
     </div>
 
     <div id="HotelInfo" style="display: none;">
-        <!-- Your hotel information goes here -->
-        <div class="flex items-center justify-end gap-3 bg-white p-4 w-auto rounded-lg border border-neutral-200 mt-3">
-            <div>
-                <h4> <span class="font-semibold">No. of rooms available :</span> 15</h4>
-            </div>
-            <div class="border-r border-neutral-300 pr-3">
-                <h4> <span class="font-semibold">Room Type :</span> Single - Double - Suite</h4>
-            </div>
+        <div class="bg-white p-4 w-auto rounded-lg border border-neutral-200 mt-3">
+            <h4 class="font-semibold mb-3">{{ __db('room_details') }}</h4>
+            <table class="min-w-full text-sm border border-neutral-300 rounded-lg">
+                <thead class="bg-neutral-100">
+                    <tr>
+                        <th class="p-2 border  text-start">{{ __db('room_type') }}</th>
+                        <th class="p-2 border">{{ __db('total_rooms') }}</th>
+                        <th class="p-2 border">{{ __db('assigned_rooms') }}</th>
+                        <th class="p-2 border">{{ __db('available_rooms') }}</th>
+                    </tr>
+                </thead>
+                <tbody id="roomDetails">
+
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -77,121 +82,145 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <table class="table-auto mb-0 border-collapse border border-gray-300 w-full">
                     <thead>
-                        <tr class="text-[9px]">
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                <input type="checkbox"
+                        <tr class="text-[12px]">
+                            @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                            <th scope="col"
+                                class="p-2 w-[30px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                {{-- <input type="checkbox"
                                     class="w-4 h-4 accent-[#B68A35] border border-white bg-transparent rounded focus:ring-white" />
+                                --}}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            @endcanany
+                            <th scope="col"
+                                class="p-2 !bg-[#B68A35] w-[30px] text-start text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}</th>
-                            <th scope="col" class="p-3  !bg-[#B68A35] text-start text-white border !border-[#cbac71] ">
-                                {{ __db('title') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('name') }}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('designation') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('internal_ranking') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-2 w-[50px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('gender') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('parent_id') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{ __db('relationship') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{ __db('badge_printed') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{  __db('participation_status') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{ __db('accommodation') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{ __db('arrival_status') }} </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+
+                            <th scope="col"
+                                class="p-2 !bg-[#B68A35] w-[100px] text-start text-white border !border-[#cbac71]">
+                                {{ __db('participation_status') }}</th>
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                {{ __db('hotel') }}</th>
+
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                {{ __db('room_type') }}</th>
+
+                            <th scope="col"
+                                class="p-2 w-[100px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                {{ __db('room_number') }}</th>
+
+
+                            @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                            <th scope="col"
+                                class="p-2 w-[60px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('action') }} </th>
+                            @endcanany
                         </tr>
                     </thead>
                     <tbody>
+                        {{-- @php
+                        echo '
+                        <pre>'; print_r($delegation->delegates);die;
+                        @endphp --}}
                         @forelse ($delegation->delegates as $key => $row)
                             @php
                                 $id = $row->id ?? uniqid();
                                 $badge = $row->team_head ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> ' : '';
                                 $arrival = $row->delegateTransports->where('type', 'arrival')->first();
                                 $departure = $row->delegateTransports->where('type', 'departure')->first();
-                                $departureStatus = $departure && $departure->status ? $departure->status->value : null;
-                                $arrivalStatus = $arrival && $arrival->status ? $arrival->status->value : null;
+                                $departureStatus = $departure && $departure->status ? $departure->status?->value : null;
+                                $arrivalStatus = $arrival && $arrival->status ? $arrival->status?->value : null;
+
+                                $room = $row->currentRoomAssignment ?? null;
+                               
                             @endphp
 
-                            <tr class="text-[12px] align-[middle] @if($row->accommodation == 0) bg-[#e5e5e5] @endif">
-                                
-                                <td class="px-4 py-2 border border-gray-200">
-                                    @if($row->accommodation === 1)
-                                        <input type="checkbox" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
-                                    @endif
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">{{ $key + 1 }}</td>
-                                <td class="px-4 border border-gray-200 py-3">{{ $row->title->value }}</td>
-                                <td class="px-4 border border-gray-200 py-3">
+                            <tr  data-id="{{ $row->id }}" class="delegate-row text-[11px] align-[middle] @if($row->accommodation == 0) bg-[#e5e5e5] @elseif($room) bg-[#acf3bc] @endif" >
+                                @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                                    <td class="px-1 py-2 border border-gray-200">
+                                        @if($row->accommodation == 1)
+                                            <input type="checkbox" class="assign-hotel-checkbox" data-delegate-id="{{ $row->id }}" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
+                                        @endif
+                                    </td>
+                                @endcanany
+                                <td class="px-1 py-2 border border-gray-200">{{ $key + 1 }}</td>
+                                <td class="px-1 border border-gray-200 py-3">
                                     
-                                    {!! $badge !!}
-                                    <div class="block">{{ $row->name_en ?? ($row->name_ar ?? '-') }}</div>
+                                    {!! $badge !!} {{ $row->id }}
+                                    <div class="block">{{ $row->name_en ?? ($row->name_ar ?? '-') }} {{ $row->title?->value }} </div>
                                 </td>
-                                <td class="px-4 border border-gray-200 py-3">
+                                <td class="px-1 border border-gray-200 py-3">
                                     {{ $row->designation_en ?? ($row->designation_ar ?? '-') }}
                                 </td>
-                                <td class="px-4 border border-gray-200 py-3">
-                                    {{ $row->internalRanking->value ?? '-' }}
+                                <td class="px-1 border border-gray-200 py-3">
+                                    {{ $row->internalRanking?->value ?? '-' }}
                                 </td>
-                                <td class="px-4 border border-gray-200 py-3">
-                                    {{ $row->gender->value ?? '-' }}
+                                <td class="px-1 border border-gray-200 py-3">
+                                    {{ $row->gender?->value ?? '-' }}
                                 </td>
-                                <td class="px-4 border border-gray-200 py-3">
-                                    {{ $row->parent->name_en ?? ($row->parent->name_ar ?? '-') }}
+                                <td class="px-1 border border-gray-200 py-3">
+                                    {{ $row->parent?->name_en ?? ($row->parent?->name_ar ?? '-') }}
+                                    <br>
+                                    {{ $row->relationship ? '('.$row->relationship->value.')' : '' }}
                                 </td>
-                                <td class="px-4 border border-gray-200 py-3">
-                                    {{ $row->relationship->value ?? '-' }}
-                                </td>
-                                <td class="px-4 border border-gray-200 py-3">
-                                    {{ $row->badge_printed ? __db('yes') : __db('no') }}
-                                </td>
-                                <td class="px-4 border border-gray-200 py-3">
+                               
+                                <td class="px-1 border border-gray-200 py-3">
                                     {{ $arrival->status?->value ?? '-' }}
                                 </td>
-                                <td class="px-4 border border-gray-200 py-3">
-                                    -
+                                <td class="px-1 border border-gray-200 py-3">
+                                    <span class="hotel_name">{{ $room?->hotel?->hotel_name ?? '' }}</span>
+                                    <input type="hidden" name="hotel_id" id="hotel_id{{ $row->id }}" class="hotel-id-input" data-delegate-id="{{ $row->id }}" value="{{ $room?->hotel_id ?? '' }}">
                                 </td>
-                                <td class="px-4 border border-gray-200 py-2">
-                                    <svg class=" cursor-pointer" width="30" height="30"  data-modal-target="delegate-transport-modal-{{ $id }}" data-modal-toggle="delegate-transport-modal-{{ $id }}" viewBox="0 0 512 512"
-                                        xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
-                                        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                                        <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                                        <g id="SVGRepo_iconCarrier">
-                                            <rect width="480" height="32" x="16" y="464"
-                                                fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
-                                            <path fill="var(--ci-primary-color, #B68A35)"
-                                                d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z"
-                                                class="ci-primary"></path>
-                                        </g>
-                                    </svg>
+                                <td class="px-1 border border-gray-200 py-3">
+
+                                    @php 
+                                        $options = '';
+                                        if($room){
+                                            $hotelid = $room->hotel_id;
+                                            $roomTypes = App\Models\AccommodationRoom::with('roomType')->where('accommodation_id', $hotelid)->get();
+                                            foreach($roomTypes as $roomType){
+                                                $options .= '<option value="'.$roomType->id.'" '.($roomType->id == $room->room_type_id ? 'selected' : '').'>'.$roomType->roomType?->value.'</option>';
+                                            }
+                                        }
+                                    @endphp
+
+                                    <select name="room_type" id="room_type" class="room-type-dropdown p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                        <option value="">{{ __db('select') }}</option>
+                                        {!! $options !!}
+                                    </select>
                                 </td>
-                                <td class="px-4 py-3 border border-gray-200">
-                                    @if($row->accommodation === 1)
-                                        <div class="flex items-center gap-5">
-                                            <a href="#" data-modal-target="delegate-transport-modal-{{ $id }}" data-modal-toggle="delegate-transport-modal-{{ $id }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    viewBox="0 0 512 512">
-                                                    <path
-                                                        d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                        fill="#B68A35"></path>
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    @endif
+                                
+                                <td class="px-1 border border-gray-200 py-3">
+                                    <input type="text" name="room_number" id="room_number" class="room-number-input w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ $room?->room_number ?? '' }}">
                                 </td>
+                                
+                                @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                                    <td class="px-1 py-3 border border-gray-200">
+                                        @if($row->accommodation == 1)
+                                            <div class="flex items-center gap-5">
+                                                <a href="#" id="add-attachment-btn" class="save-room-assignment text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                                    <span>{{ __db('save') }} </span>
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </td>
+                                @endcanany
                             </tr>
                         @empty
                             <tr class="border-t">
-                                <td class="px-4 py-3 text-center " colspan="14" dir="ltr">
+                                <td class="px-1 py-3 text-center " colspan="14" dir="ltr">
                                     {{ __db('no_data_found') }}
                                 </td>
                             </tr>
@@ -218,90 +247,623 @@
         </div>
     </div>
 
+    <hr class="mx-6 border-neutral-200 h-2">
 
+    <div class="flex items-center justify-between mt-12">
+        <h2 class="font-semibold mb-0 text-[18px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+        @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+            <div class="items-center gap-3 ">
+                <select id="hotelEscort" name="hotelEscort" class="select2 p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    <option selected value="">{{ __db('select_hotel') }}</option>
+                    @foreach ($hotels as $hot)
+                        <option value="{{ $hot->id }}">{{ $hot->hotel_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endcanany
+    </div>
 
-    @foreach ($delegation->delegates as $delegate)
-        <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
-            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative w-full max-w-2xl mx-auto">
-                <div class="bg-white rounded-lg shadow ">
-                    <div class="flex items-start justify-between p-4 border-b rounded-t">
-                        <h3 class="text-xl font-semibold text-gray-900">{{ __db('transport_information_for') }}
-                            {{ $delegate->name_en ?? '-' }}</h3>
-                        <button type="button"
-                            class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                            data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="p-6 space-y-6">
-                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
+    <div id="HotelInfoEscort" style="display: none;">
+        <div class="bg-white p-4 w-auto rounded-lg border border-neutral-200 mt-3">
+            <h4 class="font-semibold mb-3">{{ __db('room_details') }}</h4>
+            <table class="min-w-full text-sm border border-neutral-300 rounded-lg">
+                <thead class="bg-neutral-100">
+                    <tr>
+                        <th class="p-2 border  text-start">{{ __db('room_type') }}</th>
+                        <th class="p-2 border">{{ __db('total_rooms') }}</th>
+                        <th class="p-2 border">{{ __db('assigned_rooms') }}</th>
+                        <th class="p-2 border">{{ __db('available_rooms') }}</th>
+                    </tr>
+                </thead>
+                <tbody id="roomDetailsEscort">
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
+                    <thead>
+                    <tr class="text-[9px]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('sl_no') }}</th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('military_number') }}</th>
+                        
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('name') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('mobile') }}</th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('gender') }}</th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('hotel') }}</th>
+                        <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('room_type') }}</th>
+
+                        <th scope="col" class="p-2 w-[100px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('room_number') }}</th>
+
+                        
+                        @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                            <th scope="col" class="p-2 w-[60px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('action') }} </th>
+                        @endcanany
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse ($delegation->escorts as $keyEscort => $rowEscort)
                         @php
-                        $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                            $idEscort = $rowEscort->id ?? uniqid();
+                            
+                            $roomEscort = $rowEscort->currentRoomAssignment ?? null;
+                            
                         @endphp
-                        <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            @if ($arrival)
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                                <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
-                            </div>
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                <p class="text-base">{{ $arrival->flight_no ?? '-' }}</p>
-                            </div>
-                            <div class="py-4 border-b md:border-b-0">
-                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                <p class="text-base">{{ $arrival->flight_name ?? '-' }}</p>
-                            </div>
-                            <div class="py-4 !pb-0">
-                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
-                            </div>
-                            @else
-                            <p class="col-span-2 text-gray-500">No arrival information available.</p>
-                            @endif
-                        </div>
 
-                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
-                        @php
-                        $departure = $delegate->delegateTransports->where('type', 'departure')->first();
-                        @endphp
-                        <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            {{-- ✅ CORRECTED BLOCK --}}
-                            @if ($departure)
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                                <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
-                            </div>
-                            <div class="border-b py-4">
-                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                <p class="text-base">{{ $departure->flight_no ?? '-' }}</p>
-                            </div>
-                            <div class="py-4 border-b md:border-b-0">
-                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                <p class="text-base">{{ $departure->flight_name ?? '-' }}</p>
-                            </div>
-                            <div class="py-4 !pb-0">
-                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
-                            </div>
-                            @else
-                            <p class="col-span-2 text-gray-500">No departure information available.</p>
-                            @endif
-                        </div>
+                        <tr  data-id="{{ $rowEscort->id }}" class="escort-row text-[11px] align-[middle] @if($roomEscort) bg-[#acf3bc] @endif" >
+                            @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                                <td class="px-1 py-2 border border-gray-200">
+                                        <input type="checkbox" class="assign-hotel-checkbox-escort" data-escort-id="{{ $rowEscort->id }}" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
+                                </td>
+                            @endcanany
+                            <td class="px-1 py-2 border border-gray-200">{{ $keyEscort + 1 }}</td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                <div class="block">{{ $rowEscort->name_en ?? ($rowEscort->name_ar ?? '-') }} {{ $rowEscort->title?->value }} </div>
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                {{ $rowEscort->military_number ?? '-' }}
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                {{ $rowEscort->phone_number ?? '-' }}
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                {{ $rowEscort->gender?->value ?? '-' }}
+                            </td>
+                            
+                            <td class="px-1 border border-gray-200 py-3">
+                                <span class="hotel_name_escort">{{ $roomEscort?->hotel?->hotel_name ?? '' }}</span>
+                                <input type="hidden" name="hotel_id_escort" id="hotel_id_escort{{ $rowEscort->id }}" class="hotel-id-input-escort" data-escort-id="{{ $rowEscort->id }}" value="{{ $roomEscort?->hotel_id ?? '' }}">
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+
+                                @php 
+                                    $optionsEscort = '';
+                                    if($roomEscort){
+                                        $hotelidEscort = $roomEscort->hotel_id;
+                                        $roomTypesEscort = App\Models\AccommodationRoom::with('roomType')->where('accommodation_id', $hotelidEscort)->get();
+                                        foreach($roomTypesEscort as $roomTypeEscort){
+                                            $optionsEscort .= '<option value="'.$roomTypeEscort->id.'" '.($roomTypeEscort->id == $roomEscort->room_type_id ? 'selected' : '').'>'.$roomTypeEscort->roomType?->value.'</option>';
+                                        }
+                                    }
+                                @endphp
+
+                                <select name="room_type_escort" id="room_type_escort" class="room-type-dropdown-escort p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                    <option value="">{{ __db('select') }}</option>
+                                    {!! $optionsEscort !!}
+                                </select>
+                            </td>
+                            
+                            <td class="px-1 border border-gray-200 py-3">
+                                <input type="text" name="room_number_escort" id="room_number_escort" class="room-number-input-escort w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ $roomEscort?->room_number ?? '' }}">
+                            </td>
+                            
+                            @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                                <td class="px-1 py-3 border border-gray-200">
+                                    <div class="flex items-center gap-5">
+                                        <a href="#" id="add-attachment-btn" class="save-room-assignment-escort text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                            <span>{{ __db('save') }} </span>
+                                        </a>
+                                    </div>
+                                </td>
+                            @endcanany
+                        </tr>
+                    @empty
+                        <tr class="border-t">
+                            <td class="px-1 py-3 text-center " colspan="14" dir="ltr">
+                                {{ __db('no_data_found') }}
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+                <hr class="my-5">
+                <div class="flex items-center justify-start gap-6">
+
+                    <div class="mt-3 flex items-center justify-start gap-3 ">
+                    <div class="h-5 w-5 bg-[#acf3bc] rounded"></div>
+                    <span class="text-gray-800 text-sm">{{ __db('assigned') }}</span>
                     </div>
+
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
+
+    <hr class="mx-6 border-neutral-200 h-2">
+
+    <div class="flex items-center justify-between mt-12">
+        <h2 class="font-semibold mb-0 text-[18px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+        @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+            <div class="items-center gap-3 ">
+                <select id="hotelDriver" name="hotelDriver" class="select2 p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    <option selected value="">{{ __db('select_hotel') }}</option>
+                    @foreach ($hotels as $hot)
+                        <option value="{{ $hot->id }}">{{ $hot->hotel_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endcanany
+    </div>
+
+    <div id="HotelInfoDriver" style="display: none;">
+        <div class="bg-white p-4 w-auto rounded-lg border border-neutral-200 mt-3">
+            <h4 class="font-semibold mb-3">{{ __db('room_details') }}</h4>
+            <table class="min-w-full text-sm border border-neutral-300 rounded-lg">
+                <thead class="bg-neutral-100">
+                    <tr>
+                        <th class="p-2 border  text-start">{{ __db('room_type') }}</th>
+                        <th class="p-2 border">{{ __db('total_rooms') }}</th>
+                        <th class="p-2 border">{{ __db('assigned_rooms') }}</th>
+                        <th class="p-2 border">{{ __db('available_rooms') }}</th>
+                    </tr>
+                </thead>
+                <tbody id="roomDetailsDriver">
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
+                    <thead>
+                    <tr class="text-[9px]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('sl_no') }}</th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('military_number') }}</th>
+                        
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('name') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('mobile') }}</th>
+                        
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('hotel') }}</th>
+                        <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('room_type') }}</th>
+
+                        <th scope="col" class="p-2 w-[100px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('room_number') }}</th>
+
+                        
+                        @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                            <th scope="col" class="p-2 w-[60px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('action') }} </th>
+                        @endcanany
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse ($delegation->drivers as $keyDriver => $rowDriver)
+                        @php
+                            $idDriver = $rowDriver->id ?? uniqid();
+                            
+                            $roomDriver = $rowDriver->currentRoomAssignment ?? null;
+                            
+                        @endphp
+
+                        <tr  data-id="{{ $rowDriver->id }}" class="driver-row text-[11px] align-[middle] @if($roomDriver) bg-[#acf3bc] @endif" >
+                            @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                                <td class="px-1 py-2 border border-gray-200">
+                                        <input type="checkbox" class="assign-hotel-checkbox-driver" data-driver-id="{{ $rowDriver->id }}" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
+                                </td>
+                            @endcanany
+                            <td class="px-1 py-2 border border-gray-200">{{ $keyDriver + 1 }}</td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                <div class="block">{{ $rowDriver->name_en ?? ($rowDriver->name_ar ?? '-') }} {{ $rowDriver->title?->value }} </div>
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                {{ $rowDriver->military_number ?? '-' }}
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+                                {{ $rowDriver->phone_number ?? '-' }}
+                            </td>
+                           
+                            <td class="px-1 border border-gray-200 py-3">
+                                <span class="hotel_name_driver">{{ $roomDriver?->hotel?->hotel_name ?? '' }}</span>
+                                <input type="hidden" name="hotel_id_driver" id="hotel_id_driver{{ $rowDriver->id }}" class="hotel-id-input-driver" data-driver-id="{{ $rowDriver->id }}" value="{{ $roomDriver?->hotel_id ?? '' }}">
+                            </td>
+                            <td class="px-1 border border-gray-200 py-3">
+
+                                @php 
+                                    $optionsDriver = '';
+                                    if($roomDriver){
+                                        $hotelidDriver = $roomDriver->hotel_id;
+                                        $roomTypesDriver = App\Models\AccommodationRoom::with('roomType')->where('accommodation_id', $hotelidDriver)->get();
+                                        foreach($roomTypesDriver as $roomTypeDriver){
+                                            $optionsDriver .= '<option value="'.$roomTypeDriver->id.'" '.($roomTypeDriver->id == $roomDriver->room_type_id ? 'selected' : '').'>'.$roomTypeDriver->roomType?->value.'</option>';
+                                        }
+                                    }
+                                @endphp
+
+                                <select name="room_type_driver" id="room_type_driver" class="room-type-dropdown-driver p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                    <option value="">{{ __db('select') }}</option>
+                                    {!! $optionsDriver !!}
+                                </select>
+                            </td>
+                            
+                            <td class="px-1 border border-gray-200 py-3">
+                                <input type="text" name="room_number_driver" id="room_number_driver" class="room-number-input-driver w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ $roomDriver?->room_number ?? '' }}">
+                            </td>
+                            
+                            @canany(['assign_accommodations', 'hotel_assign_accommodations'])
+                                <td class="px-1 py-3 border border-gray-200">
+                                    <div class="flex items-center gap-5">
+                                        <a href="#" id="add-attachment-btn" class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                            <span>{{ __db('save') }} </span>
+                                        </a>
+                                    </div>
+                                </td>
+                            @endcanany
+                        </tr>
+                    @empty
+                        <tr class="border-t">
+                            <td class="px-1 py-3 text-center " colspan="14" dir="ltr">
+                                {{ __db('no_data_found') }}
+                            </td>
+                        </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+                <hr class="my-5">
+                <div class="flex items-center justify-start gap-6">
+
+                    <div class="mt-3 flex items-center justify-start gap-3 ">
+                    <div class="h-5 w-5 bg-[#acf3bc] rounded"></div>
+                    <span class="text-gray-800 text-sm">{{ __db('assigned') }}</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 @section('script')
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        $(document).on('change', '#hotelDelegate', function() {
+            let hotelId = this.value;
+            let url = "{{ route('accommodation.rooms', ':id') }}";
+            url = url.replace(':id', hotelId);
 
+            $.get(url, function (data) {
+                let html = '';
+                if (data.length > 0) {
+                    data.forEach(r => {
+                        let available = r.total_rooms - r.assigned_rooms;
+                        html += `
+                            <tr>
+                                <td class="p-2 border">${r.room_type?.value ?? '-'}</td>
+                                <td class="p-2 border text-center">${r.total_rooms}</td>
+                                <td class="p-2 border text-center">${r.assigned_rooms}</td>
+                                <td class="p-2 border text-center font-semibold">${available}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html = `<tr><td colspan="4" class="p-2 border text-center">{{ __db('no_rooms_found') }}</td></tr>`;
+                }
+
+                $('#roomDetails').html(html);
+                $('#HotelInfo').show();
+            });
+        });
+
+        $('.assign-hotel-checkbox').on('click', function() {
+            let hotelId = $('#hotelDelegate').val();
+            let Hotelname = $('#hotelDelegate option:selected').text();
+
+            if (!hotelId) {
+                this.checked = false;
+                toastr.error('{{ __db("please_select_hotel") }}');
+                return;
+            }
+
+            let row = $(this).closest('tr');
+            let delegateId = row.data('id');
+            let dropdown = row.find('.room-type-dropdown');
+            let hotel_name = row.find('.hotel_name');
+
+            if (this.checked) {
+                let url = "{{ route('accommodation.rooms', ':id') }}";
+                url = url.replace(':id', hotelId);
+
+                $.get(url, function (data) {
+                    dropdown.empty().append('<option value="">{{ __db("select") }}</option>');
+                    data.forEach(function(room) {
+                        let available = room.total_rooms - room.assigned_rooms;
+                        if (available > 0) {
+                            dropdown.append('<option value="'+room.id+'">'+room.room_type?.value+'</option>');
+                        }
+                    });
+                });
+
+                hotel_name.text(Hotelname);
+                $('#hotel_id' + delegateId).val(hotelId);
+            } else {
+                dropdown.empty().append('<option value="">{{ __db("select") }}</option>');
+            }
+        });
+
+        $('.save-room-assignment').on('click', function(e) {
+            e.preventDefault();
+            let row = $(this).closest('tr');
+            let checkboxDel = row.find('input[type="checkbox"]');
+            let delegateId = row.data('id');
+            let hotelId = $('#hotel_id' + delegateId).val();
+            let roomTypeId = row.find('.room-type-dropdown').val();
+            let roomNumber = row.find('.room-number-input').val();
+
+            if (!hotelId || !roomTypeId || !roomNumber) {
+                toastr.error('{{ __db("please_select_room_details") }}');
+                return;
+            }
+
+            $.post("{{ route('accommodation.assign-rooms') }}", {
+                _token: '{{ csrf_token() }}',
+                assignable_id: delegateId,
+                assignable_type: 'Delegate',
+                hotel_id: hotelId,
+                room_type_id: roomTypeId,
+                room_number: roomNumber,
+                delegation_id : {{ $delegation->id }}
+            }, function(res) {
+                if(res.success) {
+                    row.css('background-color', '#acf3bc');
+                    toastr.success('{{ __db("room_assigned") }}');
+                    // row.find('.room-type-dropdown').val('');
+                    // row.find('.room-number-input').val('');
+                } else {
+                    toastr.success('{{ __db("room_already_assigned") }}');
+                }
+                checkboxDel.prop('checked', false);
+            });
+        });
+
+        // Escort Section
+        $(document).on('change', '#hotelEscort', function() {
+            let hotelId = this.value;
+            let url = "{{ route('accommodation.rooms', ':id') }}";
+            url = url.replace(':id', hotelId);
+
+            $.get(url, function (data) {
+                let html = '';
+                if (data.length > 0) {
+                    data.forEach(r => {
+                        let available = r.total_rooms - r.assigned_rooms;
+                        html += `
+                            <tr>
+                                <td class="p-2 border">${r.room_type?.value ?? '-'}</td>
+                                <td class="p-2 border text-center">${r.total_rooms}</td>
+                                <td class="p-2 border text-center">${r.assigned_rooms}</td>
+                                <td class="p-2 border text-center font-semibold">${available}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html = `<tr><td colspan="4" class="p-2 border text-center">{{ __db('no_rooms_found') }}</td></tr>`;
+                }
+
+                $('#roomDetailsEscort').html(html);
+                $('#HotelInfoEscort').show();
+            });
+        });
+
+        $('.assign-hotel-checkbox-escort').on('click', function() {
+            let hotelIdEscort = $('#hotelEscort').val();
+            let HotelnameEscort = $('#hotelEscort option:selected').text();
+
+            if (!hotelIdEscort) {
+                this.checked = false;
+                toastr.error('{{ __db("please_select_hotel") }}');
+                return;
+            }
+
+            let rowEscort = $(this).closest('tr');
+            let escortId = rowEscort.data('id');
+            let dropdownEscort = rowEscort.find('.room-type-dropdown-escort');
+            let hotel_nameEscort = rowEscort.find('.hotel_name_escort');
+
+            if (this.checked) {
+                let url = "{{ route('accommodation.rooms', ':id') }}";
+                url = url.replace(':id', hotelIdEscort);
+
+                $.get(url, function (data) {
+                    dropdownEscort.empty().append('<option value="">{{ __db("select") }}</option>');
+                    data.forEach(function(room) {
+                        let availableEscort = room.total_rooms - room.assigned_rooms;
+                        if (availableEscort > 0) {
+                            dropdownEscort.append('<option value="'+room.id+'">'+room.room_type?.value+'</option>');
+                        }
+                    });
+                });
+
+                hotel_nameEscort.text(HotelnameEscort);
+                $('#hotel_id_escort' + escortId).val(hotelIdEscort);
+            } else {
+                dropdownEscort.empty().append('<option value="">{{ __db("select") }}</option>');
+            }
+        });
+
+        $('.save-room-assignment-escort').on('click', function(e) {
+            e.preventDefault();
+            let escortrow = $(this).closest('tr');
+            let checkboxEscort = escortrow.find('input[type="checkbox"]');
+            let idEscort = escortrow.data('id');
+            let hotelIdEscort = $('#hotel_id_escort' + idEscort).val();
+            let roomTypeIdEscort = escortrow.find('.room-type-dropdown-escort').val();
+            let roomNumberEscort = escortrow.find('.room-number-input-escort').val();
+
+            if (!hotelIdEscort || !roomTypeIdEscort || !roomNumberEscort) {
+                toastr.error('{{ __db("please_select_room_details") }}');
+                return;
+            }
+
+            $.post("{{ route('accommodation.assign-rooms') }}", {
+                _token: '{{ csrf_token() }}',
+                assignable_id: idEscort,
+                assignable_type: 'Escort',
+                hotel_id: hotelIdEscort,
+                room_type_id: roomTypeIdEscort,
+                room_number: roomNumberEscort,
+                delegation_id : {{ $delegation->id }}
+            }, function(res) {
+                if(res.success) {
+                    escortrow.css('background-color', '#acf3bc');
+                    toastr.success('{{ __db("room_assigned") }}');
+                    // row.find('.room-type-dropdown').val('');
+                    // row.find('.room-number-input').val('');
+                } else {
+                    toastr.success('{{ __db("room_already_assigned") }}');
+                }
+                checkboxEscort.prop('checked', false);
+            });
+        });
+
+        // Drivers Section
+        $(document).on('change', '#hotelDriver', function() {
+            let hotelId = this.value;
+            let url = "{{ route('accommodation.rooms', ':id') }}";
+            url = url.replace(':id', hotelId);
+
+            $.get(url, function (data) {
+                let html = '';
+                if (data.length > 0) {
+                    data.forEach(r => {
+                        let available = r.total_rooms - r.assigned_rooms;
+                        html += `
+                            <tr>
+                                <td class="p-2 border">${r.room_type?.value ?? '-'}</td>
+                                <td class="p-2 border text-center">${r.total_rooms}</td>
+                                <td class="p-2 border text-center">${r.assigned_rooms}</td>
+                                <td class="p-2 border text-center font-semibold">${available}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    html = `<tr><td colspan="4" class="p-2 border text-center">{{ __db('no_rooms_found') }}</td></tr>`;
+                }
+
+                $('#roomDetailsDriver').html(html);
+                $('#HotelInfoDriver').show();
+            });
+        });
+
+        $('.assign-hotel-checkbox-driver').on('click', function() {
+            let hotelIdDriver = $('#hotelDriver').val();
+            let HotelnameDriver = $('#hotelDriver option:selected').text();
+
+            if (!hotelIdDriver) {
+                this.checked = false;
+                toastr.error('{{ __db("please_select_hotel") }}');
+                return;
+            }
+
+            let rowDriver = $(this).closest('tr');
+            let driverId = rowDriver.data('id');
+            let dropdownDriver = rowDriver.find('.room-type-dropdown-driver');
+            let hotel_nameDriver = rowDriver.find('.hotel_name_driver');
+
+            if (this.checked) {
+                let url = "{{ route('accommodation.rooms', ':id') }}";
+                url = url.replace(':id', hotelIdDriver);
+
+                $.get(url, function (data) {
+                    dropdownDriver.empty().append('<option value="">{{ __db("select") }}</option>');
+                    data.forEach(function(room) {
+                        let availableDriver = room.total_rooms - room.assigned_rooms;
+                        if (availableDriver > 0) {
+                            dropdownDriver.append('<option value="'+room.id+'">'+room.room_type?.value+'</option>');
+                        }
+                    });
+                });
+
+                hotel_nameDriver.text(HotelnameDriver);
+                $('#hotel_id_driver' + driverId).val(hotelIdDriver);
+            } else {
+                dropdownDriver.empty().append('<option value="">{{ __db("select") }}</option>');
+            }
+        });
+
+        $('.save-room-assignment-driver').on('click', function(e) {
+            e.preventDefault();
+            
+            let driverrow = $(this).closest('tr');
+            let checkboxDriver = driverrow.find('input[type="checkbox"]');
+            let idDriver = driverrow.data('id');
+            let hotelIdDriver = $('#hotel_id_driver' + idDriver).val();
+            let roomTypeIdDriver = driverrow.find('.room-type-dropdown-driver').val();
+            let roomNumberDriver = driverrow.find('.room-number-input-driver').val();
+
+            if (!hotelIdDriver || !roomTypeIdDriver || !roomNumberDriver) {
+                toastr.error('{{ __db("please_select_room_details") }}');
+                return;
+            }
+
+            $.post("{{ route('accommodation.assign-rooms') }}", {
+                _token: '{{ csrf_token() }}',
+                assignable_id: idDriver,
+                assignable_type: 'Driver',
+                hotel_id: hotelIdDriver,
+                room_type_id: roomTypeIdDriver,
+                room_number: roomNumberDriver,
+                delegation_id : {{ $delegation->id }}
+            }, function(res) {
+                if(res.success) {
+                    driverrow.css('background-color', '#acf3bc');
+                    toastr.success('{{ __db("room_assigned") }}');
+                    // row.find('.room-type-dropdown').val('');
+                    // row.find('.room-number-input').val('');
+                } else {
+                    toastr.success('{{ __db("room_already_assigned") }}');
+                }
+                checkboxDriver.prop('checked', false);
+            });
+        });
+    });
 
 </script>
 @endsection

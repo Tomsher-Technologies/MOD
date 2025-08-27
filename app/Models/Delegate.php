@@ -22,7 +22,7 @@ class Delegate extends Model
         'accommodation_id',
         'accommodation',
         'team_head',
-        'badge_printed',
+        'badge_printed', 'current_room_assignment_id'
     ];
 
     protected $casts = [
@@ -80,5 +80,15 @@ class Delegate extends Model
     public function children()
     {
         return $this->hasMany(Delegate::class, 'parent_id');
+    }
+
+    public function roomAssignments()
+    {
+        return $this->morphMany(RoomAssignment::class, 'assignable');
+    }
+
+    public function currentRoomAssignment()
+    {
+        return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
     }
 }

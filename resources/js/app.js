@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("load", () => {
     setTimeout(() => {
         $(".select2").select2({
+            width: '100%',
             dropdownParent: $(document.body),
         });
 

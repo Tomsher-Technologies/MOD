@@ -320,6 +320,15 @@ trait HandlesUpdateConfirmation
         if ($action === 'delete') {
             return "{$module} was deleted by {$userName}.";
         }
+
+        if ($action === 'assign-room' && $changedFields) {
+            $member_name = $changedFields['member_name'] ?? 'Unknown Delegate';
+            $hotelName = $changedFields['hotel_name'] ?? 'Unknown Hotel';
+            $roomNumber = $changedFields['room_number'] ?? 'N/A';
+
+            return "{$userName} assigned {$member_name} to Room ({$roomNumber}) at {$hotelName}.";
+        }
+
         return "{$userName} performed {$action} on {$module}.";
     }
 }

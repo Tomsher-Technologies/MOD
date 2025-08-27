@@ -74,9 +74,6 @@
                                 {{ __db('total_capacity') }}
                             </th>
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{ __db('assigned_delegations') }}
-                            </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('actions') }}
                             </th>
                         </tr>
@@ -125,9 +122,7 @@
                                 <td class="px-4 py-3 border border-gray-200">
                                     {{ $assigned_rooms }}/{{ $total_rooms }}
                                 </td>
-                                <td class="px-4 py-3 !text-[#B68A35] border border-gray-200 ">
-                                    -
-                                </td>
+                                
                                 <td class="px-4 py-2 border border-gray-200">
                                     <div class="flex align-center gap-4">
                                         @canany(['edit_accommodations', 'hotel_edit_accommodations'])
