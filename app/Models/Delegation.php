@@ -11,6 +11,7 @@ class Delegation extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'code',
         'updated_by',
         'invitation_from_id',
         'continent_id',
@@ -81,10 +82,7 @@ class Delegation extends Model
 
     public function country()
     {
-        return $this->belongsTo(DropdownOption::class, 'country_id')
-            ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'country');
-            });
+        return $this->belongsTo(Country::class);
     }
 
     public function invitationStatus()
@@ -122,16 +120,22 @@ class Delegation extends Model
     {
         return $this->belongsToMany(Escort::class, 'delegation_escorts', 'delegation_id', 'escort_id')
             ->withPivot('status', 'assigned_by')
-            ->wherePivot('status', 1);
+            ->wherePivot('status', 1)
+            ->where('escorts.status', 1);
     }
 
     public function drivers()
     {
         return $this->belongsToMany(Driver::class, 'delegation_drivers', 'delegation_id', 'driver_id')
             ->withPivot('status', 'assigned_by')
-            ->wherePivot('status', 1);
+            ->wherePivot('status', 1)
+            ->where('drivers.status', 1);
     }
 
+    public function teamHead()
+    {
+        return $this->delegates()->where('team_head', true)->first();
+    }
 
     public function event()
     {

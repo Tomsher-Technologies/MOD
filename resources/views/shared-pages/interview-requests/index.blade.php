@@ -6,7 +6,8 @@
           <div class="xl:col-span-12 h-full">
               <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                   <div class=" mb-4 flex items-center justify-between gap-3">
-                      <form class="w-[50%] me-4" action="{{ getRouteForPage('delegations.interviewsIndex') }}" method="GET">
+                      <form class="w-[50%] me-4" action="{{ getRouteForPage('delegations.interviewsIndex') }}"
+                          method="GET">
                           <div class="relative">
                               <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                   <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -91,6 +92,7 @@
                           ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status->value))],
                           [
                               'label' => __db('actions'),
+                              'permission' => ['add_interviews'],
                               'render' => function ($row) {
                                   $editUrl = route('delegations.editInterview', [
                                       'delegation' => $row->delegation_id,

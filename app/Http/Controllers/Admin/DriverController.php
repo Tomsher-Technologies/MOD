@@ -25,6 +25,10 @@ class DriverController extends Controller
             'only' => ['create', 'store']
         ]);
 
+        $this->middleware('permission:assign_drivers', [
+            'only' => ['assign', 'unassign']
+        ]);
+
         $this->middleware('permission:edit_drivers', [
             'only' => ['edit', 'update']
         ]);
@@ -41,7 +45,7 @@ class DriverController extends Controller
     {
         // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
-        
+
         $query = Driver::with('delegations')
             ->where('event_id', $currentEventId)
             ->latest();
@@ -51,7 +55,7 @@ class DriverController extends Controller
                 $q->where('name_en', 'like', "%{$search}%")
                     ->orWhere('name_ar', 'like', "%{$search}%")
                     ->orWhere('military_number', 'like', "%{$search}%")
-                    ->orWhere('mobile_number', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%")
                     ->orWhere('driver_id', 'like', "%{$search}%")
                     ->orWhere('car_type', 'like', "%{$search}%")
                     ->orWhere('car_number', 'like', "%{$search}%")
@@ -83,7 +87,11 @@ class DriverController extends Controller
             });
         }
 
-        $drivers = $query->paginate(10);
+        $limit = $request->limit ? $request->limit : 20;
+
+
+        $drivers = $query->paginate($limit);
+
         $delegations = Delegation::where('event_id', $currentEventId)->get();
 
         return view('admin.drivers.index', compact('drivers', 'delegations'));
@@ -95,11 +103,11 @@ class DriverController extends Controller
         $driver->status = $request->status;
         $driver->save();
 
-        if ($request->status == 0) {
-            $driver->delegations()->updateExistingPivot($driver->delegations->pluck('id'), [
-                'status' => 0,
-            ]);
-        }
+        // if ($request->status == 0) {
+        //     $driver->delegations()->updateExistingPivot($driver->delegations->pluck('id'), [
+        //         'status' => 0,
+        //     ]);
+        // }
 
         return response()->json(['status' => 'success']);
     }
@@ -126,10 +134,11 @@ class DriverController extends Controller
             'name_ar' => 'required|string|max:255',
             'military_number' => 'nullable|string|max:255',
             'name_en' => 'required|string|max:255',
-            'mobile_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
             'car_number' => 'nullable|string|max:255',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'capacity' => 'nullable|string|max:255',
             'note1' => 'nullable|string',
             'delegation_id' => 'nullable|exists:delegations,id',
@@ -140,7 +149,8 @@ class DriverController extends Controller
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
             'title.max' => __db('driver_title_max', ['max' => 255]),
-            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
+            'unit_id.exists' => __db('unit_id_exists'),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
             'car_number.max' => __db('driver_car_number_max', ['max' => 255]),
@@ -200,10 +210,11 @@ class DriverController extends Controller
             'title' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
-            'mobile_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
             'car_number' => 'nullable|string|max:255',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'capacity' => 'nullable|string|max:255',
             'note1' => 'nullable|string',
             'status' => 'nullable|string|max:255',
@@ -215,9 +226,10 @@ class DriverController extends Controller
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
             'title.max' => __db('driver_title_max', ['max' => 255]),
-            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
+            'unit_id.exists' => __db('unit_id_exists'),
             'car_number.max' => __db('driver_car_number_max', ['max' => 255]),
             'capacity.max' => __db('driver_capacity_max', ['max' => 255]),
             'status.max' => __db('driver_status_max', ['max' => 255]),
@@ -235,11 +247,18 @@ class DriverController extends Controller
                     'label' => 'code',
                 ],
             ],
+            'unit_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
             'military_number' => [],
             'title' => [],
             'name_ar' => [],
             'name_en' => [],
-            'mobile_number' => [],
+            'phone_number' => [],
             'driver_id' => [],
             'car_type' => [],
             'car_number' => [],
@@ -312,29 +331,65 @@ class DriverController extends Controller
     {
         $request->validate([
             'delegation_id' => 'required|exists:delegations,id',
+            'start_date' => 'nullable|date',
+            'action' => 'required|in:reassign,replace',
         ]);
 
         $delegationId = $request->delegation_id;
+        $action = $request->action;
+        $startDate = $request->start_date;
+        $today = now()->toDateString();
 
-        // Check if the driver is already assigned to this delegation
-        // $existingAssignment = $driver->delegations()->where('delegation_id', $delegationId)->first();
+        $activeAssignments = $driver->delegations()->wherePivot('status', 1)->orderBy('pivot_start_date')->get();
 
-        // if ($existingAssignment) {
-        //     // If the assignment exists, ensure its status is 1 (assigned)
-        //     $driver->delegations()->updateExistingPivot($delegationId, [
-        //         'status' => 1,
-        //         'assigned_by' => auth()->id(),
-        //     ]);
-        // } else {
-        // If no assignment exists, create a new one
-        $driver->delegations()->attach($delegationId, [
-            'status' => 1,
-            'assigned_by' => auth()->id(),
-        ]);
-        // }
+        if ($activeAssignments->isNotEmpty()) {
+            if ($action === 'reassign') {
+                foreach ($activeAssignments as $assignment) {
+                    $assignmentStart = $assignment->pivot->start_date;
+                    $assignmentEnd   = $assignment->pivot->end_date;
+
+                    if ($startDate <= $assignmentStart) {
+                        $driver->delegations()->updateExistingPivot($assignment->id, [
+                            'end_date' => $assignmentStart,
+                        ]);
+                    } elseif (is_null($assignmentEnd) || $startDate < $assignmentEnd) {
+                        $driver->delegations()->updateExistingPivot($assignment->id, [
+                            'end_date' => $startDate,
+                        ]);
+                    }
+                }
+
+                $driver->delegations()->attach($delegationId, [
+                    'status' => 1,
+                    'start_date' => $startDate,
+                    'assigned_by' => auth()->id(),
+                ]);
+            } elseif ($action === 'replace') {
+                foreach ($activeAssignments as $assignment) {
+                    $driver->delegations()->updateExistingPivot($assignment->id, [
+                        'status' => 0,
+                    ]);
+                }
+
+                $driver->delegations()->attach($delegationId, [
+                    'status' => 1,
+                    'start_date' => $startDate ?? $today,
+                    'assigned_by' => auth()->id(),
+                ]);
+            }
+        } else {
+            // First assignment ever
+            $driver->delegations()->attach($delegationId, [
+                'status' => 1,
+                'start_date' => $startDate ?? $today,
+                'assigned_by' => auth()->id(),
+            ]);
+        }
 
         return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
     }
+
+
 
     public function unassign(Request $request, Driver $driver)
     {
@@ -347,6 +402,17 @@ class DriverController extends Controller
         $driver->delegations()->updateExistingPivot($delegationId, [
             'status' => 0,
         ]);
+
+        $lastAssignment = $driver->delegations()
+            ->wherePivot('status', 1)
+            ->orderByPivot('start_date', 'desc')
+            ->first();
+
+        if ($lastAssignment) {
+            $driver->delegations()->updateExistingPivot($lastAssignment->id, [
+                'end_date' => null,
+            ]);
+        }
 
         return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }

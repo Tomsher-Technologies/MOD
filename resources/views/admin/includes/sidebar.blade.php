@@ -84,7 +84,7 @@
                 </li>
             @endcan
 
-            {{-- @can('view_interviews') --}}
+            @can('view_interviews')
                 <li>
                     <a href="{{ route('delegations.interviewsIndex') }}"
                         class="{{ areActiveRoutes(['delegations.interviewsIndex']) }}">
@@ -96,7 +96,7 @@
                         <span class="text-lg">{{ __db('interview_requests') }}</span>
                     </a>
                 </li>
-            {{-- @endcan --}}
+            @endcan
 
             @can('manage_escorts')
                 <li>
