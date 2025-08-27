@@ -114,6 +114,7 @@
                             ],
                             [
                                 'label' => __db('actions'),
+                                'permission' => ['add_travels'],
                                 'render' => function ($row) {
                                     $departureData = [
                                         'id' => $row->id,

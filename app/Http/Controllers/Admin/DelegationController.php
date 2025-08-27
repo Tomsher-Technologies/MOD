@@ -136,7 +136,6 @@ class DelegationController extends Controller
 
         $delegations = $query->paginate($limit);
 
-        return response()->json(['dd' => $delegations]);
 
         return view('admin.delegations.index', compact('delegations'));
     }
@@ -950,10 +949,6 @@ class DelegationController extends Controller
     {
         $delegation = Delegation::findOrFail($delegationId);
 
-        // return response()->json([
-        //     'request' => $request->all(),
-        // ]);
-
         $validated = $request->validate([
             'delegate_ids' => 'required|array|min:1',
             'delegate_ids.*' => 'integer|exists:delegates,id',
@@ -1018,6 +1013,19 @@ class DelegationController extends Controller
                 submoduleId: $delegation->id,
                 delegationId: $delegation->id
             );
+
+
+            if ($request->has('submit_exit')) {
+                return redirect()->route('delegations.index')->with('success', __db('travel') . " " . __db("created_successfully"));
+            } elseif ($request->has('submit_add_departure')) {
+                return redirect()->route('delegations.addTravel', ['id' => $delegation->id, 'showDeparture' => '1']);
+            } elseif ($request->has('submit_add_arrival')) {
+                return redirect()->route('delegations.addTravel', ['id' => $delegation->id, 'showArrival' => '1']);
+            } elseif ($request->has('submit_add_interview')) {
+                return redirect()->route('delegations.addInterview', ['delegation' => $delegation,]);
+            } elseif ($request->has('submit_add_transport')) {
+                return redirect()->back()->with('success', __db('travel') . " " . __db("created_successfully"));
+            }
 
             return redirect()
                 ->route('delegations.show', $delegationId)

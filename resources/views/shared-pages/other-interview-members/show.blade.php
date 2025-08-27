@@ -13,82 +13,6 @@
     </div>
 
     <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {{-- <div class="bg-white shadow rounded-xl p-6">
-                <h2 class="text-2xl font-bold text-primary-700 mb-6">
-                    {{ __db('event_information') }}
-                    @if ($interviewMember->event?->is_default)
-                        <span
-                            class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">Default</span>
-                    @endif
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <div class="bg-white rounded-lg p-6 space-y-4 max-w-md">
-
-                            <div class="space-y-3 text-gray-700">
-                                <div class="flex justify-between">
-                                    <span class="font-semibold">{{ __db('name') }} (EN) :</span>
-                                    <span>{{ $interviewMember->event->name_en }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="font-semibold">{{ __db('name') }} (AR) :</span>
-                                    <span>{{ $interviewMember->event->name_ar }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="font-semibold">{{ __db('code') }} :</span>
-                                    <span>{{ $interviewMember->event->code }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="font-semibold">{{ __db('start_date') }} :</span>
-                                    <span>{{ $interviewMember->event->start_date }}</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="font-semibold">{{ __db('end_date') }} :</span>
-                                    <span>{{ $interviewMember->event->end_date }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="font-semibold">{{ __db('status') }} :</span>
-                                    @if ($interviewMember->event->status)
-                                        <span
-                                            class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">{{ __db('completed') }}</span>
-                                    @else
-                                        <span
-                                            class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded">{{ __db('not_completed') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                            <div
-                                class="bg-gray-50 border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col items-center text-center">
-                                <div class="text-sm font-semibold text-gray-700 mb-2">
-                                    {{ __db('logo') }}
-                                </div>
-                                <div class="w-full h-32 flex items-center justify-center rounded overflow-hidden">
-                                    <img src="{{ getUploadedImage($interviewMember->event->logo) }}" alt="Logo"
-                                        class="max-w-full max-h-full object-contain">
-                                </div>
-                            </div>
-
-                            @if ($interviewMember->event->image)
-                                <div
-                                    class="bg-gray-50 border border-gray-200 rounded-xl shadow-sm p-4 flex flex-col items-center text-center">
-                                    <div class="text-sm font-semibold text-gray-700 mb-2">
-                                        {{ __db('image') }}
-                                    </div>
-                                    <div class="w-full h-32 flex items-center justify-center rounded overflow-hidden">
-                                        <img src="{{ getUploadedImage($interviewMember->event->image) }}" alt="Image"
-                                            class="max-w-full max-h-full object-contain">
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div> --}}
 
         <div class="bg-white rounded-lg shadow p-6 mb-10">
             <h2 class="text-2xl font-bold text-gray-900 border-b border-gray-200 pb-4 mb-6">
@@ -97,11 +21,11 @@
             <div class=" mx-auto">
                 <div class="border rounded-lg p-6 shadow-sm">
                     <div class="mb-4">
-                        <label class="block font-semibold text-gray-700 mb-1">{{ __db('name') }} (EN):</label>
+                        <label class="block font-semibold text-gray-700 mb-1">{{ __db('name_en') }}:</label>
                         <p class="text-gray-900 text-lg">{{ $interviewMember->name_en ?? '-' }}</p>
                     </div>
                     <div class="mb-4">
-                        <label class="block font-semibold text-gray-700 mb-1">{{ __db('name') }} (AR):</label>
+                        <label class="block font-semibold text-gray-700 mb-1">{{ __db('name_ar') }}:</label>
                         <p class="text-gray-900 text-lg">{{ $interviewMember->name_ar ?? '-' }}</p>
                     </div>
                     <div class="mb-4">

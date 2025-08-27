@@ -464,7 +464,7 @@
                                     <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
                                 </div>
                             @else
-                                <p class="col-span-2 text-gray-500">No arrival information available.</p>
+                                <p class="col-span-2 text-gray-500">{{__db('no_arrival_information')}}.</p>
                             @endif
                         </div>
 
@@ -473,7 +473,6 @@
                             $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                         @endphp
                         <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            {{-- ✅ CORRECTED BLOCK --}}
                             @if ($departure)
                                 <div class="border-b py-4">
                                     <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
@@ -492,7 +491,7 @@
                                     <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
                                 </div>
                             @else
-                                <p class="col-span-2 text-gray-500">No departure information available.</p>
+                                <p class="col-span-2 text-gray-500">{{__db('no_departure_information')}}.</p>
                             @endif
                         </div>
                     </div>

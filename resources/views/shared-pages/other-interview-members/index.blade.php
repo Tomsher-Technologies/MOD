@@ -92,6 +92,7 @@
                     ],
                     [
                         'label' => __db('action'),
+                        'permission' => ['edit_other_interview_members', 'view_other_interview_members'],
                         'render' => function ($member) {
                             $btn = '';
                             if (auth()->user() && auth()->user()->can('edit_other_interview_members')) {
