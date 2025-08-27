@@ -42,6 +42,7 @@
 -- ALTER TABLE `delegate_transports` ADD  FOREIGN KEY (`status_id`) REFERENCES `dropdown_options`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 
+
 CREATE TABLE countries (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -164,3 +165,27 @@ ADD COLUMN unit_id BIGINT UNSIGNED NULL AFTER status,
 ADD CONSTRAINT fk_escorts_unit_id
     FOREIGN KEY (unit_id) REFERENCES dropdown_options(id)
     ON DELETE SET NULL;
+
+
+
+
+
+
+
+-- Jisha New Changes
+ALTER TABLE `delegates` CHANGE `delegation_id` `delegation_id` BIGINT UNSIGNED NULL DEFAULT NULL;
+ALTER TABLE `delegates` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE CASCADE ON UPDATE SET NULL;
+ALTER TABLE `delegates` ADD `current_room_assignment_id` BIGINT UNSIGNED NULL DEFAULT NULL AFTER `badge_printed`;
+ALTER TABLE `delegates` ADD FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE CASCADE ON UPDATE SET NULL;
+
+ALTER TABLE `escorts` ADD `current_room_assignment_id` BIGINT UNSIGNED NULL DEFAULT NULL AFTER `nationality_id`;
+ALTER TABLE `escorts` ADD FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE CASCADE ON UPDATE SET NULL;
+
+ALTER TABLE `drivers` ADD `current_room_assignment_id` BIGINT UNSIGNED NULL DEFAULT NULL AFTER `status`;
+ALTER TABLE `drivers` ADD FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `delegates` DROP FOREIGN KEY `delegates_ibfk_2`; ALTER TABLE `delegates` ADD CONSTRAINT `delegates_ibfk_2` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+ALTER TABLE `escorts` DROP FOREIGN KEY `escorts_ibfk_2`; ALTER TABLE `escorts` ADD CONSTRAINT `escorts_ibfk_2` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+ALTER TABLE `drivers` DROP FOREIGN KEY `drivers_ibfk_1`; ALTER TABLE `drivers` ADD CONSTRAINT `drivers_ibfk_1` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;

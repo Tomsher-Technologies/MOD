@@ -142,6 +142,12 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/export-room-types', [AccommodationController::class, 'exportRoomTypes'])->name('export.room.types');
     Route::get('/accommodation-delegations', [AccommodationController::class, 'accommodationDelegations'])->name('accommodation-delegations');
     Route::get('/accommodation-delegation-view/{id}', [AccommodationController::class, 'accommodationDelegationView'])->name('accommodation-delegation-view');
+    Route::get('/accommodation/{id}/rooms', [AccommodationController::class, 'getHotelRooms'])->name('accommodation.rooms');
+    Route::post('/accommodation/room-assign', [AccommodationController::class, 'assignRoom'])->name('accommodation.assign-rooms');
+    Route::get('/accommodation/hotel/{hotel}/occupancy', [AccommodationController::class, 'hotelOccupancy'])->name('accommodation.occupancy');
+    // Route::post('/accommodation/room-assign-escort', [AccommodationController::class, 'assignRoomEscort'])->name('accommodation.assign-rooms-escort');
+
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

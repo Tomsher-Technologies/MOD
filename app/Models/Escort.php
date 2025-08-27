@@ -28,7 +28,7 @@ class Escort extends Model
         'phone_number',
         'email',
         'nationality_id',
-        'date_of_birth',
+        'date_of_birth', 'current_room_assignment_id'
     ];
 
     protected $casts = [
@@ -111,5 +111,15 @@ class Escort extends Model
     public function delegations()
     {
         return $this->belongsToMany(Delegation::class, 'delegation_escorts', 'escort_id', 'delegation_id')->withPivot('status', 'assigned_by');
+    }
+
+    public function roomAssignments()
+    {
+        return $this->morphMany(RoomAssignment::class, 'assignable');
+    }
+
+    public function currentRoomAssignment()
+    {
+        return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
     }
 }
