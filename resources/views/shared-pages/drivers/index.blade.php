@@ -98,9 +98,61 @@
                             'label' => __db('assigned') . ' ' . __db('delegation'),
                             'key' => 'assigned_delegation',
                             'render' => function ($driver) {
-                                return e($driver->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
+                                return $driver->delegations
+                                    ->map(function ($delegation) use ($driver) {
+                                        if ($delegation->pivot->status === 1) {
+                                            $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
+                                            $delegationUrl = getRouteForPage('delegation.show', $delegation->id);
+
+                                            $unassignButton =
+                                                '
+                                                <form class="unassign-form" action="' .
+                                                $unassignUrl .
+                                                '" method="POST" style="display:inline;">
+                                                    ' .
+                                                csrf_field() .
+                                                '
+                                                    <input type="hidden" name="delegation_id" value="' .
+                                                $delegation->id .
+                                                '" />
+                                                    <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-2 py-1 rounded-lg text-sm flex items-center gap-1">
+                                                        Unassign
+                                                    </button>
+                                                </form>';
+
+                                            return '
+                                                  <div class="flex items-center gap-2 mb-2">
+                                                        ' .
+                                                $unassignButton .
+                                                '
+
+                                                        <a href="' .
+                                                $delegationUrl .
+                                                '" class="font-medium !text-[#B68A35] hover:underline">
+                                                            ' .
+                                                $delegation->code .
+                                                '
+                                                        </a>
+
+                                                        ' .
+                                                ($delegation->pivot->end_date
+                                                    ? '<span class="!text-xs">(Till: ' .
+                                                        $delegation->pivot->end_date .
+                                                        ')</span>'
+                                                    : '') .
+                                                '
+                                                    </div>
+
+                                                ';
+                                        }
+
+                                        return null;
+                                    })
+                                    ->filter()
+                                    ->implode('');
                             },
                         ],
+
                         [
                             'label' => __db('status'),
                             'key' => 'status',
@@ -127,7 +179,10 @@
                             'key' => 'actions',
                             'render' => function ($driver) {
                                 $editUrl = getRouteForPage('drivers.edit', $driver->id);
-                                $output = '<div class="flex align-center gap-4">';
+
+                                $output = '<div class="flex flex-col items-start gap-2">'; // flex column with gap
+
+                                // Edit button
                                 if (
                                     auth()->user() &&
                                     auth()
@@ -135,50 +190,38 @@
                                         ->canAny(['edit_drivers'])
                                 ) {
                                     $output .=
-                                        '<a href="' .
+                                        '
+                                <a href="' .
                                         $editUrl .
-                                        '">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
-            </a>';
+                                        '" class="flex items-center gap-2 px-3 py-1 rounded-lg !bg-[#E6D7A2] !text-[#5D471D] text-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                                        <path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/>
+                                    </svg>
+                                    <span>Edit</span>
+                                </a>';
                                 }
-                                if ($driver->status == 1) {
-                                    if ($driver->delegations->where('pivot.status', 1)->count() > 0) {
-                                        foreach ($driver->delegations->where('pivot.status', 1) as $delegation) {
-                                            $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
-                                            $output .=
-                                                '<form action="' .
-                                                $unassignUrl .
-                                                '" method="POST" style="display:inline;">' .
-                                                csrf_field() .
-                                                '<input type="hidden" name="delegation_id" value="' .
-                                                $delegation->id .
-                                                '" />
-                            <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                                <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                                <span> Unassign from ' .
-                                                e($delegation->code) .
-                                                '</span>
-                            </button>
-                        </form>';
-                                        }
-                                    } else {
-                                        if (
-                                            auth()->user() &&
-                                            auth()
-                                                ->user()
-                                                ->canAny(['assign_drivers'])
-                                        ) {
-                                            $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
-                                            $output .=
-                                                '<a href="' .
-                                                $assignUrl .
-                                                '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
-                        <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                        <span> Assign</span>
-                    </a>';
-                                        }
-                                    }
+
+                                // Assign button
+                                if (
+                                    $driver->status == 1 &&
+                                    auth()->user() &&
+                                    auth()
+                                        ->user()
+                                        ->canAny(['assign_drivers'])
+                                ) {
+                                    $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
+                                    $output .=
+                                        '
+                                <a href="' .
+                                        $assignUrl .
+                                        '" class="flex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                    </svg>
+                                    <span>Assign</span>
+                                </a>';
                                 }
+
                                 $output .= '</div>';
                                 return $output;
                             },
@@ -191,7 +234,7 @@
                 @endphp
 
 
-                <x-reusable-table :columns="$columns" :data="$drivers" :row-class="$rowClass"
+                <x-reusable-table :columns="$columns" :data="$drivers" :row-class="$rowClass" enableRowLimit
                     no-data-message="No drivers found." />
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
@@ -379,6 +422,32 @@
 
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', applyVisibility);
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const unassignForms = document.querySelectorAll('.unassign-form');
+
+            unassignForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // prevent default submission
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You are about to unassign this delegation!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, unassign it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); 
+                        }
+                    });
+                });
             });
         });
     </script>

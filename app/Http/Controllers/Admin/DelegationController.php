@@ -1539,6 +1539,8 @@ class DelegationController extends Controller
 
         $currentEventId = session('current_event_id', getDefaultEventId());
 
+        $driverId = $request->input('driver_id');
+
         $query->where('event_id', $currentEventId);
 
         if ($continentId = $request->query('continent_id')) {
@@ -1554,6 +1556,11 @@ class DelegationController extends Controller
         } else {
             $query->with('invitationFrom');
         }
+
+        $query->whereDoesntHave('drivers', function ($q) use ($driverId) {
+            $q->where('delegation_drivers.driver_id', $driverId)
+                ->where('delegation_drivers.status', 1); 
+        });
 
 
         $delegations = $query->with('invitationFrom', 'country', 'continent')->get();

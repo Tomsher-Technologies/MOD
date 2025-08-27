@@ -66,3 +66,6 @@ alter table delegates add column participation_status varchar(256);
 insert into permissions (module, parent_id, name, title, guard_name, is_active) VALUES 
 ('admin', 38, 'assign_escorts', 'Assign Escorts', 'web', 1),
 ('admin', 42, 'assign_drivers', 'Assign Drivers', 'web', 1);
+
+alter table delegation_drivers add column start_date varchar(256);
+alter table delegation_drivers add column end_date varchar(256);

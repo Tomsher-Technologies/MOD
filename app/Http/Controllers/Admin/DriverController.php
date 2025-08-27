@@ -41,7 +41,7 @@ class DriverController extends Controller
     {
         // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
-        
+
         $query = Driver::with('delegations')
             ->where('event_id', $currentEventId)
             ->latest();
@@ -83,7 +83,11 @@ class DriverController extends Controller
             });
         }
 
-        $drivers = $query->paginate(10);
+        $limit = $request->limit ? $request->limit : 20;
+
+
+        $drivers = $query->paginate($limit);
+
         $delegations = Delegation::where('event_id', $currentEventId)->get();
 
         return view('admin.drivers.index', compact('drivers', 'delegations'));
@@ -95,11 +99,11 @@ class DriverController extends Controller
         $driver->status = $request->status;
         $driver->save();
 
-        if ($request->status == 0) {
-            $driver->delegations()->updateExistingPivot($driver->delegations->pluck('id'), [
-                'status' => 0,
-            ]);
-        }
+        // if ($request->status == 0) {
+        //     $driver->delegations()->updateExistingPivot($driver->delegations->pluck('id'), [
+        //         'status' => 0,
+        //     ]);
+        // }
 
         return response()->json(['status' => 'success']);
     }
@@ -312,29 +316,65 @@ class DriverController extends Controller
     {
         $request->validate([
             'delegation_id' => 'required|exists:delegations,id',
+            'start_date' => 'nullable|date',
+            'action' => 'required|in:reassign,replace',
         ]);
 
         $delegationId = $request->delegation_id;
+        $action = $request->action;
+        $startDate = $request->start_date;
+        $today = now()->toDateString();
 
-        // Check if the driver is already assigned to this delegation
-        // $existingAssignment = $driver->delegations()->where('delegation_id', $delegationId)->first();
+        $activeAssignments = $driver->delegations()->wherePivot('status', 1)->orderBy('pivot_start_date')->get();
 
-        // if ($existingAssignment) {
-        //     // If the assignment exists, ensure its status is 1 (assigned)
-        //     $driver->delegations()->updateExistingPivot($delegationId, [
-        //         'status' => 1,
-        //         'assigned_by' => auth()->id(),
-        //     ]);
-        // } else {
-        // If no assignment exists, create a new one
-        $driver->delegations()->attach($delegationId, [
-            'status' => 1,
-            'assigned_by' => auth()->id(),
-        ]);
-        // }
+        if ($activeAssignments->isNotEmpty()) {
+            if ($action === 'reassign') {
+                foreach ($activeAssignments as $assignment) {
+                    $assignmentStart = $assignment->pivot->start_date;
+                    $assignmentEnd   = $assignment->pivot->end_date;
+
+                    if ($startDate <= $assignmentStart) {
+                        $driver->delegations()->updateExistingPivot($assignment->id, [
+                            'end_date' => $assignmentStart,
+                        ]);
+                    } elseif (is_null($assignmentEnd) || $startDate < $assignmentEnd) {
+                        $driver->delegations()->updateExistingPivot($assignment->id, [
+                            'end_date' => $startDate,
+                        ]);
+                    }
+                }
+
+                $driver->delegations()->attach($delegationId, [
+                    'status' => 1,
+                    'start_date' => $startDate,
+                    'assigned_by' => auth()->id(),
+                ]);
+            } elseif ($action === 'replace') {
+                foreach ($activeAssignments as $assignment) {
+                    $driver->delegations()->updateExistingPivot($assignment->id, [
+                        'status' => 0,
+                    ]);
+                }
+
+                $driver->delegations()->attach($delegationId, [
+                    'status' => 1,
+                    'start_date' => $startDate ?? $today,
+                    'assigned_by' => auth()->id(),
+                ]);
+            }
+        } else {
+            // First assignment ever
+            $driver->delegations()->attach($delegationId, [
+                'status' => 1,
+                'start_date' => $startDate ?? $today,
+                'assigned_by' => auth()->id(),
+            ]);
+        }
 
         return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
     }
+
+
 
     public function unassign(Request $request, Driver $driver)
     {
@@ -347,6 +387,17 @@ class DriverController extends Controller
         $driver->delegations()->updateExistingPivot($delegationId, [
             'status' => 0,
         ]);
+
+        $lastAssignment = $driver->delegations()
+            ->wherePivot('status', 1)
+            ->orderByPivot('start_date', 'desc')
+            ->first();
+
+        if ($lastAssignment) {
+            $driver->delegations()->updateExistingPivot($lastAssignment->id, [
+                'end_date' => null,
+            ]);
+        }
 
         return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }

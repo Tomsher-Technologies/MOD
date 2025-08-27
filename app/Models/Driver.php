@@ -48,6 +48,8 @@ class Driver extends Model
     }
     public function delegations()
     {
-        return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')->withPivot('status', 'assigned_by');
+        return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')
+            ->withPivot('status', 'assigned_by', 'start_date', 'end_date')
+            ->withTimestamps();
     }
 }
