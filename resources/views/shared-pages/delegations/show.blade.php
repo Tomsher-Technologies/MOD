@@ -335,28 +335,38 @@
                 },
             ],
             [
-                'label' => 'Interview With',
+                'label' => __db('interview_with'),
                 'render' => function ($row) {
-                    $interviewees = $row->interviewMembers->where('type', 'to');
-                    $names = $interviewees
-                        ->map(
-                            fn($im) => e(
-                                $im->resolveMemberForInterview($row)->name_en ??
-                                    ($im->resolveMemberForInterview($row)->name_ar ?? '-'),
-                            ),
-                        )
-                        ->filter()
-                        ->implode('<br>');
-                    $delegationLink = $row->interviewWithDelegation
-                        ? '<a href="#" class="!text-[#B68A35]" data-modal-target="interview-delegation-modal-' .
-                            $row->id .
-                            '" data-modal-toggle="interview-delegation-modal-' .
-                            $row->id .
-                            '"> Delegation ID : ' .
-                            e($row->interviewWithDelegation->code) .
-                            '</a>'
-                        : '';
-                    return $delegationLink . ($delegationLink && $names ? '<br>' : '') . $names;
+                    if (!empty($row->other_member_id) && $row->otherMember) {
+                        $otherMemberName = $row->otherMember->name ?? '';
+                        $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                        if ($otherMemberId) {
+                            $with =
+                                '<a href="' .
+                                route('other-interview-members.show', [
+                                    'other_interview_member' => base64_encode($otherMemberId),
+                                ]) .
+                                '" class="!text-[#B68A35]">
+                                    <span class="block">Other Member ID: ' .
+                                e($otherMemberId) .
+                                '</span>
+                                </a>';
+                        }
+                    } else {
+                        $with =
+                            '<a href="' .
+                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                            '" class="!text-[#B68A35]">' .
+                            'Delegation ID : ' .
+                            e($row->interviewWithDelegation->code ?? '') .
+                            '</a>';
+                    }
+
+                    $names = $row->interviewMembers
+                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                        ->implode('');
+
+                    return $with . $names;
                 },
             ],
             ['label' => 'Status', 'render' => fn($row) => e(ucfirst($row->status->value))],
@@ -464,7 +474,7 @@
                                     <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
                                 </div>
                             @else
-                                <p class="col-span-2 text-gray-500">{{__db('no_arrival_information')}}.</p>
+                                <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
                             @endif
                         </div>
 
@@ -491,7 +501,7 @@
                                     <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
                                 </div>
                             @else
-                                <p class="col-span-2 text-gray-500">{{__db('no_departure_information')}}.</p>
+                                <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
                             @endif
                         </div>
                     </div>

@@ -1523,14 +1523,19 @@ class DelegationController extends Controller
     public function searchByCode(Request $request)
     {
         $code = $request->query('code');
-        if (!$code) {
-            return response()->json(['success' => false, 'message' => __db('code_required')]);
-        }
-
 
         $currentEventId = session('current_event_id', getDefaultEventId());
+        $query = Delegation::query();
 
-        $delegation = Delegation::with('delegates')->where('code', $code)->where('event_id', $currentEventId)->first();
+        // if (!$code) {
+        //     return response()->json(['success' => false, 'message' => __db('code_required')]);
+        // }
+
+        if ($code) {
+            $query = $query->where('code', $code);
+        }
+
+        $delegation = $query->with('delegates', 'country', 'continent')->where('event_id', $currentEventId)->first();
 
         if (!$delegation) {
             return response()->json(['success' => false, 'message' => __db('delegation_not_found')]);
@@ -1541,7 +1546,11 @@ class DelegationController extends Controller
             'name_en' => $d->name_en,
         ]);
 
-        return response()->json(['success' => true, 'members' => $members]);
+        return response()->json([
+            'success' => true,
+            'members' => $members,
+            'delegation' => $delegation
+        ]);
     }
 
     public function search(Request $request)
@@ -1570,16 +1579,20 @@ class DelegationController extends Controller
             $query->with('invitationFrom');
         }
 
-        $query->whereDoesntHave('drivers', function ($q) use ($driverId) {
-            $q->where('delegation_drivers.driver_id', $driverId)
-                ->where('delegation_drivers.status', 1);
-        });
+        if ($driverId) {
+            $query->whereDoesntHave('drivers', function ($q) use ($driverId) {
+                $q->where('delegation_drivers.driver_id', $driverId)
+                    ->where('delegation_drivers.status', 1);
+            });
+        }
 
-        $query->whereDoesntHave('escorts', function ($q) use ($escortId) {
-            $q->where('delegation_escorts.escort_id', $escortId)
-                ->where('delegation_escorts.status', 1);
-        });
-
+        if ($escortId) {
+            $query->whereDoesntHave('escorts', function ($q) use ($escortId) {
+                $q->where('delegation_escorts.escort_id', $escortId)
+                    ->where('delegation_escorts.status', 1);
+            });
+        }
+        
         $delegations = $query->with('invitationFrom', 'country', 'continent')->get();
 
         return response()->json([

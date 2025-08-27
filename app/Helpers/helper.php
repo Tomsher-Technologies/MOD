@@ -552,3 +552,25 @@ if (! function_exists('getCountriesByContinent')) {
             ->get();
     }
 }
+
+
+if (!function_exists('can')) {
+    function can(string|array $permissions): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        $permissions = is_array($permissions) ? $permissions : [$permissions];
+
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

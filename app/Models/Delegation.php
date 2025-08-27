@@ -11,6 +11,7 @@ class Delegation extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'code',
         'updated_by',
         'invitation_from_id',
         'continent_id',
@@ -120,7 +121,7 @@ class Delegation extends Model
         return $this->belongsToMany(Escort::class, 'delegation_escorts', 'delegation_id', 'escort_id')
             ->withPivot('status', 'assigned_by')
             ->wherePivot('status', 1)
-            ->where('escorts.status', 1); 
+            ->where('escorts.status', 1);
     }
 
     public function drivers()
@@ -131,7 +132,10 @@ class Delegation extends Model
             ->where('drivers.status', 1);
     }
 
-
+    public function teamHead()
+    {
+        return $this->delegates()->where('team_head', true)->first();
+    }
 
     public function event()
     {

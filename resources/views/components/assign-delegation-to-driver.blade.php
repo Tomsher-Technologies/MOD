@@ -181,7 +181,7 @@
                                         </td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.code}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.value || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name || ''}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
                                     </tr>
                                 `;

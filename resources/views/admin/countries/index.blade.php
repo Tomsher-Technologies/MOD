@@ -60,7 +60,7 @@
                 @php
                     $columns = [
                         [
-                            'label' => '#',
+                            'label' => __db('sl_no'),
                             'render' => function ($country, $key) use ($countries) {
                                 return $countries->firstItem() + $key;
                             },
@@ -83,7 +83,7 @@
                         [
                             'label' => __db('status'),
                             'render' => function ($country) {
-                                if (auth()->user()->can('add_dropdown_options')) {
+                                if (can(['add_dropdown_options'])) {
                                     $checked = $country->status == 1 ? 'checked' : '';
                                     return '
                                     <div class="items-center">
@@ -110,15 +110,14 @@
                         ],
                         [
                             'label' => __db('action'),
+                            'permission' => ['add_dropdown_options'],
                             'render' => function ($country) {
-                                if (auth()->user()->can('add_dropdown_options')) {
-                                    // Return edit and delete buttons HTML as in original code here (truncated for brevity)
-                                    return '
+                                return '
                                          <button data-modal-target="edit-country-' .
-                                        $country->id .
-                                        '" data-modal-toggle="edit-country-' .
-                                        $country->id .
-                                        '" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 rounded-full inline-flex items-center justify-center">
+                                    $country->id .
+                                    '" data-modal-toggle="edit-country-' .
+                                    $country->id .
+                                    '" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 rounded-full inline-flex items-center justify-center">
                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
                                                 <path
@@ -126,7 +125,6 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </button> ';
-                                }
                                 return '';
                             },
                         ],
