@@ -129,6 +129,7 @@ class EscortController extends Controller
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
@@ -145,6 +146,7 @@ class EscortController extends Controller
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
+            'unit_id.exists' => __db('unit_id_exists'),
             'nationality_id.exists' => __db('nationality_id_exists'),
             'date_of_birth.date' => __db('date_of_birth_date'),
             'status.max' => __db('escort_status_max', ['max' => 255]),
@@ -215,6 +217,7 @@ class EscortController extends Controller
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
@@ -230,6 +233,7 @@ class EscortController extends Controller
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
+            'unit_id.exists' => __db('unit_id_exists'),
             'nationality_id.exists' => __db('nationality_id_exists'),
             'date_of_birth.date' => __db('date_of_birth_date'),
             'status.max' => __db('escort_status_max', ['max' => 255]),
@@ -262,6 +266,13 @@ class EscortController extends Controller
                 ],
             ],
             'internal_ranking_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'unit_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',

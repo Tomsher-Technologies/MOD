@@ -22,7 +22,7 @@
             </ul>
         </div>
     @endif
-    
+
     <!-- Drivers -->
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
         <form id="driver-form" action="{{ getRouteForPage('drivers.update', $driver->id) }}" method="POST"
@@ -78,6 +78,21 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('capacity', $driver->capacity) }}">
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('unit') }}:</label>
+                    <select name="unit"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option selected disabled>{{ __db('select') . ' ' . __db('unit') }}</option>
+                        @foreach (getDropDown('unit')->options ?? [] as $unit)
+                            <option value="{{ $unit->id }}"
+                                {{ old('unit', $driver->unit) == $unit->id ? 'selected' : '' }}>
+                                {{ $unit->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('status') }}:</label>
                     <select name="status"

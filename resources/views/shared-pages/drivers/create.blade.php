@@ -86,6 +86,20 @@
                         placeholder="{{ __db('enter') . ' ' . __db('capacity') }}">
                 </div>
 
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('unit') }}:</label>
+                    <select name="unit"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option disabled {{ old('unit') ? '' : 'selected' }}>{{ __db('Select Unit') }}
+                        </option>
+                        @foreach (getDropDown('unit')->options ?? [] as $unit)
+                            <option value="{{ $unit->id }}" {{ old('unit') == $unit->id ? 'selected' : '' }}>
+                                {{ $unit->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
             </div>
 
             <div class="flex justify-between items-center mt-8">

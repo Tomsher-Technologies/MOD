@@ -18,6 +18,7 @@ class Driver extends Model
         'name_en',
         'mobile_number',
         'driver_id',
+        'unit_id',
         'car_type',
         'car_number',
         'capacity',
@@ -46,6 +47,15 @@ class Driver extends Model
             }
         });
     }
+
+    public function unit()
+    {
+        return $this->belongsTo(DropdownOption::class, 'unit_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'unit');
+            });
+    }
+
     public function delegations()
     {
         return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')
