@@ -104,21 +104,30 @@
                                             $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
                                             $delegationUrl = getRouteForPage('delegation.show', $delegation->id);
 
-                                            $unassignButton =
-                                                '
+                                            $unassignButton = '';
+
+                                            if (
+                                                auth()->user() &&
+                                                auth()
+                                                    ->user()
+                                                    ->canAny(['assign_drivers'])
+                                            ) {
+                                                $unassignButton =
+                                                    '
                                                 <form class="unassign-form" action="' .
-                                                $unassignUrl .
-                                                '" method="POST" style="display:inline;">
+                                                    $unassignUrl .
+                                                    '" method="POST" style="display:inline;">
                                                     ' .
-                                                csrf_field() .
-                                                '
+                                                    csrf_field() .
+                                                    '
                                                     <input type="hidden" name="delegation_id" value="' .
-                                                $delegation->id .
-                                                '" />
+                                                    $delegation->id .
+                                                    '" />
                                                     <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-2 py-1 rounded-lg text-sm flex items-center gap-1">
                                                         Unassign
                                                     </button>
                                                 </form>';
+                                            }
 
                                             return '
                                                   <div class="flex items-center gap-2 mb-2">
@@ -444,7 +453,7 @@
                         cancelButtonText: 'Cancel'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            form.submit(); 
+                            form.submit();
                         }
                     });
                 });

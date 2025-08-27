@@ -69,3 +69,11 @@ insert into permissions (module, parent_id, name, title, guard_name, is_active) 
 
 alter table delegation_drivers add column start_date varchar(256);
 alter table delegation_drivers add column end_date varchar(256);
+
+insert into dropdowns (name, code, status) VALUES ('Unit', 'unit', 1);
+
+insert into dropdown_options (dropdown_id, value, sort_order, status) VALUES (19, 'Military', 1, 1);
+
+alter table drivers add column code varchar(256);
+
+alter table escorts add column code varchar(256);

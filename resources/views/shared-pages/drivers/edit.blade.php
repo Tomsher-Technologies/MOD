@@ -30,6 +30,19 @@
             @csrf
             @method('PUT')
             <div class="grid grid-cols-12 gap-5">
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title') }}:</label>
+                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
+                        <option value="" disabled>{{ __db('select_title') }}</option>
+                        @foreach (getDropDown('title')->options as $option)
+                            <option value="{{ $option->id }}" @if (old('title_id', $driver->title_id) == $option->id) selected @endif>
+                                {{ $option->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
                     <input type="text" name="military_number"

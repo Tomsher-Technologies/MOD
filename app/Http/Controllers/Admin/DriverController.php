@@ -25,6 +25,10 @@ class DriverController extends Controller
             'only' => ['create', 'store']
         ]);
 
+        $this->middleware('permission:assign_drivers', [
+            'only' => ['assign', 'unassign']
+        ]);
+
         $this->middleware('permission:edit_drivers', [
             'only' => ['edit', 'update']
         ]);

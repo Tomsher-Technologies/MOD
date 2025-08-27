@@ -23,10 +23,22 @@
         </div>
     @endif
 
-    <div class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
+    <div class="bg-white h-full w-full rounded-lg border-0 p-6">
+
         <form action="{{ getRouteForPage('drivers.store') }}" method="POST">
             @csrf
             <div class="grid grid-cols-12 gap-5">
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title') }}:</label>
+                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
+                        <option value="" disabled>{{ __db('select_title') }}</option>
+                        @foreach (getDropDown('title')->options as $option)
+                            <option value="{{ $option->id }}">
+                                {{ $option->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
@@ -36,14 +48,16 @@
 
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-4">
+
                     <label class="form-label">{{ __db('name_ar') }}:</label>
 
                     <input type="text" name="name_ar"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('أدخل الاسم هنا') }}">
                 </div>
-                <div class="col-span-3">
+                <div class="col-span-4">
+
                     <label class="form-label">{{ __db('name_en') }}:</label>
 
                     <input type="text" name="name_en"
@@ -51,7 +65,8 @@
                         placeholder="{{ __db('enter') }}">
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-4">
+
                     <label class="form-label">{{ __db('mobile_number') }}:</label>
                     <input type="text" name="mobile_number"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
