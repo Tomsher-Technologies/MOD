@@ -55,7 +55,7 @@ class DriverController extends Controller
                 $q->where('name_en', 'like', "%{$search}%")
                     ->orWhere('name_ar', 'like', "%{$search}%")
                     ->orWhere('military_number', 'like', "%{$search}%")
-                    ->orWhere('mobile_number', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%")
                     ->orWhere('driver_id', 'like', "%{$search}%")
                     ->orWhere('car_type', 'like', "%{$search}%")
                     ->orWhere('car_number', 'like', "%{$search}%")
@@ -134,7 +134,7 @@ class DriverController extends Controller
             'name_ar' => 'required|string|max:255',
             'military_number' => 'nullable|string|max:255',
             'name_en' => 'required|string|max:255',
-            'mobile_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
             'car_number' => 'nullable|string|max:255',
@@ -149,7 +149,7 @@ class DriverController extends Controller
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
             'title.max' => __db('driver_title_max', ['max' => 255]),
-            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
             'unit_id.exists' => __db('unit_id_exists'),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
@@ -210,7 +210,7 @@ class DriverController extends Controller
             'title' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
-            'mobile_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
             'car_number' => 'nullable|string|max:255',
@@ -226,7 +226,7 @@ class DriverController extends Controller
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
             'title.max' => __db('driver_title_max', ['max' => 255]),
-            'mobile_number.max' => __db('driver_mobile_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
             'unit_id.exists' => __db('unit_id_exists'),
@@ -258,7 +258,7 @@ class DriverController extends Controller
             'title' => [],
             'name_ar' => [],
             'name_en' => [],
-            'mobile_number' => [],
+            'phone_number' => [],
             'driver_id' => [],
             'car_type' => [],
             'car_number' => [],

@@ -85,7 +85,7 @@
                         ],
                         [
                             'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
+                            'key' => 'phone_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
                         [

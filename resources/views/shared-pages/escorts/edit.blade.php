@@ -61,6 +61,15 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('name_en', $escort->name_en) }}">
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('phone_number') }}:</label>
+                    <input type="text" name="phone_number"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}" value="{{ old('phone_number', $escort->phone_number) }}">
+                </div>
+
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}:</label>
                     <select name="gender_id"

@@ -152,3 +152,15 @@ INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_
 (103, 'hotel', NULL, 'accommodation_manage_driver', 'Manage Drivers', 'web', 1, NOW(), NOW()),
 (104, 'hotel', 103, 'accommodation_view_driver', 'View Drivers', 'web', 1, NOW(), NOW());
 
+
+ALTER TABLE drivers
+ADD COLUMN unit_id BIGINT UNSIGNED NULL AFTER status,
+ADD CONSTRAINT fk_drivers_unit_id
+    FOREIGN KEY (unit_id) REFERENCES dropdown_options(id)
+    ON DELETE SET NULL;
+
+ALTER TABLE escorts
+ADD COLUMN unit_id BIGINT UNSIGNED NULL AFTER status,
+ADD CONSTRAINT fk_escorts_unit_id
+    FOREIGN KEY (unit_id) REFERENCES dropdown_options(id)
+    ON DELETE SET NULL;

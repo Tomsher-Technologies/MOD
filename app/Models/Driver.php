@@ -16,7 +16,7 @@ class Driver extends Model
         'title',
         'name_ar',
         'name_en',
-        'mobile_number',
+        'phone_number',
         'driver_id',
         'unit_id',
         'car_type',

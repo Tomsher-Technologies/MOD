@@ -71,8 +71,8 @@
                         ],
                         [
                             'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
-                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
+                            'key' => 'phone_number',
+                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->phone_number) . '</span>',
                         ],
                         [
                             'label' => __db('driver') . ' ' . __db('id'),

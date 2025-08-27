@@ -62,21 +62,28 @@
                 </div>
                 --}}
 
-                <div class="col-span-3">
+                <div class="col-span-4">
                     <label class="form-label">{{ __db('name_ar') }}:</label>
                     <input type="text" name="name_ar" value="{{ old('name_ar') }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('أدخل الاسم هنا') }}">
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-4">
                     <label class="form-label">{{ __db('name_en') }}:</label>
                     <input type="text" name="name_en" value="{{ old('name_en') }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') }}">
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('phone_number') }}:</label>
+                    <input type="text" name="phone_number"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}">
+                </div>
+
+                <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}:</label>
                     <select name="gender_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
