@@ -91,6 +91,7 @@
 -- (63, 'deligate', 61, 'del_add_delegation', 'Add Delegations', 'web', 1, NOW(), NOW()),
 -- (64, 'deligate', 61, 'del_edit_delegation', 'Edit Delegations', 'web', 1, NOW(), NOW()),
 -- (65, 'deligate', 61, 'del_delete_delegation', 'Delete Delegations', 'web', 1, NOW(), NOW()),
+
 -- -- View/Manage other modules from Delegation
 -- -- Escort
 -- (66, 'deligate', NULL, 'del_manage_escort', 'Manage Escorts', 'web', 1, NOW(), NOW()),
@@ -167,11 +168,6 @@
 --     ON DELETE SET NULL;
 
 
-
-
-
-
-
 -- Jisha New Changes
 ALTER TABLE `delegates` CHANGE `delegation_id` `delegation_id` BIGINT UNSIGNED NULL DEFAULT NULL;
 ALTER TABLE `delegates` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE CASCADE ON UPDATE SET NULL;
@@ -189,3 +185,29 @@ ALTER TABLE `delegates` DROP FOREIGN KEY `delegates_ibfk_2`; ALTER TABLE `delega
 ALTER TABLE `escorts` DROP FOREIGN KEY `escorts_ibfk_2`; ALTER TABLE `escorts` ADD CONSTRAINT `escorts_ibfk_2` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;
 
 ALTER TABLE `drivers` DROP FOREIGN KEY `drivers_ibfk_1`; ALTER TABLE `drivers` ADD CONSTRAINT `drivers_ibfk_1` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+
+
+-- Shamil New changes
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('deligate', 61, 'del_edit_delegate', 'Edit Delegate', 'web', 1, NOW(), NOW()),
+('deligate', 61, 'del_add_delegate', 'Add Delegate', 'web', 1, NOW(), NOW()),
+('deligate', 61, 'del_delete_delegate', 'Delete Delegate', 'web', 1, NOW(), NOW()),
+('deligate', 61, 'del_view_delegate', 'Delete Delegate', 'web', 1, NOW(), NOW()),
+
+('deligate', 61, 'del_add_interviews', 'Add Interviews', 'web', 1, NOW(), NOW()),
+('deligate', 61, 'del_edit_interviews', 'Edit Interviews', 'web', 1, NOW(), NOW()),
+('deligate', 61, 'del_delete_interviews', 'Delete Interviews', 'web', 1, NOW(), NOW()),
+
+('deligate', 61, 'del_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
+('deligate', 61, 'del_add_travels', 'Add Travels', 'web', 1, NOW(), NOW()),
+
+('escort', 77, 'escort_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
+('driver', 88, 'driver_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
+('hotel', 99, 'accomodation_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
+
+
+('escort', 77, 'escort_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW()),
+('driver', 88, 'driver_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW()),
+('hotel', 99, 'accomodation_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW());
