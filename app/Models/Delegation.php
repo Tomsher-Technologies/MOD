@@ -119,15 +119,18 @@ class Delegation extends Model
     {
         return $this->belongsToMany(Escort::class, 'delegation_escorts', 'delegation_id', 'escort_id')
             ->withPivot('status', 'assigned_by')
-            ->wherePivot('status', 1);
+            ->wherePivot('status', 1)
+            ->where('escorts.status', 1); 
     }
 
     public function drivers()
     {
         return $this->belongsToMany(Driver::class, 'delegation_drivers', 'delegation_id', 'driver_id')
             ->withPivot('status', 'assigned_by')
-            ->wherePivot('status', 1);
+            ->wherePivot('status', 1)
+            ->where('drivers.status', 1);
     }
+
 
 
     public function event()

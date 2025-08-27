@@ -378,27 +378,21 @@ class EscortController extends Controller
 
         $delegationId = $request->delegation_id;
 
-        // Check if the escort is already assigned to this delegation
-        // $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
-
-        // if ($existingAssignment) {
-        //     // If the assignment exists and is marked as unassigned, update the status
-        //     if (!$existingAssignment->pivot->status) {
-        //         $escort->delegations()->updateExistingPivot($delegationId, [
-        //             'status' => 1,
-        //             'assigned_by' => auth()->id(),
-        //         ]);
-        //     }
-        // } else {
-        // If no assignment exists, create a new one
-        $escort->delegations()->attach($delegationId, [
-            'status' => 1,
-            'assigned_by' => auth()->id(),
+        $escort->delegations()->update([
+            'delegation_escorts.status' => 0,
         ]);
-        // }
+
+        $escort->delegations()->attach([
+            $delegationId => [
+                'status' => 1,
+                'assigned_by' => auth()->id(),
+            ],
+        ]);
 
         return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
+
+
 
     public function unassign(Request $request, Escort $escort)
     {

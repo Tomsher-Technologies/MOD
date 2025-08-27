@@ -67,7 +67,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('gender') }}:</label>
                     <select name="gender_id"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled {{ old('gender_id') ? '' : 'selected' }}>{{ __db('Select Gender') }}</option>
                         @foreach (getDropDown('gender')->options as $gender)
                             <option value="{{ $gender->id }}"
@@ -83,6 +83,8 @@
                     <select name="language_id[]" id="multiSelect" multiple
                         class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm"
                         placeholder="{{ __db('Select Languages') }}">
+                        <option disabled {{ old('language_id[]') ? '' : 'selected' }}>{{ __db('Select Languages') }}
+                        </option>
                         @php
                             $oldLanguageIds = old('language_id', []);
                         @endphp
@@ -98,13 +100,27 @@
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('rank') }}:</label>
                     <select name="internal_ranking_id"
-                        class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled {{ old('internal_ranking_id') ? '' : 'selected' }}>{{ __db('Select Rank') }}
                         </option>
                         @foreach (getDropDown('internal_ranking')->options as $rank)
                             <option value="{{ $rank->id }}"
                                 {{ old('internal_ranking_id') == $rank->id ? 'selected' : '' }}>
                                 {{ $rank->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('unit') }}:</label>
+                    <select name="unit"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option disabled {{ old('unit') ? '' : 'selected' }}>{{ __db('Select Unit') }}
+                        </option>
+                        @foreach (getDropDown('unit')->options ?? [] as $unit)
+                            <option value="{{ $unit->id }}" {{ old('unit') == $unit->id ? 'selected' : '' }}>
+                                {{ $unit->value }}
                             </option>
                         @endforeach
                     </select>

@@ -90,7 +90,8 @@ class DelegationController extends Controller
             'invitationStatus',
             'participationStatus',
             'delegates',
-            'escorts'
+            'escorts',
+            'drivers'
         ])->orderBy('id', 'desc');
 
         $currentEventId = session('current_event_id', getDefaultEventId());
@@ -134,6 +135,8 @@ class DelegationController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         $delegations = $query->paginate($limit);
+
+        return response()->json(['dd' => $delegations]);
 
         return view('admin.delegations.index', compact('delegations'));
     }
@@ -1540,6 +1543,8 @@ class DelegationController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $driverId = $request->input('driver_id');
+        $escortId = $request->input('escort_id');
+
 
         $query->where('event_id', $currentEventId);
 
@@ -1559,9 +1564,13 @@ class DelegationController extends Controller
 
         $query->whereDoesntHave('drivers', function ($q) use ($driverId) {
             $q->where('delegation_drivers.driver_id', $driverId)
-                ->where('delegation_drivers.status', 1); 
+                ->where('delegation_drivers.status', 1);
         });
 
+        $query->whereDoesntHave('escorts', function ($q) use ($escortId) {
+            $q->where('delegation_escorts.escort_id', $escortId)
+                ->where('delegation_escorts.status', 1);
+        });
 
         $delegations = $query->with('invitationFrom', 'country', 'continent')->get();
 

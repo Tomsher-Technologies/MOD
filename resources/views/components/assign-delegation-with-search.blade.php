@@ -14,6 +14,7 @@
 
     <form action="{{ route('escorts.assign', $escort->id) }}" method="POST">
         @csrf
+
         <div class="p-4 md:p-5 space-y-6 px-0">
             <div class="grid  grid-cols-12 gap-2 items-end">
                 <div class="col-span-5">
@@ -106,6 +107,8 @@
 
             let url = new URL(pageRoutes.delegationSearch, window.location.origin);
             url.searchParams.append('delegates', '1');
+            url.searchParams.append('escort_id', "{{ $escort->id }}");
+
 
             if (delegationCode) {
                 url = new URL(pageRoutes.delegationSearchByCode, window.location.origin);
