@@ -146,12 +146,36 @@
                             },
                         ],
                     ];
+
+                    $rowClass = function ($row) {
+                        $status = getRoomAssignmentStatus($row->id);
+                        if($status == 1){
+                            return 'bg-[#acf3bc]';
+                        }elseif ($status == 2) {
+                            return 'bg-[#e6d7a2]';
+                        }else {
+                            return 'bg-[#fff]';
+                        }
+                        
+                    };
+
                 @endphp
 
-                <x-reusable-table :data="$delegations" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegations" :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
 
                 <div class="mt-4">
                     {{ $delegations->appends(request()->input())->links() }}
+                </div>
+
+                <div class="flex items-center justify-start gap-6 mt-4">
+                     <div class="mt-3 flex items-center justify-start gap-3 ">
+                        <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
+                        <span class="text-gray-800 text-sm">{{ __db('partially_accommodated') }} </span>
+                     </div>
+                     <div class="mt-3 flex items-center justify-start gap-3 ">
+                        <div class="h-5 w-5 bg-[#acf3bc] rounded"></div>
+                        <span class="text-gray-800 text-sm">{{ __db('fully_accommodated') }}</span>
+                     </div>
                 </div>
             </div>
         </div>
