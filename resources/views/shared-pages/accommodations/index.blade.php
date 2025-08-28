@@ -20,12 +20,12 @@
                     <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
                         <li>
                             <a href="{{ getRouteForPage('accommodations.create') }}"
-                                class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') .' '.
+                                class="block px-3 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') .' '.
                                 __db('manually') }}</a>
                         </li>
                         @can('import_accommodations')
                             <li>
-                                <a href="{{ getRouteForPage('accommodations.import.form') }}" class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' .
+                                <a href="{{ getRouteForPage('accommodations.import.form') }}" class="block px-3 py-2 hover:bg-gray-100">{{ __db('add') . ' ' .
                                     __db('hotel') .' '. __db('bulk') }}</a>
                             </li>
                         @endcan
@@ -34,10 +34,8 @@
             @endcanany
 
 
-            @canany(['add_accommodations', 'external_member_add_accommodations'])
-            <a href="add-member.html"
-                class="btn text-md ms-4 mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg ">{{ __db('add')
-                . ' ' . __db('external_member') }}</a>
+            @canany(['view_external_members', 'assign_external_members'])
+                <a href="{{ route('admin.view-external-members') }}" class="btn text-md ms-4 mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg ">{{ __db('view'). ' ' . __db('external_member') }}</a>
             @endcan
 
         </div>
@@ -80,22 +78,22 @@
                     </thead>
                     <tbody>
                         @forelse ( $accommodations as $key => $hotel )
-                            <tr class=" align-[middle]">
-                                <td class="px-4 py-3 border border-gray-200">
+                            <tr class="text-xs align-[middle]">
+                                <td class="px-3 py-3 border border-gray-200">
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
-                                <td class="px-4 py-3 border border-gray-200 !text-[#B68A35]">
+                                <td class="px-3 py-3 border border-gray-200 !text-[#B68A35]">
                                     <a href="#">
                                         {{ $hotel->hotel_name ?? "-" }}
                                     </a>
                                 </td>
-                                <td class="px-4 py-3 border border-gray-200">
+                                <td class="px-3 py-3 border border-gray-200">
                                     {{ $hotel->address ?? "-" }}
                                 </td>
-                                <td class="px-4 py-3 text-end border border-gray-200" dir="ltr">
+                                <td class="px-3 py-3 text-end border border-gray-200" dir="ltr">
                                     {{ $hotel->contact_number ?? "-" }}
                                 </td>
-                                <td class="px-4 py-3 border border-gray-200">
+                                <td class="px-3 py-3 border border-gray-200">
                                     @if($hotel->contacts)
                                         @foreach ($hotel->contacts as $contact_person)
                                             <div class="mb-2">{{ $contact_person->name ?? "-" }} - {{ $contact_person->phone ?? "-" }}</div>
@@ -103,7 +101,7 @@
                                     @endif
                                 </td>
 
-                                <td class="px-4 py-3 border border-gray-200">
+                                <td class="px-3 py-3 border border-gray-200">
                                     @php
                                         $total_rooms = 0;
                                         $assigned_rooms = 0;
@@ -119,14 +117,14 @@
                                     @endif
                                   
                                 </td>
-                                <td class="px-4 py-3 border border-gray-200">
+                                <td class="px-3 py-3 border border-gray-200">
                                     {{ $assigned_rooms }}/{{ $total_rooms }}
                                 </td>
                                 
-                                <td class="px-4 py-2 border border-gray-200">
+                                <td class="px-3 py-2 border border-gray-200">
                                     <div class="flex align-center gap-4">
                                         @canany(['edit_accommodations', 'hotel_edit_accommodations'])
-                                            <a href="{{ route('accommodations.edit', ['id' => base64_encode($hotel->id)]) }}">
+                                            <a href="{{ route('accommodations.edit', ['id' => base64_encode($hotel->id)]) }}" title="{{ __db('edit_hotel') }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     viewBox="0 0 512 512">
                                                     <path
@@ -136,6 +134,14 @@
                                             </a>
                                         @endcanany
                                         
+                                        @canany(['assign_external_members'])
+                                            <a href="{{ route('external_accommodations.add', ['id' => base64_encode($hotel->id)]) }}" title="{{ __db('add_external_accommodation') }}">
+                                                <svg class=" text-[#B68A35]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  width="20" height="20" fill="none" viewBox="0 0 24 24">
+                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 14v4.833A1.166 1.166 0 0 1 16.833 20H5.167A1.167 1.167 0 0 1 4 18.833V7.167A1.166 1.166 0 0 1 5.167 6h4.618m4.447-2H20v5.768m-7.889 2.121 7.778-7.778"/>
+                                                </svg>
+                                            </a>
+                                        @endcanany
+
                                         {{-- <a href="#" data-modal-target="deleteModal" data-modal-toggle="deleteModal">
                                             <svg class="w-5.5 h-5.5 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -151,7 +157,7 @@
                             </tr>
                         @empty
                             <tr class="border-t">
-                                <td class="px-4 py-3 text-center " colspan="5" dir="ltr">
+                                <td class="px-3 py-3 text-center " colspan="5" dir="ltr">
                                     {{ __db('no_data_found') }}
                                 </td>
                             </tr>

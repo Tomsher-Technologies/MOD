@@ -138,11 +138,7 @@
                             @php
                                 $id = $row->id ?? uniqid();
                                 $badge = $row->team_head ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> ' : '';
-                                $arrival = $row->delegateTransports->where('type', 'arrival')->first();
-                                $departure = $row->delegateTransports->where('type', 'departure')->first();
-                                $departureStatus = $departure && $departure->status ? $departure->status?->value : null;
-                                $arrivalStatus = $arrival && $arrival->status ? $arrival->status?->value : null;
-
+                                
                                 $room = $row->currentRoomAssignment ?? null;
                                
                             @endphp
@@ -177,33 +173,36 @@
                                 </td>
                                
                                 <td class="px-1 border border-gray-200 py-3">
-                                    {{ $arrival->status?->value ?? '-' }}
+                                    {{ ucwords(str_replace('_', ' ', $row->participation_status)) ?? $row->participation_status  }}
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     <span class="hotel_name">{{ $room?->hotel?->hotel_name ?? '' }}</span>
                                     <input type="hidden" name="hotel_id" id="hotel_id{{ $row->id }}" class="hotel-id-input" data-delegate-id="{{ $row->id }}" value="{{ $room?->hotel_id ?? '' }}">
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
-
-                                    @php 
-                                        $options = '';
-                                        if($room){
-                                            $hotelid = $room->hotel_id;
-                                            $roomTypes = App\Models\AccommodationRoom::with('roomType')->where('accommodation_id', $hotelid)->get();
-                                            foreach($roomTypes as $roomType){
-                                                $options .= '<option value="'.$roomType->id.'" '.($roomType->id == $room->room_type_id ? 'selected' : '').'>'.$roomType->roomType?->value.'</option>';
+                                    @if($row->accommodation == 1)
+                                        @php 
+                                            $options = '';
+                                            if($room){
+                                                $hotelid = $room->hotel_id;
+                                                $roomTypes = App\Models\AccommodationRoom::with('roomType')->where('accommodation_id', $hotelid)->get();
+                                                foreach($roomTypes as $roomType){
+                                                    $options .= '<option value="'.$roomType->id.'" '.($roomType->id == $room->room_type_id ? 'selected' : '').'>'.$roomType->roomType?->value.'</option>';
+                                                }
                                             }
-                                        }
-                                    @endphp
+                                        @endphp
 
-                                    <select name="room_type" id="room_type" class="room-type-dropdown p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                        <option value="">{{ __db('select') }}</option>
-                                        {!! $options !!}
-                                    </select>
+                                        <select name="room_type" id="room_type" class="room-type-dropdown p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                            <option value="">{{ __db('select') }}</option>
+                                            {!! $options !!}
+                                        </select>
+                                    @endif
                                 </td>
                                 
                                 <td class="px-1 border border-gray-200 py-3">
-                                    <input type="text" name="room_number" id="room_number" class="room-number-input w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ $room?->room_number ?? '' }}">
+                                    @if($row->accommodation == 1)
+                                        <input type="text" name="room_number" id="room_number" class="room-number-input w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ $room?->room_number ?? '' }}">
+                                    @endif
                                 </td>
                                 
                                 @canany(['assign_accommodations', 'hotel_assign_accommodations'])
@@ -651,13 +650,17 @@
                 room_number: roomNumber,
                 delegation_id : {{ $delegation->id }}
             }, function(res) {
-                if(res.success) {
+                if(res.success === 1) {
                     row.css('background-color', '#acf3bc');
                     toastr.success('{{ __db("room_assigned") }}');
                     // row.find('.room-type-dropdown').val('');
                     // row.find('.room-number-input').val('');
-                } else {
+                } else if(res.success === 0) {
                     toastr.success('{{ __db("room_already_assigned") }}');
+                }else if(res.success === 2) {
+                    toastr.error('{{ __db("room_not_available") }}');
+                }else if(res.success === 3) {
+                    toastr.error('{{ __db("room_already_booked_by_external_member") }}');
                 }
                 checkboxDel.prop('checked', false);
             });
@@ -751,13 +754,17 @@
                 room_number: roomNumberEscort,
                 delegation_id : {{ $delegation->id }}
             }, function(res) {
-                if(res.success) {
+                if(res.success === 1) {
                     escortrow.css('background-color', '#acf3bc');
                     toastr.success('{{ __db("room_assigned") }}');
-                    // row.find('.room-type-dropdown').val('');
-                    // row.find('.room-number-input').val('');
-                } else {
+                    // escortrow.find('.room-type-dropdown').val('');
+                    // escortrow.find('.room-number-input').val('');
+                } else if(res.success === 0) {
                     toastr.success('{{ __db("room_already_assigned") }}');
+                }else if(res.success === 2) {
+                    toastr.error('{{ __db("room_not_available") }}');
+                }else if(res.success === 3) {
+                    toastr.error('{{ __db("room_already_booked_by_external_member") }}');
                 }
                 checkboxEscort.prop('checked', false);
             });
@@ -852,13 +859,17 @@
                 room_number: roomNumberDriver,
                 delegation_id : {{ $delegation->id }}
             }, function(res) {
-                if(res.success) {
+                if(res.success === 1) {
                     driverrow.css('background-color', '#acf3bc');
                     toastr.success('{{ __db("room_assigned") }}');
-                    // row.find('.room-type-dropdown').val('');
-                    // row.find('.room-number-input').val('');
-                } else {
+                    // driverrow.find('.room-type-dropdown').val('');
+                    // driverrow.find('.room-number-input').val('');
+                } else if(res.success === 0) {
                     toastr.success('{{ __db("room_already_assigned") }}');
+                }else if(res.success === 2) {
+                    toastr.error('{{ __db("room_not_available") }}');
+                }else if(res.success === 3) {
+                    toastr.error('{{ __db("room_already_booked_by_external_member") }}');
                 }
                 checkboxDriver.prop('checked', false);
             });

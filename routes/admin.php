@@ -145,7 +145,13 @@ Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])
     Route::get('/accommodation/{id}/rooms', [AccommodationController::class, 'getHotelRooms'])->name('accommodation.rooms');
     Route::post('/accommodation/room-assign', [AccommodationController::class, 'assignRoom'])->name('accommodation.assign-rooms');
     Route::get('/accommodation/hotel/{hotel}/occupancy', [AccommodationController::class, 'hotelOccupancy'])->name('accommodation.occupancy');
-    // Route::post('/accommodation/room-assign-escort', [AccommodationController::class, 'assignRoomEscort'])->name('accommodation.assign-rooms-escort');
+   
+    Route::get('/add-external-accommodation/{id}', [AccommodationController::class, 'addExternalMembers'])->name('external_accommodations.add');
+    Route::post('/add-external-accommodation', [AccommodationController::class, 'storeExternalMembers'])->name('admin.external-members.store');
+    Route::get('/external-accommodations', [AccommodationController::class, 'getExternalMembers'])->name('admin.view-external-members');
+    Route::get('/external-accommodations/{id}/edit', [AccommodationController::class, 'editExternalMembers'])->name('external-members.edit');
+    Route::put('/external-accommodations/{id}', [AccommodationController::class, 'updateExternalMembers'])->name('admin.external-members.update');
+    Route::delete('/external-accommodations/{id}', [AccommodationController::class, 'destroyExternalMembers'])->name('admin.external-members.destroy');
 
 
 });

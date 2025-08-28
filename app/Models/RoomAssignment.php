@@ -6,8 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class RoomAssignment extends Model
 {
-    protected $fillable = ['hotel_id', 'room_type_id', 'room_number', 'assigned_by', 'active_status'];
+    protected $fillable = ['hotel_id', 'room_type_id', 'room_number', 'assigned_by', 'active_status','delegation_id'];
 
+    public function delegation()
+    {
+        return $this->belongsTo(Delegation::class);
+    }
     public function assignable()
     {
         return $this->morphTo();
