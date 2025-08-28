@@ -2,6 +2,9 @@
 
 use App\Models\Country;
 use App\Models\User;
+use App\Models\Delegate;
+use App\Models\Escort;
+use App\Models\Driver;
 use App\Models\Event;
 use App\Models\Language;
 use Illuminate\Support\Str;
@@ -574,3 +577,42 @@ if (!function_exists('can')) {
         return false;
     }
 }
+
+    function getRoomAssignmentStatus($delegationId)
+    {
+        $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)
+                            ->pluck('current_room_assignment_id');
+
+        $escorts = Escort::whereIn('id', function ($q) use ($delegationId) {
+                        $q->select('escort_id')
+                        ->from('delegation_escorts')
+                        ->where('status', 1)
+                        ->where('delegation_id', $delegationId);
+                    })
+                    ->pluck('current_room_assignment_id');
+
+        $drivers = Driver::whereIn('id', function ($q) use ($delegationId) {
+                        $q->select('driver_id')
+                        ->from('delegation_drivers')
+                        ->where('status', 1)
+                        ->where('delegation_id', $delegationId);
+                    })
+                    ->pluck('current_room_assignment_id');
+
+        $all = $delegates->merge($escorts)->merge($drivers);
+
+        if ($all->count() === 0) {
+            return 'No Members';
+        }
+
+        $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
+        $totalCount    = $all->count();
+
+        if ($assignedCount === 0) {
+            return 0;
+        } elseif ($assignedCount === $totalCount) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }

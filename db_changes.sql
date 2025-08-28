@@ -91,7 +91,6 @@
 -- (63, 'deligate', 61, 'del_add_delegation', 'Add Delegations', 'web', 1, NOW(), NOW()),
 -- (64, 'deligate', 61, 'del_edit_delegation', 'Edit Delegations', 'web', 1, NOW(), NOW()),
 -- (65, 'deligate', 61, 'del_delete_delegation', 'Delete Delegations', 'web', 1, NOW(), NOW()),
-
 -- -- View/Manage other modules from Delegation
 -- -- Escort
 -- (66, 'deligate', NULL, 'del_manage_escort', 'Manage Escorts', 'web', 1, NOW(), NOW()),
@@ -185,75 +184,6 @@
 -- ALTER TABLE `escorts` DROP FOREIGN KEY `escorts_ibfk_2`; ALTER TABLE `escorts` ADD CONSTRAINT `escorts_ibfk_2` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;
 
 -- ALTER TABLE `drivers` DROP FOREIGN KEY `drivers_ibfk_1`; ALTER TABLE `drivers` ADD CONSTRAINT `drivers_ibfk_1` FOREIGN KEY (`current_room_assignment_id`) REFERENCES `room_assignments`(`id`) ON DELETE SET NULL ON UPDATE SET NULL;
-
-
-
--- -- Shamil New changes
-
--- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
--- ('deligate', 61, 'del_edit_delegate', 'Edit Delegate', 'web', 1, NOW(), NOW()),
--- ('deligate', 61, 'del_add_delegate', 'Add Delegate', 'web', 1, NOW(), NOW()),
--- ('deligate', 61, 'del_delete_delegate', 'Delete Delegate', 'web', 1, NOW(), NOW()),
--- ('deligate', 61, 'del_view_delegate', 'Delete Delegate', 'web', 1, NOW(), NOW()),
-
--- ('deligate', 61, 'del_add_interviews', 'Add Interviews', 'web', 1, NOW(), NOW()),
--- ('deligate', 61, 'del_edit_interviews', 'Edit Interviews', 'web', 1, NOW(), NOW()),
--- ('deligate', 61, 'del_delete_interviews', 'Delete Interviews', 'web', 1, NOW(), NOW()),
-
--- ('deligate', 61, 'del_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
--- ('deligate', 61, 'del_add_travels', 'Add Travels', 'web', 1, NOW(), NOW()),
-
--- ('escort', 77, 'escort_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
--- ('driver', 88, 'driver_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
--- ('hotel', 99, 'accomodation_view_travels', 'View Travels', 'web', 1, NOW(), NOW()),
-
-
--- ('escort', 77, 'escort_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW()),
--- ('driver', 88, 'driver_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW()),
--- ('hotel', 99, 'accomodation_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW());
-
-
-
--- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
--- ('escort', 72, 'escort_assign_escorts', 'Assign Escorts', 'web', 1, NOW(), NOW()),
--- ('escort', 72, 'escort_unassign_escorts', 'Unassign Escorts', 'web', 1, NOW(), NOW()),
-
--- ('driver', 83, 'driver_assign_drivers', 'Assign Drivers', 'web', 1, NOW(), NOW()),
--- ('driver', 83, 'driver_unassign_drivers', 'Unassign Drivers', 'web', 1, NOW(), NOW());
-
-
--- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
--- ('admin', 22, 'view_interviews', 'View Interviews', 'web', 1, NOW(), NOW());
-
-
-
--- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
--- ('deligate', 61, 'del_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW()),
-
--- ('escort', 77, 'escort_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW()),
-
--- ('driver', 88, 'driver_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW()),
-
--- ('hotel', 99, 'accomodation_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW());
-
-
-
--- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
--- ('deligate', 61, 'del_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW()),
-
--- ('escort', 77, 'escort_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW()),
-
--- ('driver', 88, 'driver_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW()),
-
--- ('hotel', 99, 'accommodation_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW());
-
-
-
-
-
-
-
--- NEW TABLE
 
 INSERT INTO `permissions` 
 (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
@@ -427,3 +357,40 @@ ON DELETE CASCADE
 ON UPDATE CASCADE;
 
 
+
+
+-- Jisha New changes 28/08/2025
+ALTER TABLE `room_assignments` ADD `delegation_id` BIGINT NULL DEFAULT NULL AFTER `id`;
+ALTER TABLE `room_assignments` CHANGE `delegation_id` `delegation_id` BIGINT UNSIGNED NULL DEFAULT NULL;
+ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_hotel_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_hotel_id_foreign` FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION; ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_room_type_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_room_type_id_foreign` FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+ALTER TABLE `room_assignments` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+ALTER TABLE accommodation_rooms 
+ADD COLUMN available_rooms INT GENERATED ALWAYS AS (total_rooms - assigned_rooms) STORED AFTER assigned_rooms;
+
+
+CREATE TABLE IF NOT EXISTS `external_member_assignments` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `hotel_id` bigint UNSIGNED DEFAULT NULL,
+  `room_type_id` bigint UNSIGNED DEFAULT NULL,
+  `room_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `active_status` tinyint(1) NOT NULL DEFAULT '1',
+  `assigned_by` bigint UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  
+  KEY `room_assignments_hotel_id_foreign` (`hotel_id`),
+  KEY `room_assignments_room_type_id_foreign` (`room_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+
+ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+
+ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`assigned_by`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
