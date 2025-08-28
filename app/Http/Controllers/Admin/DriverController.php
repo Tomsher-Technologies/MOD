@@ -137,7 +137,7 @@ class DriverController extends Controller
     {
         $request->validate([
             'military_number' => 'nullable|string|max:255',
-            'title' => 'nullable|string|max:255',
+            'title_id' => 'nullable|string|exists:dropdown_options,id',
             'name_ar' => 'required|string|max:255',
             'military_number' => 'nullable|string|max:255',
             'name_en' => 'required|string|max:255',
@@ -155,7 +155,6 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'title.max' => __db('driver_title_max', ['max' => 255]),
             'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
             'unit_id.exists' => __db('unit_id_exists'),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
@@ -214,7 +213,7 @@ class DriverController extends Controller
     {
         $validated = $request->validate([
             'military_number' => 'nullable|string|max:255',
-            'title' => 'nullable|string|max:255',
+            'title_id' => 'nullable|string|exists:dropdown_options,id',
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'phone_number' => 'nullable|string|max:255',
@@ -232,7 +231,6 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'title.max' => __db('driver_title_max', ['max' => 255]),
             'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
@@ -247,6 +245,13 @@ class DriverController extends Controller
 
         // Define relations to compare for confirmation dialog
         $relationsToCompare = [
+            'title_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
             'delegation_id' => [
                 'display_with' => [
                     'model' => \App\Models\Delegation::class,

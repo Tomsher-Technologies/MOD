@@ -336,6 +336,26 @@ INSERT INTO `permissions`
 (112, 'hotel', 111, 'hotel_view_drivers', 'View Drivers', 'web', 1, NULL, NULL);
 
 
+ALTER TABLE escorts
+CHANGE title title_id BIGINT(20) UNSIGNED;
+
+ALTER TABLE escorts
+ADD CONSTRAINT fk_escorts_title_id
+FOREIGN KEY (title_id) REFERENCES dropdown_options(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+
+
+ALTER TABLE drivers
+CHANGE title title_id BIGINT(20) UNSIGNED;
+
+ALTER TABLE drivers
+ADD CONSTRAINT fk_drivers_title_id
+FOREIGN KEY (title_id) REFERENCES dropdown_options(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
 
 
 

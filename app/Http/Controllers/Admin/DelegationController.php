@@ -47,7 +47,7 @@ class DelegationController extends Controller
 
         // === Delegates ===
         $this->middleware('permission:add_delegates|delegate_add_delegates', [
-            'only' => ['addDelegate', 'syncTransportInfo']
+            'only' => ['addDelegate', 'syncTransportInfo', 'storeOrUpdateDelegate']
         ]);
 
         $this->middleware('permission:delete_delegates|delegate_delete_delegates', [
@@ -55,7 +55,7 @@ class DelegationController extends Controller
         ]);
 
         $this->middleware('permission:edit_delegates|delegate_edit_delegates', [
-            'only' => ['editDelegate', 'syncTransportInfo']
+            'only' => ['editDelegate', 'syncTransportInfo', 'storeOrUpdateDelegate']
         ]);
 
         // === Interviews ===

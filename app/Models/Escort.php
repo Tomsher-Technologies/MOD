@@ -22,13 +22,14 @@ class Escort extends Model
         'spoken_languages',
         'internal_ranking_id',
         'status',
-        'title',
+        'title_id',
         'unit_id',
         'rank',
         'phone_number',
         'email',
         'nationality_id',
-        'date_of_birth', 'current_room_assignment_id'
+        'date_of_birth',
+        'current_room_assignment_id'
     ];
 
     protected $casts = [
@@ -52,6 +53,14 @@ class Escort extends Model
                 }
             }
         });
+    }
+
+    public function title()
+    {
+        return $this->belongsTo(DropdownOption::class, 'title_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'title');
+            });
     }
 
     public function getSpokenLanguagesLabelsAttribute()

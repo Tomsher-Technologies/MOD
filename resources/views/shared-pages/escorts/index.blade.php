@@ -76,7 +76,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title),
+                            'render' => fn($escort) => e($escort->title->value ?? ""),
                         ],
                         [
                             'label' => __db('name_en'),
