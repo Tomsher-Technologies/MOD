@@ -44,7 +44,7 @@
                         }
                     @endphp
 
-                    @if (!$colPermissions || auth()->user()->canAny($colPermissions))
+                    @if (!$colPermissions || can($colPermissions))
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                             {{ $column['label'] }}
                         </th>
@@ -64,7 +64,7 @@
                     }
                 @endphp
 
-                @if (!$rowPermissions || auth()->user()->canAny($rowPermissions))
+                @if (!$rowPermissions || can($rowPermissions))
                     <tr class="text-sm align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
                         data-id="{{ $row->id }}">
                         @foreach ($columns as $column)
@@ -78,7 +78,7 @@
                                 }
                             @endphp
 
-                            @if (!$colPermissions || auth()->user()->canAny($colPermissions))
+                            @if (!$colPermissions || can($colPermissions))
                                 <td class="px-4 py-2 border border-gray-200"
                                     data-column="{{ Str::slug($column['label']) }}">
                                     {!! $column['render']($row, $key) !!}

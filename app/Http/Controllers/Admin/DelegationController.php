@@ -28,57 +28,50 @@ class DelegationController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_delegations', [
-            'only' => ['index', 'setDefault', 'search', 'members', 'editAttachment', 'updateAttachments', 'destroyAttachment']
+        $this->middleware('permission:view_delegations|del_view_delegations|escort_view_delegations|driver_view_delegations|accommodation_view_delegations', [
+            'only' => ['index', 'search', 'searchByCode', 'members', 'interviewsIndex', 'show']
         ]);
 
-        $this->middleware('permission:add_delegations', [
-            'only' => ['create', 'store']
+        $this->middleware('permission:add_delegations|del_add_delegations', [
+            'only' => ['create', 'store', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:edit_delegations', [
-            'only' => ['edit', 'update']
+        $this->middleware('permission:edit_delegations|del_edit_delegations', [
+            'only' => ['edit', 'update', 'setDefault',  'editAttachment', 'updateAttachments', 'destroyAttachment', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:view_delegations', [
-            'only' => ['show']
+        $this->middleware('permission:del_add_delegate|add_delegate', [
+            'only' => ['addDelegate', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:add_delegate', [
-            'only' => ['addDelegate']
+        $this->middleware('permission:del_delete_delegate|delete_delegate', [
+            'only' => ['destroyDelegate', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:delete_delegate', [
-            'only' => ['destroyDelegate']
+        $this->middleware('permission:del_edit_delegate|edit_delegate', [
+            'only' => ['editDelegate', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:edit_delegate', [
-            'only' => ['editDelegate']
+        $this->middleware('permission:del_add_interviews|add_interviews', [
+            'only' => ['storeOrUpdateInterview', 'addInterview']
         ]);
 
-        $this->middleware('permission:add_interviews', [
-            'only' => ['storeOrUpdateInterview']
-        ]);
-
-        $this->middleware('permission:edit_interviews', [
+        $this->middleware('permission:del_edit_interviews|edit_interviews', [
             'only' => ['editInterview', 'storeOrUpdateInterview']
         ]);
 
-        $this->middleware('permission:delete_interviews', [
+        $this->middleware('permission:del_delete_interviews|delete_interviews', [
             'only' => ['destroyInterview']
         ]);
 
-        $this->middleware('permission:add_travels', [
-            'only' => ['addTravel', 'storeTravel']
+        $this->middleware('permission:del_add_travels|add_travels', [
+            'only' => ['addTravel', 'storeTravel', 'updateTravel']
         ]);
 
-        $this->middleware('permission:view_travels', [
-            'only' => ['arrivalsIndex', 'departuresIndex']
+        $this->middleware('permission:del_view_travels|view_travels|escort_view_travels|driver_view_travels|accommodation_view_travels', [
+            'only' => ['arrivalsIndex', 'departuresIndex', 'getTravelDetails']
         ]);
-
-        // $this->middleware('permission:view_interviews', [
-        //     'only' => ['interviews']
-        // ]);
+        
     }
 
     public function index(Request $request)

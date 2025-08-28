@@ -2,10 +2,12 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
         <h2 class="font-semibold text-2xl">{{ __db('delegation') }}</h2>
         <div class="flex gap-3 ms-auto">
-            <a href="{{ getRouteForPage('delegation.edit', $delegation->id) }}" data-modal-hide="default-modal"
-                class="btn text-sm ms-auto !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-5">
-                {{ __db('edit') }}
-            </a>
+            @canany(['edit_delegations', 'del_edit_delegations'])
+                <a href="{{ getRouteForPage('delegation.edit', $delegation->id) }}" data-modal-hide="default-modal"
+                    class="btn text-sm ms-auto !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-5">
+                    {{ __db('edit') }}
+                </a>
+            @endcanany
             <x-back-btn class="" back-url="{{ getRouteForPage('delegations.index') }}" />
         </div>
     </div>

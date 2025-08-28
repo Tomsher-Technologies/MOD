@@ -17,24 +17,32 @@ class EscortController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_escorts', [
+        $this->middleware('permission:view_escorts|del_view_escorts|delegation_view_escorts', [
             'only' => ['index', 'search']
         ]);
 
-        $this->middleware('permission:add_escorts', [
+        $this->middleware('permission:add_escorts|del_add_escorts', [
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:assign_escorts', [
+        $this->middleware('permission:assign_escorts|del_assign_escorts', [
             'only' => ['assign', 'unassign']
         ]);
 
-        $this->middleware('permission:edit_escorts', [
+        $this->middleware('permission:edit_escorts|del_edit_escorts', [
             'only' => ['edit', 'update']
         ]);
 
-        $this->middleware('permission:delete_escorts', [
+        $this->middleware('permission:delete_escorts|del_delete_escorts', [
             'only' => ['destroy']
+        ]);
+        
+        $this->middleware('permission:del_view_travels|view_travels|escort_view_travels|driver_view_travels|accommodation_view_travels', [
+            'only' => ['arrivalsIndex', 'departuresIndex']
+        ]);
+        
+        $this->middleware('permission:del_view_delegate|view_delegate|escort_view_delegate|driver_view_delegate|accommodation_view_delegate', [
+            'only' => ['delegatesIndex']
         ]);
     }
 
@@ -93,11 +101,11 @@ class EscortController extends Controller
         $escort->status = $request->status;
         $escort->save();
 
-        if ($request->status == 0) {
-            $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
-                'status' => 0,
-            ]);
-        }
+        // if ($request->status == 0) {
+        //     $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
+        //         'status' => 0,
+        //     ]);
+        // }
 
         return response()->json(['status' => 'success']);
     }
@@ -433,5 +441,35 @@ class EscortController extends Controller
             'languages' => $languages ? $languages->options : collect(),
             'ranks' => $ranks ? $ranks->options : collect(),
         ];
+    }
+    
+    /**
+     * Display arrivals index for escorts.
+     */
+    public function arrivalsIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with escort_view_travels permission
+        // Implementation would be similar to delegation controller's arrivalsIndex
+        return redirect()->route('escorts.index');
+    }
+    
+    /**
+     * Display departures index for escorts.
+     */
+    public function departuresIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with escort_view_travels permission
+        // Implementation would be similar to delegation controller's departuresIndex
+        return redirect()->route('escorts.index');
+    }
+    
+    /**
+     * Display delegates index for escorts.
+     */
+    public function delegatesIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with escort_view_delegate permission
+        // Implementation would be similar to delegation controller's delegates functionality
+        return redirect()->route('escorts.index');
     }
 }

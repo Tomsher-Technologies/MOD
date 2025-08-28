@@ -106,12 +106,7 @@
 
                                             $unassignButton = '';
 
-                                            if (
-                                                auth()->user() &&
-                                                auth()
-                                                    ->user()
-                                                    ->canAny(['assign_drivers'])
-                                            ) {
+                                            if (can(['assign_drivers'])) {
                                                 $unassignButton =
                                                     '
                                                 <form class="unassign-form" action="' .
@@ -192,12 +187,7 @@
                                 $output = '<div class="flex flex-col items-start gap-2">'; // flex column with gap
 
                                 // Edit button
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['edit_drivers'])
-                                ) {
+                                if (can(['edit_drivers'])) {
                                     $output .=
                                         '
                                 <a href="' .
@@ -211,13 +201,7 @@
                                 }
 
                                 // Assign button
-                                if (
-                                    $driver->status == 1 &&
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['assign_drivers'])
-                                ) {
+                                if (can(['assign_drivers'])) {
                                     $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
                                     $output .=
                                         '

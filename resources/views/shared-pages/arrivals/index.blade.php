@@ -128,7 +128,7 @@
                         ],
                         [
                             'label' => __db('actions'),
-                            'permission' => ['add_travels'],
+                            'permission' => ['add_travels', 'del_add_travels'],
                             'render' => function ($row) {
                                 $arrivalData = [
                                     'id' => $row->id,
@@ -327,7 +327,7 @@
                     </option>
                 @endforeach
             </select>
-            <select name="continent_id"
+            <select name="continent_id" id="continent"
                 class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                 <option value="">{{ __db('all_continents') }}</option>
                 @foreach (getDropDown('continents')->options as $continent)
@@ -337,7 +337,7 @@
                     </option>
                 @endforeach
             </select>
-            <select name="country_id"
+            <select name="country_id" id="country"
                 class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                 <option value="">{{ __db('all_countries') }}</option>
                 @foreach (getDropDown('country')->options as $country)
@@ -390,9 +390,43 @@
                     }));
                 });
             });
+
+            // Handle continent change to load countries
+            const continentSelect = $("#continent");
+            const countrySelect = $("#country");
+
+            continentSelect.on("change", async function() {
+                const selectedContinent = $(this).val();
+
+                // Clear current options except the default
+                countrySelect.find('option[value!=""]').remove();
+
+                if (selectedContinent) {
+                    try {
+                        let response = await fetch(
+                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
+                        let countries = await response.json();
+
+                        // Add new options
+                        countries.forEach(country => {
+                            let option = new Option(country.name, country.id, false, false);
+                            countrySelect.append(option);
+                        });
+
+                        countrySelect.trigger("change");
+                    } catch (error) {
+                        console.error("Error fetching countries:", error);
+                    }
+                }
+            });
+
+            // Trigger continent change on page load if a continent is already selected
+            const selectedContinent = continentSelect.val();
+            if (selectedContinent) {
+                continentSelect.trigger("change");
+            }
         });
     </script>
-
 
 
     <script>

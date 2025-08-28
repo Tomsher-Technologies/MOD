@@ -106,7 +106,22 @@
                             'label' => __db('assigned') . ' ' . __db('delegation'),
                             'key' => 'assigned_delegation',
                             'render' => function ($escort) {
-                                return e($escort->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
+                                return $escort->delegations
+                                    ->where('pivot.status', 1)
+                                    ->map(function ($delegation) {
+                                        $delegationUrl = $delegation->id
+                                            ? getRouteForPage('delegation.show', $delegation->id)
+                                            : '';
+
+                                        return '<a class="font-medium !text-[#B68A35] hover:underline" href="' .
+                                            $delegationUrl .
+                                            '?id=' .
+                                            $delegation->id .
+                                            '">' .
+                                            e($delegation->code) .
+                                            '</a>';
+                                    })
+                                    ->implode(', ');
                             },
                         ],
                         [
@@ -136,12 +151,7 @@
                             'render' => function ($escort) {
                                 $editUrl = getRouteForPage('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['edit_escorts'])
-                                ) {
+                                if (can(['edit_escorts'])) {
                                     $output .=
                                         '<a href="' .
                                         $editUrl .
@@ -163,12 +173,7 @@
                                                 '</span></button></form>';
                                         }
                                     } else {
-                                        if (
-                                            auth()->user() &&
-                                            auth()
-                                                ->user()
-                                                ->canAny(['assign_escorts'])
-                                        ) {
+                                        if (can(['assign_escorts'])) {
                                             $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
                                             $output .=
                                                 '<a href="' .

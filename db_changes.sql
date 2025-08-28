@@ -211,3 +211,5 @@ INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`,
 ('escort', 77, 'escort_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW()),
 ('driver', 88, 'driver_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW()),
 ('hotel', 99, 'accomodation_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW());
+
+
