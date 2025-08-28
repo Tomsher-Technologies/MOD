@@ -336,61 +336,61 @@ INSERT INTO `permissions`
 (112, 'hotel', 111, 'hotel_view_drivers', 'View Drivers', 'web', 1, NULL, NULL);
 
 
-ALTER TABLE escorts
-CHANGE title title_id BIGINT(20) UNSIGNED;
+-- ALTER TABLE escorts
+-- CHANGE title title_id BIGINT(20) UNSIGNED;
 
-ALTER TABLE escorts
-ADD CONSTRAINT fk_escorts_title_id
-FOREIGN KEY (title_id) REFERENCES dropdown_options(id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+-- ALTER TABLE escorts
+-- ADD CONSTRAINT fk_escorts_title_id
+-- FOREIGN KEY (title_id) REFERENCES dropdown_options(id)
+-- ON DELETE CASCADE
+-- ON UPDATE CASCADE;
 
 
 
-ALTER TABLE drivers
-CHANGE title title_id BIGINT(20) UNSIGNED;
+-- ALTER TABLE drivers
+-- CHANGE title title_id BIGINT(20) UNSIGNED;
 
-ALTER TABLE drivers
-ADD CONSTRAINT fk_drivers_title_id
-FOREIGN KEY (title_id) REFERENCES dropdown_options(id)
-ON DELETE CASCADE
-ON UPDATE CASCADE;
+-- ALTER TABLE drivers
+-- ADD CONSTRAINT fk_drivers_title_id
+-- FOREIGN KEY (title_id) REFERENCES dropdown_options(id)
+-- ON DELETE CASCADE
+-- ON UPDATE CASCADE;
 
 
 
 
 -- Jisha New changes 28/08/2025
-ALTER TABLE `room_assignments` ADD `delegation_id` BIGINT NULL DEFAULT NULL AFTER `id`;
-ALTER TABLE `room_assignments` CHANGE `delegation_id` `delegation_id` BIGINT UNSIGNED NULL DEFAULT NULL;
-ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_hotel_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_hotel_id_foreign` FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION; ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_room_type_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_room_type_id_foreign` FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
-ALTER TABLE `room_assignments` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+-- ALTER TABLE `room_assignments` ADD `delegation_id` BIGINT NULL DEFAULT NULL AFTER `id`;
+-- ALTER TABLE `room_assignments` CHANGE `delegation_id` `delegation_id` BIGINT UNSIGNED NULL DEFAULT NULL;
+-- ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_hotel_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_hotel_id_foreign` FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION; ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_room_type_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_room_type_id_foreign` FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+-- ALTER TABLE `room_assignments` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-ALTER TABLE accommodation_rooms 
-ADD COLUMN available_rooms INT GENERATED ALWAYS AS (total_rooms - assigned_rooms) STORED AFTER assigned_rooms;
+-- ALTER TABLE accommodation_rooms 
+-- ADD COLUMN available_rooms INT GENERATED ALWAYS AS (total_rooms - assigned_rooms) STORED AFTER assigned_rooms;
 
 
-CREATE TABLE IF NOT EXISTS `external_member_assignments` (
-  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `hotel_id` bigint UNSIGNED DEFAULT NULL,
-  `room_type_id` bigint UNSIGNED DEFAULT NULL,
-  `room_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `active_status` tinyint(1) NOT NULL DEFAULT '1',
-  `assigned_by` bigint UNSIGNED DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
+-- CREATE TABLE IF NOT EXISTS `external_member_assignments` (
+--   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+--     `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+--   `hotel_id` bigint UNSIGNED DEFAULT NULL,
+--   `room_type_id` bigint UNSIGNED DEFAULT NULL,
+--   `room_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+--   `active_status` tinyint(1) NOT NULL DEFAULT '1',
+--   `assigned_by` bigint UNSIGNED DEFAULT NULL,
+--   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+--   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`id`),
   
-  KEY `room_assignments_hotel_id_foreign` (`hotel_id`),
-  KEY `room_assignments_room_type_id_foreign` (`room_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+--   KEY `room_assignments_hotel_id_foreign` (`hotel_id`),
+--   KEY `room_assignments_room_type_id_foreign` (`room_type_id`)
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+-- ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
-ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+-- ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
-ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`assigned_by`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+-- ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`assigned_by`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
