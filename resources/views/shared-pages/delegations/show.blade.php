@@ -2,11 +2,13 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
         <h2 class="font-semibold text-2xl">{{ __db('delegation') }}</h2>
         <div class="flex gap-3 ms-auto">
-            <a href="{{ getRouteForPage('delegation.edit', $delegation->id) }}" data-modal-hide="default-modal"
-                class="btn text-sm ms-auto !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-5">
-                {{ __db('edit') }}
-            </a>
-            <x-back-btn class="" back-url="{{ getRouteForPage('delegations.index') }}" />
+            @canany(['edit_delegations', 'del_edit_delegations'])
+                <a href="{{ route('delegations.edit', $delegation->id) }}" data-modal-hide="default-modal"
+                    class="btn text-sm ms-auto !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-5">
+                    {{ __db('edit') }}
+                </a>
+            @endcanany
+            <x-back-btn class="" back-url="{{ route('delegations.index') }}" />
         </div>
     </div>
 
@@ -159,8 +161,11 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
-                    <a href={{ getRouteForPage('escorts.index') }}
-                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escort') }}</a>
+
+                    @canany(['add_escorts', 'escort_add_escorts'])
+                        <a href={{ route('escorts.index') }}
+                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escort') }}</a>
+                    @endcanany
                 </div>
                 @php
                     $columns = [
@@ -218,8 +223,11 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
-                    <a href={{ getRouteForPage('drivers.index') }}
-                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+
+                    @canany(['add_drivers', 'driver_add_drivers'])
+                        <a href={{ route('drivers.index') }}
+                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+                    @endcanany
                 </div>
                 @php
                     $columns = [
@@ -544,7 +552,7 @@
             } else {
                 var status = 0;
             }
-            $.post('{{ getRouteForPage('escorts.status') }}', {
+            $.post('{{ route('escorts.status') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status
@@ -571,7 +579,7 @@
             } else {
                 var status = 0;
             }
-            $.post('{{ getRouteForPage('drivers.status') }}', {
+            $.post('{{ route('drivers.status') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status

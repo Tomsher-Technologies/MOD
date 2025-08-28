@@ -187,7 +187,7 @@
             let total = parseInt($(this).data('total'));
             let assigned = parseInt($(this).data('assigned'));
             let roomId = $(this).data('id');
-            let routeUrl = "{{ getRouteForPage('accommodation-rooms.destroy', ':id') }} ".replace(':id', roomId);
+            let routeUrl = "{{ route('accommodation-rooms.destroy', ':id') }} ".replace(':id', roomId);
 
             if (assigned != 0) {
                 toastr.error("{{ __db('this_room_type_has_been_assigned') }}");

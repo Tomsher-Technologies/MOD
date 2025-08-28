@@ -29,7 +29,7 @@
         <div class="text-red-600">{{ $message }}</div>
     @enderror
 
-    <form method="POST" action="{{ getRouteForPage('delegation.storeInterview', $delegation->id) ?? '#' }}"
+    <form method="POST" action="{{ route('delegations.storeOrUpdateInterview', $delegation->id) ?? '#' }}"
         enctype="multipart/form-data">
         @csrf
         @php
@@ -274,9 +274,9 @@
 
     <script>
         window.pageRoutes = {
-            delegationSearchByCode: @json(getRouteForPage('delegation.searchByCode')),
-            delegationSearchByFilters: @json(getRouteForPage('delegation.search')),
-            delegationMembers: @json(getRouteForPage('delegation.members'))
+            delegationSearchByCode: @json(route('delegations.searchByCode')),
+            delegationSearchByFilters: @json(route('delegations.search')),
+            delegationMembers: @json(route('delegations.members'))
         };
     </script>
 

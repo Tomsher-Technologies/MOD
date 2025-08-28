@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <form id="create-delegation-form" action="{{ getRouteForPage('delegation.store') ?? '#' }}" method="POST"
+    <form id="create-delegation-form" action="{{ route('delegations.store') ?? '#' }}" method="POST"
         autocomplete="off" enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
@@ -45,7 +45,7 @@
                 @endphp
 
                 <div class="col-span-3">
-                        <label class="form-label">{{ __db('invitation_from') }}:</label>
+                    <label class="form-label">{{ __db('invitation_from') }}:</label>
 
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
@@ -68,7 +68,7 @@
 
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('continent') }}:</label>
-                    <select name="continent_id"
+                    <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_continent') }}</option>
                         @if ($continentOptions)
@@ -89,7 +89,7 @@
 
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('country') }}:</label>
-                    <select name="country_id"
+                    <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_country') }}</option>
                         @foreach (getAllCountries() as $option)
@@ -503,18 +503,18 @@
 
                 <div class="flex gap-4">
 
-                    @canany(['add_delegations'])
+                    @canany(['add_delegations', 'delegate_add_delegations'])
                         <button type="submit" name="submit_exit" value="1"
                             class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
                     @endcanany
 
-                    @canany(['add_travels'])
+                    @canany(['add_travels', 'delegate_add_delegates'])
                         <button type="submit" name="submit_add_travel" value="2"
                             class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
                     @endcanany
 
 
-                    @canany(['add_interviews'])
+                    @canany(['add_interviews', 'delegate_add_delegates'])
                         <button type="submit" name="submit_add_interview" value="3"
                             class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
                     @endcanany
@@ -528,6 +528,119 @@
 
 
 @section('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const attachmentTitleDropdown = @json($attachmentTitleOptionsHtml);
+            initializeAttachmentsComponent(attachmentTitleDropdown);
+
+            // Initialize Select2 for all select elements
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+
+            // Handle continent change to load countries
+            $('#continent-select').on('change', function() {
+                const continentId = $(this).val();
+                const countrySelect = $('#country-select');
+
+                // Clear current options except the default
+                countrySelect.find('option[value!=""]').remove();
+
+                if (continentId) {
+                    // Load countries for selected continent
+                    $.get('{{ route('countries.by-continent') }}', {
+                        continent_ids: continentId
+                    }, function(data) {
+                        // Add new options
+                        $.each(data, function(index, country) {
+                            countrySelect.append(new Option(country.name, country.id, false,
+                                false));
+                        });
+
+                        // Refresh Select2
+                        countrySelect.trigger('change');
+                    }).fail(function() {
+                        console.log('Failed to load countries');
+                    });
+                }
+            });
+
+            // Trigger continent change on page load if a continent is already selected
+            const selectedContinent = $('#continent-select').val();
+            if (selectedContinent) {
+                $('#continent-select').trigger('change');
+            }
+        });
+
+        function update_status(el) {
+            if (el.checked) {
+                var status = 1;
+            } else {
+                var status = 0;
+            }
+            $.post('{{ route('delegations.status') }}', {
+                _token: '{{ csrf_token() }}',
+                id: el.value,
+                status: status
+            }, function(data) {
+                if (data.status == 'success') {
+                    toastr.success("{{ __db('status_updated') }}");
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+
+                } else {
+                    toastr.error("{{ __db('something_went_wrong') }}");
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                }
+            });
+        }
+
+
+        function attachmentsComponent() {
+            return {
+                attachments: @json($attachmentsData),
+
+                addAttachment() {
+                    this.attachments.push({
+                        title_id: '',
+                        document_date: '',
+                        file: null
+                    });
+                },
+
+                removeAttachment(index) {
+                    // Mark as deleted instead of removing from array to preserve indices
+                    this.attachments[index]._destroy = true;
+                }
+            };
+        }
+
+        function initializeAttachmentsComponent(dropdownHtml) {
+            window.attachmentsComponent = function() {
+                return {
+                    attachments: @json($attachmentsData),
+
+                    addAttachment() {
+                        this.attachments.push({
+                            title_id: '',
+                            document_date: '',
+                            file: null
+                        });
+                    },
+
+                    removeAttachment(index) {
+                        // Mark as deleted instead of removing from array to preserve indices
+                        this.attachments[index]._destroy = true;
+                    }
+                };
+            };
+        }
+    </script>
+
     <script>
         window.attachmentsData = @json($attachmentsData);
         window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());

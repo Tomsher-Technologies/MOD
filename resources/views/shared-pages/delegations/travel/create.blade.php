@@ -53,7 +53,7 @@
     <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }}
     </h2>
 
-    <form method="POST" action="{{ getRouteForPage('delegation.storeTravel', $delegation->id) }}"
+    <form method="POST" action="{{ route('delegations.storeTravel', $delegation->id) }}"
         enctype="multipart/form-data">
         @csrf
 

@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form action="{{ getRouteForPage('drivers.assign', $driver->id) }}" method="POST">
+    <form action="{{ route('drivers.assign', $driver->id) }}" method="POST">
         @csrf
         <input type="hidden" name="action" id="actionInput" value="">
         <input type="hidden" name="start_date" id="startDateInput" value="">
@@ -137,8 +137,8 @@
 
         // Define pageRoutes here or ensure they are globally available
         const pageRoutes = {
-            delegationSearchByCode: "{{ getRouteForPage('delegation.searchByCode') }}",
-            delegationSearch: "{{ getRouteForPage('delegation.search') }}",
+            delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
+            delegationSearch: "{{ route('delegations.search') }}",
         };
 
         searchBtn.addEventListener('click', function() {

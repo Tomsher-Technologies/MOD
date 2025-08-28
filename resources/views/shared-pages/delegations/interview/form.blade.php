@@ -20,14 +20,14 @@
         $oldToDelegateId = old('to_delegate_id', $isEditMode ? $interview->toMembers()->value('member_id') : '');
 
         $formAction = $isEditMode
-            ? getRouteForPage('delegation.storeInterview', [
+            ? route('delegations.storeOrUpdateInterview', [
                 'delegation' => $delegation,
                 'interview' => $interview,
             ])
-            : getRouteForPage('delegation.storeInterview', $delegation);
+            : route('delegations.storeOrUpdateInterview', $delegation);
     @endphp
 
-    <x-back-btn :title="$title" back-url="{{ getRouteForPage('delegation.show', $delegation->id) }}" />
+    <x-back-btn :title="$title" back-url="{{ route('delegations.show', $delegation->id) }}" />
 
     {{-- <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
@@ -278,9 +278,9 @@
 
     <script>
         window.pageRoutes = {
-            delegationSearchByCode: @json(getRouteForPage('delegation.searchByCode')),
-            delegationSearchByFilters: @json(getRouteForPage('delegation.search')),
-            delegationMembers: @json(getRouteForPage('delegation.members'))
+            delegationSearchByCode: @json(route('delegations.searchByCode')),
+            delegationSearchByFilters: @json(route('delegations.search')),
+            delegationMembers: '/mod-admin/delegations/members'
         };
     </script>
 

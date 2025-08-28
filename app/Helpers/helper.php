@@ -346,11 +346,11 @@ if (!function_exists('getRouteForPage')) {
             // Escorts
             'escorts.index' => [
                 'manage_escorts' => 'escorts.index',
-                'del_manage_escorts' => 'escorts.index',
+                'del_manage_escort' => 'escorts.index',
             ],
             'escorts.show' => [
                 'manage_escorts' => 'escorts.show',
-                'del_manage_escorts' => 'escorts.show',
+                'del_manage_escort' => 'escorts.show',
             ],
             'escorts.create' => [
                 'add_escorts' => 'escorts.create',
@@ -435,7 +435,7 @@ if (!function_exists('getRouteForPage')) {
                 'manage_delegations' => 'attachments.destroy',
                 'del_manage_delegations' => 'attachments.destroy',
             ],
-            'attachments.edit' => [
+            'delegations.updateAttachment' => [
                 'manage_delegations' => 'delegations.updateAttachment',
                 'del_manage_delegations' => 'delegations.updateAttachment',
             ],

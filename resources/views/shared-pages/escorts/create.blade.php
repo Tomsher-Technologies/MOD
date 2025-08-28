@@ -1,7 +1,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('add') . ' ' . __db('escorts') }}</h2>
-        <a href="{{ getRouteForPage('escorts.index') }}"
+        <a href="{{ route('escorts.index') }}"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                 height="24" fill="none" viewBox="0 0 24 24">
@@ -24,7 +24,7 @@
     @endif
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
-        <form action="{{ getRouteForPage('escorts.store') }}" method="POST">
+        <form action="{{ route('escorts.store') }}" method="POST">
             @csrf
             <div class="grid grid-cols-12 gap-5">
 

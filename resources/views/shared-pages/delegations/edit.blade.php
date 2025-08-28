@@ -1,9 +1,9 @@
 <div x-data="{ isAttachmentEditModalOpen: false }">
-    <x-back-btn title="" back-url="{{ getRouteForPage('delegations.index') }}" />
+    <x-back-btn title="" back-url="{{ route('delegations.index') }}" />
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 
-        <form action="{{ getRouteForPage('delegation.update', $delegation->id) }}" method="POST" data-ajax-form="true"
+        <form action="{{ route('delegations.update', $delegation->id) }}" method="POST" data-ajax-form="true"
             class="mb-5">
             @csrf
             @method('PUT')
@@ -38,9 +38,9 @@
 
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('continent') }}:</label>
-                    <select name="continent_id"
+                    <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled>{{ __('Select Continent') }}</option>
+                        <option value="">{{ __('Select Continent') }}</option>
                         @foreach (getDropDown('continents')->options as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('continent_id', $delegation->continent_id) == $option->id ? 'selected' : '' }}>
@@ -55,9 +55,9 @@
 
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('country') }}:</label>
-                    <select name="country_id"
+                    <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled>{{ __('Select Country') }}</option>
+                        <option value="">{{ __('Select Country') }}</option>
                         @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('country_id', $delegation->country_id) == $option->id ? 'selected' : '' }}>
@@ -129,7 +129,7 @@
 
                 </div>
 
-                @canany(['edit_delegations'])
+                @canany(['edit_delegations', 'delegate_edit_delegations'])
                     <div class="col-span-12 mt-6">
                         <button type="submit"
                             class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition">
@@ -173,6 +173,7 @@
                             ],
                             [
                                 'label' => __db(__db('actions')),
+                                'permission' => ['edit_delegations', 'del_edit_delegations'],
                                 'render' => function ($row) {
                                     $attachmentData = [
                                         'id' => $row->id,
@@ -188,19 +189,13 @@
                                         'UTF-8',
                                     );
 
-                                    if (
-                                        auth()->user() &&
-                                        auth()
-                                            ->user()
-                                            ->canAny(['edit_delegations'])
-                                    ) {
-                                        return '<div class="flex items-center gap-5">' .
-                                            '<form action="' .
-                                            getRouteForPage('attachments.destroy', $row->id) .
-                                            '" method="POST" class="delete-attachment-form">' .
-                                            csrf_field() .
-                                            method_field('DELETE') .
-                                            '<button type="submit" title="Delete" class="delete-attachment-btn text-red-600 hover:text-red-800">
+                                    return '<div class="flex items-center gap-5">' .
+                                        '<form action="' .
+                                        route('attachments.destroy', $row->id) .
+                                        '" method="POST" class="delete-attachment-form">' .
+                                        csrf_field() .
+                                        method_field('DELETE') .
+                                        '<button type="submit" title="Delete" class="delete-attachment-btn text-red-600 hover:text-red-800">
                                             <svg class="w-5.5 h-5.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
                                                 <path stroke="#B68A35" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
                                             </svg>
@@ -210,15 +205,14 @@
                                                 type="button"
                                                 title="Edit"
                                                 data-attachment=\'' .
-                                            $attachmentJson .
-                                            '\'
+                                        $attachmentJson .
+                                        '\'
                                                 class="edit-attachment-btn text-[#B68A35] hover:underline">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="#B68A35">
                                                     <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/>
                                                 </svg>
                                             </button>
                                         </div>';
-                                    }
                                 },
                             ],
                         ];
@@ -236,7 +230,7 @@
                         </div>
                     @endif
 
-                    <form method="POST" action="{{ getRouteForPage('attachments.edit', $delegation->id) }}"
+                    <form method="POST" action="{{ route('delegations.updateAttachment', $delegation->id) }}"
                         enctype="multipart/form-data">
                         @csrf
                         @method('POST')
@@ -294,7 +288,7 @@
                                     x-text="window.attachmentsFieldErrors?.[`attachments.${index}.file`]?.[0] ?? ''"></span>
                             </template>
 
-                            @canany(['edit_delegations'])
+                            @canany(['edit_delegations', 'delegate_edit_delegations'])
                                 <button type="button" class="btn !bg-[#B68A35] text-white rounded-lg px-4 py-2 mt-3"
                                     @click="addAttachment()">
                                     + {{ __db('add_attachments') }}
@@ -302,12 +296,14 @@
                             @endcanany
 
 
-                            <div class="mt-6">
-                                <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-6 py-2"
-                                    x-show="attachments.length > 0">
-                                    {{ __db('save_attachments') }}
-                                </button>
-                            </div>
+                            @canany(['edit_delegations', 'delegate_edit_delegations'])
+                                <div class="mt-6">
+                                    <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-6 py-2"
+                                        x-show="attachments.length > 0">
+                                        {{ __db('save_attachments') }}
+                                    </button>
+                                </div>
+                            @endcanany
                         </div>
                     </form>
                 </div>
@@ -320,23 +316,23 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})
         </h2>
         <div class="flex items-center gap-3">
-            @canany(['add_delegate'])
-                <a href="{{ getRouteForPage('delegation.addDelegate', $delegation->id) }}" id="add-attachment-btn"
+            @canany(['add_delegate', 'delegate_add_delegates'])
+                <a href="{{ route('delegations.addDelegate', $delegation->id) }}" id="add-attachment-btn"
                     class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
                     <span>{{ __db('add_delegate') }}</span>
                 </a>
             @endcanany
 
-            @canany(['add_travels'])
-                <a href="{{ getRouteForPage('delegation.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"
+            @canany(['add_travels', 'delegate_edit_delegations'])
+                <a href="{{ route('delegations.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"
                     id="add-attachment-btn"
                     class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
                     <span>{{ __db('add_group_arrival') }}</span>
                 </a>
             @endcanany
 
-            @canany(['add_travels'])
-                <a href="{{ getRouteForPage('delegation.addTravel', ['id' => $delegation->id, 'showDeparture' => 1]) }}"
+            @canany(['add_travels', 'delegate_edit_delegations'])
+                <a href="{{ route('delegations.addTravel', ['id' => $delegation->id, 'showDeparture' => 1]) }}"
                     id="add-attachment-btn"
                     class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
                     <span>{{ __db('add_group_departure') }}</span>
@@ -438,24 +434,18 @@
                         [
                             'label' => __db('action'),
                             'render' => function ($row) use ($delegation) {
-                                $editUrl = getRouteForPage('delegation.editDelegate', [
+                                $editUrl = route('delegations.editDelegate', [
                                     'delegation' => $delegation->id,
                                     'delegate' => $row->id,
                                 ]);
 
                                 $deleteForm = '';
                                 $editButton = '';
-
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['delete_delegate'])
-                                ) {
+                                if (can(['delete_delegates', 'delegate_delete_delegates'])) {
                                     $deleteForm =
                                         '
                                         <form action="' .
-                                        getRouteForPage('delegation.destroyDelegate', [$delegation, $row]) .
+                                        route('delegations.destroyDelegate', [$delegation, $row]) .
                                         '" method="POST" class="delete-delegate-form">
                                             ' .
                                         csrf_field() .
@@ -471,12 +461,7 @@
                                         </form>';
                                 }
 
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['edit_delegate'])
-                                ) {
+                                if (can(['edit_delegates', 'delegate_edit_delegates'])) {
                                     $editButton =
                                         '
                                         <a href="' .
@@ -588,8 +573,8 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
-                    @canany(['add_escorts'])
-                        <a href={{ getRouteForPage('escorts.index') }}
+                    @canany(['add_escorts', 'escort_add_escorts'])
+                        <a href={{ route('escorts.index') }}
                             class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
                     @endcanany
                 </div>
@@ -639,70 +624,58 @@
                         [
                             'label' => __db('status'),
                             'key' => 'status',
+                            'permission' => ['edit_escorts', 'escort_edit_escorts'],
                             'render' => function ($escort) {
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['edit_escorts'])
-                                ) {
-                                    return '<div class="flex items-center">
+                                return '<div class="flex items-center">
                 <label for="switch-' .
-                                        $escort->id .
-                                        '" class="relative inline-block w-11 h-6">
+                                    $escort->id .
+                                    '" class="relative inline-block w-11 h-6">
                     <input type="checkbox" id="switch-' .
-                                        $escort->id .
-                                        '" onchange="update_escort_status(this)" value="' .
-                                        $escort->id .
-                                        '" class="sr-only peer" ' .
-                                        ($escort->status == 1 ? 'checked' : '') .
-                                        ' />
+                                    $escort->id .
+                                    '" onchange="update_escort_status(this)" value="' .
+                                    $escort->id .
+                                    '" class="sr-only peer" ' .
+                                    ($escort->status == 1 ? 'checked' : '') .
+                                    ' />
                     <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
                     <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                 </label>
             </div>';
-                                }
                             },
                         ],
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
+                            'permission' => ['assign_escorts', 'escort_edit_escorts'],
                             'render' => function ($escort) {
-                                $editUrl = getRouteForPage('escorts.edit', $escort->id);
+                                $editUrl = route('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
 
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['assign_escorts'])
-                                ) {
-                                    $output .=
-                                        '<a href="' .
-                                        $editUrl .
-                                        '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
-                                    if ($escort->status == 1) {
-                                        if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
-                                            foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
-                                                $unassignUrl = getRouteForPage('escorts.unassign', $escort->id);
-                                                $output .=
-                                                    '<form action="' .
-                                                    $unassignUrl .
-                                                    '" method="POST" style="display:inline;">' .
-                                                    csrf_field() .
-                                                    '<input type="hidden" name="delegation_id" value="' .
-                                                    $delegation->id .
-                                                    '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
-                                                    e($delegation->code) .
-                                                    '</span></button></form>';
-                                            }
-                                        } else {
-                                            $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
+                                $output .=
+                                    '<a href="' .
+                                    $editUrl .
+                                    '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
+                                if ($escort->status == 1) {
+                                    if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
+                                        foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
+                                            $unassignUrl = route('escorts.unassign', $escort->id);
                                             $output .=
-                                                '<a href="' .
-                                                $assignUrl .
-                                                '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
+                                                '<form action="' .
+                                                $unassignUrl .
+                                                '" method="POST" style="display:inline;">' .
+                                                csrf_field() .
+                                                '<input type="hidden" name="delegation_id" value="' .
+                                                $delegation->id .
+                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
+                                                e($delegation->code) .
+                                                '</span></button></form>';
                                         }
+                                    } else {
+                                        $assignUrl = route('escorts.assignIndex', $escort->id);
+                                        $output .=
+                                            '<a href="' .
+                                            $assignUrl .
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
                                     }
                                 }
                                 $output .= '</div>';
@@ -725,8 +698,8 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
-                    @canany(['add_drivers'])
-                        <a href={{ getRouteForPage('drivers.index') }}
+                    @canany(['add_drivers', 'driver_add_drivers'])
+                        <a href={{ route('drivers.index') }}
                             class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
                     @endcanany
                 </div>
@@ -782,80 +755,68 @@
                         [
                             'label' => __db('status'),
                             'key' => 'status',
+                            'permission' => ['edit_drivers', 'driver_edit_drivers'],
                             'render' => function ($driver) {
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['edit_drivers'])
-                                ) {
-                                    return '<div class="flex items-center">
+                                return '<div class="flex items-center">
                                         <label for="switch-driver' .
-                                                                $driver->id .
-                                                                '" class="relative inline-block w-11 h-6">
+                                    $driver->id .
+                                    '" class="relative inline-block w-11 h-6">
                                             <input type="checkbox" id="switch-driver' .
-                                                                $driver->id .
-                                                                '" onchange="update_driver_status(this)" value="' .
-                                                                $driver->id .
-                                                                '" class="sr-only peer" ' .
-                                                                ($driver->status == 1 ? 'checked' : '') .
-                                                                ' />
+                                    $driver->id .
+                                    '" onchange="update_driver_status(this)" value="' .
+                                    $driver->id .
+                                    '" class="sr-only peer" ' .
+                                    ($driver->status == 1 ? 'checked' : '') .
+                                    ' />
                                             <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                         </label>
                                     </div>';
-                                }
                             },
                         ],
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
+                            'permission' => ['assign_drivers', 'driver_edit_drivers'],
                             'render' => function ($driver) {
-                                $editUrl = getRouteForPage('drivers.edit', $driver->id);
+                                $editUrl = route('drivers.edit', $driver->id);
                                 $output = '<div class="flex align-center gap-4">';
 
-                                if (
-                                    auth()->user() &&
-                                    auth()
-                                        ->user()
-                                        ->canAny(['assign_drivers'])
-                                ) {
-                                    $output .=
-                                        '<a href="' .
-                                        $editUrl .
-                                        '">
+                                $output .=
+                                    '<a href="' .
+                                    $editUrl .
+                                    '">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
                                         </a>';
-                                    if ($driver->status == 1) {
-                                        if ($driver->delegations->where('pivot.status', 1)->count() > 0) {
-                                            foreach ($driver->delegations->where('pivot.status', 1) as $delegation) {
-                                                $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
-                                                $output .=
-                                                    '<form action="' .
-                                                    $unassignUrl .
-                                                    '" method="POST" style="display:inline;">' .
-                                                    csrf_field() .
-                                                    '<input type="hidden" name="delegation_id" value="' .
-                                                    $delegation->id .
-                                                    '" />
+                                if ($driver->status == 1) {
+                                    if ($driver->delegations->where('pivot.status', 1)->count() > 0) {
+                                        foreach ($driver->delegations->where('pivot.status', 1) as $delegation) {
+                                            $unassignUrl = route('drivers.unassign', $driver->id);
+                                            $output .=
+                                                '<form action="' .
+                                                $unassignUrl .
+                                                '" method="POST" style="display:inline;">' .
+                                                csrf_field() .
+                                                '<input type="hidden" name="delegation_id" value="' .
+                                                $delegation->id .
+                                                '" />
                                                     <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
                                                         <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                                                         <span> Unassign from ' .
-                                                    e($delegation->code) .
-                                                    '</span>
+                                                e($delegation->code) .
+                                                '</span>
                                                     </button>
                                                 </form>';
-                                            }
-                                        } else {
-                                            $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
-                                            $output .=
-                                                '<a href="' .
-                                                $assignUrl .
-                                                '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                                        }
+                                    } else {
+                                        $assignUrl = route('drivers.assignIndex', $driver->id);
+                                        $output .=
+                                            '<a href="' .
+                                            $assignUrl .
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
                                                 <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                                                 <span> Assign</span>
                                             </a>';
-                                        }
                                     }
                                 }
                                 $output .= '</div>';
@@ -961,7 +922,7 @@
             [
                 'label' => __db('action'),
                 'render' => function ($row) use ($delegation) {
-                    $editUrl = getRouteForPage('delegation.editInterview', [
+                    $editUrl = route('delegations.editInterview', [
                         'delegation' => $delegation->id,
                         'interview' => $row->id,
                     ]);
@@ -969,16 +930,11 @@
                     $deleteForm = '';
                     $editButton = '';
 
-                    if (
-                        auth()->user() &&
-                        auth()
-                            ->user()
-                            ->canAny(['delete_interviews'])
-                    ) {
+                    if (can(['delete_interviews', 'delegate_edit_delegations'])) {
                         $deleteForm =
                             '
                         <form action="' .
-                            getRouteForPage('delegation.destroyInterview', [$row]) .
+                            route('delegations.destroyInterview', [$row]) .
                             '" method="POST" class="delete-interview-form">
                             ' .
                             csrf_field() .
@@ -993,12 +949,7 @@
                             </button>
                         </form>';
                     }
-                    if (
-                        auth()->user() &&
-                        auth()
-                            ->user()
-                            ->canAny(['edit_interviews'])
-                    ) {
+                    if (can(['edit_interviews', 'delegate_edit_delegations'])) {
                         $editButton =
                             '
                         <a href="' .
@@ -1019,10 +970,10 @@
 
     <hr class="mx-6 border-neutral-200 h-10">
 
-    @canany(['add_interviews'])
+    @canany(['add_interviews', 'delegate_edit_delegations'])
         <div class="flex items-center justify-between mt-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }}</h2>
-            <a href="{{ getRouteForPage('delegation.addInterview', $delegation) }}" id="add-attachment-btn"
+            <a href="{{ route('delegations.addInterview', $delegation) }}" id="add-attachment-btn"
                 class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
                 <span>{{ __db('add_interview') }}</span>
             </a>
@@ -1072,7 +1023,7 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </button>
-                    <form :action="`{{ getRouteForPage('attachments.edit', $delegation->id) }}`" method="POST"
+                    <form :action="`{{ route('delegations.updateAttachment', $delegation->id) }}`" method="POST"
                         enctype="multipart/form-data" class="p-6 space-y-6">
                         @csrf
                         @method('POST')
@@ -1127,15 +1078,13 @@
 
 
 @section('script')
-    <script>
-        window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
-    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.edit-attachment-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const data = JSON.parse(this.getAttribute('data-attachment'));
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.edit-attachment-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const data = JSON.parse(btn.getAttribute('data-attachment'));
                     window.dispatchEvent(new CustomEvent('open-edit-attachment', {
                         detail: data
                     }));
@@ -1145,6 +1094,51 @@
     </script>
 
     <script>
+        window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+
+            // Handle continent change to load countries
+            $('#continent-select').on('change', function() {
+                const continentId = $(this).val();
+                const countrySelect = $('#country-select');
+
+                // Clear current options except the default
+                countrySelect.find('option[value!=""]').remove();
+
+                if (continentId) {
+                    // Load countries for selected continent
+                    $.get('{{ route('countries.by-continent') }}', {
+                        continent_ids: continentId
+                    }, function(data) {
+                        // Add new options
+                        $.each(data, function(index, country) {
+                            countrySelect.append(new Option(country.name, country.id, false,
+                                false));
+                        });
+
+                        // Refresh Select2
+                        countrySelect.trigger('change');
+                    }).fail(function() {
+                        console.log('Failed to load countries');
+                    });
+                }
+            });
+
+            // Trigger continent change on page load if a continent is already selected
+            const selectedContinent = $('#continent-select').val();
+            if (selectedContinent) {
+                $('#continent-select').trigger('change');
+            }
+        });
+
         function attachmentsComponent() {
             return {
                 attachments: [],
@@ -1241,7 +1235,7 @@
             } else {
                 var status = 0;
             }
-            $.post('{{ getRouteForPage('escorts.status') }}', {
+            $.post('{{ route('escorts.status') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status
@@ -1268,7 +1262,7 @@
             } else {
                 var status = 0;
             }
-            $.post('{{ getRouteForPage('drivers.status') }}', {
+            $.post('{{ route('drivers.status') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status
