@@ -215,6 +215,7 @@ class EscortController extends Controller
     {
         $validated = $request->validate([
             'name_en' => 'required|string|max:255',
+            'title_id' => 'nullable|string|exists:dropdown_options,id',
             'military_number' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
@@ -250,6 +251,13 @@ class EscortController extends Controller
 
         // Define relations to compare for confirmation dialog
         $relationsToCompare = [
+            'title_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
             'gender_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,

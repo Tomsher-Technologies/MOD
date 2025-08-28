@@ -114,12 +114,12 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('unit') }}:</label>
-                    <select name="unit"
+                    <select name="unit_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('select') . ' ' . __db('unit') }}</option>
                         @foreach (getDropDown('unit')->options ?? [] as $unit)
                             <option value="{{ $unit->id }}"
-                                {{ old('unit', $escort->unit) == $unit->id ? 'selected' : '' }}>
+                                {{ old('unit', $escort->unit_id) == $unit->id ? 'selected' : '' }}>
                                 {{ $unit->value }}</option>
                         @endforeach
                     </select>

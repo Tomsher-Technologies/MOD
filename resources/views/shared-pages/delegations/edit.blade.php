@@ -356,7 +356,7 @@
                         ],
                         [
                             'label' => __db('title'),
-                            'render' => fn($row) => $row->title->value ?? '-',
+                            'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name'),
@@ -588,7 +588,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title),
+                            'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -614,13 +614,7 @@
                                 return e(implode(', ', $names));
                             },
                         ],
-                        [
-                            'label' => __db('assigned') . ' ' . __db('delegation'),
-                            'key' => 'assigned_delegation',
-                            'render' => function ($escort) {
-                                return e($escort->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
-                            },
-                        ],
+                    
                         [
                             'label' => __db('status'),
                             'key' => 'status',
@@ -713,7 +707,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($driver) => e($driver->title),
+                            'render' => fn($driver) => e($driver->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -744,13 +738,6 @@
                             'label' => __db('capacity'),
                             'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
-                        ],
-                        [
-                            'label' => __db('assigned') . ' ' . __db('delegation'),
-                            'key' => 'assigned_delegation',
-                            'render' => function ($driver) {
-                                return e($driver->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
-                            },
                         ],
                         [
                             'label' => __db('status'),

@@ -62,7 +62,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($driver) => e($driver->title),
+                            'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -160,7 +160,7 @@
                         [
                             'label' => __db('status'),
                             'key' => 'status',
-                            'permission' => ['edit_drivers','driver_edit_drivers'],
+                            'permission' => ['edit_drivers', 'driver_edit_drivers'],
                             'render' => function ($driver) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
