@@ -11,7 +11,7 @@
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
 
-                    <form class="w-[50%] me-4" action="{{ getRouteForPage('escorts.index') }}" method="GET">
+                    <form class="w-[50%] me-4" action="{{ route('escorts.index') }}" method="GET">
                         <div class="relative">
 
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -110,7 +110,7 @@
                                     ->where('pivot.status', 1)
                                     ->map(function ($delegation) {
                                         $delegationUrl = $delegation->id
-                                            ? getRouteForPage('delegation.show', $delegation->id)
+                                            ? route('delegations.show', $delegation->id)
                                             : '';
 
                                         return '<a class="font-medium !text-[#B68A35] hover:underline" href="' .
@@ -127,6 +127,7 @@
                         [
                             'label' => __db('status'),
                             'key' => 'status',
+                            'permission' => ['edit_escorts','escort_edit_escorts'],
                             'render' => function ($escort) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -149,9 +150,9 @@
                             'label' => __db('actions'),
                             'key' => 'actions',
                             'render' => function ($escort) {
-                                $editUrl = getRouteForPage('escorts.edit', $escort->id);
+                                $editUrl = route('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
-                                if (can(['edit_escorts'])) {
+                                if (can(['edit_escorts', 'escort_edit_escorts'])) {
                                     $output .=
                                         '<a href="' .
                                         $editUrl .
@@ -160,7 +161,7 @@
                                 if ($escort->status == 1) {
                                     if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
                                         foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
-                                            $unassignUrl = getRouteForPage('escorts.unassign', $escort->id);
+                                            $unassignUrl = route('escorts.unassign', $escort->id);
                                             $output .=
                                                 '<form action="' .
                                                 $unassignUrl .
@@ -173,8 +174,8 @@
                                                 '</span></button></form>';
                                         }
                                     } else {
-                                        if (can(['assign_escorts'])) {
-                                            $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
+                                        if (can(['assign_escorts', 'escort_edit_escorts'])) {
+                                            $assignUrl = route('escorts.assignIndex', $escort->id);
                                             $output .=
                                                 '<a href="' .
                                                 $assignUrl .
@@ -217,7 +218,7 @@
         <span class="sr-only">{{ __db('close_menu') }}</span>
     </button>
 
-    <form action="{{ getRouteForPage('escorts.index') }}" method="GET">
+    <form action="{{ route('escorts.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
             <select name="title[]" placeholder="Title"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
@@ -254,7 +255,7 @@
             </select>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
-            <a href="{{ getRouteForPage('escorts.index') }}"
+            <a href="{{ route('escorts.index') }}"
                 class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>

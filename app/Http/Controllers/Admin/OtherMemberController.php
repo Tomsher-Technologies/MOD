@@ -13,10 +13,9 @@ class OtherMemberController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_other_interview_members',  ['only' => ['index']]);
+        $this->middleware('permission:manage_other_interview_members|delegate_manage_delegations|escort_manage_delegations| driver_manage_delegations|hotel_manage_delegations',  ['only' => ['index', 'show']]);
         $this->middleware('permission:add_other_interview_members',  ['only' => ['create', 'store']]);
         $this->middleware('permission:edit_other_interview_members',  ['only' => ['edit', 'update']]);
-        $this->middleware('permission:view_other_interview_members',  ['only' => ['show', 'index']]);
     }
 
     public function index(Request $request)

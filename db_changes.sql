@@ -213,3 +213,197 @@ INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`,
 ('hotel', 99, 'accomodation_view_delegate', 'View Delegate', 'web', 1, NOW(), NOW());
 
 
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('escort', 72, 'escort_assign_escorts', 'Assign Escorts', 'web', 1, NOW(), NOW()),
+('escort', 72, 'escort_unassign_escorts', 'Unassign Escorts', 'web', 1, NOW(), NOW()),
+
+('driver', 83, 'driver_assign_drivers', 'Assign Drivers', 'web', 1, NOW(), NOW()),
+('driver', 83, 'driver_unassign_drivers', 'Unassign Drivers', 'web', 1, NOW(), NOW());
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('admin', 22, 'view_interviews', 'View Interviews', 'web', 1, NOW(), NOW());
+
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('deligate', 61, 'del_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW()),
+
+('escort', 77, 'escort_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW()),
+
+('driver', 88, 'driver_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW()),
+
+('hotel', 99, 'accomodation_view_interviews', 'View Interviews', 'web', 1, NOW(), NOW());
+
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('deligate', 61, 'del_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW()),
+
+('escort', 77, 'escort_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW()),
+
+('driver', 88, 'driver_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW()),
+
+('hotel', 99, 'accommodation_manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NOW(), NOW());
+
+
+
+
+
+
+
+-- NEW TABLE
+
+INSERT INTO `permissions` 
+(`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'admin', NULL, 'manage_roles', 'Manage Roles', 'web', 1, NULL, NULL),
+(2, 'admin', 1, 'view_roles', 'View Roles', 'web', 1, NULL, NULL),
+(3, 'admin', 1, 'add_role', 'Add Roles', 'web', 1, NULL, NULL),
+(4, 'admin', 1, 'edit_role', 'Edit Roles', 'web', 1, NULL, NULL),
+(5, 'admin', 1, 'delete_role', 'Delete Roles', 'web', 1, NULL, NULL),
+
+(6, 'admin', NULL, 'manage_staff', 'Manage Staff', 'web', 1, NULL, NULL),
+(7, 'admin', 6, 'view_staff', 'View Staff', 'web', 1, NULL, NULL),
+(8, 'admin', 6, 'add_staff', 'Add Staff', 'web', 1, NULL, NULL),
+(9, 'admin', 6, 'edit_staff', 'Edit Staff', 'web', 1, NULL, NULL),
+(10, 'admin', 6, 'delete_staff', 'Delete Staff', 'web', 1, NULL, NULL),
+
+(11, 'admin', NULL, 'manage_events', 'Manage Events', 'web', 1, NULL, NULL),
+(12, 'admin', 11, 'view_events', 'View Events', 'web', 1, NULL, NULL),
+(13, 'admin', 11, 'add_events', 'Add Events', 'web', 1, NULL, NULL),
+(14, 'admin', 11, 'edit_events', 'Edit Events', 'web', 1, NULL, NULL),
+(15, 'admin', 11, 'delete_events', 'Delete Events', 'web', 1, NULL, NULL),
+(16, 'admin', 11, 'assign_events', 'Assign Event Staffs', 'web', 1, NULL, NULL),
+
+(17, 'admin', NULL, 'manage_dropdowns', 'Manage Dynamic Dropdown Contents', 'web', 1, NULL, NULL),
+(18, 'admin', 17, 'view_dropdowns', 'View Dropdown Options', 'web', 1, NULL, NULL),
+(19, 'admin', 17, 'add_dropdowns', 'Add Dropdown Options', 'web', 1, NULL, NULL),
+(20, 'admin', 17, 'edit_dropdowns', 'Edit Dropdown Options', 'web', 1, NULL, NULL),
+(21, 'admin', 17, 'delete_dropdowns', 'Delete Dropdown Options', 'web', 1, NULL, NULL),
+
+(22, 'admin', NULL, 'manage_labels', 'Manage Label Translations', 'web', 1, NULL, NULL),
+(23, 'admin', 22, 'view_labels', 'View Label Translations', 'web', 1, NULL, NULL),
+(24, 'admin', 22, 'edit_labels', 'Edit Label Translations', 'web', 1, NULL, NULL),
+
+(25, 'admin', NULL, 'manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
+(26, 'admin', 25, 'view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
+(27, 'admin', 25, 'add_delegations', 'Add Delegations', 'web', 1, NULL, NULL),
+(28, 'admin', 25, 'edit_delegations', 'Edit Delegations', 'web', 1, NULL, NULL),
+(29, 'admin', 25, 'delete_delegations', 'Delete Delegations', 'web', 1, NULL, NULL),
+
+(30, 'admin', 25, 'view_interviews', 'View Interviews', 'web', 1, NULL, NULL),
+(31, 'admin', 25, 'add_interviews', 'Add Interviews', 'web', 1, NULL, NULL),
+(32, 'admin', 25, 'edit_interviews', 'Edit Interviews', 'web', 1, NULL, NULL),
+(33, 'admin', 25, 'delete_interviews', 'Delete Interviews', 'web', 1, NULL, NULL),
+
+(34, 'admin', 25, 'view_travels', 'View Travels', 'web', 1, NULL, NULL),
+(35, 'admin', 25, 'add_travels', 'Add Travels', 'web', 1, NULL, NULL),
+(36, 'admin', 25, 'edit_travels', 'Edit Travels', 'web', 1, NULL, NULL),
+(37, 'admin', 25, 'delete_travels', 'Delete Travels', 'web', 1, NULL, NULL),
+
+(38, 'admin', 25, 'view_delegates', 'View Delegates', 'web', 1, NULL, NULL),
+(39, 'admin', 25, 'add_delegates', 'Add Delegates', 'web', 1, NULL, NULL),
+(40, 'admin', 25, 'edit_delegates', 'Edit Delegates', 'web', 1, NULL, NULL),
+(41, 'admin', 25, 'delete_delegates', 'Delete Delegates', 'web', 1, NULL, NULL),
+
+(42, 'admin', NULL, 'manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
+(43, 'admin', 42, 'view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
+(44, 'admin', 42, 'add_escorts', 'Add Escorts', 'web', 1, NULL, NULL),
+(45, 'admin', 42, 'edit_escorts', 'Edit Escorts', 'web', 1, NULL, NULL),
+(46, 'admin', 42, 'delete_escorts', 'Delete Escorts', 'web', 1, NULL, NULL),
+(47, 'admin', 42, 'assign_escorts', 'Assign Escorts', 'web', 1, NULL, NULL),
+(48, 'admin', 42, 'unassign_escorts', 'Unassign Escorts', 'web', 1, NULL, NULL),
+
+(49, 'admin', NULL, 'manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
+(50, 'admin', 49, 'view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
+(51, 'admin', 49, 'add_drivers', 'Add Drivers', 'web', 1, NULL, NULL),
+(52, 'admin', 49, 'edit_drivers', 'Edit Drivers', 'web', 1, NULL, NULL),
+(53, 'admin', 49, 'delete_drivers', 'Delete Drivers', 'web', 1, NULL, NULL),
+(54, 'admin', 49, 'assign_drivers', 'Assign Drivers', 'web', 1, NULL, NULL),
+(55, 'admin', 49, 'unassign_drivers', 'Unassign Drivers', 'web', 1, NULL, NULL),
+
+(56, 'admin', NULL, 'manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
+(57, 'admin', 56, 'view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
+(58, 'admin', 56, 'add_accommodations', 'Add Accommodations', 'web', 1, NULL, NULL),
+(59, 'admin', 56, 'edit_accommodations', 'Edit Accommodations', 'web', 1, NULL, NULL),
+(60, 'admin', 56, 'delete_accommodations', 'Delete Accommodations', 'web', 1, NULL, NULL),
+(61, 'admin', 56, 'assign_accommodations', 'Assign Accommodations', 'web', 1, NULL, NULL),
+(62, 'admin', 56, 'import_accommodations', 'Bulk Import Accommodations', 'web', 1, NULL, NULL),
+(63, 'admin', 56, 'view_accommodation_delegations', 'View Accommodation Delegations', 'web', 1, NULL, NULL),
+
+(64, 'admin', NULL, 'manage_other_interview_members', 'Manage Other Interview Members', 'web', 1, NULL, NULL),
+(65, 'admin', 64, 'view_other_interview_members', 'View Other Interview Members', 'web', 1, NULL, NULL),
+(66, 'admin', 64, 'add_other_interview_members', 'Add Other Interview Members', 'web', 1, NULL, NULL),
+(67, 'admin', 64, 'edit_other_interview_members', 'Edit Other Interview Members', 'web', 1, NULL, NULL),
+(68, 'admin', 64, 'delete_other_interview_members', 'Delete Other Interview Members', 'web', 1, NULL, NULL),
+
+(69, 'deligate', NULL, 'delegate_manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
+(70, 'deligate', 69, 'delegate_view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
+(71, 'deligate', 69, 'delegate_add_delegations', 'Add Delegations', 'web', 1, NULL, NULL),
+(72, 'deligate', 69, 'delegate_edit_delegations', 'Edit Delegations', 'web', 1, NULL, NULL),
+(73, 'deligate', 69, 'delegate_delete_delegations', 'Delete Delegations', 'web', 1, NULL, NULL),
+
+(74, 'deligate', NULL, 'delegate_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
+(75, 'deligate', 74, 'delegate_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
+
+(76, 'deligate', NULL, 'delegate_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
+(77, 'deligate', 76, 'delegate_view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
+
+(78, 'deligate', NULL, 'delegate_manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
+(79, 'deligate', 78, 'delegate_view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
+
+
+(113, 'deligate', 69, 'delegate_view_delegates', 'View Delegates', 'web', 1, NULL, NULL),
+(114, 'deligate', 69, 'delegate_add_delegates', 'Add Delegates', 'web', 1, NULL, NULL),
+(115, 'deligate', 69, 'delegate_edit_delegates', 'Edit Delegates', 'web', 1, NULL, NULL),
+(116, 'deligate', 69, 'delegate_delete_delegates', 'Delete Delegates', 'web', 1, NULL, NULL),
+
+
+(80, 'escort', NULL, 'escort_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
+(81, 'escort', 80, 'escort_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
+(82, 'escort', 80, 'escort_add_escorts', 'Add Escorts', 'web', 1, NULL, NULL),
+(83, 'escort', 80, 'escort_edit_escorts', 'Edit Escorts', 'web', 1, NULL, NULL),
+(84, 'escort', 80, 'escort_delete_escorts', 'Delete Escorts', 'web', 1, NULL, NULL),
+
+(85, 'escort', NULL, 'escort_manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
+(86, 'escort', 85, 'escort_view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
+
+(87, 'escort', NULL, 'escort_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
+(88, 'escort', 87, 'escort_view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
+
+(89, 'escort', NULL, 'escort_manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
+(90, 'escort', 89, 'escort_view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
+
+(91, 'driver', NULL, 'driver_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
+(92, 'driver', 91, 'driver_view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
+(93, 'driver', 91, 'driver_add_drivers', 'Add Drivers', 'web', 1, NULL, NULL),
+(94, 'driver', 91, 'driver_edit_drivers', 'Edit Drivers', 'web', 1, NULL, NULL),
+(95, 'driver', 91, 'driver_delete_drivers', 'Delete Drivers', 'web', 1, NULL, NULL),
+
+(96, 'driver', NULL, 'driver_manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
+(97, 'driver', 96, 'driver_view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
+
+(98, 'driver', NULL, 'driver_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
+(99, 'driver', 98, 'driver_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
+
+(100, 'driver', NULL, 'driver_manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
+(101, 'driver', 100, 'driver_view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
+
+(102, 'hotel', NULL, 'hotel_manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
+(103, 'hotel', 102, 'hotel_view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
+(104, 'hotel', 102, 'hotel_add_accommodations', 'Add Accommodations', 'web', 1, NULL, NULL),
+(105, 'hotel', 102, 'hotel_edit_accommodations', 'Edit Accommodations', 'web', 1, NULL, NULL),
+(106, 'hotel', 102, 'hotel_delete_accommodations', 'Delete Accommodations', 'web', 1, NULL, NULL),
+
+(107, 'hotel', NULL, 'hotel_manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
+(108, 'hotel', 107, 'hotel_view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
+
+(109, 'hotel', NULL, 'hotel_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
+(110, 'hotel', 109, 'hotel_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
+
+(111, 'hotel', NULL, 'hotel_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
+(112, 'hotel', 111, 'hotel_view_drivers', 'View Drivers', 'web', 1, NULL, NULL);
+
+
+

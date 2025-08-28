@@ -17,34 +17,33 @@ class EscortController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:view_escorts|del_view_escorts|delegation_view_escorts', [
+        $this->middleware('permission:view_escorts|delegate_view_escorts|escort_view_escorts|hotel_view_escorts', [
             'only' => ['index', 'search']
         ]);
 
-        $this->middleware('permission:add_escorts|del_add_escorts', [
+        $this->middleware('permission:add_escorts|driver_add_escorts', [
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:assign_escorts|del_assign_escorts', [
-            'only' => ['assign', 'unassign']
+        $this->middleware('permission:assign_escorts|driver_edit_escorts', [
+            'only' => ['assign']
         ]);
 
-        $this->middleware('permission:edit_escorts|del_edit_escorts', [
+
+        $this->middleware('permission:unassign_escorts|driver_edit_escorts', [
+            'only' => ['unassign']
+        ]);
+
+
+        $this->middleware('permission:edit_escorts|driver_edit_escorts', [
             'only' => ['edit', 'update']
         ]);
 
-        $this->middleware('permission:delete_escorts|del_delete_escorts', [
+        $this->middleware('permission:delete_escorts|driver_delete_escorts', [
             'only' => ['destroy']
         ]);
-        
-        $this->middleware('permission:del_view_travels|view_travels|escort_view_travels|driver_view_travels|accommodation_view_travels', [
-            'only' => ['arrivalsIndex', 'departuresIndex']
-        ]);
-        
-        $this->middleware('permission:del_view_delegate|view_delegate|escort_view_delegate|driver_view_delegate|accommodation_view_delegate', [
-            'only' => ['delegatesIndex']
-        ]);
     }
+
 
     /**
      * Display a listing of the resource.
@@ -442,7 +441,7 @@ class EscortController extends Controller
             'ranks' => $ranks ? $ranks->options : collect(),
         ];
     }
-    
+
     /**
      * Display arrivals index for escorts.
      */
@@ -452,7 +451,7 @@ class EscortController extends Controller
         // Implementation would be similar to delegation controller's arrivalsIndex
         return redirect()->route('escorts.index');
     }
-    
+
     /**
      * Display departures index for escorts.
      */
@@ -462,7 +461,7 @@ class EscortController extends Controller
         // Implementation would be similar to delegation controller's departuresIndex
         return redirect()->route('escorts.index');
     }
-    
+
     /**
      * Display delegates index for escorts.
      */

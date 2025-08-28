@@ -10,7 +10,7 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
-                    <form class="w-[50%] me-4" action="{{ getRouteForPage('drivers.index') }}" method="GET">
+                    <form class="w-[50%] me-4" action="{{ route('drivers.index') }}" method="GET">
                         <div class="relative">
 
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -101,12 +101,12 @@
                                 return $driver->delegations
                                     ->map(function ($delegation) use ($driver) {
                                         if ($delegation->pivot->status === 1) {
-                                            $unassignUrl = getRouteForPage('drivers.unassign', $driver->id);
-                                            $delegationUrl = getRouteForPage('delegation.show', $delegation->id);
+                                            $unassignUrl = route('drivers.unassign', $driver->id);
+                                            $delegationUrl = route('delegations.show', $delegation->id);
 
                                             $unassignButton = '';
 
-                                            if (can(['assign_drivers'])) {
+                                            if (can(['assign_drivers', 'driver_edit_drivers'])) {
                                                 $unassignButton =
                                                     '
                                                 <form class="unassign-form" action="' .
@@ -160,6 +160,7 @@
                         [
                             'label' => __db('status'),
                             'key' => 'status',
+                            'permission' => ['edit_drivers','driver_edit_drivers'],
                             'render' => function ($driver) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -182,12 +183,12 @@
                             'label' => __db('actions'),
                             'key' => 'actions',
                             'render' => function ($driver) {
-                                $editUrl = getRouteForPage('drivers.edit', $driver->id);
+                                $editUrl = route('drivers.edit', $driver->id);
 
                                 $output = '<div class="flex flex-col items-start gap-2">'; // flex column with gap
 
                                 // Edit button
-                                if (can(['edit_drivers'])) {
+                                if (can(['edit_drivers', 'driver_edit_drivers'])) {
                                     $output .=
                                         '
                                 <a href="' .
@@ -201,8 +202,8 @@
                                 }
 
                                 // Assign button
-                                if (can(['assign_drivers'])) {
-                                    $assignUrl = getRouteForPage('drivers.assignIndex', $driver->id);
+                                if (can(['assign_drivers', 'driver_edit_drivers'])) {
+                                    $assignUrl = route('drivers.assignIndex', $driver->id);
                                     $output .=
                                         '
                                 <a href="' .
@@ -253,7 +254,7 @@
         <span class="sr-only">{{ __db('close_menu') }}</span>
     </button>
 
-    <form action="{{ getRouteForPage('drivers.index') }}" method="GET">
+    <form action="{{ route('drivers.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
             <select name="title[]" placeholder="Title"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
@@ -294,7 +295,7 @@
             </select>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
-            <a href="{{ getRouteForPage('drivers.index') }}"
+            <a href="{{ route('drivers.index') }}"
                 class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>

@@ -23,7 +23,7 @@
         </div>
     @endif
 
-    <form id="create-delegation-form" action="{{ getRouteForPage('delegation.store') ?? '#' }}" method="POST"
+    <form id="create-delegation-form" action="{{ route('delegations.store') ?? '#' }}" method="POST"
         autocomplete="off" enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
@@ -503,18 +503,18 @@
 
                 <div class="flex gap-4">
 
-                    @canany(['add_delegations'])
+                    @canany(['add_delegations', 'delegate_add_delegations'])
                         <button type="submit" name="submit_exit" value="1"
                             class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
                     @endcanany
 
-                    @canany(['add_travels'])
+                    @canany(['add_travels', 'delegate_add_delegates'])
                         <button type="submit" name="submit_add_travel" value="2"
                             class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
                     @endcanany
 
 
-                    @canany(['add_interviews'])
+                    @canany(['add_interviews', 'delegate_add_delegates'])
                         <button type="submit" name="submit_add_interview" value="3"
                             class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
                     @endcanany
@@ -579,7 +579,7 @@
             } else {
                 var status = 0;
             }
-            $.post('{{ getRouteForPage('delegations.status') }}', {
+            $.post('{{ route('delegations.status') }}', {
                 _token: '{{ csrf_token() }}',
                 id: el.value,
                 status: status

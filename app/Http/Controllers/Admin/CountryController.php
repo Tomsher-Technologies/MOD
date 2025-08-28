@@ -14,7 +14,6 @@ class CountryController extends Controller
         $this->middleware('auth');
 
         $this->middleware('permission:add_dropdown_options',  ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy' ,'updateStatus']]);
-        $this->middleware('permission:add_dropdown_options',  ['only' => ['index']]);
     }
 
     /**

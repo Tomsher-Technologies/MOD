@@ -23,7 +23,7 @@ Route::prefix('mod-admin')->group(function () {
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
 
-Route::prefix('mod-admin')->middleware(['web', 'auth', 'user_type:admin,staff'])->group(function () {
+Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('admin.dashboard');
 
     // Manage countries
