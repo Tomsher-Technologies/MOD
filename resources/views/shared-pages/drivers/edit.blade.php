@@ -1,7 +1,7 @@
 <div class="dashboard-main-body">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('edit') . ' ' . __db('driver') }}</h2>
-        <a href="{{ getRouteForPage('drivers.index') }}"
+        <a href="{{ route('drivers.index') }}"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                 height="24" fill="none" viewBox="0 0 24 24">
@@ -25,7 +25,7 @@
 
     <!-- Drivers -->
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
-        <form id="driver-form" action="{{ getRouteForPage('drivers.update', $driver->id) }}" method="POST"
+        <form id="driver-form" action="{{ route('drivers.update', $driver->id) }}" method="POST"
             data-ajax-form="true">
             @csrf
             @method('PUT')

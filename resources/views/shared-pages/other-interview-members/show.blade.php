@@ -55,7 +55,7 @@
             </div>
 
             <div class="flex justify-start items-center gap-5 mt-6">
-                @can('edit_interview_members')
+                @canany(['edit_other_interview_members'])
                     <a href="{{ route('otherInterviewMembers.edit', ['id' => base64_encode($interviewMember->id)]) }}"
                         class="btn !bg-yellow-400 text-yellow-900 rounded-lg px-6 py-2 font-semibold hover:bg-yellow-500">
                         {{ __db('edit') }}

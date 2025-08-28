@@ -1,7 +1,7 @@
 <div class="dashboard-main-body ">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('import') . ' ' . __db('accommodations') }}</h2>
-        <a href="{{ getRouteForPage('accommodations.index') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+        <a href="{{ route('accommodations.index') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -38,7 +38,7 @@
             </div>
 
             <div class="border  rounded-lg text-center p-10 block">
-                <form action="{{ getRouteForPage('accommodations.import') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('accommodations.import') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="col-span-3 mb-2">
                         <input type="file" name="file" class="rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">

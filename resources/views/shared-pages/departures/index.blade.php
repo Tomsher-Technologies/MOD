@@ -7,7 +7,7 @@
 
             <input type="date"
                 class="p-3 !w-[20%] text-secondary-light !border-[#d1d5db] rounded-lg w-full border text-sm">
-            <form class="w-[75%]" action="{{ getRouteForPage('delegations.departuresIndex') }}" method="GET">
+            <form class="w-[75%]" action="{{ route('delegations.departuresIndex') }}" method="GET">
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                         <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -114,7 +114,7 @@
                             ],
                             [
                                 'label' => __db('actions'),
-                                'permission' => ['add_travels'],
+                                'permission' => ['add_travels', 'delegate_edit_delegations'],
                                 'render' => function ($row) {
                                     $departureData = [
                                         'id' => $row->id,
@@ -297,7 +297,7 @@
             <span class="sr-only">{{ __db('close_menu') }}</span>
         </button>
 
-        <form action="{{ getRouteForPage('delegations.departuresIndex') }}" method="GET">
+        <form action="{{ route('delegations.departuresIndex') }}" method="GET">
             <div class="flex flex-col gap-4 mt-4">
                 <select name="invitation_from[]" placeholder="Invitation From" multiple
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
@@ -307,7 +307,7 @@
                         </option>
                     @endforeach
                 </select>
-                <select name="continent_id"
+                <select name="continent_id" id="continent"
                     class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_continents') }}</option>
                     @foreach (getDropDown('continents')->options as $continent)
@@ -317,7 +317,7 @@
                         </option>
                     @endforeach
                 </select>
-                <select name="country_id"
+                <select name="country_id" id="country"
                     class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_countries') }}</option>
                     @foreach (getDropDown('country')->options as $country)
@@ -348,7 +348,7 @@
                 </select>
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
-                <a href="{{ getRouteForPage('delegations.departuresIndex') }}"
+                <a href="{{ route('delegations.departuresIndex') }}"
                     class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
                 <button type="submit"
                     class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
@@ -370,6 +370,41 @@
                     }));
                 });
             });
+
+            // Handle continent change to load countries
+            const continentSelect = $("#continent");
+            const countrySelect = $("#country");
+
+            continentSelect.on("change", async function() {
+                const selectedContinent = $(this).val();
+
+                // Clear current options except the default
+                countrySelect.find('option[value!=""]').remove();
+
+                if (selectedContinent) {
+                    try {
+                        let response = await fetch(
+                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
+                        let countries = await response.json();
+
+                        // Add new options
+                        countries.forEach(country => {
+                            let option = new Option(country.name, country.id, false, false);
+                            countrySelect.append(option);
+                        });
+
+                        countrySelect.trigger("change");
+                    } catch (error) {
+                        console.error("Error fetching countries:", error);
+                    }
+                }
+            });
+
+            // Trigger continent change on page load if a continent is already selected
+            const selectedContinent = continentSelect.val();
+            if (selectedContinent) {
+                continentSelect.trigger("change");
+            }
         });
     </script>
 

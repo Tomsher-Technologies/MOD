@@ -19,13 +19,13 @@
                 <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
                     <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
                         <li>
-                            <a href="{{ getRouteForPage('accommodations.create') }}"
-                                class="block px-3 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') .' '.
+                            <a href="{{ route('accommodations.create') }}"
+                                class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') .' '.
                                 __db('manually') }}</a>
                         </li>
                         @can('import_accommodations')
                             <li>
-                                <a href="{{ getRouteForPage('accommodations.import.form') }}" class="block px-3 py-2 hover:bg-gray-100">{{ __db('add') . ' ' .
+                                <a href="{{ route('accommodations.import.form') }}" class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' .
                                     __db('hotel') .' '. __db('bulk') }}</a>
                             </li>
                         @endcan

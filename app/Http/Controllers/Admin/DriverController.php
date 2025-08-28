@@ -17,23 +17,30 @@ class DriverController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_drivers', [
+        // === Drivers === (Admin + Delegate + Escort + Hotel)
+        $this->middleware('permission:view_drivers|delegate_view_drivers|escort_view_drivers|hotel_view_drivers', [
             'only' => ['index', 'search']
         ]);
 
-        $this->middleware('permission:add_drivers', [
+        $this->middleware('permission:add_drivers|driver_add_drivers', [
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:assign_drivers', [
-            'only' => ['assign', 'unassign']
+        $this->middleware('permission:assign_drivers|driver_edit_drivers', [
+            'only' => ['assign']
         ]);
 
-        $this->middleware('permission:edit_drivers', [
+
+        $this->middleware('permission:unassign_drivers|driver_edit_drivers', [
+            'only' => ['unassign']
+        ]);
+
+
+        $this->middleware('permission:edit_drivers|driver_edit_drivers', [
             'only' => ['edit', 'update']
         ]);
 
-        $this->middleware('permission:delete_drivers', [
+        $this->middleware('permission:delete_drivers|driver_delete_drivers', [
             'only' => ['destroy']
         ]);
     }
@@ -430,5 +437,35 @@ class DriverController extends Controller
             'languages' => $languages ? $languages->options : collect(),
             'ranks' => $ranks ? $ranks->options : collect(),
         ];
+    }
+
+    /**
+     * Display arrivals index for drivers.
+     */
+    public function arrivalsIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with driver_view_travels permission
+        // Implementation would be similar to delegation controller's arrivalsIndex
+        return redirect()->route('drivers.index');
+    }
+
+    /**
+     * Display departures index for drivers.
+     */
+    public function departuresIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with driver_view_travels permission
+        // Implementation would be similar to delegation controller's departuresIndex
+        return redirect()->route('drivers.index');
+    }
+
+    /**
+     * Display delegates index for drivers.
+     */
+    public function delegatesIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with driver_view_delegate permission
+        // Implementation would be similar to delegation controller's delegates functionality
+        return redirect()->route('drivers.index');
     }
 }

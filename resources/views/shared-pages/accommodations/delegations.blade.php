@@ -7,7 +7,7 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class=" mb-4 flex items-center justify-between gap-3">
-                    <form class="w-[50%] me-4" action="{{ getRouteForPage('accommodation-delegations') }}" method="GET">
+                    <form class="w-[50%] me-4" action="{{ route('accommodation-delegations') }}" method="GET">
                         <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +137,7 @@
                                 if (auth()->user() && auth()->user()->can('view_accommodation_delegations')) {
                                     $buttons .= 
                                         '<a href="' .
-                                        getRouteForPage('accommodation-delegation-view', $delegation->id) . 
+                                        route('accommodation-delegation-view', $delegation->id) . 
                                         '" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                         <svg xmlns=\'http://www.w3.org/2000/svg\' width=\'18\' height=\'18\' viewBox=\'0 0 16 12\' fill=\'none\'><path d=\'M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z\' stroke=\'#7C5E24\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' /><path d=\'M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z\' stroke=\'#7C5E24\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'></svg>
                                     </a>';
@@ -196,7 +196,7 @@
             <span class="sr-only">{{ __db('close_menu') }}</span>
         </button>
 
-        <form action="{{ getRouteForPage('accommodation-delegations') }}" method="GET">
+        <form action="{{ route('accommodation-delegations') }}" method="GET">
             <div class="flex flex-col gap-4 mt-4">
                 <select name="invitation_from[]" placeholder="Invitation From" multiple
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
@@ -253,7 +253,7 @@
                 </select> --}}
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
-                <a href="{{ getRouteForPage('accommodation-delegations') }}"
+                <a href="{{ route('accommodation-delegations') }}"
                     class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
                 <button type="submit"
                     class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
