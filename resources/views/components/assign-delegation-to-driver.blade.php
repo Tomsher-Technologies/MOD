@@ -12,8 +12,12 @@
         </div>
     @endif
 
-    <form action="{{ getRouteForPage('drivers.assign', $driver->id) }}" method="POST">
+    <form action="{{ route('drivers.assign', $driver->id) }}" method="POST">
         @csrf
+        <input type="hidden" name="action" id="actionInput" value="">
+        <input type="hidden" name="start_date" id="startDateInput" value="">
+
+
         <div class="p-4 md:p-5 space-y-6 px-0">
             <div class="grid  grid-cols-12 gap-2 items-end">
                 <div class="col-span-5">
@@ -37,7 +41,7 @@
                         <div>
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
-                            <select id="country_id" class="p-3 rounded-lg w-full border text-sm">
+                            <select id="country_id" class="select2 p-3 rounded-lg w-full border text-sm">
                                 <option selected="" disabled="">{{ __db('Select Country') }}</option>
                                 @foreach (getDropDown('country')->options as $country)
                                     <option value="{{ $country->id }}">{{ $country->value }}</option>
@@ -80,11 +84,48 @@
 
         </div>
         <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
-            <button type="submit"
-                class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('assign') }}</button>
+            <button type="button" id="assignBtn"
+                class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12 hidden">{{ __db('assign') }}</button>
+
         </div>
     </form>
 </div>
+
+<div id="assignConfirmationModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h2 class="text-lg font-semibold mb-4">{{ __db('This driver already has an assignment') }}</h2>
+        <p class="mb-6">{{ __db('Do you want to reassign (continue history) or replace (end previous)?') }}</p>
+
+        <!-- Reassign Date Field (hidden by default) -->
+        <div id="reassignDateWrapper" class="hidden mb-6">
+            <label for="reassignDate" class="block text-gray-700 font-medium mb-2">
+                {{ __db('Start Date for New Delegation') }}
+            </label>
+            <input type="date" id="reassignDate"
+                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" />
+            <p class="text-red-500 text-sm mt-1 hidden" id="dateError">
+                {{ __db('Start date is required.') }}
+            </p>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <button type="button" id="cancelModal"
+                class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                {{ __db('Cancel') }}
+            </button>
+            <button type="button" id="reassignBtn"
+                class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+                {{ __db('Reassign') }}
+            </button>
+            <button type="button" id="replaceBtn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
+                {{ __db('Replace') }}
+            </button>
+        </div>
+    </div>
+</div>
+
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -92,11 +133,12 @@
         const delegationCodeInput = document.getElementById('delegation_code');
         const countryIdInput = document.getElementById('country_id');
         const delegationTableBody = document.querySelector('#delegationTable tbody');
+        const assignBtn = document.getElementById('assignBtn');
 
         // Define pageRoutes here or ensure they are globally available
         const pageRoutes = {
-            delegationSearchByCode: "{{ getRouteForPage('delegation.searchByCode') }}",
-            delegationSearch: "{{ getRouteForPage('delegation.search') }}",
+            delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
+            delegationSearch: "{{ route('delegations.search') }}",
         };
 
         searchBtn.addEventListener('click', function() {
@@ -105,6 +147,7 @@
 
             let url = new URL(pageRoutes.delegationSearch, window.location.origin);
             url.searchParams.append('delegates', '1');
+            url.searchParams.append('driver_id', "{{ $driver->id }}");
 
             if (delegationCode) {
                 url = new URL(pageRoutes.delegationSearchByCode, window.location.origin);
@@ -138,26 +181,81 @@
                                         </td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.code}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.value || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name || ''}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
                                     </tr>
                                 `;
                                 delegationTableBody.innerHTML += row;
                             });
+
+                            assignBtn.classList.remove('hidden');
                         } else {
                             delegationTableBody.innerHTML =
-                                '<tr><td colspan="5" class="text-center py-4">{{ __db('No delegations found.') }}</td></tr>';
+                                '<tr><td colspan="5" class="text-center py-4">{{ __db('no_delegations_found') }}</td></tr>';
                         }
                     } else {
                         delegationTableBody.innerHTML =
-                            `<tr><td colspan="5" class="text-center py-4">${data.message || '{{ __db('No delegations found.') }}'}</td></tr>`;
+                            `<tr><td colspan="5" class="text-center py-4">${data.message || '{{ __db('no_delegations_found') }}'}</td></tr>`;
                     }
                 })
                 .catch(err => {
                     console.error(err);
                     delegationTableBody.innerHTML =
-                        '<tr><td colspan="5" class="text-center py-4">{{ __db('An error occurred.') }}</td></tr>';
+                        '<tr><td colspan="5" class="text-center py-4">{{ __db('error') }}</td></tr>';
                 });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const assignBtn = document.getElementById('assignBtn');
+        const actionInput = document.getElementById('actionInput');
+        const startDateInput = document.getElementById('startDateInput');
+        const form = assignBtn.closest('form');
+
+        const hasAssignment = @json($driver->delegations()->wherePivot('status', 1)->exists());
+
+        assignBtn.addEventListener('click', function() {
+            if (hasAssignment) {
+                Swal.fire({
+                    title: '{{ __db('driver_already_has_assignment') }}',
+                    text: '{{ __db('reassign_or_replace_assignment') }}',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    showDenyButton: true,
+                    confirmButtonText: '{{ __db('reassign') }}',
+                    denyButtonText: '{{ __db('replace') }}',
+                    cancelButtonText: '{{ __db('cancel') }}',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: '{{ __db('start_date_for_reassignment') }}',
+                            input: 'date',
+                            inputLabel: '{{ __db('start_date') }}',
+                            inputPlaceholder: '{{ __db('select_date') }}',
+                            inputValidator: (value) => {
+                                if (!value)
+                                return '{{ __db('start_date_required') }}';
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: '{{ __db('submit') }}',
+                            cancelButtonText: '{{ __db('cancel') }}',
+                        }).then((dateResult) => {
+                            if (dateResult.isConfirmed) {
+                                actionInput.value = 'reassign';
+                                startDateInput.value = dateResult.value;
+                                form.submit();
+                            }
+                        });
+                    } else if (result.isDenied) {
+                        // Replace
+                        actionInput.value = 'replace';
+                        startDateInput.value = '';
+                        form.submit();
+                    }
+                });
+            } else {
+                actionInput.value = 'reassign';
+                form.submit();
+            }
         });
     });
 </script>

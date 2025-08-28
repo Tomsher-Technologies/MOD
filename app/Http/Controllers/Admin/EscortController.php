@@ -17,22 +17,33 @@ class EscortController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_escorts', [
+        $this->middleware('permission:view_escorts|delegate_view_escorts|escort_view_escorts|hotel_view_escorts', [
             'only' => ['index', 'search']
         ]);
 
-        $this->middleware('permission:add_escorts', [
+        $this->middleware('permission:add_escorts|driver_add_escorts', [
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:edit_escorts', [
+        $this->middleware('permission:assign_escorts|driver_edit_escorts', [
+            'only' => ['assign']
+        ]);
+
+
+        $this->middleware('permission:unassign_escorts|driver_edit_escorts', [
+            'only' => ['unassign']
+        ]);
+
+
+        $this->middleware('permission:edit_escorts|driver_edit_escorts', [
             'only' => ['edit', 'update']
         ]);
 
-        $this->middleware('permission:delete_escorts', [
+        $this->middleware('permission:delete_escorts|driver_delete_escorts', [
             'only' => ['destroy']
         ]);
     }
+
 
     /**
      * Display a listing of the resource.
@@ -41,7 +52,7 @@ class EscortController extends Controller
     {
         // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
-        
+
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
             ->where('event_id', $currentEventId)
             ->latest();
@@ -89,11 +100,11 @@ class EscortController extends Controller
         $escort->status = $request->status;
         $escort->save();
 
-        if ($request->status == 0) {
-            $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
-                'status' => 0,
-            ]);
-        }
+        // if ($request->status == 0) {
+        //     $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
+        //         'status' => 0,
+        //     ]);
+        // }
 
         return response()->json(['status' => 'success']);
     }
@@ -115,7 +126,6 @@ class EscortController extends Controller
     public function store(Request $request)
     {
 
-
         $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
@@ -125,6 +135,7 @@ class EscortController extends Controller
             'phone_number' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
@@ -141,6 +152,7 @@ class EscortController extends Controller
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
+            'unit_id.exists' => __db('unit_id_exists'),
             'nationality_id.exists' => __db('nationality_id_exists'),
             'date_of_birth.date' => __db('date_of_birth_date'),
             'status.max' => __db('escort_status_max', ['max' => 255]),
@@ -203,6 +215,7 @@ class EscortController extends Controller
     {
         $validated = $request->validate([
             'name_en' => 'required|string|max:255',
+            'title_id' => 'nullable|string|exists:dropdown_options,id',
             'military_number' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
@@ -211,6 +224,7 @@ class EscortController extends Controller
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
+            'unit_id' => 'nullable|exists:dropdown_options,id',
             'date_of_birth' => 'nullable|date',
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
@@ -226,6 +240,7 @@ class EscortController extends Controller
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
+            'unit_id.exists' => __db('unit_id_exists'),
             'nationality_id.exists' => __db('nationality_id_exists'),
             'date_of_birth.date' => __db('date_of_birth_date'),
             'status.max' => __db('escort_status_max', ['max' => 255]),
@@ -236,6 +251,13 @@ class EscortController extends Controller
 
         // Define relations to compare for confirmation dialog
         $relationsToCompare = [
+            'title_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
             'gender_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,
@@ -258,6 +280,13 @@ class EscortController extends Controller
                 ],
             ],
             'internal_ranking_id' => [
+                'display_with' => [
+                    'model' => \App\Models\DropdownOption::class,
+                    'key' => 'id',
+                    'label' => 'value',
+                ],
+            ],
+            'unit_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',
@@ -374,27 +403,21 @@ class EscortController extends Controller
 
         $delegationId = $request->delegation_id;
 
-        // Check if the escort is already assigned to this delegation
-        // $existingAssignment = $escort->delegations()->where('delegation_id', $delegationId)->first();
-
-        // if ($existingAssignment) {
-        //     // If the assignment exists and is marked as unassigned, update the status
-        //     if (!$existingAssignment->pivot->status) {
-        //         $escort->delegations()->updateExistingPivot($delegationId, [
-        //             'status' => 1,
-        //             'assigned_by' => auth()->id(),
-        //         ]);
-        //     }
-        // } else {
-        // If no assignment exists, create a new one
-        $escort->delegations()->attach($delegationId, [
-            'status' => 1,
-            'assigned_by' => auth()->id(),
+        $escort->delegations()->update([
+            'delegation_escorts.status' => 0,
         ]);
-        // }
+
+        $escort->delegations()->attach([
+            $delegationId => [
+                'status' => 1,
+                'assigned_by' => auth()->id(),
+            ],
+        ]);
 
         return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
+
+
 
     public function unassign(Request $request, Escort $escort)
     {
@@ -424,5 +447,35 @@ class EscortController extends Controller
             'languages' => $languages ? $languages->options : collect(),
             'ranks' => $ranks ? $ranks->options : collect(),
         ];
+    }
+
+    /**
+     * Display arrivals index for escorts.
+     */
+    public function arrivalsIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with escort_view_travels permission
+        // Implementation would be similar to delegation controller's arrivalsIndex
+        return redirect()->route('escorts.index');
+    }
+
+    /**
+     * Display departures index for escorts.
+     */
+    public function departuresIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with escort_view_travels permission
+        // Implementation would be similar to delegation controller's departuresIndex
+        return redirect()->route('escorts.index');
+    }
+
+    /**
+     * Display delegates index for escorts.
+     */
+    public function delegatesIndex(Request $request)
+    {
+        // This method is intended to be accessed by users with escort_view_delegate permission
+        // Implementation would be similar to delegation controller's delegates functionality
+        return redirect()->route('escorts.index');
     }
 }

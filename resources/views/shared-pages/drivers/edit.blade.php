@@ -1,7 +1,7 @@
 <div class="dashboard-main-body">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('edit') . ' ' . __db('driver') }}</h2>
-        <a href="{{ getRouteForPage('drivers.index') }}"
+        <a href="{{ route('drivers.index') }}"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                 height="24" fill="none" viewBox="0 0 24 24">
@@ -22,14 +22,27 @@
             </ul>
         </div>
     @endif
-    
+
     <!-- Drivers -->
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
-        <form id="driver-form" action="{{ getRouteForPage('drivers.update', $driver->id) }}" method="POST"
+        <form id="driver-form" action="{{ route('drivers.update', $driver->id) }}" method="POST"
             data-ajax-form="true">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-12 gap-5">
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title') }}:</label>
+                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
+                        <option value="" disabled>{{ __db('select_title') }}</option>
+                        @foreach (getDropDown('title')->options as $option)
+                            <option value="{{ $option->id }}" @if (old('title_id', $driver->title_id) == $option->id) selected @endif>
+                                {{ $option->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
                     <input type="text" name="military_number"
@@ -48,12 +61,14 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('name_en', $driver->name_en) }}">
                 </div>
+
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('mobile_number') }}:</label>
-                    <input type="text" name="mobile_number"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        value="{{ old('mobile_number', $driver->mobile_number) }}">
+                    <label class="form-label">{{ __db('phone_number') }}:</label>
+                    <input type="text" name="phone_number"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}" value="{{ old('phone_number', $driver->phone_number) }}">
                 </div>
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('driver') . ' ' . __db('id') }}:</label>
                     <input type="text" name="driver_id"
@@ -78,6 +93,21 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('capacity', $driver->capacity) }}">
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('unit') }}:</label>
+                    <select name="unit_id"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option selected disabled>{{ __db('select') . ' ' . __db('unit') }}</option>
+                        @foreach (getDropDown('unit')->options ?? [] as $unit)
+                            <option value="{{ $unit->id }}"
+                                {{ old('unit', $driver->unit_id) == $unit->id ? 'selected' : '' }}>
+                                {{ $unit->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('status') }}:</label>
                     <select name="status"
@@ -91,6 +121,16 @@
                     </select>
                 </div>
             </div>
+
+            <div class="col-span-4 mt-5">
+                <label class="form-label">{{ __db('note_1') }}:</label>
+                <textarea id="message" rows="4" name="note1"
+                    class="block p-2.5 w-full text-sm text-gray-900 rounded-lg border border-neutral-300 focus:border-blue-500 bg-white">{{ old('note1', $driver->note1) }}</textarea>
+                @error('note1')
+                    <div class="text-red-600">{{ $message }}</div>
+                @enderror
+            </div>
+
             <div class="flex justify-between items-center mt-8">
                 <button type="submit"
                     class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('save') }}</button>

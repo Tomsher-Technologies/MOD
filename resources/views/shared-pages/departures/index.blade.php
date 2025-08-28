@@ -7,7 +7,7 @@
 
             <input type="date"
                 class="p-3 !w-[20%] text-secondary-light !border-[#d1d5db] rounded-lg w-full border text-sm">
-            <form class="w-[75%]" action="{{ getRouteForPage('delegations.departuresIndex') }}" method="GET">
+            <form class="w-[75%]" action="{{ route('delegations.departuresIndex') }}" method="GET">
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                         <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -110,10 +110,11 @@
                             ],
                             [
                                 'label' => __db('departure') . ' ' . __db('status'),
-                                'render' => fn($row) => $row->status->value ?? '-',
+                                'render' => fn($row) => $row->status ?? '-',
                             ],
                             [
                                 'label' => __db('actions'),
+                                'permission' => ['add_travels', 'delegate_edit_delegations'],
                                 'render' => function ($row) {
                                     $departureData = [
                                         'id' => $row->id,
@@ -123,7 +124,7 @@
                                         'date_time' => $row->date_time
                                             ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
                                             : '',
-                                        'status_id' => $row->status_id,
+                                        'status' => $row->status,
                                     ];
                                     $json = htmlspecialchars(json_encode($departureData), ENT_QUOTES, 'UTF-8');
                                     return '<button type="button" class="edit-departure-btn text-[#B68A35]" data-departure=\'' .
@@ -143,18 +144,49 @@
                             $oneHourHence = $now->copy()->addHour();
                             $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
-                            if ($rowDateTime->lt($oneHourAgo)) {
-                                return 'bg-[#b7e9b2]'; 
+                            $statusName =
+                                is_object($row->status) && isset($row->status->value)
+                                    ? $row->status->value
+                                    : $row->status;
+
+                            if ($statusName === 'to_be_departed') {
+                                if ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
+                                    return 'bg-[#ffc5c5]';
+                                }
+                                if ($rowDateTime->gt($oneHourHence)) {
+                                    return 'bg-[#ffffff]';
+                                }
+                                return 'bg-[#ffffff]';
                             }
-                            elseif ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
-                                return 'bg-[#ffc5c5]'; 
+
+                            if ($statusName === 'departed') {
+                                return 'bg-[#b7e9b2]';
                             }
-                            else {
-                                return 'bg-[#ffffff]'; 
-                            }
+
+                            return 'bg-[#ffffff]';
                         };
                     @endphp
                     <x-reusable-table :columns="$columns" :data="$departures" :row-class="$rowClass" />
+
+                    <div class="mt-3 flex items-center flex-wrap gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-[#ffc5c5] rounded border"></div>
+                            <span class="text-gray-800 text-sm">{{ __db('To be departed (within 1 hour)') }}</span>
+                        </div>
+
+
+
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-[#b7e9b2] rounded border"></div>
+                            <span class="text-gray-800 text-sm">{{ __db('Departed') }}</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-[#ffffff] rounded border border-gray-300"></div>
+                            <span class="text-gray-800 text-sm">{{ __db('Scheduled / No active status') }}</span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -221,11 +253,18 @@
 
                         <div>
                             <label class="form-label">{{ __db('departure') . ' ' . __db('status') }}:</label>
-                            <select name="status_id" x-model="departure.status_id"
-                                class="p-3 rounded-lg w-full border text-sm">
+                            @php
+                                $departureStatuses = [
+                                    'departed' => __db('departed'),
+                                    'to_be_departed' => __db('to_be_departed'),
+                                ];
+                            @endphp
+                            <select name="status" x-model="departure.status"
+                                class="p-3 rounded-lg w-full border border-neutral-300 text-sm" required>
                                 <option value="">{{ __db('select_status') }}</option>
-                                @foreach (getDropdown('departure_status')->options as $option)
-                                    <option value="{{ $option->id }}">{{ $option->value }}</option>
+                                @foreach ($departureStatuses as $value => $label)
+                                    <option :selected="departure.status === '{{ $value }}'"
+                                        value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -258,7 +297,7 @@
             <span class="sr-only">{{ __db('close_menu') }}</span>
         </button>
 
-        <form action="{{ getRouteForPage('delegations.departuresIndex') }}" method="GET">
+        <form action="{{ route('delegations.departuresIndex') }}" method="GET">
             <div class="flex flex-col gap-4 mt-4">
                 <select name="invitation_from[]" placeholder="Invitation From" multiple
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
@@ -268,7 +307,7 @@
                         </option>
                     @endforeach
                 </select>
-                <select name="continent_id"
+                <select name="continent_id" id="continent"
                     class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_continents') }}</option>
                     @foreach (getDropDown('continents')->options as $continent)
@@ -278,7 +317,7 @@
                         </option>
                     @endforeach
                 </select>
-                <select name="country_id"
+                <select name="country_id" id="country"
                     class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_countries') }}</option>
                     @foreach (getDropDown('country')->options as $country)
@@ -309,7 +348,7 @@
                 </select>
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
-                <a href="{{ getRouteForPage('delegations.departuresIndex') }}"
+                <a href="{{ route('delegations.departuresIndex') }}"
                     class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
                 <button type="submit"
                     class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
@@ -331,6 +370,41 @@
                     }));
                 });
             });
+
+            // Handle continent change to load countries
+            const continentSelect = $("#continent");
+            const countrySelect = $("#country");
+
+            continentSelect.on("change", async function() {
+                const selectedContinent = $(this).val();
+
+                // Clear current options except the default
+                countrySelect.find('option[value!=""]').remove();
+
+                if (selectedContinent) {
+                    try {
+                        let response = await fetch(
+                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
+                        let countries = await response.json();
+
+                        // Add new options
+                        countries.forEach(country => {
+                            let option = new Option(country.name, country.id, false, false);
+                            countrySelect.append(option);
+                        });
+
+                        countrySelect.trigger("change");
+                    } catch (error) {
+                        console.error("Error fetching countries:", error);
+                    }
+                }
+            });
+
+            // Trigger continent change on page load if a continent is already selected
+            const selectedContinent = continentSelect.val();
+            if (selectedContinent) {
+                continentSelect.trigger("change");
+            }
         });
     </script>
 

@@ -50,6 +50,56 @@ class DropdownController extends Controller
         return view('admin.dropdowns.options', compact('dropdown', 'options'));
     }
 
+    public function countries()
+    {
+        // Get the Country dropdown (assuming it has code 'country')
+        $countryDropdown = Dropdown::where('code', 'country')->first();
+        $continentDropdown = Dropdown::where('code', 'continents')->first();
+        
+        if (!$countryDropdown) {
+            return redirect()->back()->with('error', 'Country dropdown not found');
+        }
+        
+        $query = $countryDropdown->options();
+        $continents = $continentDropdown ? $continentDropdown->options()->where('status', 1)->get() : collect();
+        
+        $countries = $query->paginate(20);
+        return view('admin.dropdowns.countries', compact('countries', 'continents'));
+    }
+
+    public function storeCountry(Request $request)
+    {
+        $request->validate([
+            'value' => 'required|string|max:255',
+        ]);
+
+        // Get the Country dropdown
+        $countryDropdown = Dropdown::where('code', 'country')->first();
+        
+        if (!$countryDropdown) {
+            return back()->with('error', 'Country dropdown not found');
+        }
+
+        // Check if country already exists
+        $existingCountry = DropdownOption::where('dropdown_id', $countryDropdown->id)
+            ->where('value', $request->value)
+            ->first();
+            
+        if ($existingCountry) {
+            return back()->with('error', 'Country already exists');
+        }
+
+        // Create the country option
+        $country = DropdownOption::create([
+            'dropdown_id' => $countryDropdown->id,
+            'value' => $request->value,
+            'sort_order' => 0, // You can modify this as needed
+            'status' => 1
+        ]);
+
+        return back()->with('success', 'Country added successfully');
+    }
+
     public function storeOption(Request $request)
     {
         $request->validate([

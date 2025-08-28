@@ -29,7 +29,7 @@
         <div class="text-red-600">{{ $message }}</div>
     @enderror
 
-    <form method="POST" action="{{ getRouteForPage('delegation.storeInterview', $delegation->id) ?? '#' }}"
+    <form method="POST" action="{{ route('delegations.storeOrUpdateInterview', $delegation->id) ?? '#' }}"
         enctype="multipart/form-data">
         @csrf
         @php
@@ -143,7 +143,7 @@
 
                 <div id="other-input" class="hidden col-span-1">
                     <label class="form-label block text-gray-700 font-medium">{{ __db('select') }}:</label>
-                    <select name="interview_with_other_member_id" class="p-3 rounded-lg w-full border text-sm">
+                    <select name="interview_with_other_member_id" class="select2 p-3 rounded-lg w-full border text-sm">
                         <option selected disabled>{{ __db('select_other_member') }}</option>
                         @foreach ($otherMembers as $member)
                             <option value="{{ $member->id }}">{{ $member->name_en ?? $member->name_ar }}</option>
@@ -157,7 +157,7 @@
 
                 <div id="membersbox">
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
-                    <select name="members" class="p-3 rounded-lg w-full border text-sm" id="members-select">
+                    <select name="members" class="select2 p-3 rounded-lg w-full border text-sm" id="members-select">
                     </select>
 
                     @error('members')
@@ -167,7 +167,7 @@
 
                 <div id="statusbox">
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('status') }}:</label>
-                    <select name="status" class="p-3 rounded-lg w-full border text-sm">
+                    <select name="status" class="select2 p-3 rounded-lg w-full border text-sm">
                         <option selected disabled>{{ __db('select_status') }}</option>
                         @foreach (getDropdown('interview_status')->options as $status)
                             <option value="{{ $status->id }}">{{ $status->value }}</option>
@@ -211,7 +211,7 @@
                 @endphp
                 <div>
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('continents') }}:</label>
-                    <select id="modal-continent" class="p-3 rounded-lg w-full border text-sm">
+                    <select id="modal-continent" class="select2 p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_continent') }}</option>
 
                         @if ($continentOptions)
@@ -226,7 +226,7 @@
                 </div>
                 <div>
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
-                    <select id="modal-country" class="p-3 rounded-lg w-full border text-sm">
+                    <select id="modal-country" class="select2 p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_country') }}</option>
                         @if ($countryOptions)
                             @foreach ($countryOptions->options as $option)
@@ -274,9 +274,9 @@
 
     <script>
         window.pageRoutes = {
-            delegationSearchByCode: @json(getRouteForPage('delegation.searchByCode')),
-            delegationSearchByFilters: @json(getRouteForPage('delegation.search')),
-            delegationMembers: @json(getRouteForPage('delegation.members'))
+            delegationSearchByCode: @json(route('delegations.searchByCode')),
+            delegationSearchByFilters: @json(route('delegations.search')),
+            delegationMembers: @json(route('delegations.members'))
         };
     </script>
 

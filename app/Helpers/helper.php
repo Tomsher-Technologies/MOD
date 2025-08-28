@@ -1,6 +1,10 @@
 <?php
 
+use App\Models\Country;
 use App\Models\User;
+use App\Models\Delegate;
+use App\Models\Escort;
+use App\Models\Driver;
 use App\Models\Event;
 use App\Models\Language;
 use Illuminate\Support\Str;
@@ -345,11 +349,11 @@ if (!function_exists('getRouteForPage')) {
             // Escorts
             'escorts.index' => [
                 'manage_escorts' => 'escorts.index',
-                'del_manage_escorts' => 'escorts.index',
+                'del_manage_escort' => 'escorts.index',
             ],
             'escorts.show' => [
                 'manage_escorts' => 'escorts.show',
-                'del_manage_escorts' => 'escorts.show',
+                'del_manage_escort' => 'escorts.show',
             ],
             'escorts.create' => [
                 'add_escorts' => 'escorts.create',
@@ -434,10 +438,25 @@ if (!function_exists('getRouteForPage')) {
                 'manage_delegations' => 'attachments.destroy',
                 'del_manage_delegations' => 'attachments.destroy',
             ],
-            'attachments.edit' => [
+            'delegations.updateAttachment' => [
                 'manage_delegations' => 'delegations.updateAttachment',
                 'del_manage_delegations' => 'delegations.updateAttachment',
             ],
+
+            //Other Interview Members
+            'other-interview-members.index' => [
+                'manage_other_interview_members' => 'other-interview-members.index',
+                'del_manage_other_interview_members' => 'other-interview-members.index',
+            ],
+            'otherInterviewMembers.edit' => [
+                'edit_other_interview_members' => 'otherInterviewMembers.edit',
+                'del_edit_other_interview_members' => 'otherInterviewMembers.edit',
+            ],
+            'otherInterviewMembers.show' => [
+                'view_other_interview_members' => 'otherInterviewMembers.show',
+                'del_view_other_interview_members' => 'otherInterviewMembers.show',
+            ],
+
 
             // Accommodation
             'accommodations.index' => [
@@ -488,8 +507,6 @@ if (!function_exists('getRouteForPage')) {
                 'view_accommodation_delegations' => 'accommodation-delegation-view',
                 'hotel_view_accommodation_delegations' => 'accommodation-delegation-view',
             ],
-            
-            
         ];
 
         $user = auth()->user();
@@ -522,3 +539,80 @@ if (!function_exists('getRouteForPage')) {
         return "#";
     }
 }
+
+function getAllCountries()
+{
+    return Country::orderBy('name')
+        ->get();
+}
+
+
+if (! function_exists('getCountriesByContinent')) {
+    function getCountriesByContinent($continentId)
+    {
+        return Country::where('continent_id', $continentId)
+            ->orderBy('name')
+            ->get();
+    }
+}
+
+
+if (!function_exists('can')) {
+    function can(string|array $permissions): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        $permissions = is_array($permissions) ? $permissions : [$permissions];
+
+        foreach ($permissions as $permission) {
+            if ($user->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
+    function getRoomAssignmentStatus($delegationId)
+    {
+        $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)
+                            ->pluck('current_room_assignment_id');
+
+        $escorts = Escort::whereIn('id', function ($q) use ($delegationId) {
+                        $q->select('escort_id')
+                        ->from('delegation_escorts')
+                        ->where('status', 1)
+                        ->where('delegation_id', $delegationId);
+                    })
+                    ->pluck('current_room_assignment_id');
+
+        $drivers = Driver::whereIn('id', function ($q) use ($delegationId) {
+                        $q->select('driver_id')
+                        ->from('delegation_drivers')
+                        ->where('status', 1)
+                        ->where('delegation_id', $delegationId);
+                    })
+                    ->pluck('current_room_assignment_id');
+
+        $all = $delegates->merge($escorts)->merge($drivers);
+
+        if ($all->count() === 0) {
+            return 'No Members';
+        }
+
+        $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
+        $totalCount    = $all->count();
+
+        if ($assignedCount === 0) {
+            return 0;
+        } elseif ($assignedCount === $totalCount) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }

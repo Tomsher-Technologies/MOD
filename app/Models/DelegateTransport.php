@@ -17,7 +17,7 @@ class DelegateTransport extends Model
         'flight_no',
         'flight_name',
         'date_time',
-        'status_id',
+        'status',
         'comment',
     ];
 
@@ -52,21 +52,6 @@ class DelegateTransport extends Model
         return $this->belongsTo(Delegate::class);
     }
 
-    public function arrivalStatus()
-    {
-        return $this->belongsTo(DropdownOption::class, 'status_id')
-            ->whereHas('dropdown', function ($query) {
-                $query->where('code', 'arrival_status');
-            });
-    }
-
-    public function departureStatus()
-    {
-        return $this->belongsTo(DropdownOption::class, 'status_id')
-            ->whereHas('dropdown', function ($query) {
-                $query->where('code', 'departure_status');
-            });
-    }
 
     public function airport()
     {
@@ -76,30 +61,4 @@ class DelegateTransport extends Model
             });
     }
 
-    public function status()
-    {
-        if ($this->type == 'arrival') {
-            return $this->arrivalStatus();
-        }
-
-        if ($this->type == 'departure') {
-            return $this->departureStatus();
-        }
-
-        // Return a default relation to an empty DropdownOption instance to avoid errors
-        return $this->belongsTo(DropdownOption::class, 'status_id')->whereRaw('0 = 1');
-    }
-
-    public function getStatusAttribute()
-    {
-        if ($this->type === 'arrival') {
-            return $this->arrivalStatus;
-        }
-
-        if ($this->type === 'departure') {
-            return $this->departureStatus;
-        }
-
-        return null;
-    }
 }

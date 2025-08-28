@@ -20,14 +20,14 @@
         $oldToDelegateId = old('to_delegate_id', $isEditMode ? $interview->toMembers()->value('member_id') : '');
 
         $formAction = $isEditMode
-            ? getRouteForPage('delegation.storeInterview', [
+            ? route('delegations.storeOrUpdateInterview', [
                 'delegation' => $delegation,
                 'interview' => $interview,
             ])
-            : getRouteForPage('delegation.storeInterview', $delegation);
+            : route('delegations.storeOrUpdateInterview', $delegation);
     @endphp
 
-    <x-back-btn :title="$title" back-url="{{ getRouteForPage('delegation.show', $delegation->id) }}" />
+    <x-back-btn :title="$title" back-url="{{ route('delegations.show', $delegation->id) }}" />
 
     {{-- <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
@@ -118,7 +118,7 @@
                     </div>
                 </div>
 
-                <div class="flex col-span-2 items-end gap-3" id="delegation-input">
+                <div class="flex col-span-2 items-end gap-3" id="delegation-input" @class(['hidden' => $oldInterviewType !== 'delegation'])>
                     <div class="w-full">
                         <label class="form-label block text-gray-700 font-semibold">{{ __db('interview_with') }}
                             ({{ __db('delegate_id') }}):</label>
@@ -140,7 +140,7 @@
                 </div>
 
 
-                <div id="membersbox" class=" col-span-1">
+                <div id="membersbox" class=" col-span-1" @class(['hidden' => $oldInterviewType !== 'delegation'])>
                     <label class="form-label block text-gray-700 font-medium">{{ __db('select') }}:</label>
                     <select name="to_delegate_id" class="p-3 rounded-lg w-full border text-sm" id="members-select">
                         @if ($isEditMode && $oldInterviewType === 'delegation' && !empty($toDelegationMembers))
@@ -160,7 +160,7 @@
                     @enderror
                 </div>
 
-                <div id="other-input" class="hidden">
+                <div id="other-input" class="hidden" @class(['hidden' => $oldInterviewType !== 'other'])>
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
                     <select name="other_member_id" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select') }}</option>
@@ -278,13 +278,21 @@
 
     <script>
         window.pageRoutes = {
-            delegationSearchByCode: @json(getRouteForPage('delegation.searchByCode')),
-            delegationSearchByFilters: @json(getRouteForPage('delegation.search')),
-            delegationMembers: @json(getRouteForPage('delegation.members'))
+            delegationSearchByCode: @json(route('delegations.searchByCode')),
+            delegationSearchByFilters: @json(route('delegations.search')),
+            delegationMembers: '/mod-admin/delegations/members'
         };
     </script>
 
+
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkedRadio = document.querySelector('input[name="interview_type"]:checked');
+            if (checkedRadio) {
+                toggleInterviewInput(checkedRadio);
+            }
+        });
+
         function toggleInterviewInput(el) {
             const delegationInput = document.getElementById('delegation-input');
             const otherInput = document.getElementById('other-input');
@@ -347,8 +355,8 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        console.log("data",data);
-                        
+                        console.log("data", data);
+
                         if (data.success && data.members) {
                             populateMembers(data.members);
                             toastr.success("{{ __db('members_fetched') }}");
@@ -409,9 +417,9 @@
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");
 
-                                  modalSelectBtn.disabled = false;
-                                    modalSelectBtn.classList.remove(
-                                        'hidden');
+                            modalSelectBtn.disabled = false;
+                            modalSelectBtn.classList.remove(
+                                'hidden');
 
                         } else {
                             delegationsList.innerHTML = '<li>No delegations found.</li>';
@@ -430,7 +438,7 @@
             modalSelectBtn.addEventListener('click', function() {
                 if (!selectedDelegationId) return;
 
-                  codeInput.value = selectedDelegationCode;
+                codeInput.value = selectedDelegationCode;
 
                 fetch(`${window.pageRoutes.delegationMembers}/${selectedDelegationId}`, {
                         headers: {
@@ -440,11 +448,11 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            
+
                             populateMembers(data.members);
                             closeModal();
                             toastr.success("{{ __db('members_fetched') }}");
-                          
+
                         } else {
                             toastr.success("{{ __db('failed_to_load_members') }}");
 
@@ -469,10 +477,5 @@
                 });
             }
         });
-
-
-
-       
-
     </script>
 @endsection

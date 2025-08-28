@@ -27,7 +27,7 @@
                 </a>
             </li>
 
-            @can('manage_events')
+            @canany(['manage_events'])
                 <li>
                     <a href="{{ route('events.index') }}"
                         class="{{ areActiveRoutes(['events.index', 'events.create', 'events.edit']) }}">
@@ -39,9 +39,10 @@
                         <span class="text-lg">{{ __db('events') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_delegations')
+            @canany(['manage_delegations', 'delegate_manage_delegations', 'escort_manage_delegations',
+                'driver_manage_delegation', 'hotel_manage_delegations'])
                 <li>
                     <a href="{{ route('delegations.index') }}"
                         class="{{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit']) }}">
@@ -53,10 +54,11 @@
                         <span class="text-lg">{{ __db('delegations') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
 
-            @can('view_travels')
+            @canany(['manage_delegations', 'delegate_manage_delegations', 'escort_manage_delegations', 'driver_manage_delegations',
+                'hotel_manage_delegations'])
                 <li>
                     <a href="{{ route('delegations.arrivalsIndex') }}"
                         class="{{ areActiveRoutes(['delegations.arrivalsIndex']) }}">
@@ -68,9 +70,10 @@
                         <span class="text-lg">{{ __db('arrivals') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('view_travels')
+             @canany(['manage_delegations', 'delegate_manage_delegations', 'escort_manage_delegations', 'driver_manage_delegations',
+                'hotel_manage_delegations'])
                 <li>
                     <a href="{{ route('delegations.departuresIndex') }}"
                         class="{{ areActiveRoutes(['delegations.departuresIndex']) }}">
@@ -82,9 +85,10 @@
                         <span class="text-lg">{{ __db('departures') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            {{-- @can('view_interviews') --}}
+            @canany(['manage_delegations', 'delegate_manage_delegations', 'escort_manage_delegations', 'driver_manage_delegations',
+                'hotel_manage_delegations'])
                 <li>
                     <a href="{{ route('delegations.interviewsIndex') }}"
                         class="{{ areActiveRoutes(['delegations.interviewsIndex']) }}">
@@ -96,9 +100,10 @@
                         <span class="text-lg">{{ __db('interview_requests') }}</span>
                     </a>
                 </li>
-            {{-- @endcan --}}
+            @endcanany
 
-            @can('manage_escorts')
+            @canany(['manage_escorts', 'delegate_manage_escorts', 'escort_manage_escorts', 'driver_manage_escorts',
+                'hotel_manage_escorts'])
                 <li>
                     <a href="{{ route('escorts.index') }}"
                         class="{{ areActiveRoutes(['escorts.index', 'escorts.create', 'escorts.edit']) }}">
@@ -123,9 +128,10 @@
                         <span class="text-lg">{{ __db('escorts') }} </span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_drivers')
+            @canany(['manage_drivers', 'delegate_manage_drivers', 'escort_manage_drivers', 'driver_manage_drivers',
+                'hotel_manage_drivers'])
                 <li>
                     <a href="{{ route('drivers.index') }}"
                         class="{{ areActiveRoutes(['drivers.index', 'drivers.create', 'drivers.edit']) }}">
@@ -143,9 +149,10 @@
                         <span class="text-lg">{{ __db('drivers') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_accommodations')
+            @canany(['manage_accommodations', 'delegate_manage_accommodations', 'escort_manage_accommodations',
+                'driver_manage_accommodations', 'hotel_manage_accommodations'])
                 <li>
                     <a href="{{ route('accommodations.index') }}"
                         class="{{ areActiveRoutes(['accommodations.index', 'accommodations.show', 'accommodations.import']) }}">
@@ -157,9 +164,9 @@
                         <span class="text-lg">{{ __db('accommodations') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_dropdowns')
+            @canany(['manage_dropdowns'])
                 <li>
                     <a href="{{ route('dropdowns.index') }}"
                         class="{{ areActiveRoutes(['dropdowns.index', 'dropdowns.options.show', 'dropdowns.bulk.import']) }}">
@@ -171,9 +178,9 @@
                         <span class="text-lg">{{ __db('dynamic_contents') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_staff')
+            @canany(['manage_staff'])
                 <li>
                     <a href="{{ route('staffs.index') }}"
                         class="{{ areActiveRoutes(['staffs.index', 'staffs.create', 'staffs.edit']) }}">
@@ -185,9 +192,9 @@
                         <span class="text-lg">{{ __db('staffs') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_roles')
+            @canany(['manage_roles'])
                 <li>
                     <a href="{{ route('roles.index') }}"
                         class="{{ areActiveRoutes(['roles.create', 'roles.edit', 'roles.index']) }}">
@@ -199,9 +206,10 @@
                         <span class="text-lg">{{ __db('roles_and_permission') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_other_interview_members')
+            @canany(['manage_other_interview_members', 'delegate_manage_delegations', 'escort_manage_delegations',
+                'driver_manage_delegations', 'hotel_manage_delegations'])
                 <li>
                     <a href="{{ route('other-interview-members.index') }}"
                         class="{{ areActiveRoutes(['other_interview_members.create', 'other_interview_members.edit', 'other_interview_members.index']) }}">
@@ -213,9 +221,9 @@
                         <span class="text-lg">{{ __db('interview_members') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
-            @can('manage_labels')
+            @canany(['manage_labels'])
                 <li>
                     <a href="{{ route('translations.index') }}"
                         class="{{ areActiveRoutes(['translations.create', 'translations.edit', 'translations.index']) }}">
@@ -227,7 +235,7 @@
                         <span class="text-lg">{{ __db('label_translations') }}</span>
                     </a>
                 </li>
-            @endcan
+            @endcanany
 
             <hr>
             <li>

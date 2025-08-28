@@ -3,7 +3,7 @@
 
         <input type="date"
             class="p-3 !w-[20%] text-secondary-light !border-[#d1d5db] rounded-lg w-full border text-sm">
-        <form class="w-[75%]" action="{{ getRouteForPage('delegation.arrivalsIndex') }}" method="GET">
+        <form class="w-[75%]" action="{{ route('delegations.arrivalsIndex') }}" method="GET">
             <div class="relative">
                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                     <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -59,6 +59,12 @@
 
                 <hr class="mx-6 border-neutral-200 h-5 ">
                 @php
+
+                    $statusLabels = [
+                        'arrived' => __db('arrived'),
+                        'to_be_arrived' => __db('to_be_arrived'),
+                    ];
+
                     $columns = [
                         [
                             'label' => __db('sl_no'),
@@ -116,10 +122,13 @@
                         ],
                         [
                             'label' => __db('arrival') . ' ' . __db('status'),
-                            'render' => fn($row) => $row->status->value ?? '-',
+                            'render' => function ($row) use ($statusLabels) {
+                                return $row->status ?? '-';
+                            },
                         ],
                         [
                             'label' => __db('actions'),
+                            'permission' => ['add_travels', 'delegate_add_delegates'],
                             'render' => function ($row) {
                                 $arrivalData = [
                                     'id' => $row->id,
@@ -129,7 +138,7 @@
                                     'date_time' => $row->date_time
                                         ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
                                         : '',
-                                    'status_id' => $row->status_id,
+                                    'status' => $row->status,
                                 ];
                                 $json = htmlspecialchars(json_encode($arrivalData), ENT_QUOTES, 'UTF-8');
                                 return '<button type="button" class="edit-arrival-btn text-[#B68A35]" data-arrival=\'' .
@@ -141,14 +150,15 @@
                     ];
 
                     $bgClass = [
-                        'Arrived' => 'bg-[#b7e9b2]', 
-                        'Departed' => 'bg-[#c2e0ff]', 
-                        'Upcoming' => 'bg-[#fff9b2]', 
+                        'to_be_arrived' => 'bg-[#fff]',
+                        'arrived' => 'bg-[#b7e9b2]',
                     ];
 
                     $rowClass = function ($row) use ($bgClass) {
                         $now = \Carbon\Carbon::now();
-                        $statusName = $row->status->value ?? null;
+
+                        $statusName =
+                            is_object($row->status) && isset($row->status->value) ? $row->status->value : $row->status;
 
                         if (!$row->date_time) {
                             return $bgClass[$statusName] ?? 'bg-[#fff]';
@@ -156,17 +166,47 @@
 
                         $rowDateTime = \Carbon\Carbon::parse($row->date_time);
 
-                        if ($rowDateTime->lt($now->copy()->subHour())) {
-                            return 'bg-[#b7e9b2]'; 
+                        if ($statusName === 'to_be_arrived') {
+                            if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
+                                return 'bg-[#ffc5c5]';
+                            }
+
+                            if ($rowDateTime->gt($now->copy()->addHour())) {
+                                return 'bg-[#fff]';
+                            }
+
+                            return 'bg-[#fff]';
                         }
-                        if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
-                            return 'bg-[#ffc5c5]'; 
+
+                        if ($statusName === 'arrived') {
+                            return $bgClass['arrived'];
                         }
+
                         return $bgClass[$statusName] ?? 'bg-[#fff]';
                     };
                 @endphp
 
                 <x-reusable-table :columns="$columns" :data="$arrivals" :row-class="$rowClass" />
+
+                <div class="mt-3 flex items-center flex-wrap gap-4">
+
+                    <div class="flex items-center gap-2">
+                        <div class="h-5 w-5 bg-[#fff] rounded border border-gray-300"></div>
+                        <span class="text-gray-800 text-sm">{{ __db('Scheduled / No active status') }}</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="h-5 w-5 bg-[#b7e9b2] rounded border"></div>
+                        <span class="text-gray-800 text-sm">{{ __db('Arrived') }}</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="h-5 w-5 bg-[#ffc5c5] rounded border"></div>
+                        <span class="text-gray-800 text-sm">{{ __db('To be arrived (within 1 hour)') }}</span>
+                    </div>
+
+                </div>
+
             </div>
         </div>
     </div>
@@ -205,7 +245,7 @@
                     <div>
                         <label class="form-label">{{ __db('arrival') . ' ' . __db('airport') }}:</label>
                         <select name="airport_id" x-model="arrival.airport_id"
-                            class="p-3 rounded-lg w-full border text-sm">
+                            class="select2 p-3 rounded-lg w-full border text-sm">
                             <option value="">{{ __db('select') . ' ' . __db('to') . ' ' . __db('airport') }}
                             </option>
                             @foreach (getDropdown('airports')->options as $option)
@@ -231,14 +271,21 @@
                         <input type="datetime-local" name="date_time" x-model="arrival.date_time"
                             class="p-3 rounded-lg w-full border text-sm">
                     </div>
-
                     <div>
+
                         <label class="form-label">{{ __db('arrival') . ' ' . __db('status') }}:</label>
-                        <select name="status_id" x-model="arrival.status_id"
-                            class="p-3 rounded-lg w-full border text-sm">
+                        @php
+                            $arrivalStatuses = [
+                                'arrived' => __db('arrived'),
+                                'to_be_arrived' => __db('to_be_arrived'),
+                            ];
+                        @endphp
+                        <select name="status" x-model="arrival.status"
+                            class="p-3 rounded-lg w-full border border-neutral-300 text-sm" required>
                             <option value="">{{ __db('select_status') }}</option>
-                            @foreach (getDropdown('arrival_status')->options as $option)
-                                <option value="{{ $option->id }}">{{ $option->value }}</option>
+                            @foreach ($arrivalStatuses as $value => $label)
+                                <option :selected="arrival.status === '{{ $value }}'"
+                                    value="{{ $value }}">{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -270,7 +317,7 @@
         <span class="sr-only">{{ __db('close_menu') }}</span>
     </button>
 
-    <form action="{{ getRouteForPage('delegation.arrivalsIndex') }}" method="GET">
+    <form action="{{ route('delegations.arrivalsIndex') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
             <select name="invitation_from[]" placeholder="Invitation From" multiple
                 class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
@@ -280,7 +327,7 @@
                     </option>
                 @endforeach
             </select>
-            <select name="continent_id"
+            <select name="continent_id" id="continent"
                 class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                 <option value="">{{ __db('all_continents') }}</option>
                 @foreach (getDropDown('continents')->options as $continent)
@@ -290,7 +337,7 @@
                     </option>
                 @endforeach
             </select>
-            <select name="country_id"
+            <select name="country_id" id="country"
                 class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                 <option value="">{{ __db('all_countries') }}</option>
                 @foreach (getDropDown('country')->options as $country)
@@ -321,7 +368,7 @@
             </select>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
-            <a href="{{ getRouteForPage('delegation.arrivalsIndex') }}"
+            <a href="{{ route('delegations.arrivalsIndex') }}"
                 class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
@@ -343,9 +390,43 @@
                     }));
                 });
             });
+
+            // Handle continent change to load countries
+            const continentSelect = $("#continent");
+            const countrySelect = $("#country");
+
+            continentSelect.on("change", async function() {
+                const selectedContinent = $(this).val();
+
+                // Clear current options except the default
+                countrySelect.find('option[value!=""]').remove();
+
+                if (selectedContinent) {
+                    try {
+                        let response = await fetch(
+                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
+                        let countries = await response.json();
+
+                        // Add new options
+                        countries.forEach(country => {
+                            let option = new Option(country.name, country.id, false, false);
+                            countrySelect.append(option);
+                        });
+
+                        countrySelect.trigger("change");
+                    } catch (error) {
+                        console.error("Error fetching countries:", error);
+                    }
+                }
+            });
+
+            // Trigger continent change on page load if a continent is already selected
+            const selectedContinent = continentSelect.val();
+            if (selectedContinent) {
+                continentSelect.trigger("change");
+            }
         });
     </script>
-
 
 
     <script>

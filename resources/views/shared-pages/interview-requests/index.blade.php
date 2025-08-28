@@ -6,7 +6,8 @@
           <div class="xl:col-span-12 h-full">
               <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                   <div class=" mb-4 flex items-center justify-between gap-3">
-                      <form class="w-[50%] me-4" action="{{ getRouteForPage('delegations.interviewsIndex') }}" method="GET">
+                      <form class="w-[50%] me-4" action="{{ route('delegations.interviewsIndex') }}"
+                          method="GET">
                           <div class="relative">
                               <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                   <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -91,6 +92,7 @@
                           ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status->value))],
                           [
                               'label' => __db('actions'),
+                              'permission' => ['add_interviews', 'delegate_edit_delegations'],
                               'render' => function ($row) {
                                   $editUrl = route('delegations.editInterview', [
                                       'delegation' => $row->delegation_id,
@@ -134,7 +136,7 @@
           <span class="sr-only">{{ __db('close_menu') }}</span>
       </button>
 
-      <form action="{{ getRouteForPage('delegation.interviewIndex') }}" method="GET">
+      <form action="{{ route('delegations.interviewsIndex') }}" method="GET">
           <div class="flex flex-col gap-4 mt-4">
               <select name="continent_id"
                   class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
@@ -167,7 +169,7 @@
               </select>
           </div>
           <div class="grid grid-cols-2 gap-4 mt-6">
-              <a href="{{ getRouteForPage('delegations.interviewsIndex') }}"
+              <a href="{{ route('delegations.interviewsIndex') }}"
                   class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
               <button type="submit"
                   class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>

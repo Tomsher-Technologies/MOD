@@ -22,12 +22,14 @@ class Escort extends Model
         'spoken_languages',
         'internal_ranking_id',
         'status',
-        'title',
+        'title_id',
+        'unit_id',
         'rank',
         'phone_number',
         'email',
         'nationality_id',
         'date_of_birth',
+        'current_room_assignment_id'
     ];
 
     protected $casts = [
@@ -51,6 +53,14 @@ class Escort extends Model
                 }
             }
         });
+    }
+
+    public function title()
+    {
+        return $this->belongsTo(DropdownOption::class, 'title_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'title');
+            });
     }
 
     public function getSpokenLanguagesLabelsAttribute()
@@ -84,6 +94,13 @@ class Escort extends Model
                 $q->where('code', 'gender');
             });
     }
+    public function unit()
+    {
+        return $this->belongsTo(DropdownOption::class, 'unit_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'unit');
+            });
+    }
     public function internalRanking()
     {
         return $this->belongsTo(DropdownOption::class, 'internal_ranking_id')
@@ -103,5 +120,15 @@ class Escort extends Model
     public function delegations()
     {
         return $this->belongsToMany(Delegation::class, 'delegation_escorts', 'escort_id', 'delegation_id')->withPivot('status', 'assigned_by');
+    }
+
+    public function roomAssignments()
+    {
+        return $this->morphMany(RoomAssignment::class, 'assignable');
+    }
+
+    public function currentRoomAssignment()
+    {
+        return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
     }
 }

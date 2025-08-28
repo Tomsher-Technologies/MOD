@@ -28,55 +28,56 @@
             </form>
 
             @php
-            $currentRoute = Route::currentRouteName();
+                $currentRoute = Route::currentRouteName();
 
-            $buttonConfig = [
-                'roles.index' => [
-                    'text' => __db('add_new_role'),
-                    'link' => route('roles.create'),
-                    'permission' => 'add_role',
-                ],
-                'staffs.index' => [
-                    'text' => __db('add_new_staff'),
-                    'link' => route('staffs.create'),
-                    'permission' => 'add_staff',
-                ],
-                'events.index' => [
-                    'text' => __db('add_new_event'),
-                    'link' => route('events.create'),
-                    'permission' => 'add_event',
-                ],
-                'other-interview-members.index' => [
-                    'text' => __db('add_new_member'),
-                    'link' => route('other-interview-members.create'),
-                    'permission' => 'add_other_interview_members',
-                ],
-                'delegations.index' => [
-                    'text' => __db('add_new_delegation'),
-                    'link' => route('delegations.create'),
-                    'permission' => 'add_delegations',
-                ],
-                'escorts.index' => [
-                    'text' => __db('add_escort'),
-                    'link' => route('escorts.create'),
-                    // 'permission' => 'add_escorts',
-                    'permission' => 'add_delegations',
-                ],
-                'drivers.index' => [
-                    'text' => __db('add_driver'),
-                    'link' => route('drivers.create'),
-                    // 'permission' => 'add_escorts',
-                    'permission' => 'add_drivers',
-                ],
-                'accommodations.index' => [
-                    'text' => __db('add_accommodation'),
-                    'link' => route('accommodation-delegations'),
-                    'permission' => 'view_accommodation_delegations',
-                ],
-            ];
+                $buttonConfig = [
+                    'roles.index' => [
+                        'text' => __db('add_new_role'),
+                        'link' => route('roles.create'),
+                        'permission' => ['add_role'],
+                    ],
+                    'staffs.index' => [
+                        'text' => __db('add_new_staff'),
+                        'link' => route('staffs.create'),
+                        'permission' => ['add_staff'],
+                    ],
+                    'events.index' => [
+                        'text' => __db('add_new_event'),
+                        'link' => route('events.create'),
+                        'permission' => ['add_event'],
+                    ],
+                    'other-interview-members.index' => [
+                        'text' => __db('add_new_member'),
+                        'link' => route('other-interview-members.create'),
+                        'permission' => ['add_other_interview_members'],
+                    ],
+                    'delegations.index' => [
+                        'text' => __db('add_new_delegation'),
+                        'link' => route('delegations.create'),
+                        'permission' => ['add_delegations'],
+                    ],
+                    'escorts.index' => [
+                        'text' => __db('add_escort'),
+                        'link' => route('escorts.create'),
+                        // 'permission' => 'add_escorts',
+                        'permission' => ['add_delegations'],
+                    ],
+                    'drivers.index' => [
+                        'text' => __db('add_driver'),
+                        'link' => route('drivers.create'),
+                        // 'permission' => 'add_escorts',
+                        'permission' => ['add_drivers'],
+                    ],
+                    'accommodations.index' => [
+                        'text' => __db('add_accommodation'),
+                        'link' => route('accommodation-delegations'),
+                        'permission' => ['view_accommodation_delegations', 'hotel_view_accommodation_delegations'],
+                    ],
+                ];
+                $config = $buttonConfig[$currentRoute] ?? null;
             @endphp
 
-            @if (isset($buttonConfig[$currentRoute]) && auth()->user()->can($buttonConfig[$currentRoute]['permission']))
+            @if ($config && can($config['permission']))
             <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
                 class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                 <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"

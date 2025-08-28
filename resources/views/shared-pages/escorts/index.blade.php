@@ -11,7 +11,7 @@
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
 
-                    <form class="w-[50%] me-4" action="{{ getRouteForPage('escorts.index') }}" method="GET">
+                    <form class="w-[50%] me-4" action="{{ route('escorts.index') }}" method="GET">
                         <div class="relative">
 
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -61,6 +61,14 @@
                 @php
                     $columns = [
                         [
+                            'label' => __db('sl_no'),
+                            'key' => 'sl_no',
+                            'render' => function ($escort, $key) use ($escorts) {
+                                return $escorts->firstItem() + $key;
+                            },
+                        ],
+
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
                             'render' => fn($escort) => e($escort->military_number),
@@ -68,7 +76,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title),
+                            'render' => fn($escort) => e($escort->title->value ?? ""),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -77,7 +85,7 @@
                         ],
                         [
                             'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
+                            'key' => 'phone_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
                         [
@@ -98,12 +106,28 @@
                             'label' => __db('assigned') . ' ' . __db('delegation'),
                             'key' => 'assigned_delegation',
                             'render' => function ($escort) {
-                                return e($escort->delegations->where('pivot.status', 1)->pluck('code')->implode(', '));
+                                return $escort->delegations
+                                    ->where('pivot.status', 1)
+                                    ->map(function ($delegation) {
+                                        $delegationUrl = $delegation->id
+                                            ? route('delegations.show', $delegation->id)
+                                            : '';
+
+                                        return '<a class="font-medium !text-[#B68A35] hover:underline" href="' .
+                                            $delegationUrl .
+                                            '?id=' .
+                                            $delegation->id .
+                                            '">' .
+                                            e($delegation->code) .
+                                            '</a>';
+                                    })
+                                    ->implode(', ');
                             },
                         ],
                         [
                             'label' => __db('status'),
                             'key' => 'status',
+                            'permission' => ['edit_escorts','escort_edit_escorts'],
                             'render' => function ($escort) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -126,16 +150,18 @@
                             'label' => __db('actions'),
                             'key' => 'actions',
                             'render' => function ($escort) {
-                                $editUrl = getRouteForPage('escorts.edit', $escort->id);
+                                $editUrl = route('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
-                                $output .=
-                                    '<a href="' .
-                                    $editUrl .
-                                    '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
+                                if (can(['edit_escorts', 'escort_edit_escorts'])) {
+                                    $output .=
+                                        '<a href="' .
+                                        $editUrl .
+                                        '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
+                                }
                                 if ($escort->status == 1) {
                                     if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
                                         foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
-                                            $unassignUrl = getRouteForPage('escorts.unassign', $escort->id);
+                                            $unassignUrl = route('escorts.unassign', $escort->id);
                                             $output .=
                                                 '<form action="' .
                                                 $unassignUrl .
@@ -148,11 +174,13 @@
                                                 '</span></button></form>';
                                         }
                                     } else {
-                                        $assignUrl = getRouteForPage('escorts.assignIndex', $escort->id);
-                                        $output .=
-                                            '<a href="' .
-                                            $assignUrl .
-                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
+                                        if (can(['assign_escorts', 'escort_edit_escorts'])) {
+                                            $assignUrl = route('escorts.assignIndex', $escort->id);
+                                            $output .=
+                                                '<a href="' .
+                                                $assignUrl .
+                                                '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
+                                        }
                                     }
                                 }
                                 $output .= '</div>';
@@ -170,9 +198,6 @@
                 <div class="mt-3 flex items-center justify-start gap-3 ">
                     <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
                     <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('escorts') }}</span>
-                </div>
-                <div class="mt-4">
-                    {{ $escorts->appends(request()->input())->links() }}
                 </div>
             </div>
         </div>
@@ -193,9 +218,9 @@
         <span class="sr-only">{{ __db('close_menu') }}</span>
     </button>
 
-    <form action="{{ getRouteForPage('escorts.index') }}" method="GET">
+    <form action="{{ route('escorts.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-            <select name="title[]" placeholder="Title" 
+            <select name="title[]" placeholder="Title"
                 class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                 @foreach (getDropDown('title')->options as $option)
                     <option value="{{ $option->id }}" @if (in_array($option->id, request('title', []))) selected @endif>
@@ -230,7 +255,7 @@
             </select>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
-            <a href="{{ getRouteForPage('escorts.index') }}"
+            <a href="{{ route('escorts.index') }}"
                 class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>

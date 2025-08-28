@@ -13,11 +13,12 @@ class Driver extends Model
     protected $fillable = [
         'code',
         'military_number',
-        'title',
+        'title_id',
         'name_ar',
         'name_en',
-        'mobile_number',
+        'phone_number',
         'driver_id',
+        'unit_id',
         'car_type',
         'car_number',
         'capacity',
@@ -25,6 +26,7 @@ class Driver extends Model
         'status',
         'delegation_id',
         'event_id',
+        'current_room_assignment_id'
     ];
 
     protected static function booted()
@@ -46,8 +48,37 @@ class Driver extends Model
             }
         });
     }
+
+    public function title()
+    {
+        return $this->belongsTo(DropdownOption::class, 'title_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'title');
+            });
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(DropdownOption::class, 'unit_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'unit');
+            });
+    }
+
     public function delegations()
     {
-        return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')->withPivot('status', 'assigned_by');
+        return $this->belongsToMany(Delegation::class, 'delegation_drivers', 'driver_id', 'delegation_id')
+            ->withPivot('status', 'assigned_by', 'start_date', 'end_date')
+            ->withTimestamps();
+    }
+
+    public function roomAssignments()
+    {
+        return $this->morphMany(RoomAssignment::class, 'assignable');
+    }
+
+    public function currentRoomAssignment()
+    {
+        return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
     }
 }

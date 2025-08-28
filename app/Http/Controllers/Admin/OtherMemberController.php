@@ -13,10 +13,9 @@ class OtherMemberController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:manage_other_interview_members',  ['only' => ['index']]);
+        $this->middleware('permission:manage_other_interview_members|delegate_manage_delegations|escort_manage_delegations| driver_manage_delegations|hotel_manage_delegations',  ['only' => ['index', 'show']]);
         $this->middleware('permission:add_other_interview_members',  ['only' => ['create', 'store']]);
         $this->middleware('permission:edit_other_interview_members',  ['only' => ['edit', 'update']]);
-        $this->middleware('permission:view_other_interview_members',  ['only' => ['show', 'index']]);
     }
 
     public function index(Request $request)
@@ -44,7 +43,8 @@ class OtherMemberController extends Controller
             }
         }
 
-        $other_interview_members = $query->paginate(20);
+        $other_interview_members = $query->paginate(20) ?? collect([]);
+
 
         return view('admin.other_interview_members.index', compact('other_interview_members'));
     }
@@ -63,14 +63,6 @@ class OtherMemberController extends Controller
             'name_ar' => 'required|string|max:255',
             'status' => 'required|boolean',
         ]);
-
-        $defaultEvent = Event::default()->first();
-
-        if (!$defaultEvent) {
-            return redirect()->back()->withErrors(['event_id' => __db('no_default_event_found')])->withInput();
-        }
-
-        $data['event_id'] = $defaultEvent->id;
 
         OtherInterviewMember::create($data);
 
