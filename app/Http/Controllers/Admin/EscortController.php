@@ -126,7 +126,6 @@ class EscortController extends Controller
     public function store(Request $request)
     {
 
-
         $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
