@@ -17,7 +17,6 @@ class DriverController extends Controller
     {
         $this->middleware('auth');
 
-        // === Drivers === (Admin + Delegate + Escort + Hotel)
         $this->middleware('permission:view_drivers|delegate_view_drivers|escort_view_drivers|hotel_view_drivers', [
             'only' => ['index', 'search']
         ]);
@@ -45,12 +44,8 @@ class DriverController extends Controller
         ]);
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Driver::with('delegations')
@@ -119,9 +114,6 @@ class DriverController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $delegations = Delegation::all();
@@ -130,9 +122,6 @@ class DriverController extends Controller
         return view('admin.drivers.create', compact('delegations', 'dropdowns'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -180,18 +169,12 @@ class DriverController extends Controller
         return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver created successfully.'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $driver = Driver::with('delegations')->findOrFail($id);
         return view('admin.drivers.show', compact('driver'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $driver = Driver::findOrFail($id);
@@ -206,9 +189,6 @@ class DriverController extends Controller
         return view('admin.drivers.assign', compact('driver'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -243,7 +223,6 @@ class DriverController extends Controller
 
         $driver = Driver::findOrFail($id);
 
-        // Define relations to compare for confirmation dialog
         $relationsToCompare = [
             'title_id' => [
                 'display_with' => [
@@ -318,9 +297,6 @@ class DriverController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $driver = Driver::findOrFail($id);
@@ -348,6 +324,7 @@ class DriverController extends Controller
         ]);
 
         $delegationId = $request->delegation_id;
+        $delegation = \App\Models\Delegation::find($delegationId);
         $action = $request->action;
         $startDate = $request->start_date;
         $today = now()->toDateString();
@@ -390,13 +367,26 @@ class DriverController extends Controller
                 ]);
             }
         } else {
-            // First assignment ever
             $driver->delegations()->attach($delegationId, [
                 'status' => 1,
                 'start_date' => $startDate ?? $today,
                 'assigned_by' => auth()->id(),
             ]);
         }
+
+        $this->logActivity(
+            module: 'Drivers',
+            submodule: 'assignment',
+            action: 'assign-drivers',
+            model: $driver,
+            submoduleId: $driver->id,
+            delegationId: $delegationId,
+            changedFields: [
+                'driver_name' => $driver->name_en,
+                'delegation_code' => $delegation->code,
+                'action' => $action
+            ]
+        );
 
         return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
     }
@@ -410,6 +400,7 @@ class DriverController extends Controller
         ]);
 
         $delegationId = $request->delegation_id;
+        $delegation = \App\Models\Delegation::find($delegationId);
 
         $driver->delegations()->updateExistingPivot($delegationId, [
             'status' => 0,
@@ -425,6 +416,20 @@ class DriverController extends Controller
                 'end_date' => null,
             ]);
         }
+
+        // Log activity
+        $this->logActivity(
+            module: 'Drivers',
+            submodule: 'assignment',
+            action: 'unassign-drivers',
+            model: $driver,
+            submoduleId: $driver->id,
+            delegationId: $delegationId,
+            changedFields: [
+                'driver_name' => $driver->name_en,
+                'delegation_code' => $delegation->code
+            ]
+        );
 
         return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }
@@ -442,35 +447,5 @@ class DriverController extends Controller
             'languages' => $languages ? $languages->options : collect(),
             'ranks' => $ranks ? $ranks->options : collect(),
         ];
-    }
-
-    /**
-     * Display arrivals index for drivers.
-     */
-    public function arrivalsIndex(Request $request)
-    {
-        // This method is intended to be accessed by users with driver_view_travels permission
-        // Implementation would be similar to delegation controller's arrivalsIndex
-        return redirect()->route('drivers.index');
-    }
-
-    /**
-     * Display departures index for drivers.
-     */
-    public function departuresIndex(Request $request)
-    {
-        // This method is intended to be accessed by users with driver_view_travels permission
-        // Implementation would be similar to delegation controller's departuresIndex
-        return redirect()->route('drivers.index');
-    }
-
-    /**
-     * Display delegates index for drivers.
-     */
-    public function delegatesIndex(Request $request)
-    {
-        // This method is intended to be accessed by users with driver_view_delegate permission
-        // Implementation would be similar to delegation controller's delegates functionality
-        return redirect()->route('drivers.index');
     }
 }

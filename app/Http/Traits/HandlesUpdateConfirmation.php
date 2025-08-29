@@ -41,7 +41,8 @@ trait HandlesUpdateConfirmation
         Request $request,
         Model $model,
         array $validatedData,
-        array $relationsToCompare = []
+        array $relationsToCompare = [],
+        array $customChangedFields = []
     ) {
         if ($request->has('_is_confirmed')) {
             // Already confirmed, just proceed
@@ -51,7 +52,8 @@ trait HandlesUpdateConfirmation
             ];
         }
 
-        $changedFields = [];
+        $changedFields = $customChangedFields ? [...$customChangedFields] : [];
+
         $mainModelData = Arr::only($validatedData, $model->getFillable());
         $originalMainData = $model->getOriginal();
 
@@ -273,7 +275,6 @@ trait HandlesUpdateConfirmation
             }
         }
 
-        // If still no event ID, try to get the default event
         if (!$eventId) {
             $defaultEvent = \App\Models\Event::where('is_default', true)->first();
             $eventId = $defaultEvent ? $defaultEvent->id : null;
@@ -328,6 +329,37 @@ trait HandlesUpdateConfirmation
 
             return "{$userName} assigned {$member_name} to Room ({$roomNumber}) at {$hotelName}.";
         }
+
+        if ($action === 'assign-escorts' && $changedFields) {
+            $escortName = $changedFields['escort_name'] ?? 'Unknown Escort';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} assigned escort {$escortName} to delegation {$delegationCode}.";
+        }
+
+        if ($action === 'unassign-escorts' && $changedFields) {
+            $escortName = $changedFields['escort_name'] ?? 'Unknown Escort';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} unassigned escort {$escortName} from delegation {$delegationCode}.";
+        }
+
+        if ($action === 'assign-drivers' && $changedFields) {
+            $driverName = $changedFields['driver_name'] ?? 'Unknown Driver';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} assigned driver {$driverName} to delegation {$delegationCode}.";
+        }
+
+        if ($action === 'unassign-drivers' && $changedFields) {
+            $driverName = $changedFields['driver_name'] ?? 'Unknown Driver';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} unassigned driver {$driverName} from delegation {$delegationCode}.";
+        }
+
+       
+
 
         return "{$userName} performed {$action} on {$module}.";
     }

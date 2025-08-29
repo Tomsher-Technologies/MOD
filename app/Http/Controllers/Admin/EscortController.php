@@ -45,12 +45,8 @@ class EscortController extends Controller
     }
 
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
@@ -109,9 +105,6 @@ class EscortController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $delegations = Delegation::all();
@@ -120,9 +113,6 @@ class EscortController extends Controller
         return view('admin.escorts.create', compact('delegations', 'dropdowns'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
 
@@ -182,18 +172,12 @@ class EscortController extends Controller
         return redirect()->route('escorts.index')->with('success', __db('Escort created successfully.'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $escorts = Escort::with('delegations', 'gender', 'nationality')->findOrFail($id);
         return view('admin.escorts.index', compact('escorts'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $escort = Escort::findOrFail($id);
@@ -208,9 +192,6 @@ class EscortController extends Controller
         return view('admin.escorts.assign', compact('escort'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
@@ -249,7 +230,6 @@ class EscortController extends Controller
 
         $escort = Escort::findOrFail($id);
 
-        // Define relations to compare for confirmation dialog
         $relationsToCompare = [
             'title_id' => [
                 'display_with' => [
@@ -259,13 +239,6 @@ class EscortController extends Controller
                 ],
             ],
             'gender_id' => [
-                'display_with' => [
-                    'model' => \App\Models\DropdownOption::class,
-                    'key' => 'id',
-                    'label' => 'value',
-                ],
-            ],
-            'nationality_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',
@@ -294,21 +267,19 @@ class EscortController extends Controller
                 ],
             ],
             'military_number' => [],
-            'title' => [],
             'name_ar' => [],
             'name_en' => [],
             'status' => [],
         ];
 
-        // Manually handle spoken_languages comparison
         $originalSpokenLanguages = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
         $newSpokenLanguages = $validated['language_id'] ?? [];
 
         $customChangedFields = [];
 
-        // Compare and format for display
         $oldLanguageLabels = \App\Models\DropdownOption::whereIn('id', $originalSpokenLanguages)->pluck('value')->implode(', ');
         $newLanguageLabels = \App\Models\DropdownOption::whereIn('id', $newSpokenLanguages)->pluck('value')->implode(', ');
+
 
         if ($oldLanguageLabels !== $newLanguageLabels) {
             $customChangedFields['spoken_languages'] = [
@@ -318,25 +289,16 @@ class EscortController extends Controller
             ];
         }
 
-        // Remove language_id from validated data before passing to processUpdate
         $validatedDataForProcessUpdate = $validated;
         unset($validatedDataForProcessUpdate['language_id']);
 
-        // Use the processUpdate method for confirmation dialog
-        $confirmationResult = $this->processUpdate($request, $escort, $validatedDataForProcessUpdate, $relationsToCompare);
+        $confirmationResult = $this->processUpdate($request, $escort, $validatedDataForProcessUpdate, $relationsToCompare, $customChangedFields);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
             return $confirmationResult;
         }
 
-        // Merge custom changes with changes from processUpdate
-        $confirmationResult['changed_fields'] = array_merge($customChangedFields, $confirmationResult['changed_fields'] ?? []);
-
-        if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
-            return $confirmationResult;
-        }
-
-        $fieldsToNotify = $confirmationResult['notify'] ?? [];
+        $fieldsToNotify = is_array($confirmationResult) ? ($confirmationResult['notify'] ?? []) : [];
 
         if (isset($validated['language_id'])) {
             $validated['spoken_languages'] = implode(',', $validated['language_id']);
@@ -347,7 +309,6 @@ class EscortController extends Controller
 
         $escort->update($validated);
 
-        // Log activity with changed fields
         if ($request->has('changed_fields_json')) {
             $changes = json_decode($request->input('changed_fields_json'), true);
             if (!empty($changes)) {
@@ -374,15 +335,11 @@ class EscortController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $escort = Escort::findOrFail($id);
         $escort->update(['status' => 0]);
 
-        // Log activity
         $this->logActivity(
             module: 'Escorts',
             submodule: 'managing_members',
@@ -402,6 +359,7 @@ class EscortController extends Controller
         ]);
 
         $delegationId = $request->delegation_id;
+        $delegation = \App\Models\Delegation::find($delegationId);
 
         $escort->delegations()->update([
             'delegation_escorts.status' => 0,
@@ -413,6 +371,19 @@ class EscortController extends Controller
                 'assigned_by' => auth()->id(),
             ],
         ]);
+
+        $this->logActivity(
+            module: 'Escorts',
+            submodule: 'assignment',
+            action: 'assign-escorts',
+            model: $escort,
+            submoduleId: $escort->id,
+            delegationId: $delegationId,
+            changedFields: [
+                'escort_name' => $escort->name_en,
+                'delegation_code' => $delegation->code
+            ]
+        );
 
         return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
     }
@@ -426,10 +397,24 @@ class EscortController extends Controller
         ]);
 
         $delegationId = $request->delegation_id;
+        $delegation = \App\Models\Delegation::find($delegationId);
 
         $escort->delegations()->updateExistingPivot($delegationId, [
             'status' => 0,
         ]);
+
+        $this->logActivity(
+            module: 'Escorts',
+            submodule: 'assignment',
+            action: 'unassign-escorts',
+            model: $escort,
+            submoduleId: $escort->id,
+            delegationId: $delegationId,
+            changedFields: [
+                'escort_name' => $escort->name_en,
+                'delegation_code' => $delegation->code
+            ]
+        );
 
         return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
     }
@@ -449,33 +434,4 @@ class EscortController extends Controller
         ];
     }
 
-    /**
-     * Display arrivals index for escorts.
-     */
-    public function arrivalsIndex(Request $request)
-    {
-        // This method is intended to be accessed by users with escort_view_travels permission
-        // Implementation would be similar to delegation controller's arrivalsIndex
-        return redirect()->route('escorts.index');
-    }
-
-    /**
-     * Display departures index for escorts.
-     */
-    public function departuresIndex(Request $request)
-    {
-        // This method is intended to be accessed by users with escort_view_travels permission
-        // Implementation would be similar to delegation controller's departuresIndex
-        return redirect()->route('escorts.index');
-    }
-
-    /**
-     * Display delegates index for escorts.
-     */
-    public function delegatesIndex(Request $request)
-    {
-        // This method is intended to be accessed by users with escort_view_delegate permission
-        // Implementation would be similar to delegation controller's delegates functionality
-        return redirect()->route('escorts.index');
-    }
 }
