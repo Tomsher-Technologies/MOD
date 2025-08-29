@@ -455,7 +455,8 @@ class DelegationController extends Controller
                         model: $transport,
                         changedFields: $changes,
                         submoduleId: $transport->id,
-                        delegationId: $transport->delegate->delegation_id ?? null
+                        delegationId: $transport->delegate->delegation_id ?? null,
+                        fieldsToNotify: $fieldsToNotify
                     );
                 }
             }
@@ -822,7 +823,8 @@ class DelegationController extends Controller
                         action: 'update',
                         model: $delegation,
                         changedFields: $changes,
-                        delegationId: $delegation->id
+                        delegationId: $delegation->id,
+                        fieldsToNotify: $fieldsToNotify
                     );
                 }
             }
@@ -1226,7 +1228,8 @@ class DelegationController extends Controller
                     changedFields: json_decode($request->input('changed_fields_json'), true),
                     activityModelClass: \App\Models\DelegationActivity::class,
                     submoduleId: $interview->id,
-                    delegationId: $delegation->id
+                    delegationId: $delegation->id,
+                    fieldsToNotify: $fieldsToNotify
                 );
             }
 
@@ -1437,7 +1440,8 @@ class DelegationController extends Controller
                         model: $delegate,
                         changedFields: $changes,
                         submoduleId: $delegate->id,
-                        delegationId: $delegation->id
+                        delegationId: $delegation->id,
+                        fieldsToNotify: $fieldsToNotify
                     );
                 }
             }

@@ -98,45 +98,4 @@
             @endif
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.mark-as-read').forEach(button => {
-                button.addEventListener('click', function() {
-                    const notificationId = this.getAttribute('data-notification-id');
-                    fetch(`/mod-admin/notifications/${notificationId}/mark-as-read`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector(
-                                    'meta[name="csrf-token"]').getAttribute('content')
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'success') {
-                                location.reload();
-                            }
-                        });
-                });
-            });
-
-            document.getElementById('markAllAsRead')?.addEventListener('click', function() {
-                fetch('/mod-admin/notifications/mark-all-as-read', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                .getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            location.reload();
-                        }
-                    });
-            });
-        });
-    </script>
 @endsection
