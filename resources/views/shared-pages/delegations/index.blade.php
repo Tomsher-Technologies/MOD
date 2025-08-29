@@ -205,56 +205,75 @@
         </button>
 
         <form action="{{ route('delegations.index') }}" method="GET">
-            <div class="flex flex-col gap-4 mt-4">
-                <select name="invitation_from[]" placeholder="Invitation From" data-placeholder="Hello"
-                    class=" w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    <option value="">{{ __db('all_rankings') }}</option>
-                    @foreach (getDropDown('internal_ranking')->options as $option)
-                        <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
-                            {{ $option->value }}</option>
-                    @endforeach
-                </select>
-                <select name="continent_id" id="continent"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_continents') }}</option>
-                    @foreach (getDropDown('continents')->options as $continent)
-                        <option value="{{ $continent->id }}"
-                            {{ request('continent_id') == $continent->id ? 'selected' : '' }}>{{ $continent->value }}
-                        </option>
-                    @endforeach
-                </select>
-                <select name="country_id" id="country"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_countries') }}</option>
-                    @foreach (getDropDown('country')->options as $country)
-                        <option value="{{ $country->id }}"
-                            {{ request('country_id') == $country->id ? 'selected' : '' }}>
-                            {{ $country->value }}</option>
-                    @endforeach
-                </select>
-                <select name="invitation_status_id"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_invitation_statuses') }}</option>
-                    @foreach (getDropDown('invitation_status')->options as $status)
-                        <option value="{{ $status->id }}"
-                            {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
-                            {{ $status->value }}
-                        </option>
-                    @endforeach
-                </select>
-                <select name="participation_status_id"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_participation_statuses') }}</option>
-                    @foreach (getDropDown('participation_status')->options as $status)
-                        <option value="{{ $status->id }}"
-                            {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
-                            {{ $status->value }}
-                        </option>
-                    @endforeach
-                </select>
+            <div class="flex flex-col gap-2 mt-2">
+                <div class="flex flex-col">
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                    <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('departments')->options as $option)
+                            <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
+                                {{ $option->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                    <select multiple name="continent_id" id="continent" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('continents')->options as $continent)
+                            <option value="{{ $continent->id }}"
+                                {{ request('continent_id') == $continent->id ? 'selected' : '' }}>{{ $continent->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                    <select multiple name="country_id" id="country" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('country')->options as $country)
+                            <option value="{{ $country->id }}"
+                                {{ request('country_id') == $country->id ? 'selected' : '' }}>
+                                {{ $country->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
+                    <select multiple name="invitation_status_id" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('invitation_status')->options as $status)
+                            <option value="{{ $status->id }}"
+                                {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
+                                {{ $status->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
+                    <select multiple name="participation_status_id" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('participation_status')->options as $status)
+                            <option value="{{ $status->id }}"
+                                {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
+                                {{ $status->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 {{-- <select name="hotel_name"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_hotel_names') }}</option>
+                    class="w-full rounded-lg border border-gray-300 text-sm">
+                    <option value="">{{ __db('select') }}</option>
                     @foreach ($filterData['hotelNames'] as $hotel)
                         <option value="{{ $hotel }}" {{ request('hotel_name') == $hotel ? 'selected' : '' }}>
                             {{ $hotel }}</option>

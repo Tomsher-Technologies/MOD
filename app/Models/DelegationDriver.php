@@ -4,18 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DelegationEscort extends Model
+class DelegationDriver extends Model
 {
     protected $fillable = [
-        'delegation_id',
-        'escort_id',
-        'status',
-        'assigned_by',
+        'delegation_id', 'driver_id', 'status', 'assigned_by', 'start_date', 'end_date'
     ];
 
-    public function escort()
+    public function driver()
     {
-        return $this->belongsTo(Escort::class);
+        return $this->belongsTo(Driver::class);
     }
 
     public function delegation()
