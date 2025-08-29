@@ -1,4 +1,4 @@
-<div class="dashboard-main-body ">
+<div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
 
