@@ -41,21 +41,21 @@ trait HandlesUpdateConfirmation
         Request $request,
         Model $model,
         array $validatedData,
-        array $relationsToCompare = []
+        array $relationsToCompare = [],
+        array $customChangedFields = []
     ) {
         if ($request->has('_is_confirmed')) {
-            // Already confirmed, just proceed
             return [
                 'data' => $validatedData,
                 'notify' => $request->input('_notify_fields', []),
             ];
         }
 
-        $changedFields = [];
+        $changedFields = $customChangedFields ? [...$customChangedFields] : [];
+
         $mainModelData = Arr::only($validatedData, $model->getFillable());
         $originalMainData = $model->getOriginal();
 
-        // Handle normal scalar fields
         foreach ($mainModelData as $key => $newValue) {
             if (!array_key_exists($key, $originalMainData)) {
                 continue;
@@ -69,7 +69,6 @@ trait HandlesUpdateConfirmation
                 : ($originalValue != $newValue);
 
             if ($isChanged) {
-                // Check if there is display_with config for this field (with or without _id)
                 $displayLabel = null;
                 if (isset($relationsToCompare[$key]['display_with'])) {
                     $dw = $relationsToCompare[$key]['display_with'];
@@ -91,14 +90,12 @@ trait HandlesUpdateConfirmation
             }
         }
 
-        // Handle relations
         foreach ($relationsToCompare as $requestKey => $config) {
             if (!isset($validatedData[$requestKey])) {
                 continue;
             }
             $relationName = $config['relation'] ?? null;
 
-            // Special handling for list/checkbox relations (sync tables)
             if (($config['type'] ?? null) === 'list' && isset($config['column'])) {
                 $oldList = $model
                     ->{$relationName}()
@@ -135,7 +132,6 @@ trait HandlesUpdateConfirmation
                 }
             }
 
-            // Handling for a single related model
             if (($config['type'] ?? null) === 'single') {
                 $findBy = $config['find_by'] ?? [];
                 $relationQuery = $model->{$relationName}();
@@ -145,7 +141,6 @@ trait HandlesUpdateConfirmation
                 $existingRelatedModel = $relationQuery->first();
                 $submittedRelationData = $validatedData[$requestKey];
 
-                // If submittedRelationData is associative array (multiple fields)
                 if (is_array($submittedRelationData)) {
                     foreach ($submittedRelationData as $field => $value) {
                         $originalValue = $existingRelatedModel ? $existingRelatedModel->{$field} : null;
@@ -167,7 +162,6 @@ trait HandlesUpdateConfirmation
                         }
                     }
                 } else {
-                    // If just scalar value (e.g. single id field)
                     $originalValue = $existingRelatedModel ? $existingRelatedModel->{$config['column']} : null;
                     $newValue = $submittedRelationData;
 
@@ -253,18 +247,15 @@ trait HandlesUpdateConfirmation
         string $activityModelClass = \App\Models\DelegationActivity::class,
         ?string $submodule = null,
         ?int $submoduleId = null,
-        ?int $delegationId = null
+        ?int $delegationId = null,
+        ?Bool $sendNotification = true,
     ): void {
-        // Try to get the current event ID from various sources
         $eventId = $currentEventId;
 
         if (!$eventId && $model) {
-            // If the model has an event_id field, use it
             if ($model->hasAttribute('event_id') && $model->event_id) {
                 $eventId = $model->event_id;
-            }
-            // For delegation-related models, try to get event from delegation
-            elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
+            } elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
             } elseif ($model instanceof \App\Models\Interview && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
@@ -273,7 +264,6 @@ trait HandlesUpdateConfirmation
             }
         }
 
-        // If still no event ID, try to get the default event
         if (!$eventId) {
             $defaultEvent = \App\Models\Event::where('is_default', true)->first();
             $eventId = $defaultEvent ? $defaultEvent->id : null;
@@ -294,7 +284,13 @@ trait HandlesUpdateConfirmation
         ];
 
         try {
-            $activityModelClass::create($activityData);
+            $activity = $activityModelClass::create($activityData);
+
+            if ($sendNotification) {
+                if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'managing_members', 'unassign-escorts', 'assign-drivers', 'unassign-drivers'])) {
+                    $this->sendNotification($activity, $action, $module, $delegationId);
+                }
+            }
         } catch (\Throwable $e) {
             Log::error("Failed to log activity for {$module} - {$e->getMessage()}");
         }
@@ -329,6 +325,52 @@ trait HandlesUpdateConfirmation
             return "{$userName} assigned {$member_name} to Room ({$roomNumber}) at {$hotelName}.";
         }
 
+        if ($action === 'assign-escorts' && $changedFields) {
+            $escortName = $changedFields['escort_name'] ?? 'Unknown Escort';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} assigned escort {$escortName} to delegation {$delegationCode}.";
+        }
+
+        if ($action === 'unassign-escorts' && $changedFields) {
+            $escortName = $changedFields['escort_name'] ?? 'Unknown Escort';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} unassigned escort {$escortName} from delegation {$delegationCode}.";
+        }
+
+        if ($action === 'assign-drivers' && $changedFields) {
+            $driverName = $changedFields['driver_name'] ?? 'Unknown Driver';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} assigned driver {$driverName} to delegation {$delegationCode}.";
+        }
+
+        if ($action === 'unassign-drivers' && $changedFields) {
+            $driverName = $changedFields['driver_name'] ?? 'Unknown Driver';
+            $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
+
+            return "{$userName} unassigned driver {$driverName} from delegation {$delegationCode}.";
+        }
+
         return "{$userName} performed {$action} on {$module}.";
+    }
+
+    protected function sendNotification($activity, $action, $module, $delegationId = null)
+    {
+        $notificationData = [
+            'delegation_id' => $delegationId,
+            'message' => $activity->message,
+            'module' => $module,
+            'action' => $action,
+            'changes' => $activity->changes,
+            'created_at' => $activity->created_at,
+        ];
+
+        $users = \App\Models\User::all();
+
+        foreach ($users as $user) {
+            $user->notify(new \App\Notifications\CommonNotification($notificationData));
+        }
     }
 }

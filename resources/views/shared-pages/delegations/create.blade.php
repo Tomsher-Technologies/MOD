@@ -533,32 +533,26 @@
             const attachmentTitleDropdown = @json($attachmentTitleOptionsHtml);
             initializeAttachmentsComponent(attachmentTitleDropdown);
 
-            // Initialize Select2 for all select elements
             $('.select2').select2({
                 placeholder: "Select an option",
                 allowClear: true
             });
 
-            // Handle continent change to load countries
             $('#continent-select').on('change', function() {
                 const continentId = $(this).val();
                 const countrySelect = $('#country-select');
 
-                // Clear current options except the default
                 countrySelect.find('option[value!=""]').remove();
 
                 if (continentId) {
-                    // Load countries for selected continent
                     $.get('{{ route('countries.by-continent') }}', {
                         continent_ids: continentId
                     }, function(data) {
-                        // Add new options
                         $.each(data, function(index, country) {
                             countrySelect.append(new Option(country.name, country.id, false,
                                 false));
                         });
 
-                        // Refresh Select2
                         countrySelect.trigger('change');
                     }).fail(function() {
                         console.log('Failed to load countries');
@@ -566,39 +560,11 @@
                 }
             });
 
-            // Trigger continent change on page load if a continent is already selected
             const selectedContinent = $('#continent-select').val();
             if (selectedContinent) {
                 $('#continent-select').trigger('change');
             }
         });
-
-        function update_status(el) {
-            if (el.checked) {
-                var status = 1;
-            } else {
-                var status = 0;
-            }
-            $.post('{{ route('delegations.status') }}', {
-                _token: '{{ csrf_token() }}',
-                id: el.value,
-                status: status
-            }, function(data) {
-                if (data.status == 'success') {
-                    toastr.success("{{ __db('status_updated') }}");
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-
-                } else {
-                    toastr.error("{{ __db('something_went_wrong') }}");
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                }
-            });
-        }
-
 
         function attachmentsComponent() {
             return {
@@ -613,7 +579,6 @@
                 },
 
                 removeAttachment(index) {
-                    // Mark as deleted instead of removing from array to preserve indices
                     this.attachments[index]._destroy = true;
                 }
             };
@@ -633,7 +598,6 @@
                     },
 
                     removeAttachment(index) {
-                        // Mark as deleted instead of removing from array to preserve indices
                         this.attachments[index]._destroy = true;
                     }
                 };
@@ -647,16 +611,7 @@
         window.delegatesData = @json($delegatesData);
         window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
 
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     const form = document.getElementById('create-delegation-form');
-        //     const submitButtons = form.querySelectorAll('.submit-btn');
 
-        //     form.addEventListener('submit', function() {
-        //         submitButtons.forEach(button => {
-        //             button.disabled = true;
-        //         });
-        //     });
-        // });
     </script>
 
     <script>
@@ -665,7 +620,6 @@
                 delegates: window.delegatesData && window.delegatesData.length > 0 ?
                     window.delegatesData : [],
                 addDelegate() {
-                    // Generate a unique tmp_id based on existing tmp_ids
                     const maxTmpId = Math.max(...this.delegates.map(d => d.tmp_id || 0), 0);
                     const newTmpId = maxTmpId + 1;
                     this.delegates.push({
