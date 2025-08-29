@@ -268,26 +268,22 @@
 -- (67, 'admin', 64, 'edit_other_interview_members', 'Edit Other Interview Members', 'web', 1, NULL, NULL),
 -- (68, 'admin', 64, 'delete_other_interview_members', 'Delete Other Interview Members', 'web', 1, NULL, NULL),
 
--- (69, 'deligate', NULL, 'delegate_manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
--- (70, 'deligate', 69, 'delegate_view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
--- (71, 'deligate', 69, 'delegate_add_delegations', 'Add Delegations', 'web', 1, NULL, NULL),
--- (72, 'deligate', 69, 'delegate_edit_delegations', 'Edit Delegations', 'web', 1, NULL, NULL),
--- (73, 'deligate', 69, 'delegate_delete_delegations', 'Delete Delegations', 'web', 1, NULL, NULL),
+-- (69, 'delegate', NULL, 'delegate_manage_delegations', 'Manage Delegations', 'web', 1, NULL, NULL),
+-- (70, 'delegate', 69, 'delegate_view_delegations', 'View Delegations', 'web', 1, NULL, NULL),
+-- (71, 'delegate', 69, 'delegate_add_delegations', 'Add Delegations', 'web', 1, NULL, NULL),
+-- (72, 'delegate', 69, 'delegate_edit_delegations', 'Edit Delegations', 'web', 1, NULL, NULL),
+-- (73, 'delegate', 69, 'delegate_delete_delegations', 'Delete Delegations', 'web', 1, NULL, NULL),
 
--- (74, 'deligate', NULL, 'delegate_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
--- (75, 'deligate', 74, 'delegate_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
+-- (74, 'delegate', NULL, 'delegate_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
+-- (75, 'delegate', 74, 'delegate_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
 
--- (76, 'deligate', NULL, 'delegate_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
--- (77, 'deligate', 76, 'delegate_view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
+-- (76, 'delegate', NULL, 'delegate_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
+-- (77, 'delegate', 76, 'delegate_view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
 
--- (78, 'deligate', NULL, 'delegate_manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
--- (79, 'deligate', 78, 'delegate_view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
+-- (78, 'delegate', NULL, 'delegate_manage_accommodations', 'Manage Accommodations', 'web', 1, NULL, NULL),
+-- (79, 'delegate', 78, 'delegate_view_accommodations', 'View Accommodations', 'web', 1, NULL, NULL),
 
 
--- (113, 'deligate', 69, 'delegate_view_delegates', 'View Delegates', 'web', 1, NULL, NULL),
--- (114, 'deligate', 69, 'delegate_add_delegates', 'Add Delegates', 'web', 1, NULL, NULL),
--- (115, 'deligate', 69, 'delegate_edit_delegates', 'Edit Delegates', 'web', 1, NULL, NULL),
--- (116, 'deligate', 69, 'delegate_delete_delegates', 'Delete Delegates', 'web', 1, NULL, NULL),
 
 
 -- (80, 'escort', NULL, 'escort_manage_escorts', 'Manage Escorts', 'web', 1, NULL, NULL),
@@ -333,22 +329,21 @@
 -- (110, 'hotel', 109, 'hotel_view_escorts', 'View Escorts', 'web', 1, NULL, NULL),
 
 -- (111, 'hotel', NULL, 'hotel_manage_drivers', 'Manage Drivers', 'web', 1, NULL, NULL),
--- (112, 'hotel', 111, 'hotel_view_drivers', 'View Drivers', 'web', 1, NULL, NULL);
+-- (112, 'hotel', 111, 'hotel_view_drivers', 'View Drivers', 'web', 1, NULL, NULL),
 
-
-
-
-
+-- (113, 'delegate', 69, 'delegate_view_delegates', 'View Delegates', 'web', 1, NULL, NULL),
+-- (114, 'delegate', 69, 'delegate_add_delegates', 'Add Delegates', 'web', 1, NULL, NULL),
+-- (115, 'delegate', 69, 'delegate_edit_delegates', 'Edit Delegates', 'web', 1, NULL, NULL),
+-- (116, 'delegate', 69, 'delegate_delete_delegates', 'Delete Delegates', 'web', 1, NULL, NULL);
 -- INSERT INTO `permissions` 
 -- (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
--- (113, 'admin', NULL, 'manage_dropdowns', 'Manage Dropdowns', 'web', 1, NULL, NULL),
--- (114, 'admin', 113, 'add_dropdown_options', 'Add Dropdown Options', 'web', 1, NULL, NULL),
--- (115, 'admin', 113, 'edit_dropdown_options', 'Edit Dropdown Options', 'web', 1, NULL, NULL),
--- (116, 'admin', 113, 'view_dropdown_options', 'View Dropdown Options', 'web', 1, NULL, NULL);
+-- (117, 'admin', 17, 'add_dropdown_options', 'Add Dropdown Options', 'web', 1, NULL, NULL),
+-- (118, 'admin', 17, 'edit_dropdown_options', 'Edit Dropdown Options', 'web', 1, NULL, NULL),
+-- (119, 'admin', 17, 'view_dropdown_options', 'View Dropdown Options', 'web', 1, NULL, NULL);
 
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '56', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-
-
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '56', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ALTER TABLE escorts
 -- CHANGE title title_id BIGINT(20) UNSIGNED;
@@ -374,15 +369,14 @@
 
 
 -- Jisha New changes 28/08/2025
-
 -- ALTER TABLE `room_assignments` ADD `delegation_id` BIGINT NULL DEFAULT NULL AFTER `id`;
 -- ALTER TABLE `room_assignments` CHANGE `delegation_id` `delegation_id` BIGINT UNSIGNED NULL DEFAULT NULL;
 -- ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_hotel_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_hotel_id_foreign` FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION; ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_room_type_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_room_type_id_foreign` FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 -- ALTER TABLE `room_assignments` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
--- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '56', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '56', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ALTER TABLE accommodation_rooms 
 -- ADD COLUMN available_rooms INT GENERATED ALWAYS AS (total_rooms - assigned_rooms) STORED AFTER assigned_rooms;
