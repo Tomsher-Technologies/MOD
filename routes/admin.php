@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ArrivalController;
 use App\Http\Controllers\Admin\AccommodationController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -153,6 +154,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::put('/external-accommodations/{id}', [AccommodationController::class, 'updateExternalMembers'])->name('admin.external-members.update');
     Route::delete('/external-accommodations/{id}', [AccommodationController::class, 'destroyExternalMembers'])->name('admin.external-members.destroy');
 
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 
 });
 

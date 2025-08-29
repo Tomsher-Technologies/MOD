@@ -319,7 +319,8 @@ class EscortController extends Controller
                     model: $escort,
                     changedFields: $changes,
                     submoduleId: $escort->id,
-                    delegationId: $escort->delegation_id
+                    delegationId: $escort->delegation_id,
+                    fieldsToNotify: $fieldsToNotify
                 );
             }
         }

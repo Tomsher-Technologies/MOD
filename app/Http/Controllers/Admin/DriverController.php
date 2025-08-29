@@ -258,7 +258,6 @@ class DriverController extends Controller
             'status' => [],
         ];
 
-        // Use the processUpdate method for confirmation dialog
         $confirmationResult = $this->processUpdate($request, $driver, $validated, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
@@ -270,7 +269,6 @@ class DriverController extends Controller
 
         $driver->update($dataToSave);
 
-        // Log activity with changed fields
         if ($request->has('changed_fields_json')) {
             $changes = json_decode($request->input('changed_fields_json'), true);
             if (!empty($changes)) {
@@ -281,7 +279,8 @@ class DriverController extends Controller
                     model: $driver,
                     changedFields: $changes,
                     submoduleId: $driver->id,
-                    delegationId: $driver->delegation_id
+                    delegationId: $driver->delegation_id,
+                    fieldsToNotify: $fieldsToNotify
                 );
             }
         }
@@ -302,7 +301,6 @@ class DriverController extends Controller
         $driver = Driver::findOrFail($id);
         $driver->update(['status' => 0]);
 
-        // Log activity
         $this->logActivity(
             module: 'Drivers',
             submodule: 'managing_members',

@@ -115,7 +115,6 @@
                     </ul>
                 </div>
 
-                <!-- Message Dropdown Start  -->
                 <button data-modal-target="default-modal" data-modal-toggle="default-modal"
                     class="has-indicator flex h-10 w-10 items-center justify-center rounded-full bg-neutral-200 "
                     type="button">
@@ -127,8 +126,7 @@
                     <span
                         class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex items-center text-sm justify-center badge rounded-full bg-danger-600 text-white">01</span>
                 </button>
-                <!-- Message Dropdown End  -->
-                <!-- Notification Start  -->
+
                 <button data-dropdown-toggle="dropdownNotification"
                     class="has-indicator flex h-10 w-10 items-center justify-center rounded-full bg-neutral-200 "
                     type="button">
@@ -138,7 +136,7 @@
                             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                     </svg>
                     <span
-                        class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">05</span>
+                        class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">{{ auth()->user()->unreadNotifications()->count() }}</span>
                 </button>
                 <div id="dropdownNotification"
                     class="z-10 hidden w-full max-w-[394px] overflow-hidden rounded-2xl bg-white shadow-lg ">
@@ -148,91 +146,68 @@
                             Notification
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 dark:text-white">05</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 dark:text-white">{{ auth()->user()->unreadNotifications()->count() }}</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
-                            <a href="javascript:void(0)"
-                                class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <div class="flex items-center gap-3">
-                                    <div>
-                                        <h6 class="fw-semibold mb-1 text-sm">Congratulations</h6>
-                                        <p class="mb-0 line-clamp-1 text-sm">
-                                            Your profile has been Verified. Your profile has been
-                                            Verified
-                                        </p>
+                            @forelse(auth()->user()->unreadNotifications as $notification)
+                                @php
+                                    $data = is_string($notification->data) ? json_decode($notification->data, true) : $notification->data;
+                                    $message = $data['message'] ?? 'New notification';
+                                    $module = $data['module'] ?? null;
+                                    $action = $data['action'] ?? null;
+                                    $delegationId = $data['delegation_id'] ?? null;
+                                    $url = '#';
+                                    
+                                    if ($module && $delegationId) {
+                                        switch (strtolower($module)) {
+                                            case 'escorts':
+                                                $url = route('escorts.index');
+                                                break;
+                                            case 'drivers':
+                                                $url = route('drivers.index');
+                                                break;
+                                            case 'delegations':
+                                                $url = route('delegations.show', $delegationId);
+                                                break;
+                                            default:
+                                                $url = '#';
+                                        }
+                                    } elseif ($delegationId) {
+                                        $url = route('delegations.show', $delegationId);
+                                    }
+                                @endphp
+                                <a href="{{ $url }}"
+                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <div class="flex items-center gap-3">
+                                        <div>
+                                            <h6 class="fw-semibold mb-1 text-sm">{{ $module ?? 'Notification' }}</h6>
+                                            <p class="mb-0 line-clamp-1 text-sm">
+                                                {{ $message }}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="shrink-0">
-                                    <span class="text-sm text-neutral-500">23 Mins ago</span>
-                                </div>
-                            </a>
-                            <a href="javascript:void(0)"
-                                class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <div class="flex items-center gap-3">
-                                    <div>
-                                        <h6 class="fw-semibold mb-1 text-sm">Ronald Richards</h6>
-                                        <p class="mb-0 line-clamp-1 text-sm">
-                                            You can stitch between artboards
-                                        </p>
+                                    <div class="shrink-0">
+                                        <span class="text-sm text-neutral-500">{{ $notification->created_at->diffForHumans() }}</span>
                                     </div>
+                                </a>
+                            @empty
+                                <div class="px-4 py-2 text-center text-neutral-500">
+                                    No notifications
                                 </div>
-                                <div class="shrink-0">
-                                    <span class="text-sm text-neutral-500">23 Mins ago</span>
-                                </div>
-                            </a>
-                            <a href="javascript:void(0)"
-                                class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <div class="flex items-center gap-3">
-                                    <div>
-                                        <h6 class="fw-semibold mb-1 text-sm">Arlene McCoy</h6>
-                                        <p class="mb-0 line-clamp-1 text-sm">
-                                            Invite you to prototyping
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="shrink-0">
-                                    <span class="text-sm text-neutral-500">23 Mins ago</span>
-                                </div>
-                            </a>
-                            <a href="javascript:void(0)"
-                                class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <div class="flex items-center gap-3">
-                                    <div>
-                                        <h6 class="fw-semibold mb-1 text-sm">Annette Black</h6>
-                                        <p class="mb-0 line-clamp-1 text-sm">
-                                            Invite you to prototyping
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="shrink-0">
-                                    <span class="text-sm text-neutral-500">23 Mins ago</span>
-                                </div>
-                            </a>
-                            <a href="javascript:void(0)"
-                                class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                <div class="flex items-center gap-3">
-                                    <div>
-                                        <h6 class="fw-semibold mb-1 text-sm">Darlene Robertson</h6>
-                                        <p class="mb-0 line-clamp-1 text-sm">
-                                            Invite you to prototyping
-                                        </p>
-                                    </div>
-                                </div>
-                                <div class="shrink-0">
-                                    <span class="text-sm text-neutral-500">23 Mins ago</span>
-                                </div>
-                            </a>
+                            @endforelse
                         </div>
+                        @if(auth()->user()->unreadNotifications()->count() > 0)
                         <div class="px-4 py-2 text-center">
-                            <a href="notifications.html"
+                            <a href="{{ route('notifications.index') }}"
                                 class="text-center font-semibold text-primary-600 hover:underline dark:text-primary-600">See
                                 All Notification
                             </a>
                         </div>
+                        @endif
                     </div>
                 </div>
-                <!-- Notification End  -->
+
                 <div id="dropdownProfile" class="dropdown-menu-sm z-10 hidden rounded-lg bg-white p-3 shadow-lg ">
                     <div
                         class="mb-4 flex items-center justify-between gap-2 rounded-lg bg-primary-50 px-4 py-2 dark:bg-primary-600/25">
