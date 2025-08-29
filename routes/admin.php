@@ -161,6 +161,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::get('/alerts/create', [AlertController::class, 'create'])->name('alerts.create');
+    Route::post('/alerts', [AlertController::class, 'store'])->name('alerts.store');
+    Route::get('/alerts/{alert}', [AlertController::class, 'show'])->name('alerts.show');
+    Route::get('/alerts/latest', [AlertController::class, 'getLatestAlert'])->name('alerts.latest');
+    Route::post('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.markAsRead');
 
 });
 
