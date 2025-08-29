@@ -601,31 +601,31 @@ function getRoomAssignmentStatus($delegationId)
 
     $all = $delegates->merge($escorts)->merge($drivers);
 
-    if ($all->count() === 0) {
-        return 'No Members';
+        if ($all->count() === 0) {
+            return 0;
+        }
+
+        $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
+        $totalCount    = $all->count();
+
+        if ($assignedCount === 0) {
+            return 0;
+        } elseif ($assignedCount === $totalCount) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
-    $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
-    $totalCount    = $all->count();
+    function shadeColor($hex, $percent) {
+        $hex = str_replace('#', '', $hex);
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
 
-    if ($assignedCount === 0) {
-        return 0;
-    } elseif ($assignedCount === $totalCount) {
-        return 1;
-    } else {
-        return 2;
+        $r = max(0, min(255, $r + ($percent / 100 * 255)));
+        $g = max(0, min(255, $g + ($percent / 100 * 255)));
+        $b = max(0, min(255, $b + ($percent / 100 * 255)));
+
+        return sprintf("#%02x%02x%02x", $r, $g, $b);
     }
-}
-
-
-function getAllDrivers()
-{
-    return Driver::orderBy('code')
-        ->get();
-}
-
-function getAllEscorts()
-{
-    return Escort::orderBy('code')
-        ->get();
-}
