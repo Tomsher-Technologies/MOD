@@ -200,7 +200,7 @@
 
                 <button id="alertDropdownBtn" data-dropdown-toggle="dropdownAlert"
                     class="has-indicator flex h-10 w-10 items-center justify-center rounded-full bg-neutral-200 "
-                    type="button">
+                    type="button" onclick="showLatestAlertModal()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -326,6 +326,62 @@
 
 @section('script')
     <script>
+        function showLatestAlertModal() {
+            // Get the latest unread alert notification
+            fetch('/mod-admin/alerts/latest', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.alert) {
+                    // Set modal content
+                    document.getElementById('alertModalTitle').textContent = data.alert.title;
+                    document.getElementById('alertModalMessage').textContent = data.alert.message;
+                    
+                    // Set the view all alerts button to point to the specific alert
+                    document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
+                    
+                    // Show the modal
+                    document.getElementById('alertModal').classList.remove('hidden');
+                    document.getElementById('alertModal').classList.add('flex');
+                    
+                    // Mark alert as read
+                    if (data.alert.id > 0) {
+                        fetch('/mod-admin/alerts/' + data.alert.id + '/mark-as-read', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update alert count in header
+                            const alertCountElement = document.querySelector('#dropdownAlert .badge');
+                            if (alertCountElement) {
+                                let count = parseInt(alertCountElement.textContent) || 0;
+                                if (count > 0) {
+                                    alertCountElement.textContent = count - 1;
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    // If no alerts, just open the dropdown as usual
+                    document.getElementById('dropdownAlert').classList.toggle('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching latest alert:', error);
+                // If error, just open the dropdown as usual
+                document.getElementById('dropdownAlert').classList.toggle('hidden');
+            });
+        }
+        
         function showAlertModal(alertId, title, message) {
             document.getElementById('alertModalTitle').textContent = title;
             document.getElementById('alertModalMessage').textContent = message;

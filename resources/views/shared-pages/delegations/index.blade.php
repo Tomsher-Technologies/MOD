@@ -322,9 +322,7 @@
     <div id="note-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl mx-auto">
-            <!-- Modal content -->
             <div class="bg-white rounded-lg shadow ">
-                <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
                     <button type="button"
@@ -336,9 +334,7 @@
                         </svg>
                     </button>
                 </div>
-                <!-- Modal body -->
                 <div class="p-6 space-y-6 text-gray-700 " id="note-modal-content">
-                    <!-- Content will be dynamically inserted here by JS -->
                 </div>
             </div>
         </div>
