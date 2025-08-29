@@ -22,6 +22,12 @@ import { Fancybox } from "@fancyapps/ui";
 import "flowbite";
 import "./bootstrap";
 
+import Highcharts from "highcharts";
+window.Highcharts = Highcharts;
+
+import ApexCharts from 'apexcharts';
+window.ApexCharts = ApexCharts;
+
 window.toastr = toastr;
 window.Swal = Swal;
 
@@ -37,6 +43,7 @@ window.addEventListener("load", () => {
     setTimeout(() => {
         $(".select2").select2({
             width: '100%',
+            placeholder: $(this).data('placeholder'),
             dropdownParent: $(document.body),
         });
 
