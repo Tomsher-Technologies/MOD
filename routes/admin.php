@@ -160,6 +160,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
+    Route::get('/alerts/create', [AlertController::class, 'create'])->name('alerts.create');
 
 });
 
