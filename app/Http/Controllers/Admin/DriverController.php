@@ -67,8 +67,8 @@ class DriverController extends Controller
             });
         }
 
-        if ($request->has('title') && !empty($request->title)) {
-            $query->whereIn('title', $request->title);
+        if ($request->has('title_id') && !empty($request->title_id)) {
+            $query->whereIn('title_id', $request->title_id);
         }
 
         if ($request->has('car_type') && !empty($request->car_type)) {
@@ -84,13 +84,13 @@ class DriverController extends Controller
         }
 
         if ($request->has('delegation_id') && !empty($request->delegation_id)) {
-            $query->whereHas('delegations', function ($q) use ($request) {
-                $q->where('delegations.id', $request->delegation_id);
+            $delegations = is_array($request->delegation_id) ? $request->delegation_id : [$request->delegation_id];
+            $query->whereHas('delegations', function ($q) use ($delegations) {
+                $q->whereIn('delegations.id', $delegations);
             });
         }
 
-        $limit = $request->limit ? $request->limit : 20;
-
+        $limit = $request->limit ?: 20;
 
         $drivers = $query->paginate($limit);
 
@@ -98,6 +98,7 @@ class DriverController extends Controller
 
         return view('admin.drivers.index', compact('drivers', 'delegations'));
     }
+
 
     public function updateStatus(Request $request)
     {

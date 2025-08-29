@@ -67,16 +67,20 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize select2
             $('#usersSelect').select2({
                 placeholder: "{{ __db('select_recipients') }}",
                 allowClear: true
             });
             
+            // Handle "All Users" selection
             $('#usersSelect').on('select2:select', function(e) {
                 var selectedValue = e.params.data.id;
                 if (selectedValue === 'all') {
+                    // If "All Users" is selected, deselect all other options
                     $(this).val(['all']).trigger('change');
                 } else {
+                    // If any other option is selected, deselect "All Users" if it's selected
                     var selectedValues = $(this).val();
                     if (selectedValues && selectedValues.includes('all')) {
                         var filteredValues = selectedValues.filter(function(value) {
