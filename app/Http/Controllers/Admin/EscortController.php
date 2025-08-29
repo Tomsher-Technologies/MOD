@@ -324,10 +324,6 @@ class EscortController extends Controller
             }
         }
 
-        if (!empty($fieldsToNotify)) {
-            \Illuminate\Support\Facades\Log::info('Admin chose to notify about these escort changes: ' . implode(', ', $fieldsToNotify));
-        }
-
         return response()->json([
             'status' => 'success',
             'message' => __db('Escort updated successfully.'),

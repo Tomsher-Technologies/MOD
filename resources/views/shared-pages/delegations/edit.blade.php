@@ -24,7 +24,7 @@
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __db('select_invitation_from') }}</option>
-                        @foreach (getDropDown('internal_ranking')->options as $option)
+                        @foreach (getDropDown('departments')->options as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('invitation_from_id', $delegation->invitation_from_id) == $option->id ? 'selected' : '' }}>
                                 {{ $option->value }}
