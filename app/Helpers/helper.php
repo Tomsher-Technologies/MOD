@@ -550,7 +550,7 @@ function getAllCountries()
 if (! function_exists('getAllDrivers')) {
     function getAllDrivers()
     {
-        return Driver::orderBy('name')
+        return Driver::orderBy('code')
             ->get();
     }
 }
@@ -558,7 +558,7 @@ if (! function_exists('getAllDrivers')) {
 if (! function_exists('getAllEscorts')) {
     function getAllEscorts()
     {
-        return Driver::orderBy('name')
+        return Driver::orderBy('code')
             ->get();
     }
 }
