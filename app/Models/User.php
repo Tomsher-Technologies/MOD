@@ -62,4 +62,24 @@ class User extends Authenticatable
     {
         return $this->notifications()->whereNull('read_at');
     }
+    
+    /**
+     * Get user's non-alert notifications
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function nonAlertNotifications()
+    {
+        return $this->notifications()->whereNull('alert_id');
+    }
+    
+    /**
+     * Get user's unread non-alert notifications
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function unreadNonAlertNotifications()
+    {
+        return $this->notifications()->whereNull('read_at')->whereNull('alert_id');
+    }
 }
