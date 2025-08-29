@@ -602,7 +602,7 @@ if (!function_exists('can')) {
         $all = $delegates->merge($escorts)->merge($drivers);
 
         if ($all->count() === 0) {
-            return 'No Members';
+            return 0;
         }
 
         $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
@@ -615,4 +615,17 @@ if (!function_exists('can')) {
         } else {
             return 2;
         }
+    }
+
+    function shadeColor($hex, $percent) {
+        $hex = str_replace('#', '', $hex);
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        $r = max(0, min(255, $r + ($percent / 100 * 255)));
+        $g = max(0, min(255, $g + ($percent / 100 * 255)));
+        $b = max(0, min(255, $b + ($percent / 100 * 255)));
+
+        return sprintf("#%02x%02x%02x", $r, $g, $b);
     }
