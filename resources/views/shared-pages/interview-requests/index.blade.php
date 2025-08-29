@@ -6,8 +6,7 @@
           <div class="xl:col-span-12 h-full">
               <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                   <div class=" mb-4 flex items-center justify-between gap-3">
-                      <form class="w-[50%] me-4" action="{{ route('delegations.interviewsIndex') }}"
-                          method="GET">
+                      <form class="w-[50%] me-4" action="{{ route('delegations.interviewsIndex') }}" method="GET">
                           <div class="relative">
                               <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                   <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +56,6 @@
                                   $attendees = $row->fromMembers;
                                   $names = $attendees
                                       ->map(function ($im) use ($row) {
-                                          // Use resolveMemberForInterview() to get correct member
                                           $member = $im->resolveMemberForInterview($row);
                                           return $member ? e($member->name_en ?? ($member->name_ar ?? '-')) : '-';
                                       })
@@ -70,23 +68,36 @@
                           [
                               'label' => __db('interview_with'),
                               'render' => function ($row) {
-                                  if ($row->type === 'del_del') {
-                                      $interviewees = $row->toMembers;
-                                      $names = $interviewees
-                                          ->map(fn($im) => e($im->delegate->name_en ?? ($im->delegate->name_ar ?? '-')))
-                                          ->filter()
-                                          ->implode('<br>');
-                                      $delegationLink = $row->interviewWithDelegation
-                                          ? '<a href="' .
-                                              route('delegations.show', $row->interviewWithDelegation->id) .
-                                              '" class="!text-[#B68A35]"> Delegation ID : ' .
-                                              e($row->interviewWithDelegation->code) .
-                                              '</a>'
-                                          : '';
-                                      return $delegationLink . ($delegationLink && $names ? '<br>' : '') . $names;
+                                  if (!empty($row->other_member_id) && $row->otherMember) {
+                                      $otherMemberName = $row->otherMember->name ?? '';
+                                      $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                                      if ($otherMemberId) {
+                                          $with =
+                                              '<a href="' .
+                                              route('other-interview-members.show', [
+                                                  'other_interview_member' => base64_encode($otherMemberId),
+                                              ]) .
+                                              '" class="!text-[#B68A35]">
+                                    <span class="block">Other Member ID: ' .
+                                              e($otherMemberId) .
+                                              '</span>
+                                </a>';
+                                      }
                                   } else {
-                                      return $row->otherMember->name ?? '-';
+                                      $with =
+                                          '<a href="' .
+                                          route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                          '" class="!text-[#B68A35]">' .
+                                          'Delegation ID : ' .
+                                          e($row->interviewWithDelegation->code ?? '') .
+                                          '</a>';
                                   }
+
+                                  $names = $row->interviewMembers
+                                      ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                                      ->implode('');
+
+                                  return $with . $names;
                               },
                           ],
                           ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status->value))],

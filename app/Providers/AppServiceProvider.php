@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
+use App\Notifications\CustomDatabaseChannel;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,5 +26,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(255);
         App::setLocale(Session::get('locale', config('app.locale')));
+        
+        NotificationFacade::extend('database', function ($app) {
+            return new CustomDatabaseChannel();
+        });
     }
 }

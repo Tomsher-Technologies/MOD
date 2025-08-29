@@ -13,7 +13,7 @@ class CountryController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:add_dropdown_options',  ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy' ,'updateStatus']]);
+        $this->middleware('permission:add_dropdown_options',  ['only' => ['index', 'create', 'store', 'edit', 'update', 'destroy', 'updateStatus']]);
     }
 
     /**
@@ -130,7 +130,15 @@ class CountryController extends Controller
 
     public function getByContinents(Request $request)
     {
-        $continentIds = explode(',', $request->query('continent_ids'));
+        $continentIds = $request->query('continent_ids');
+
+        if (is_array($continentIds)) {
+            $continentIds = array_filter($continentIds); 
+        } else if (is_string($continentIds)) {
+            $continentIds = array_filter(explode(',', $continentIds));
+        } else {
+            $continentIds = [];
+        }
 
         $countries = Country::whereIn('continent_id', $continentIds)
             ->select('id', 'name')
@@ -139,6 +147,7 @@ class CountryController extends Controller
 
         return response()->json($countries);
     }
+
 
 
     /**
