@@ -36,9 +36,9 @@ class LoginController extends Controller
 
             $user = Auth::user();
             $redirectTo = match ($user->user_type) {
-                'admin' => route('admin.dashboard'),
-                'staff' => route('admin.dashboard'),
-                default => '/user/dashboard',
+                // 'admin' => route('admin.dashboard'),
+                // 'staff' => route('admin.dashboard'),
+                default => route('admin.dashboard'),
             };
                      
             return redirect()->intended($redirectTo);

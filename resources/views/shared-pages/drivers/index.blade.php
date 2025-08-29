@@ -256,43 +256,66 @@
 
     <form action="{{ route('drivers.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-            <select name="title[]" placeholder="Title"
-                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                @foreach (getDropDown('title')->options as $option)
-                    <option value="{{ $option->value }}" @if (in_array($option->value, request('title', []))) selected @endif>
-                        {{ $option->value }}</option>
-                @endforeach
-            </select>
-            <select name="car_type[]" placeholder="Vehicle Type"
-                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                @foreach (getDropDown('vehicle_type')->options as $option)
-                    <option value="{{ $option->value }}" @if (in_array($option->value, request('car_type', []))) selected @endif>
-                        {{ $option->value }}</option>
-                @endforeach
-            </select>
-            <select name="car_number[]" placeholder="Plate Number"
-                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                @foreach ($drivers as $driver)
-                    <option value="{{ $driver->car_number }}" @if (in_array($driver->car_number, request('car_number', []))) selected @endif>
-                        {{ $driver->car_number }}</option>
-                @endforeach
-            </select>
-            <select name="capacity[]" placeholder="Capacity"
-                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                @foreach ($drivers as $driver)
-                    <option value="{{ $driver->capacity }}" @if (in_array($driver->capacity, request('capacity', []))) selected @endif>
-                        {{ $driver->capacity }}</option>
-                @endforeach
-            </select>
-            <select name="delegation_id"
-                class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                <option value="">{{ __db('all_delegations') }}</option>
-                @foreach ($delegations as $delegation)
-                    <option value="{{ $delegation->id }}"
-                        {{ request('delegation_id') == $delegation->id ? 'selected' : '' }}>
-                        {{ $delegation->code }}</option>
-                @endforeach
-            </select>
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title') }}</label>
+                <select name="title_id[]" multiple data-placeholder="{{ __db('select_titles') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getDropDown('title')->options as $option)
+                        <option value="{{ $option->value }}" @if (in_array($option->value, request('title_id', []))) selected @endif>
+                            {{ $option->value }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle_type') }}</label>
+                <select name="car_type[]" multiple data-placeholder="{{ __db('select_vehicle_types') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getDropDown('vehicle_type')->options as $option)
+                        <option value="{{ $option->value }}" @if (in_array($option->value, request('car_type', []))) selected @endif>
+                            {{ $option->value }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('car_number') }}</label>
+                <select name="car_number[]" multiple data-placeholder="{{ __db('select_plate_numbers') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getAllDrivers() as $driver)
+                        <option value="{{ $driver->car_number }}" @if (in_array($driver->car_number, request('car_number', []))) selected @endif>
+                            {{ $driver->car_number }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('capacity') }}</label>
+                <select name="capacity[]" multiple data-placeholder="{{ __db('select_capacities') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getAllDrivers() as $driver)
+                        <option value="{{ $driver->capacity }}" @if (in_array($driver->capacity, request('capacity', []))) selected @endif>
+                            {{ $driver->capacity }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation_id') }}</label>
+                <select name="delegation_id[]" multiple data-placeholder="{{ __db('select_delegations') }}"
+                    class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    <option value="">{{ __db('all_delegations') }}</option>
+                    @foreach ($delegations as $delegation)
+                        <option value="{{ $delegation->id }}" @if (in_array($delegation->id, request('delegation_id', []))) selected @endif>
+                            {{ $delegation->code }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('drivers.index') }}"

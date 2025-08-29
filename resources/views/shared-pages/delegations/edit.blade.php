@@ -316,7 +316,7 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})
         </h2>
         <div class="flex items-center gap-3">
-            @canany(['add_delegate', 'delegate_add_delegates'])
+            @canany(['add_delegates', 'delegate_add_delegates'])
                 <a href="{{ route('delegations.addDelegate', $delegation->id) }}" id="add-attachment-btn"
                     class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
                     <span>{{ __db('add_delegate') }}</span>

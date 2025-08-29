@@ -248,14 +248,15 @@ trait HandlesUpdateConfirmation
         ?string $submodule = null,
         ?int $submoduleId = null,
         ?int $delegationId = null,
-        ?Bool $sendNotification = true,
+        ?array $fieldsToNotify = null
     ): void {
         $eventId = $currentEventId;
 
         if (!$eventId && $model) {
             if ($model->hasAttribute('event_id') && $model->event_id) {
                 $eventId = $model->event_id;
-            } elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
+            }
+            elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
             } elseif ($model instanceof \App\Models\Interview && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
@@ -285,10 +286,18 @@ trait HandlesUpdateConfirmation
 
         try {
             $activity = $activityModelClass::create($activityData);
-
-            if ($sendNotification) {
-                if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'managing_members', 'unassign-escorts', 'assign-drivers', 'unassign-drivers'])) {
-                    $this->sendNotification($activity, $action, $module, $delegationId);
+            
+            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room' ])) {
+                $this->sendNotification($activity, $action, $module, $delegationId);
+            }
+            elseif ($action === 'update' && !empty($fieldsToNotify) && !empty($changedFields)) {
+                $notifiedChanges = array_intersect_key($changedFields, array_flip($fieldsToNotify));
+                
+                if (!empty($notifiedChanges)) {
+                    $notificationActivity = clone $activity;
+                    $notificationActivity->changes = $notifiedChanges;
+                    $notificationActivity->message = $this->generateActivityMessage($action, $module, $notifiedChanges);
+                    $this->sendNotification($notificationActivity, $action, $module, $delegationId);
                 }
             }
         } catch (\Throwable $e) {
