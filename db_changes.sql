@@ -336,6 +336,20 @@ INSERT INTO `permissions`
 (112, 'hotel', 111, 'hotel_view_drivers', 'View Drivers', 'web', 1, NULL, NULL);
 
 
+
+
+
+INSERT INTO `permissions` 
+(`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+(113, 'admin', NULL, 'manage_dropdowns', 'Manage Dropdowns', 'web', 1, NULL, NULL),
+(114, 'admin', 113, 'add_dropdown_options', 'Add Dropdown Options', 'web', 1, NULL, NULL),
+(115, 'admin', 113, 'edit_dropdown_options', 'Edit Dropdown Options', 'web', 1, NULL, NULL),
+(116, 'admin', 113, 'view_dropdown_options', 'View Dropdown Options', 'web', 1, NULL, NULL);
+
+
+
+
+
 ALTER TABLE escorts
 CHANGE title title_id BIGINT(20) UNSIGNED;
 
@@ -365,9 +379,9 @@ ALTER TABLE `room_assignments` CHANGE `delegation_id` `delegation_id` BIGINT UNS
 ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_hotel_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_hotel_id_foreign` FOREIGN KEY (`hotel_id`) REFERENCES `accommodations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION; ALTER TABLE `room_assignments` DROP FOREIGN KEY `room_assignments_room_type_id_foreign`; ALTER TABLE `room_assignments` ADD CONSTRAINT `room_assignments_room_type_id_foreign` FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 ALTER TABLE `room_assignments` ADD FOREIGN KEY (`delegation_id`) REFERENCES `delegations`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '56', 'view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '46', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '56', 'assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 ALTER TABLE accommodation_rooms 
 ADD COLUMN available_rooms INT GENERATED ALWAYS AS (total_rooms - assigned_rooms) STORED AFTER assigned_rooms;

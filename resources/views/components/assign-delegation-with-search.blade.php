@@ -41,8 +41,8 @@
                             <select id="country_id" class="select2 p-3 rounded-lg w-full border text-sm">
                                 <option value="" selected="" disabled="">{{ __db('select') . ' ' . __db('country') }}
                                 </option>
-                                @foreach (getDropDown('country')->options as $country)
-                                    <option value="{{ $country->id }}">{{ $country->value }}</option>
+                                @foreach (getAllCountries() as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach
                             </select>
                         </div>

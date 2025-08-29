@@ -28,7 +28,7 @@ class AccommodationController extends Controller
     {
         $request->session()->put('accommodations_last_url', url()->full());
         $accommodations = Accommodation::with(['rooms', 'contacts'])->where('event_id', session('current_event_id', getDefaultEventId() ?? null));
-        
+
         if (request()->has('search')) {
             $accommodations = $accommodations->where('hotel_name', 'like', '%' . request('search') . '%');
         }
@@ -91,7 +91,7 @@ class AccommodationController extends Controller
 
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
 
-        return view('admin.accommodations.edit', compact('accommodation','roomTypes'));
+        return view('admin.accommodations.edit', compact('accommodation', 'roomTypes'));
     }
 
     public function update(Request $request, Accommodation $accommodation)
@@ -139,7 +139,7 @@ class AccommodationController extends Controller
 
     public function showImportForm()
     {
-        return view('admin.accommodations.import'); 
+        return view('admin.accommodations.import');
     }
 
     public function import(Request $request)
@@ -151,17 +151,17 @@ class AccommodationController extends Controller
         Excel::import(new AccommodationsImport, $request->file('file'));
 
         return redirect()->route('accommodations.index')
-                        ->with('success',  __db('accommodation') . __db('created_successfully'));
+            ->with('success',  __db('accommodation') . __db('created_successfully'));
     }
 
     public function exportRoomTypes()
     {
-         return Excel::download(new RoomTypesExport, 'room_types.xlsx');
+        return Excel::download(new RoomTypesExport, 'room_types.xlsx');
     }
 
     public function accommodationDelegations(Request $request)
     {
-        $query = Delegation::with(['invitationFrom', 'continent','country','invitationStatus','participationStatus','delegates','escorts' ])->orderBy('id', 'desc');
+        $query = Delegation::with(['invitationFrom', 'continent', 'country', 'invitationStatus', 'participationStatus', 'delegates', 'escorts'])->orderBy('id', 'desc');
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
@@ -205,16 +205,24 @@ class AccommodationController extends Controller
         return view('admin.accommodations.delegations', compact('delegations'));
     }
 
-    public function accommodationDelegationView (Request $request, $id)
+    public function accommodationDelegationView(Request $request, $id)
     {
-        $delegation = Delegation::with([ 'invitationFrom', 'continent', 'country', 'invitationStatus', 'participationStatus',
-                                    'delegates' => function ($query) {
-                                        $query->with([ 'gender', 'parent', 'delegateTransports','currentRoomAssignment']);
-                                    }, 'attachments', 'escorts', 'drivers'
-                                ])->findOrFail($id);
+        $delegation = Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates' => function ($query) {
+                $query->with(['gender', 'parent', 'delegateTransports', 'currentRoomAssignment']);
+            },
+            'attachments',
+            'escorts',
+            'drivers'
+        ])->findOrFail($id);
 
         $hotels = Accommodation::where('status', 1)->where('event_id', session('current_event_id', getDefaultEventId() ?? null))->orderBy('hotel_name', 'asc')->get();
-        return view('admin.accommodations.delegations-show', compact('delegation','hotels'));
+        return view('admin.accommodations.delegations-show', compact('delegation', 'hotels'));
     }
 
     public function getHotelRooms($id)
@@ -226,7 +234,7 @@ class AccommodationController extends Controller
         return response()->json($rooms);
     }
 
-     public function assignRoom(Request $request)
+    public function assignRoom(Request $request)
     {
         $request->validate([
             'assignable_type' => 'required|in:Delegate,Escort,Driver',
@@ -240,26 +248,26 @@ class AccommodationController extends Controller
         $user  = $model::findOrFail($request->assignable_id);
 
         $current = $user->roomAssignments()
-                    ->where('hotel_id', $request->hotel_id)
-                    ->where('room_type_id', $request->room_type_id)
-                    ->where('room_number', $request->room_number)
-                    ->where('active_status', 1)
-                    ->latest()
-                    ->first();
+            ->where('hotel_id', $request->hotel_id)
+            ->where('room_type_id', $request->room_type_id)
+            ->where('room_number', $request->room_number)
+            ->where('active_status', 1)
+            ->latest()
+            ->first();
 
         if (!$current) {
             $alreadyAssignedExternal = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                                        ->where('room_type_id', $request->room_type_id)
-                                        ->where('room_number', $request->room_number)
-                                        ->where('active_status', 1)
-                                        ->exists();
+                ->where('room_type_id', $request->room_type_id)
+                ->where('room_number', $request->room_number)
+                ->where('active_status', 1)
+                ->exists();
 
             $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                                    ->where('room_type_id', $request->room_type_id)
-                                    ->where('room_number', $request->room_number)
-                                    ->where('assignable_id', '!=', $user->id)
-                                    ->where('active_status', 1)
-                                    ->exists();
+                ->where('room_type_id', $request->room_type_id)
+                ->where('room_number', $request->room_number)
+                ->where('assignable_id', '!=', $user->id)
+                ->where('active_status', 1)
+                ->exists();
 
             $roomType = AccommodationRoom::find($request->room_type_id);
             $availableRooms = $roomType->available_rooms;
@@ -294,7 +302,7 @@ class AccommodationController extends Controller
             }
 
             $user->roomAssignments()->update(['active_status' => 0]);
-            
+
             $assignment = $user->roomAssignments()->create([
                 'hotel_id'     => $request->hotel_id,
                 'room_type_id' => $request->room_type_id,
@@ -310,21 +318,21 @@ class AccommodationController extends Controller
             if ($request->assignable_type === 'Escort') {
                 $escort = Escort::findOrFail($request->assignable_id);
                 $name = $escort->name_en ?? $escort->name_ar;
-            }elseif ($request->assignable_type === 'Driver') {
+            } elseif ($request->assignable_type === 'Driver') {
                 $driver = Driver::findOrFail($request->assignable_id);
                 $name = $driver->name_en ?? $driver->name_ar;
-            }else{
+            } else {
                 $delegate = Delegate::findOrFail($request->assignable_id);
                 $name = $delegate->name_en ?? $delegate->name_ar;
             }
-            
+
             $hotel = Accommodation::findOrFail($request->hotel_id);
 
             $changes = [
-                        'member_name' => $name,
-                        'hotel_name' => $hotel->hotel_name ?? NULL,
-                        'room_number' => $request->room_number ?? NULL,
-                        ];
+                'member_name' => $name,
+                'hotel_name' => $hotel->hotel_name ?? NULL,
+                'room_number' => $request->room_number ?? NULL,
+            ];
             $this->logActivity(
                 module: 'Accommodations',
                 action: 'assign-room',
@@ -354,34 +362,34 @@ class AccommodationController extends Controller
         $hotel = Accommodation::findOrFail(base64_decode($id) ?? $id);
 
         $roomTypes = AccommodationRoom::with('roomType')
-                                        ->where('accommodation_id', $hotel->id)
-                                        ->get();
-        return view('admin.accommodations.add-external-members', compact('hotel','roomTypes'));
+            ->where('accommodation_id', $hotel->id)
+            ->get();
+        return view('admin.accommodations.add-external-members', compact('hotel', 'roomTypes'));
     }
-    
+
     public function storeExternalMembers(Request $request)
     {
         $request->validate([
             'name' => 'required',
             'room_type' => 'required',
             'room_number' => 'required'
-        ],[
+        ], [
             'name.required' => __db('this_field_is_required'),
             'room_type.required' => __db('this_field_is_required'),
             'room_number.required' => __db('this_field_is_required'),
         ]);
 
         $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                                    ->where('room_type_id', $request->room_type)
-                                    ->where('room_number', $request->room_number)
-                                    ->where('active_status', 1)
-                                    ->exists();
+            ->where('room_type_id', $request->room_type)
+            ->where('room_number', $request->room_number)
+            ->where('active_status', 1)
+            ->exists();
 
         $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                                    ->where('room_type_id', $request->room_type)
-                                    ->where('room_number', $request->room_number)
-                                    ->where('active_status', 1)
-                                    ->exists();
+            ->where('room_type_id', $request->room_type)
+            ->where('room_number', $request->room_number)
+            ->where('active_status', 1)
+            ->exists();
 
         $roomType = AccommodationRoom::find($request->room_type);
         $availableRooms = $roomType->available_rooms;
@@ -411,14 +419,15 @@ class AccommodationController extends Controller
         ]);
 
         $hotel = Accommodation::findOrFail($request->hotel_id);
-        
+
         $changes = [
-                    'member_name' => $request->name.' ('.__db('external_member').')',
-                    'hotel_name' => $hotel->hotel_name ?? NULL,
-                    'room_number' => $request->room_number ?? NULL,
-                ];
+            'member_name' => $request->name . ' (' . __db('external_member') . ')',
+            'hotel_name' => $hotel->hotel_name ?? NULL,
+            'room_number' => $request->room_number ?? NULL,
+        ];
         $this->logActivity(
             module: 'Accommodations',
+            submodule: 'assignment',
             action: 'assign-room',
             model: $hotel,
             changedFields: $changes,
@@ -427,28 +436,31 @@ class AccommodationController extends Controller
         return redirect()->back()->with('success', __db('room_assigned'));
     }
 
-    public function getExternalMembers(){
+    public function getExternalMembers()
+    {
         request()->session()->put('external_members_last_url', url()->full());
         $externalMembers = ExternalMemberAssignment::where('active_status', 1)->orderBy('id', 'desc')->paginate(10);
         return view('admin.accommodations.view-external-members', compact('externalMembers'));
     }
 
-    public function editExternalMembers($id){
+    public function editExternalMembers($id)
+    {
         $externalMember = ExternalMemberAssignment::findOrFail($id);
         $hotel = Accommodation::findOrFail($externalMember->hotel_id);
         $roomTypes = AccommodationRoom::with('roomType')
-                                        ->where('accommodation_id', $hotel->id)
-                                        ->get();
-        return view('admin.accommodations.edit-external-members', compact('externalMember','hotel','roomTypes'));
+            ->where('accommodation_id', $hotel->id)
+            ->get();
+        return view('admin.accommodations.edit-external-members', compact('externalMember', 'hotel', 'roomTypes'));
     }
 
-    public function updateExternalMembers(Request $request, $id){
-        
+    public function updateExternalMembers(Request $request, $id)
+    {
+
         $request->validate([
             'name' => 'required',
             'room_type' => 'required',
             'room_number' => 'required'
-        ],[
+        ], [
             'name.required' => __db('this_field_is_required'),
             'room_type.required' => __db('this_field_is_required'),
             'room_number.required' => __db('this_field_is_required'),
@@ -456,19 +468,19 @@ class AccommodationController extends Controller
 
         $externalMember = ExternalMemberAssignment::findOrFail($id);
 
-        if($externalMember->room_type_id != $request->room_type || $externalMember->room_number != $request->room_number || $externalMember->hotel_id != $request->hotel_id){
-        
+        if ($externalMember->room_type_id != $request->room_type || $externalMember->room_number != $request->room_number || $externalMember->hotel_id != $request->hotel_id) {
+
             $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                                        ->where('room_type_id', $request->room_type)
-                                        ->where('room_number', $request->room_number)
-                                        ->where('active_status', 1)
-                                        ->exists();
+                ->where('room_type_id', $request->room_type)
+                ->where('room_number', $request->room_number)
+                ->where('active_status', 1)
+                ->exists();
 
             $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                                        ->where('room_type_id', $request->room_type)
-                                        ->where('room_number', $request->room_number)
-                                        ->where('active_status', 1)
-                                        ->exists();
+                ->where('room_type_id', $request->room_type)
+                ->where('room_number', $request->room_number)
+                ->where('active_status', 1)
+                ->exists();
 
             $roomType = AccommodationRoom::find($request->room_type);
             $availableRooms = $roomType->available_rooms;
@@ -476,7 +488,7 @@ class AccommodationController extends Controller
             if ($alreadyAssignedDelegation) {
                 return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
             }
-            if ($availableRooms <= 0 ) { // && $externalMember->hotel_id != $request->hotel_id && $externalMember->room_type_id != $request->room_type && $externalMember->room_number != $request->room_number
+            if ($availableRooms <= 0) { // && $externalMember->hotel_id != $request->hotel_id && $externalMember->room_type_id != $request->room_type && $externalMember->room_number != $request->room_number
                 return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
             }
 
@@ -508,19 +520,20 @@ class AccommodationController extends Controller
             ]);
 
             $hotel = Accommodation::findOrFail($request->hotel_id);
-            
+
             $changes = [
-                        'member_name' => $request->name.' ('.__db('external_member').')',
-                        'hotel_name' => $hotel->hotel_name ?? NULL,
-                        'room_number' => $request->room_number ?? NULL,
-                    ];
+                'member_name' => $request->name . ' (' . __db('external_member') . ')',
+                'hotel_name' => $hotel->hotel_name ?? NULL,
+                'room_number' => $request->room_number ?? NULL,
+            ];
             $this->logActivity(
                 module: 'Accommodations',
+                submodule: 'assignment',
                 action: 'assign-room',
                 model: $hotel,
                 changedFields: $changes,
             );
-        }else{
+        } else {
             $externalMember->update([
                 'name' => $request->name,
                 'assigned_by'  => auth()->user()->id,
@@ -531,9 +544,10 @@ class AccommodationController extends Controller
         return redirect()->back()->with('success', __db('external_member_updated'));
     }
 
-    public function destroyExternalMembers($id){
+    public function destroyExternalMembers($id)
+    {
         $externalMember = ExternalMemberAssignment::findOrFail($id);
-        
+
         $hotel_id = $externalMember->hotel_id;
         $room_number = $externalMember->room_number;
 
@@ -549,5 +563,4 @@ class AccommodationController extends Controller
 
         return redirect()->back()->with('success', __db('external_member_deleted'));
     }
-
 }

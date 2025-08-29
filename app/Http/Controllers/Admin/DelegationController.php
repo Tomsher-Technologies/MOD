@@ -1427,7 +1427,6 @@ class DelegationController extends Controller
 
             DB::commit();
 
-            // Log delegate update activity if there were changes
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
