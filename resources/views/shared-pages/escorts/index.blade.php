@@ -1,4 +1,4 @@
-<div class="dashboard-main-body ">
+<div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }}</h2>
 
@@ -76,7 +76,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ""),
+                            'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -127,7 +127,7 @@
                         [
                             'label' => __db('status'),
                             'key' => 'status',
-                            'permission' => ['edit_escorts','escort_edit_escorts'],
+                            'permission' => ['edit_escorts', 'escort_edit_escorts'],
                             'render' => function ($escort) {
                                 return '<div class="flex items-center">
                 <label for="switch-' .
@@ -220,39 +220,62 @@
 
     <form action="{{ route('escorts.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-            <select name="title[]" placeholder="Title"
-                class="w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                @foreach (getDropDown('title')->options as $option)
-                    <option value="{{ $option->id }}" @if (in_array($option->id, request('title', []))) selected @endif>
-                        {{ $option->value }}</option>
-                @endforeach
-            </select>
-            <select name="gender_id" class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                <option value="">{{ __db('all_genders') }}</option>
-                @foreach (getDropDown('gender')->options as $gender)
-                    <option value="{{ $gender->id }}" {{ request('gender_id') == $gender->id ? 'selected' : '' }}>
-                        {{ $gender->value }}
-                    </option>
-                @endforeach
-            </select>
-            <select name="language_id"
-                class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                <option value="">{{ __db('all_languages') }}</option>
-                @foreach (getDropDown('spoken_languages')->options as $language)
-                    <option value="{{ $language->id }}"
-                        {{ request('language_id') == $language->id ? 'selected' : '' }}>
-                        {{ $language->value }}</option>
-                @endforeach
-            </select>
-            <select name="delegation_id"
-                class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                <option value="">{{ __db('all_delegations') }}</option>
-                @foreach ($delegations as $delegation)
-                    <option value="{{ $delegation->id }}"
-                        {{ request('delegation_id') == $delegation->id ? 'selected' : '' }}>
-                        {{ $delegation->code }}</option>
-                @endforeach
-            </select>
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title') }}</label>
+
+                <select name="title_id[]" multiple data-placeholder="{{ __db('select_titles') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getDropDown('title')->options as $option)
+                        <option value="{{ $option->id }}" @if (in_array($option->id, request('title_id', []))) selected @endif>
+                            {{ $option->value }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('gender') }}</label>
+                <select name="gender_id[]" multiple data-placeholder="{{ __db('select_genders') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getDropDown('gender')->options as $gender)
+                        <option value="{{ $gender->id }}" @if (in_array($gender->id, request('gender_id', []))) selected @endif>
+                            {{ $gender->value }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('language') }}</label>
+                <select name="language_id[]" multiple data-placeholder="{{ __db('select_languages') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach (getDropDown('spoken_languages')->options as $language)
+                        <option value="{{ $language->id }}" @if (in_array($language->id, request('language_id', []))) selected @endif>
+                            {{ $language->value }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+
+
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation') }}</label>
+                <select name="delegation_id[]" multiple data-placeholder="{{ __db('select_delegations') }}"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    @foreach ($delegations as $delegation)
+                        <option value="{{ $delegation->id }}" @if (in_array($delegation->id, request('delegation_id', []))) selected @endif>
+                            {{ $delegation->code }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+
+
+
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('escorts.index') }}"

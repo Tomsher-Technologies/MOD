@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ArrivalController;
 use App\Http\Controllers\Admin\AccommodationController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\AlertController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -153,6 +155,16 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::put('/external-accommodations/{id}', [AccommodationController::class, 'updateExternalMembers'])->name('admin.external-members.update');
     Route::delete('/external-accommodations/{id}', [AccommodationController::class, 'destroyExternalMembers'])->name('admin.external-members.destroy');
 
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+
+    // Alerts
+    Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
+    Route::get('/alerts/create', [AlertController::class, 'create'])->name('alerts.create');
+    Route::post('/alerts', [AlertController::class, 'store'])->name('alerts.store');
+    Route::get('/alerts/{alert}', [AlertController::class, 'show'])->name('alerts.show');
+    Route::get('/alerts/latest', [AlertController::class, 'getLatestAlert'])->name('alerts.latest');
+    Route::post('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.markAsRead');
 
 });
 

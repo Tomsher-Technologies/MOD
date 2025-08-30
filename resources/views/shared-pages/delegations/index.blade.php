@@ -170,7 +170,15 @@
                                         <svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 512 512\'><path d=\'M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z\' fill=\'#B68A35\'></path></svg>
                                     </a>';
                                 }
-                                if (can(['view_delegations', 'delegate_view_delegations', 'escort_view_delegations', 'driver_view_delegations', 'hotel_view_delegations'])) {
+                                if (
+                                    can([
+                                        'view_delegations',
+                                        'delegate_view_delegations',
+                                        'escort_view_delegations',
+                                        'driver_view_delegations',
+                                        'hotel_view_delegations',
+                                    ])
+                                ) {
                                     $buttons .=
                                         '<a href="' .
                                         route('delegations.show', $delegation->id) .
@@ -206,6 +214,7 @@
 
         <form action="{{ route('delegations.index') }}" method="GET">
             <div class="flex flex-col gap-2 mt-2">
+                
                 <div class="flex flex-col">
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
@@ -220,12 +229,14 @@
 
                 <div class="flex flex-col">
                     <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
-                    <select multiple name="continent_id" id="continent" data-placeholder="{{ __db('select') }}"
+                    <select multiple name="continent_id[]" id="continent-select"
+                        data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('continents')->options as $continent)
                             <option value="{{ $continent->id }}"
-                                {{ request('continent_id') == $continent->id ? 'selected' : '' }}>{{ $continent->value }}
+                                {{ is_array(request('continent_id')) && in_array($continent->id, request('continent_id')) ? 'selected' : '' }}>
+                                {{ $continent->value }}
                             </option>
                         @endforeach
                     </select>
@@ -233,19 +244,21 @@
 
                 <div class="flex flex-col">
                     <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
-                    <select multiple name="country_id" id="country" data-placeholder="{{ __db('select') }}"
+                    <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
-                        @foreach (getDropDown('country')->options as $country)
-                            <option value="{{ $country->id }}"
-                                {{ request('country_id') == $country->id ? 'selected' : '' }}>
-                                {{ $country->value }}</option>
+                        @foreach (getAllCountries() as $option)
+                            <option value="{{ $option->id }}"
+                                {{ is_array(request('country_id')) && in_array($option->id, request('country_id')) ? 'selected' : '' }}>
+                                {{ $option->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
+                    <label
+                        class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
                     <select multiple name="invitation_status_id" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
@@ -259,7 +272,8 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
+                    <label
+                        class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
                     <select multiple name="participation_status_id" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
@@ -322,9 +336,7 @@
     <div id="note-modal" tabindex="-1" aria-hidden="true"
         class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative w-full max-w-2xl mx-auto">
-            <!-- Modal content -->
             <div class="bg-white rounded-lg shadow ">
-                <!-- Modal header -->
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
                     <button type="button"
@@ -336,9 +348,7 @@
                         </svg>
                     </button>
                 </div>
-                <!-- Modal body -->
                 <div class="p-6 space-y-6 text-gray-700 " id="note-modal-content">
-                    <!-- Content will be dynamically inserted here by JS -->
                 </div>
             </div>
         </div>
@@ -444,39 +454,44 @@
     </script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const continentSelect = $("#continent");
-            const countrySelect = $("#country");
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
 
-            continentSelect.on("change", async function() {
-                const selectedContinent = $(this).val();
+            let initiallySelectedCountries = $('#country-select').val() || [];
 
-                // Clear current options except the default
+            $('#continent-select').on('change', function() {
+                const continentId = $(this).val();
+                const countrySelect = $('#country-select');
+
                 countrySelect.find('option[value!=""]').remove();
 
-                if (selectedContinent) {
-                    try {
-                        let response = await fetch(
-                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
-                        let countries = await response.json();
+                if (continentId) {
+                    $.get('{{ route('countries.by-continent') }}', {
+                        continent_ids: continentId
+                    }, function(data) {
+                        $.each(data, function(index, country) {
+                            const isSelected = initiallySelectedCountries.includes(country
+                                .id.toString());
 
-                        // Add new options
-                        countries.forEach(country => {
-                            let option = new Option(country.name, country.id, false, false);
-                            countrySelect.append(option);
+                            countrySelect.append(new Option(country.name, country.id, false,
+                                isSelected));
                         });
 
-                        countrySelect.trigger("change");
-                    } catch (error) {
-                        console.error("Error fetching countries:", error);
-                    }
+                        countrySelect.trigger('change');
+                    }).fail(function() {
+                        console.log('Failed to load countries');
+                    });
+                } else {
+                    countrySelect.val(null).trigger('change');
                 }
             });
 
-            // Trigger continent change on page load if a continent is already selected
-            const selectedContinent = continentSelect.val();
-            if (selectedContinent) {
-                continentSelect.trigger("change");
+            const selectedContinent = $('#continent-select').val();
+            if (selectedContinent && selectedContinent.length > 0) {
+                $('#continent-select').trigger('change');
             }
         });
     </script>

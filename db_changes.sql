@@ -403,3 +403,12 @@
 -- ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`room_type_id`) REFERENCES `accommodation_rooms`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
 -- ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`assigned_by`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+
+
+php artisan migrate;
+
+INSERT INTO `permissions` 
+(`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+(122, 'admin', NULL, 'manage_alerts', 'Manage Alerts', 'web', 1, NULL, NULL),
+(123, 'admin', 122, 'add_alerts', 'Add Alerts', 'web', 1, NULL, NULL),
+(124, 'admin', 122, 'view_alerts', 'Edit Alerts', 'web', 1, NULL, NULL);

@@ -316,7 +316,7 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})
         </h2>
         <div class="flex items-center gap-3">
-            @canany(['add_delegate', 'delegate_add_delegates'])
+            @canany(['add_delegates', 'delegate_add_delegates'])
                 <a href="{{ route('delegations.addDelegate', $delegation->id) }}" id="add-attachment-btn"
                     class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
                     <span>{{ __db('add_delegate') }}</span>
@@ -614,7 +614,7 @@
                                 return e(implode(', ', $names));
                             },
                         ],
-                    
+
                         [
                             'label' => __db('status'),
                             'key' => 'status',
@@ -825,153 +825,155 @@
     </div>
 
 
-    @php
-        $delegatesCollection = collect($delegation->delegates)->mapWithKeys(function ($delegate) {
-            return [(int) $delegate->id => $delegate];
-        });
 
-        $columns = [
-            ['label' => __db('sl_no'), 'render' => fn($row, $key) => $key + 1],
-            [
-                'label' => __db('date_time'),
-                'render' => fn($row) => $row->date_time
-                    ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
-                    : '',
-            ],
-            [
-                'label' => __db('attended_by'),
-                'render' => function ($row) use ($delegatesCollection, $delegation) {
-                    if ($row->interviewMembers && count($row->interviewMembers)) {
-                        $attendedBy = collect($row->interviewMembers)->filter(fn($m) => $m->type === 'from');
-                        if ($attendedBy->isEmpty()) {
-                            return '-';
-                        }
+    <hr class="mx-6 border-neutral-200 h-10">
 
-                        return $attendedBy
-                            ->map(function ($member) use ($delegatesCollection, $delegation) {
-                                $memberId = (int) $member->member_id;
-                                $delegate = $delegatesCollection->get($memberId);
-                                $delegateName = $delegate
-                                    ? ($delegate->name_en ?:
-                                    $delegate->name_ar ?:
-                                    'N/A')
-                                    : 'Unknown';
-                                return '<span class="block">Member ID: ' .
-                                    e($memberId) .
-                                    ' - Delegate Name: ' .
-                                    e($delegateName) .
-                                    '</span>';
-                            })
-                            ->implode('');
-                    }
-                    return '-';
-                },
-            ],
-            [
-                'label' => __db('interview_with'),
-                'render' => function ($row) {
-                    if (!empty($row->other_member_id) && $row->otherMember) {
-                        $otherMemberName = $row->otherMember->name ?? '';
-                        $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
-                        if ($otherMemberId) {
-                            $with =
-                                '<a href="' .
-                                route('other-interview-members.show', [
-                                    'other_interview_member' => base64_encode($otherMemberId),
-                                ]) .
-                                '" class="!text-[#B68A35]">
+
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold text-lg">{{ __db('interviews') }}</h4>
+                    @canany(['add_interviews', 'delegate_edit_delegations'])
+                        <a href="{{ route('delegations.addInterview', $delegation) }}"
+                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
+                    @endcanany
+                </div>
+
+                @php
+                    $delegatesCollection = collect($delegation->delegates)->mapWithKeys(function ($delegate) {
+                        return [(int) $delegate->id => $delegate];
+                    });
+
+                    $columns = [
+                        ['label' => __db('sl_no'), 'render' => fn($row, $key) => $key + 1],
+                        [
+                            'label' => __db('date_time'),
+                            'render' => fn($row) => $row->date_time
+                                ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                                : '',
+                        ],
+                        [
+                            'label' => __db('attended_by'),
+                            'render' => function ($row) use ($delegatesCollection, $delegation) {
+                                if ($row->interviewMembers && count($row->interviewMembers)) {
+                                    $attendedBy = collect($row->interviewMembers)->filter(
+                                        fn($m) => $m->type === 'from',
+                                    );
+                                    if ($attendedBy->isEmpty()) {
+                                        return '-';
+                                    }
+
+                                    return $attendedBy
+                                        ->map(function ($member) use ($delegatesCollection, $delegation) {
+                                            $memberId = (int) $member->member_id;
+                                            $delegate = $delegatesCollection->get($memberId);
+                                            $delegateName = $delegate
+                                                ? ($delegate->name_en ?:
+                                                $delegate->name_ar ?:
+                                                'N/A')
+                                                : 'Unknown';
+                                            return '<span class="block">Member ID: ' .
+                                                e($memberId) .
+                                                ' - Delegate Name: ' .
+                                                e($delegateName) .
+                                                '</span>';
+                                        })
+                                        ->implode('');
+                                }
+                                return '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('interview_with'),
+                            'render' => function ($row) {
+                                if (!empty($row->other_member_id) && $row->otherMember) {
+                                    $otherMemberName = $row->otherMember->name ?? '';
+                                    $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                                    if ($otherMemberId) {
+                                        $with =
+                                            '<a href="' .
+                                            route('other-interview-members.show', [
+                                                'other_interview_member' => base64_encode($otherMemberId),
+                                            ]) .
+                                            '" class="!text-[#B68A35]">
                                     <span class="block">Other Member ID: ' .
-                                e($otherMemberId) .
-                                '</span>
+                                            e($otherMemberId) .
+                                            '</span>
                                 </a>';
-                        }
-                    } else {
-                        $with =
-                            '<a href="' .
-                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
-                            '" class="!text-[#B68A35]">' .
-                            'Delegation ID : ' .
-                            e($row->interviewWithDelegation->code ?? '') .
-                            '</a>';
-                    }
+                                    }
+                                } else {
+                                    $with =
+                                        '<a href="' .
+                                        route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                        '" class="!text-[#B68A35]">' .
+                                        'Delegation ID : ' .
+                                        e($row->interviewWithDelegation->code ?? '') .
+                                        '</a>';
+                                }
 
-                    $names = $row->interviewMembers
-                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
-                        ->implode('');
+                                $names = $row->interviewMembers
+                                    ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                                    ->implode('');
 
-                    return $with . $names;
-                },
-            ],
-            [
-                'label' => __db('status'),
-                'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown')),
-            ],
-            [
-                'label' => __db('action'),
-                'render' => function ($row) use ($delegation) {
-                    $editUrl = route('delegations.editInterview', [
-                        'delegation' => $delegation->id,
-                        'interview' => $row->id,
-                    ]);
+                                return $with . $names;
+                            },
+                        ],
+                        [
+                            'label' => __db('status'),
+                            'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown')),
+                        ],
+                        [
+                            'label' => __db('action'),
+                            'render' => function ($row) use ($delegation) {
+                                $editUrl = route('delegations.editInterview', [
+                                    'delegation' => $delegation->id,
+                                    'interview' => $row->id,
+                                ]);
 
-                    $deleteForm = '';
-                    $editButton = '';
+                                $deleteForm = '';
+                                $editButton = '';
 
-                    if (can(['delete_interviews', 'delegate_edit_delegations'])) {
-                        $deleteForm =
-                            '
+                                if (can(['delete_interviews', 'delegate_edit_delegations'])) {
+                                    $deleteForm =
+                                        '
                         <form action="' .
-                            route('delegations.destroyInterview', [$row]) .
-                            '" method="POST" class="delete-interview-form">
+                                        route('delegations.destroyInterview', [$row]) .
+                                        '" method="POST" class="delete-interview-form">
                             ' .
-                            csrf_field() .
-                            '
+                                        csrf_field() .
+                                        '
                             ' .
-                            method_field('DELETE') .
-                            '
+                                        method_field('DELETE') .
+                                        '
                             <button type="submit" class="delete-interview-btn text-red-600 hover:text-red-800">
                                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
                                 </svg>
                             </button>
                         </form>';
-                    }
-                    if (can(['edit_interviews', 'delegate_edit_delegations'])) {
-                        $editButton =
-                            '
+                                }
+                                if (can(['edit_interviews', 'delegate_edit_delegations'])) {
+                                    $editButton =
+                                        '
                         <a href="' .
-                            $editUrl .
-                            '" class="text-blue-600 hover:text-blue-800">
+                                        $editUrl .
+                                        '" class="text-blue-600 hover:text-blue-800">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
                                 <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
                             </svg>
                         </a>';
-                    }
+                                }
 
-                    return '<div class="flex items-center gap-5">' . $deleteForm . $editButton . '</div>';
-                },
-            ],
-        ];
+                                return '<div class="flex items-center gap-5">' . $deleteForm . $editButton . '</div>';
+                            },
+                        ],
+                    ];
 
-    @endphp
+                @endphp
 
-    <hr class="mx-6 border-neutral-200 h-10">
-
-    @canany(['add_interviews', 'delegate_edit_delegations'])
-        <div class="flex items-center justify-between mt-6">
-            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }}</h2>
-            <a href="{{ route('delegations.addInterview', $delegation) }}" id="add-attachment-btn"
-                class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
-                <span>{{ __db('add_interview') }}</span>
-            </a>
-        </div>
-    @endcanany
-
-
-    {{-- <pre>{{ dd($delegation) }}</pre> --}}
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
-        <div class="xl:col-span-12 h-full">
-            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>

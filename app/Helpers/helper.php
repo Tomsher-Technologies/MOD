@@ -547,6 +547,32 @@ function getAllCountries()
 }
 
 
+if (! function_exists('getAllDrivers')) {
+    function getAllDrivers()
+    {
+        return Driver::orderBy('code')
+            ->get();
+    }
+}
+
+if (! function_exists('getAllEscorts')) {
+    function getAllEscorts()
+    {
+        return Driver::orderBy('code')
+            ->get();
+    }
+}
+
+
+if (! function_exists('getCountriesByContinent')) {
+    function getCountriesByContinent($continentId)
+    {
+        return Country::where('continent_id', $continentId)
+            ->orderBy('name')
+            ->get();
+    }
+}
+
 if (! function_exists('getCountriesByContinent')) {
     function getCountriesByContinent($continentId)
     {
@@ -578,54 +604,55 @@ if (!function_exists('can')) {
     }
 }
 
-    function getRoomAssignmentStatus($delegationId)
-    {
-        $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)
-                            ->pluck('current_room_assignment_id');
+function getRoomAssignmentStatus($delegationId)
+{
+    $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)
+        ->pluck('current_room_assignment_id');
 
-        $escorts = Escort::whereIn('id', function ($q) use ($delegationId) {
-                        $q->select('escort_id')
-                        ->from('delegation_escorts')
-                        ->where('status', 1)
-                        ->where('delegation_id', $delegationId);
-                    })
-                    ->pluck('current_room_assignment_id');
+    $escorts = Escort::whereIn('id', function ($q) use ($delegationId) {
+        $q->select('escort_id')
+            ->from('delegation_escorts')
+            ->where('status', 1)
+            ->where('delegation_id', $delegationId);
+    })
+        ->pluck('current_room_assignment_id');
 
-        $drivers = Driver::whereIn('id', function ($q) use ($delegationId) {
-                        $q->select('driver_id')
-                        ->from('delegation_drivers')
-                        ->where('status', 1)
-                        ->where('delegation_id', $delegationId);
-                    })
-                    ->pluck('current_room_assignment_id');
+    $drivers = Driver::whereIn('id', function ($q) use ($delegationId) {
+        $q->select('driver_id')
+            ->from('delegation_drivers')
+            ->where('status', 1)
+            ->where('delegation_id', $delegationId);
+    })
+        ->pluck('current_room_assignment_id');
 
-        $all = $delegates->merge($escorts)->merge($drivers);
+    $all = $delegates->merge($escorts)->merge($drivers);
 
-        if ($all->count() === 0) {
-            return 0;
-        }
-
-        $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
-        $totalCount    = $all->count();
-
-        if ($assignedCount === 0) {
-            return 0;
-        } elseif ($assignedCount === $totalCount) {
-            return 1;
-        } else {
-            return 2;
-        }
+    if ($all->count() === 0) {
+        return 0;
     }
 
-    function shadeColor($hex, $percent) {
-        $hex = str_replace('#', '', $hex);
-        $r = hexdec(substr($hex, 0, 2));
-        $g = hexdec(substr($hex, 2, 2));
-        $b = hexdec(substr($hex, 4, 2));
+    $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
+    $totalCount    = $all->count();
 
-        $r = max(0, min(255, $r + ($percent / 100 * 255)));
-        $g = max(0, min(255, $g + ($percent / 100 * 255)));
-        $b = max(0, min(255, $b + ($percent / 100 * 255)));
-
-        return sprintf("#%02x%02x%02x", $r, $g, $b);
+    if ($assignedCount === 0) {
+        return 0;
+    } elseif ($assignedCount === $totalCount) {
+        return 1;
+    } else {
+        return 2;
     }
+}
+
+function shadeColor($hex, $percent)
+{
+    $hex = str_replace('#', '', $hex);
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+
+    $r = max(0, min(255, $r + ($percent / 100 * 255)));
+    $g = max(0, min(255, $g + ($percent / 100 * 255)));
+    $b = max(0, min(255, $b + ($percent / 100 * 255)));
+
+    return sprintf("#%02x%02x%02x", $r, $g, $b);
+}
