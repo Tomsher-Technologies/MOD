@@ -22,7 +22,7 @@
                 {{ __db('event_information') }}
                 @if ($event->is_default)
                 <span
-                    class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">Default</span>
+                    class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">{{ __db('default') }}</span>
                 @endif
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -111,7 +111,7 @@
                 @if ($event->status === 0)
                     <button class="openAssignModalBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                         data-module="{{ $module }}">
-                        Assign Users to {{ ucfirst($module) }}
+                        {{ __db('assign_users_to') }} {{ ucfirst(__db($module)) }}
                     </button>
                 @endif
             </div>
@@ -156,28 +156,26 @@
                 <button
                     class="closeAssignModalBtn absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
-                <h2 class="text-xl font-semibold mb-4">Assign Users to {{ ucfirst($module) }} Module</h2>
+                <h2 class="text-xl font-semibold mb-4">{{ __db('assign_users_to') }} {{ ucfirst(__db($module)) }} {{ __db('module') }}</h2>
 
                 <form method="POST" action="{{ route('events.assignUsers', $event->id) }}" class="assignUsersForm"
                     data-module="{{ $module }}">
                     @csrf
                     <input type="hidden" name="module" value="{{ $module }}">
 
-                    <label class="block text-sm mb-1 text-gray-600 font-medium" for="user_ids_{{ $module }}">Select
-                        Users</label>
+                    <label class="block text-sm mb-1 text-gray-600 font-medium" for="user_ids_{{ $module }}">{{ __db('select_users') }}</label>
                     <select id="user_ids_{{ $module }}" name="user_ids[]" multiple required
                         class="select2 w-full rounded border border-gray-300 p-2 mb-4" style="min-height: 120px;">
                         @foreach ($availableUsers as $user)
                         <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                         @endforeach
                     </select>
-                    <p class="text-xs text-gray-500 mb-4">Hold Ctrl (Cmd) to select multiple users.</p>
+                    {{-- <p class="text-xs text-gray-500 mb-4">Hold Ctrl (Cmd) to select multiple users.</p> --}}
 
-                    <label class="block text-sm mb-1 text-gray-600 font-medium" for="role_id_{{ $module }}">Select
-                        Role</label>
+                    <label class="block text-sm mb-1 text-gray-600 font-medium" for="role_id_{{ $module }}">{{ __db('select_role') }}</label>
                     <select id="role_id_{{ $module }}" name="role_id" required
                         class="w-full rounded border border-gray-300 p-2 mb-6">
-                        <option value="">Select role</option>
+                        <option value="">{{ __db('select') }}</option>
                         @foreach ($roles as $role)
                         @if ($role->module === $module && $role->is_active)
                         <option value="{{ $role->id }}">{{ $role->name }}</option>
@@ -187,7 +185,7 @@
 
                     <div class="text-right">
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                            Assign
+                            {{ __db('assign') }}
                         </button>
                     </div>
                 </form>
@@ -358,7 +356,6 @@
             });
         });
 
-        // Close modal buttons
         document.querySelectorAll('.closeAssignModalBtn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const modal = btn.closest('.assignUserModal');
@@ -368,7 +365,6 @@
             });
         });
 
-        // Close modal if clicking outside modal content
         document.querySelectorAll('.assignUserModal').forEach(modal => {
             modal.addEventListener('click', function(e) {
                 if(e.target === modal) {
@@ -377,7 +373,6 @@
             });
         });
 
-        // AJAX submit with SweetAlert confirmation for all forms
         document.querySelectorAll('.assignUsersForm').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();

@@ -144,13 +144,13 @@
                         <thead>
                            <tr class="text-[10px]">
                               <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    Airport/Land/Sea</th>
+                                    {{ __db('airport_land_sea') }}</th>
                               <th scope="col"
                                     class="p-3 !bg-[#B68A35] text-white border !border-[#cbac71] text-center">
-                                    Arrivals</th>
+                                    {{ __db('arrivals') }}</th>
                               <th scope="col"
                                     class="p-3 !bg-[#B68A35] text-white border !border-[#cbac71] text-centertext-center">
-                                    Departures</th>
+                                    {{ __db('departures') }}</th>
                            </tr>
                         </thead>
                         <tbody>
@@ -162,7 +162,7 @@
                                  </tr>
                            @empty
                                  <tr>
-                                    <td colspan="3" class="px-4 py-2 border text-center">No data available for today</td>
+                                    <td colspan="3" class="px-4 py-2 border text-center">{{ __db('no_record_found') }}</td>
                                  </tr>
                            @endforelse
                         </tbody>
@@ -280,7 +280,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0">Delegates invitation status</h6>
+                        <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_invitation_status') }}</h6>
 
                     </div>
                     <div id="InvitationStatus"></div>
