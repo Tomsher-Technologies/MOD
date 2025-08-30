@@ -70,7 +70,6 @@
     "unit_id_exists": "Invalid Unit",
     "no_arrival_information": "No arrival information available",
     "no_departure_information": "No departure information available",
-
     "invitation_from_id_required" : "Invitation from is required",
     "invitation_from_id_exists" : "Invalid invitation from",
     "continent_id_required" : "Continent is required",
