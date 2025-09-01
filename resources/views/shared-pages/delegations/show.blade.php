@@ -159,14 +159,6 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
-
-                    @canany(['add_escorts', 'escort_add_escorts'])
-                        <a href={{ route('escorts.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escort') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
@@ -221,14 +213,6 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
-
-                    @canany(['add_drivers', 'driver_add_drivers'])
-                        <a href={{ route('drivers.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [

@@ -567,17 +567,21 @@
 
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
+        <div class="flex items-center gap-3">
+            @canany(['add_escorts', 'escort_add_escorts'])
+                <a href={{ route('escorts.index') }}
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+            @endcanany
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
-                    @canany(['add_escorts', 'escort_add_escorts'])
-                        <a href={{ route('escorts.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
@@ -686,17 +690,25 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+
+
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+
+        <div class="flex items-center gap-3">
+            @canany(['add_drivers', 'driver_add_drivers'])
+                <a href={{ route('drivers.index') }}
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+            @endcanany
+        </div>
+    </div>
+
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
-                    @canany(['add_drivers', 'driver_add_drivers'])
-                        <a href={{ route('drivers.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
@@ -829,19 +841,22 @@
     <hr class="mx-6 border-neutral-200 h-10">
 
 
+
+
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
+        <div class="flex items-center gap-3">
+            @canany(['add_interviews', 'delegate_edit_delegations'])
+                <a href="{{ route('delegations.addInterview', $delegation) }}"
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
+            @endcanany
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('interviews') }}</h4>
-                    @canany(['add_interviews', 'delegate_edit_delegations'])
-                        <a href="{{ route('delegations.addInterview', $delegation) }}"
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
-                    @endcanany
-                </div>
-
                 @php
                     $delegatesCollection = collect($delegation->delegates)->mapWithKeys(function ($delegate) {
                         return [(int) $delegate->id => $delegate];
@@ -973,7 +988,6 @@
                     ];
 
                 @endphp
-
                 <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
@@ -1088,32 +1102,34 @@
 
     <script>
         $(document).ready(function() {
-            // Initialize Select2
             $('.select2').select2({
                 placeholder: "Select an option",
                 allowClear: true
             });
 
-            // Handle continent change to load countries
+            const delegationCountryId = @json(old('country_id', $delegation->country_id));
+
             $('#continent-select').on('change', function() {
                 const continentId = $(this).val();
                 const countrySelect = $('#country-select');
 
-                // Clear current options except the default
                 countrySelect.find('option[value!=""]').remove();
 
                 if (continentId) {
-                    // Load countries for selected continent
                     $.get('{{ route('countries.by-continent') }}', {
                         continent_ids: continentId
                     }, function(data) {
-                        // Add new options
                         $.each(data, function(index, country) {
                             countrySelect.append(new Option(country.name, country.id, false,
                                 false));
                         });
 
-                        // Refresh Select2
+                        if (delegationCountryId) {
+                            countrySelect.val(delegationCountryId);
+                        } else {
+                            countrySelect.val(null);
+                        }
+
                         countrySelect.trigger('change');
                     }).fail(function() {
                         console.log('Failed to load countries');
@@ -1121,7 +1137,6 @@
                 }
             });
 
-            // Trigger continent change on page load if a continent is already selected
             const selectedContinent = $('#continent-select').val();
             if (selectedContinent) {
                 $('#continent-select').trigger('change');

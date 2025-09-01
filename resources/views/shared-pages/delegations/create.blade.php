@@ -23,8 +23,8 @@
         </div>
     @endif
 
-    <form id="create-delegation-form" action="{{ route('delegations.store') ?? '#' }}" method="POST"
-        autocomplete="off" enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
+    <form id="create-delegation-form" action="{{ route('delegations.store') ?? '#' }}" method="POST" autocomplete="off"
+        enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
 
@@ -471,7 +471,6 @@
                                 </div>
                             </div>
 
-                            <!-- Checkboxes -->
                             <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" :id="`team-head-${index}`"
@@ -480,6 +479,7 @@
                                         x-model="delegate.team_head" />
                                     <label :for="`team-head-${index}`"
                                         class="text-sm text-gray-700">{{ __db('team_head') }}</label>
+
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" :id="`badge-printed-${index}`"
@@ -610,8 +610,6 @@
         window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
         window.delegatesData = @json($delegatesData);
         window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
-
-
     </script>
 
     <script>
@@ -619,6 +617,13 @@
             return {
                 delegates: window.delegatesData && window.delegatesData.length > 0 ?
                     window.delegatesData : [],
+
+                canToggleTeamHead(delegate) {
+                    const anyOtherTeamHead = this.delegates.some(d => d.team_head && d.tmp_id !== delegate.tmp_id);
+                    return !anyOtherTeamHead || delegate.team_head;
+                },
+
+
                 addDelegate() {
                     const maxTmpId = Math.max(...this.delegates.map(d => d.tmp_id || 0), 0);
                     const newTmpId = maxTmpId + 1;

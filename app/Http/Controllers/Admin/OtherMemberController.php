@@ -94,6 +94,13 @@ class OtherMemberController extends Controller
             'status' => 'required|boolean',
         ]);
 
+        if ($status = $request->input('status')) {
+            if ($status == 1) {
+                $data['status'] = 1;
+            } else if ($status == 2) {
+                $data['status'] = 0;
+            }
+        }
         $interviewMember->update($data);
 
         return redirect()->route('other-interview-members.index')->with('success', __db('interview_member') . __db('updated_successfully'));

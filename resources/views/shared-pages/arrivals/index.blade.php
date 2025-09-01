@@ -82,7 +82,24 @@
                         ],
                         [
                             'label' => __db('country'),
-                            'render' => fn($row) => $row->delegate->delegation->country->value ?? '-',
+                            'key' => 'country',
+                            'render' => function ($row) {
+                                if (!$row->delegate->delegation->country) {
+                                    return '-';
+                                }
+
+                                $flag = $row->delegate->delegation->country->flag
+                                    ? '<img src="' .
+                                        getUploadedImage($row->delegate->delegation->country->flag) .
+                                        '" 
+                                        alt="' .
+                                        e($row->delegate->delegation->country->name) .
+                                        ' flag" 
+                                        class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
+                                    : '';
+
+                                return $flag . ' ' . e($row->delegate->delegation->country->name);
+                            },
                         ],
                         ['label' => __db('delegates'), 'render' => fn($row) => $row->delegate->name_en ?? '-'],
                         [
@@ -245,8 +262,8 @@
                     <div>
                         <label class="form-label">{{ __db('arrival') . ' ' . __db('airport') }}:</label>
                         <select name="airport_id" x-model="arrival.airport_id"
-                            class="select2 p-3 rounded-lg w-full border text-sm">
-                            <option value="">{{ __db('select') . ' ' . __db('to') . ' ' . __db('airport') }}
+                            class="p-3 rounded-lg w-full border text-sm">
+                            <option value="">{{ __db('select') . ' ' . __db('from') . ' ' . __db('airport') }}
                             </option>
                             @foreach (getDropdown('airports')->options as $option)
                                 <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -389,7 +406,7 @@
                         'to_be_arrived' => __db('to_be_arrived'),
                     ];
                     $departureStatuses = [
-                        'to_be_departed' => __db('to_be_departed'),
+                        // 'to_be_departed' => __db('to_be_departed'),
                         'departed' => __db('departed'),
                     ];
 

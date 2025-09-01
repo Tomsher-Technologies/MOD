@@ -15,8 +15,7 @@
     <div class="mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         <div class="bg-white rounded-lg shadow p-6 mb-10">
-            <h2 class="text-2xl font-bold text-gray-900 border-b border-gray-200 pb-4 mb-6">
-                {{ __db('interview_member_details') }}</h2>
+           
 
             <div class=" mx-auto">
                 <div class="border rounded-lg p-6 shadow-sm">
@@ -61,10 +60,10 @@
                         {{ __db('edit') }}
                     </a>
                 @endcan
-                <a href="{{ route('other-interview-members.index') }}"
+                {{-- <a href="{{ route('other-interview-members.index') }}"
                     class="btn !bg-gray-600 text-white rounded-lg px-6 py-2 font-semibold hover:bg-gray-700">
                     {{ __db('back_to_interview_members') }}
-                </a>
+                </a> --}}
             </div>
         </div>
     </div>

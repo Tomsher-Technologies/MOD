@@ -66,19 +66,16 @@ class EscortController extends Controller
             });
         }
 
-        // Handle multiple title selections
         if ($request->has('title') && !empty($request->title)) {
             $titles = is_array($request->title) ? $request->title : [$request->title];
             $query->whereIn('internal_ranking_id', $titles);
         }
 
-        // Handle multiple gender selections
         if ($request->has('gender_id') && !empty($request->gender_id)) {
             $genders = is_array($request->gender_id) ? $request->gender_id : [$request->gender_id];
             $query->whereIn('gender_id', $genders);
         }
 
-        // Handle multiple language selections
         if ($request->has('language_id') && !empty($request->language_id)) {
             $languages = is_array($request->language_id) ? $request->language_id : [$request->language_id];
             $query->where(function ($q) use ($languages) {
@@ -88,7 +85,6 @@ class EscortController extends Controller
             });
         }
 
-        // Handle multiple delegation selections
         if ($request->has('delegation_id') && !empty($request->delegation_id)) {
             $delegations = is_array($request->delegation_id) ? $request->delegation_id : [$request->delegation_id];
             $query->whereHas('delegations', function ($q) use ($delegations) {

@@ -256,7 +256,7 @@
                             @php
                                 $departureStatuses = [
                                     'departed' => __db('departed'),
-                                    'to_be_departed' => __db('to_be_departed'),
+                                    // 'to_be_departed' => __db('to_be_departed'),
                                 ];
                             @endphp
                             <select name="status" x-model="departure.status"
@@ -366,7 +366,7 @@
 
                     @php
                         $departureStatuses = [
-                            'to_be_departed' => __db('to_be_departed'),
+                            // 'to_be_departed' => __db('to_be_departed'),
                             'departed' => __db('departed'),
                         ];
 

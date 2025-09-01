@@ -25,8 +25,24 @@ class EventController extends Controller
 
     public function index(Request $request)
     {
+
+        $query = Event::query();
+
+        if ($search = $request->input('search')) {
+            $query->where('name_en', 'like', "%{$search}%");
+        }
+
+        if ($status = $request->input('status')) {
+            if ($status == 1) {
+                $query->where('status', 1);
+            } else if ($status == 2) {
+                $query->where('status', 0);
+            }
+        }
+
         $request->session()->put('events_last_url', url()->full());
-        $events = Event::orderBy('id', 'desc')->paginate(20);
+        $events = $query->orderBy('id', 'desc')->paginate(20);
+
         return view('admin.events.index', compact('events'));
     }
 

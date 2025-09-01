@@ -68,19 +68,23 @@ class DriverController extends Controller
         }
 
         if ($request->has('title_id') && !empty($request->title_id)) {
-            $query->whereIn('title_id', $request->title_id);
+            $titleIds = is_array($request->title_id) ? $request->title_id : [$request->title_id];
+            $query->whereIn('title_id', $titleIds);
         }
 
         if ($request->has('car_type') && !empty($request->car_type)) {
-            $query->whereIn('car_type', $request->car_type);
+            $carTypes = is_array($request->car_type) ? $request->car_type : [$request->car_type];
+            $query->whereIn('car_type', $carTypes);
         }
 
         if ($request->has('car_number') && !empty($request->car_number)) {
-            $query->whereIn('car_number', $request->car_number);
+            $carNumbers = is_array($request->car_number) ? $request->car_number : [$request->car_number];
+            $query->whereIn('car_number', $carNumbers);
         }
 
         if ($request->has('capacity') && !empty($request->capacity)) {
-            $query->whereIn('capacity', $request->capacity);
+            $capacities = is_array($request->capacity) ? $request->capacity : [$request->capacity];
+            $query->whereIn('capacity', $capacities);
         }
 
         if ($request->has('delegation_id') && !empty($request->delegation_id)) {

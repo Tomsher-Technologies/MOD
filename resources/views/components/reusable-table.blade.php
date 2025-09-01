@@ -54,41 +54,48 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($data as $key => $row)
-                @php
-                    $rowPermissionsKey = $row->permission ?? null;
-                    $rowPermissions = null;
+            @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+                <tr>
+                    <td class="px-4 py-2 border border-gray-200 text-center" colspan="{{ count($columns) }}">
+                        {{ $noDataMessage ?? 'No data found.' }}
+                    </td>
+                </tr>
+            @else
+                @foreach ($data as $key => $row)
+                    @php
+                        $rowPermissionsKey = $row->permission ?? null;
+                        $rowPermissions = null;
 
-                    if ($rowPermissionsKey) {
-                        $rowPermissions = is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey];
-                    }
-                @endphp
+                        if ($rowPermissionsKey) {
+                            $rowPermissions = is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey];
+                        }
+                    @endphp
 
-                @if (!$rowPermissions || can($rowPermissions))
-                    <tr class="text-sm align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
-                        data-id="{{ $row->id }}">
-                        @foreach ($columns as $column)
-                            @php
-                                $colPermissionKey = $column['permission'] ?? null;
-                                $colPermissions = null;
-                                if ($colPermissionKey) {
-                                    $colPermissions = is_array($colPermissionKey)
-                                        ? $colPermissionKey
-                                        : [$colPermissionKey];
-                                }
-                            @endphp
+                    @if (!$rowPermissions || can($rowPermissions))
+                        <tr class="text-sm align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                            data-id="{{ $row->id }}">
+                            @foreach ($columns as $column)
+                                @php
+                                    $colPermissionKey = $column['permission'] ?? null;
+                                    $colPermissions = null;
+                                    if ($colPermissionKey) {
+                                        $colPermissions = is_array($colPermissionKey)
+                                            ? $colPermissionKey
+                                            : [$colPermissionKey];
+                                    }
+                                @endphp
 
-                            @if (!$colPermissions || can($colPermissions))
-                                <td class="px-4 py-2 border border-gray-200"
-                                    data-column="{{ Str::slug($column['label']) }}">
-                                    {!! $column['render']($row, $key) !!}
-                                </td>
-                            @endif
-                        @endforeach
-                    </tr>
-                @endif
-            @endforeach
-
+                                @if (!$colPermissions || can($colPermissions))
+                                    <td class="px-4 py-2 border border-gray-200"
+                                        data-column="{{ Str::slug($column['label']) }}">
+                                        {!! $column['render']($row, $key) !!}
+                                    </td>
+                                @endif
+                            @endforeach
+                        </tr>
+                    @endif
+                @endforeach
+            @endif
         </tbody>
 
     </table>

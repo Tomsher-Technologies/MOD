@@ -38,6 +38,9 @@ class CountryController extends Controller
                 $query->where('status', 0);
             }
         }
+        if ($request->filled('continent_id')) {
+            $query->where('continent_id', $request->continent_id);
+        }
 
         $countries = $query->with('continent')->orderBy('sort_order')->paginate(20)->appends($request->all());
 
