@@ -179,8 +179,9 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_invitation_status') }}</h6>
-
+                        <a href="{{ route("admin.dashboard.tables",["table" => "invitations"]) }}">
+                            <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_invitation_status') }}</h6>
+                        </a>
                     </div>
                     <div id="InvitationStatus"></div>
 
@@ -194,7 +195,9 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_by_participation_status') }}</h6>
+                        <a href="{{ route("admin.dashboard.tables",["table" => "participations"]) }}">
+                            <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_by_participation_status') }}</h6>
+                        </a>
                     </div>
                     <div id="ParticipationStatus"></div>
                 </div>
@@ -206,8 +209,11 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0">{{ __db('accepted_invitations_continents') }}</h6>
+                        <a href="{{ route("admin.dashboard.tables",["table" => "continents"]) }}">
+                            <h6 class="!text-[16px] font-medium mb-0">{{ __db('accepted_invitations_continents') }}</h6>
+                        </a>
                     </div>
+                
                     <div id="AcceptedContinents"></div>
                 </div>
             </div>
