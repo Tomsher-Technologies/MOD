@@ -1365,9 +1365,9 @@
                series: [{
                   name: 'Delegates',
                   data: [
-                        { name: 'Arrived', y: {{ $data['arrival_status']['arrived'] }} },
-                        { name: 'Not Yet Arrived', y: {{ $data['arrival_status']['not_yet_arrived'] }} },
-                        { name: 'Departured', y: {{ $data['arrival_status']['departured'] }} }
+                        { name: '{{ __db('arrived') }}', y: {{ $data['arrival_status']['arrived'] }} },
+                        { name: '{{ __db('not_yet_arrived') }}', y: {{ $data['arrival_status']['not_yet_arrived'] }} },
+                        { name: '{{ __db('departed') }}', y: {{ $data['arrival_status']['departed'] }} }
                   ]
                }]
             });

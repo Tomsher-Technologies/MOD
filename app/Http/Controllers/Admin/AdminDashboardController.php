@@ -162,7 +162,7 @@ class AdminDashboardController extends Controller
         $allStatuses = [
             'not_yet_arrived' => 0,
             'arrived' => 0,
-            'departured' => 0
+            'departed' => 0
         ];
 
         $statuses = array_merge($allStatuses, $statuses->toArray());
@@ -190,7 +190,7 @@ class AdminDashboardController extends Controller
         $data['arrival_status'] = [
             'not_yet_arrived' => $statuses['not_yet_arrived'],
             'arrived' => $statuses['arrived'],
-            'departured' => $statuses['departured']
+            'departed' => $statuses['departed']
         ];
 
         $data['totalDelegates'] = $totalDelegates;
