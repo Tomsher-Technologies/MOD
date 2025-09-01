@@ -23,7 +23,7 @@ class DropdownController extends Controller
 
     public function index()
     {
-        $dropdowns = Dropdown::all();
+        $dropdowns = Dropdown::where('status', 1)->get();
         return view('admin.dropdowns.index', compact('dropdowns'));
     }
 
