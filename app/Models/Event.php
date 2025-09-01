@@ -34,6 +34,7 @@ class Event extends Model
     }
 
 
+
     public function generateEventCode()
     {
         $lastEvent = Event::orderBy('created_at', 'desc')->first();
