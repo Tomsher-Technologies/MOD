@@ -27,6 +27,7 @@ Route::prefix('mod-admin')->group(function () {
 
 Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/dashboard/tables/{table}', [AdminDashboardController::class, 'dashboardTables'])->name('admin.dashboard.tables');
 
     // Manage countries
     Route::resource('countries', CountryController::class);

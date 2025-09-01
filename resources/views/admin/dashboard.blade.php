@@ -154,11 +154,11 @@
                            </tr>
                         </thead>
                         <tbody>
-                           @forelse($data['arr_dep_summary'] as $row)
+                           @forelse($data['arr_dep_summary'] as $drow)
                                  <tr class="text-[10px] align-[middle]">
-                                    <td class="px-4 py-2 border border-gray-200">{{ $row->transport_point }}</td>
-                                    <td class="px-4 py-2 border border-gray-200 text-center">{{ $row->arrival_count }}</td>
-                                    <td class="px-4 py-2 border border-gray-200 text-center">{{ $row->departure_count }}</td>
+                                    <td class="px-4 py-2 border border-gray-200">{{ $drow->transport_point }}</td>
+                                    <td class="px-4 py-2 border border-gray-200 text-center">{{ $drow->arrival_count }}</td>
+                                    <td class="px-4 py-2 border border-gray-200 text-center">{{ $drow->departure_count }}</td>
                                  </tr>
                            @empty
                                  <tr>
@@ -175,108 +175,7 @@
 
         <!-- Invitation Status -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-3 mt-6">
-            {{-- <div class="xl:col-span-6 2xl:col-span-6">
-                <div class="bg-white h-full rounded-lg border-0 p-6">
-                    <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0"> Invitation Status</h6>
-                    </div>
-
-                    <div class="overflow-x-auto w-full">
-                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full max-h-full h-[400px]">
-                            <thead>
-
-                                <tr class="text-[10px]">
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Division</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Navy</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Army</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Air Force </th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Total</th>
-
-
-                                </tr>
-
-
-                            </thead>
-                            <tbody>
-                                <tr class=" align-[middle] text-[10px]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Waiting</td>
-                                    <td class="px-4 py-2 border border-gray-200">10</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">15</td>
-                                </tr>
-                                <tr class="  align-[middle] text-[10px]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Accepted </td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">10</td>
-                                    <td class="px-4 py-2 border border-gray-200">20</td>
-                                    <td class="px-4 py-2 border border-gray-200">35</td>
-
-                                </tr>
-                                <tr class="  align-[middle] text-[10px]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Accepted with secretary </td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">2</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">2</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Accepted with acting person </td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-
-                                </tr>
-
-
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Rejected </td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">11</td>
-                                </tr>
-
-
-                                <tr
-                                    class=" text-[10px] align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[20px]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Total </td>
-                                    <td class="px-4 py-2 border border-gray-200">18</td>
-                                    <td class="px-4 py-2 border border-gray-200">20</td>
-                                    <td class="px-4 py-2 border border-gray-200">30</td>
-                                    <td class="px-4 py-2 border border-gray-200">68</td>
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> --}}
-
+        
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
@@ -287,442 +186,163 @@
 
                 </div>
             </div>
-
-
         </div>
 
 
-        {{-- <!-- Participation status -->
+        <!-- Participation status -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-3 mt-6">
-
-            <div class="xl:col-span-6 2xl:col-span-6">
+            <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0"> Participation Status</h6>
-                    </div>
-
-                    <div class="overflow-x-auto w-full">
-                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
-                            <thead>
-
-                                <tr class="text-[10px]">
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Division</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Navy</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Army </th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Air Force </th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Total</th>
-
-                                </tr>
-
-
-                            </thead>
-                            <tbody>
-
-
-                                <tr class=" text-[10px] align-[middle]">
-
-                                    <td class="px-4 py-2 border border-gray-200"> Not Yet</td>
-                                    <td class="px-4 py-2 border border-gray-200">10</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">15</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Partially arrived</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">10</td>
-                                    <td class="px-4 py-2 border border-gray-200">20</td>
-                                    <td class="px-4 py-2 border border-gray-200">35</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Arrived</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">2</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">2</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Partially Departed</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-
-                                </tr>
-
-
-                                <tr class=" text-[10px] align-[middle] ">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Departed</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">11</td>
-
-                                </tr>
-
-
-
-
-                                <tr
-                                    class=" text-[10px] align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[20px]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Total</td>
-                                    <td class="px-4 py-2 border border-gray-200">18</td>
-                                    <td class="px-4 py-2 border border-gray-200">20</td>
-                                    <td class="px-4 py-2 border border-gray-200">30</td>
-                                    <td class="px-4 py-2 border border-gray-200">68</td>
-
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-
-
-
-                </div>
-            </div>
-
-            <div class="xl:col-span-6 2xl:col-span-6">
-                <div class="bg-white h-full rounded-lg border-0 p-6">
-                    <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0">Delegates participation status</h6>
-
+                        <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_by_participation_status') }}</h6>
                     </div>
                     <div id="ParticipationStatus"></div>
-
                 </div>
             </div>
-
         </div>
 
         <!-- Accepted Delegates by Continents -->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-3 mt-6">
-
-            <div class="xl:col-span-6 2xl:col-span-6">
+            <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0"> Accepted Delegates by Continents</h6>
-                    </div>
-
-                    <div class="overflow-x-auto w-full">
-
-                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
-                            <thead>
-
-                                <tr class="text-[10px]">
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Division</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Navy</th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Army </th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Air Force </th>
-                                    <th scope="col"
-                                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                        Total</th>
-
-                                </tr>
-
-
-                            </thead>
-                            <tbody>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Asia</td>
-                                    <td class="px-4 py-2 border border-gray-200">1</td>
-                                    <td class="px-4 py-2 border border-gray-200">1</td>
-                                    <td class="px-4 py-2 border border-gray-200">1</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Africa</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">1</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">4</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Europe</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">2</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">7</td>
-
-                                </tr>
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">America</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">1</td>
-                                    <td class="px-4 py-2 border border-gray-200">1</td>
-                                    <td class="px-4 py-2 border border-gray-200">2</td>
-
-                                </tr>
-
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Gcc Countries</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">11</td>
-
-                                </tr>
-
-
-                                <tr class=" text-[10px] align-[middle]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Arab Countries</td>
-                                    <td class="px-4 py-2 border border-gray-200">0</td>
-                                    <td class="px-4 py-2 border border-gray-200">3</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">8</td>
-
-                                </tr>
-
-                                <tr
-                                    class=" text-[10px] align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[20px]">
-
-
-                                    <td class="px-4 py-2 border border-gray-200">Total</td>
-                                    <td class="px-4 py-2 border border-gray-200">5</td>
-                                    <td class="px-4 py-2 border border-gray-200">10</td>
-                                    <td class="px-4 py-2 border border-gray-200">20</td>
-                                    <td class="px-4 py-2 border border-gray-200">35</td>
-
-                                </tr>
-
-                            </tbody>
-                        </table>
-                    </div>
-
-
-                </div>
-            </div>
-
-            <div class="xl:col-span-6 2xl:col-span-6">
-                <div class="bg-white h-full rounded-lg border-0 p-6">
-                    <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0">Total number of accepted invitations
-                            by Continents.</h6>
-
+                        <h6 class="!text-[16px] font-medium mb-0">{{ __db('accepted_invitations_continents') }}</h6>
                     </div>
                     <div id="AcceptedContinents"></div>
-
                 </div>
             </div>
-
-
         </div>
-
-        
 
         <!-- Upcoming Arrivals-->
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6">
             <div class="xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class=" mb-4 flex items-center justify-start gap-2">
-                        <h6 class="!text-[16px] font-medium mb-0"> Upcoming Arrivals </h6>
-
+                        <h6 class="!text-[16px] font-medium mb-0"> {{ __db('upcoming_arrivals') }} </h6>
                         <span
                             class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
-                            Today
+                            {{ __db('today') }}
                         </span>
-
                     </div>
 
                     <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                         <thead>
 
                             <tr class="text-[10px]">
-                                <th scope="col"
-                                    class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    Sl.No</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Delegation
+                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('sl_no') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Continent</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Country</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Delegates</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Escort</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Driver</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">To Airport
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('delegation') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Time</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Flight Number
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('continent') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Flight Name
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('country') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Action</th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('delegates') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('escort') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('driver') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('airport') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('time') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('flight_number') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('flight_name') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('action') }}
+                                </th>
 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="text-[10px] align-middle  align-center">
-                                <td class="px-4 py-2 border border-gray-200">1</td>
-                                <td class="px-4 py-2 border border-gray-200]">
+                            @forelse ($data['upcomming_arrivals'] as $akey => $row)
+                                <tr class="text-[10px] align-middle  align-center">
+                                    <td class="px-4 py-2 border border-gray-200">{{ $akey + 1 }}</td>
+                                    <td class="px-4 py-2 border border-gray-200]">
 
-                                    <a href="#">
-                                        DA25-001
-                                    </a>
-
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">Asia</td>
-                                <td class="px-4 py-2 border border-gray-200">Japan</td>
-                                <td class="px-4 py-2 border border-gray-200">
-
-                                    <span class="block">Sara Al-Suwaidi</span>
-                                    <span class="block">Dalia Al-Hassan</span>
-
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <span class="block">
-                                        <a href="#" class="" data-modal-target=""
-                                            data-modal-toggle="">DR023</a>
-
-                                    </span>
-                                    <span class="block">DR030
-                                    </span>
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <span class="block">
-                                        <a class="" href="#" data-modal-target=""
-                                            data-modal-toggle="">EC001</a>
-                                    </span>
-                                    <span class="block">EC008</span>
-                                </td>
-
-                                <td class="px-4 py-2 border border-gray-200">Dubai International</td>
-                                <td class="px-4 py-2 border border-gray-200">08:45 AM</td>
-                                <td class="px-4 py-2 border border-gray-200">JL786</td>
-                                <td class="px-4 py-2 border border-gray-200">Japan Airlines</td>
-
-
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <div class="flex items-center gap-5">
-                                        <a href="#"
-                                            class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                viewBox="0 0 16 12" fill="none">
-                                                <path
-                                                    d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                                <path
-                                                    d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                            </svg>
+                                        <a href="{{ route('delegations.show', $row->delegate->delegation_id) }}">
+                                            {{ $row->delegate->delegation->code ?? '-' }}
                                         </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="text-[10px] align-middle">
-                                <td class="px-4 py-2 border border-gray-200">2</td>
-                                <td class="px-4 py-2 border border-gray-200">DA25-002</td>
-                                <td class="px-4 py-2 border border-gray-200">Europe</td>
-                                <td class="px-4 py-2 border border-gray-200">Germany</td>
-                                <td class="px-4 py-2 border border-gray-200">Rachel Lewis</td>
-                                <td class="px-4 py-2 border border-gray-200">DR031</td>
-                                <td class="px-4 py-2 border border-gray-200">EC011</td>
 
-                                <td class="px-4 py-2 border border-gray-200">Sharjah Airport</td>
-                                <td class="px-4 py-2 border border-gray-200">09:30 PM</td>
-                                <td class="px-4 py-2 border border-gray-200">LH789</td>
-                                <td class="px-4 py-2 border border-gray-200">Lufthansa</td>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $row->delegate->delegation->continent->value ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $row->delegate->delegation->country->value ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        <span class="block">{{ $row->delegate->name_en ?? '-' }}</span>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        @if($row->delegate->delegation->escorts->isNotEmpty())
+                                            @foreach ($row->delegate->delegation->escorts as $escort)
+                                                <span class="block">{{ $escort->code }}</span> <br>
+                                            @endforeach
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        @if($row->delegate->delegation->drivers->isNotEmpty())
+                                            @foreach ($row->delegate->delegation->drivers as $driver)
+                                                <span class="block">{{ $driver->code }}</span> <br>
+                                            @endforeach
+                                        @endif
+                                    </td>
 
-                                <td class="px-4 py-3 border border-gray-200">
-                                    <div class="flex items-center gap-5">
-                                        <a href="#"
-                                            class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                viewBox="0 0 16 12" fill="none">
-                                                <path
-                                                    d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                                <path
-                                                    d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class=" text-[10px] align-middle">
-                                <td class="px-4 py-2 border border-gray-200">3</td>
-                                <td class="px-4 py-2 border border-gray-200">DA25-003</td>
-                                <td class="px-4 py-2 border border-gray-200">Africa</td>
-                                <td class="px-4 py-2 border border-gray-200">Nigeria</td>
-                                <td class="px-4 py-2 border border-gray-200">Alex Morgan</td>
-                                <td class="px-4 py-2 border border-gray-200">DR040</td>
-                                <td class="px-4 py-2 border border-gray-200">EC012</td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $row->airport->value ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $row->date_time ? \Carbon\Carbon::parse($row->date_time)->format('h:i A') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">{{ $row->flight_no ?? '-' }}</td>
+                                    <td class="px-4 py-2 border border-gray-200">{{ $row->flight_name ?? '-' }}</td>
 
-                                <td class="px-4 py-2 border border-gray-200">Abu Dhabi Airport</td>
-                                <td class="px-4 py-2 border border-gray-200">11:15 AM</td>
-                                <td class="px-4 py-2 border border-gray-200">NG452</td>
-                                <td class="px-4 py-2 border border-gray-200">Air Nigeria</td>
 
-                                <td class="px-4 py-2 border border-gray-200"> <a href="#"
-                                        class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 16 12" fill="none">
-                                            <path
-                                                d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
-                                                stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                            </path>
-                                            <path
-                                                d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
-                                                stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                            </path>
-                                        </svg>
-                                    </a></td>
-                            </tr>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        <div class="flex items-center gap-5">
+                                            <a href="{{ route('delegations.show', $row->delegate->delegation_id) }}"
+                                                class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                    viewBox="0 0 16 12" fill="none">
+                                                    <path
+                                                        d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
+                                                        stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                    </path>
+                                                    <path
+                                                        d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
+                                                        stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                    </path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
+                                    <td colspan="12" class="px-4 py-2 border text-center">
+                                        {{ __db('no_data_found') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                            
                         </tbody>
                     </table>
                 </div>
@@ -735,179 +355,134 @@
             <div class="xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class=" mb-4 flex items-center justify-start gap-2">
-                        <h6 class="!text-[16px] font-medium mb-0"> Upcoming Departures</h6>
-
-                        <span
-                            class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
+                        <h6 class="!text-[16px] font-medium mb-0"> {{ __db('upcoming_departures') }}</h6>
+                        <span  class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
-                            Today
+                            {{ __db('today') }}
                         </span>
-
-
                     </div>
-
 
                     <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                         <thead>
                             <tr class="text-[10px]">
-                                <th scope="col"
-                                    class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    Sl.No</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Delegation
+                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('sl_no') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Continent</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Country</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Delegates</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Escort</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Driver</th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('delegation') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('continent') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('country') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('delegates') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('escort') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('driver') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('airport') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('time') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('flight_number') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('flight_name') }}
+                                </th>
+                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    {{ __db('action') }}
+                                </th>
 
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">From Airport
-                                </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Time</th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Flight Number
-                                </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Flight Name
-                                </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="text-[10px] align-middle  !text-[#000] align-center">
-                                <td class="px-4 py-2 border border-gray-200">1</td>
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <a href="#">
-                                        DA25-004
-                                    </a>
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">North America</td>
-                                <td class="px-4 py-2 border border-gray-200">USA</td>
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <span class="block">Kevin Wilson</span>
-                                    <span class="block">David Johnson</span>
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <span class="block">
-                                        <a href="#" class="" data-modal-target=""
-                                            data-modal-toggle="">DR023</a>
+                            @forelse ($data['upcomming_departures'] as $dkey => $drow)
+                                <tr class="text-[10px] align-middle  align-center">
+                                    <td class="px-4 py-2 border border-gray-200">{{ $dkey + 1 }}</td>
+                                    <td class="px-4 py-2 border border-gray-200]">
 
-                                    </span>
-                                    <span class="block">DR030
-                                    </span>
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <span class="block">
-                                        <a class="" href="#" data-modal-target=""
-                                            data-modal-toggle="">EC001</a>
-                                    </span>
-                                    <span class="block">EC008</span>
-                                </td>
-                                <td class="px-4 py-2 border border-gray-200">Dubai International</td>
-                                <!-- swapped -->
-
-                                <!-- swapped -->
-                                <td class="px-4 py-2 border border-gray-200">2025-06-26 06:15</td>
-                                <td class="px-4 py-2 border border-gray-200">EK202</td>
-                                <td class="px-4 py-2 border border-gray-200">Emirates</td>
-
-                                <td class="px-4 py-2 border border-gray-200">
-                                    <div class="flex items-center gap-5">
-                                        <a href="#"
-                                            class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                viewBox="0 0 16 12" fill="none">
-                                                <path
-                                                    d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                                <path
-                                                    d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                            </svg>
+                                        <a href="{{ route('delegations.show', $drow->delegate->delegation_id) }}">
+                                            {{ $drow->delegate->delegation->code ?? '-' }}
                                         </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="text-[10px] align-middle">
-                                <td class="px-4 py-2 border border-gray-200">2</td>
-                                <td class="px-4 py-2 border border-gray-200">DA25-005</td>
-                                <td class="px-4 py-2 border border-gray-200">Oceania</td>
-                                <td class="px-4 py-2 border border-gray-200">Australia</td>
-                                <td class="px-4 py-2 border border-gray-200">Chris Anderson</td>
-                                <td class="px-4 py-2 border border-gray-200">DR018</td>
-                                <td class="px-4 py-2 border border-gray-200">EC021</td>
-                                <td class="px-4 py-2 border border-gray-200">Abu Dhabi Airport</td>
-                                <!-- swapped -->
 
-                                <!-- swapped -->
-                                <td class="px-4 py-2 border border-gray-200">2025-06-26 13:00</td>
-                                <td class="px-4 py-2 border border-gray-200">EY451</td>
-                                <td class="px-4 py-2 border border-gray-200">Etihad Airways</td>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $drow->delegate->delegation->continent->value ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $drow->delegate->delegation->country->value ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        <span class="block">{{ $drow->delegate->name_en ?? '-' }}</span>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        @if($drow->delegate->delegation->escorts->isNotEmpty())
+                                            @foreach ($drow->delegate->delegation->escorts as $escort)
+                                                <span class="block">{{ $escort->code }}</span> <br>
+                                            @endforeach
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        @if($drow->delegate->delegation->drivers->isNotEmpty())
+                                            @foreach ($drow->delegate->delegation->drivers as $driver)
+                                                <span class="block">{{ $driver->code }}</span> <br>
+                                            @endforeach
+                                        @endif
+                                    </td>
 
-                                <td class="px-4 py-3 border border-gray-200">
-                                    <div class="flex items-center gap-5">
-                                        <a href="#"
-                                            class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                viewBox="0 0 16 12" fill="none">
-                                                <path
-                                                    d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                                <path
-                                                    d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
-                                                    stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                </path>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="text-[10px] align-middle">
-                                <td class="px-4 py-2 border border-gray-200">3</td>
-                                <td class="px-4 py-2 border border-gray-200">DA25-006</td>
-                                <td class="px-4 py-2 border border-gray-200">South America</td>
-                                <td class="px-4 py-2 border border-gray-200">Brazil</td>
-                                <td class="px-4 py-2 border border-gray-200">Nicole Harris</td>
-                                <td class="px-4 py-2 border border-gray-200">DR015</td>
-                                <td class="px-4 py-2 border border-gray-200">EC022</td>
-                                <td class="px-4 py-2 border border-gray-200">Sharjah Airport</td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $drow->airport->value ?? '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        {{ $drow->date_time ? \Carbon\Carbon::parse($drow->date_time)->format('h:i A') : '-' }}
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-200">{{ $drow->flight_no ?? '-' }}</td>
+                                    <td class="px-4 py-2 border border-gray-200">{{ $drow->flight_name ?? '-' }}</td>
 
-                                <!-- swapped -->
 
-                                <!-- swapped -->
-                                <td class="px-4 py-2 border border-gray-200">2025-06-26 21:45</td>
-                                <td class="px-4 py-2 border border-gray-200">AZ982</td>
-                                <td class="px-4 py-2 border border-gray-200">Azul Airlines</td>
-
-                                <td class="px-4 py-3 border border-gray-200">
-                                    <a href="#"
-                                        class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                            viewBox="0 0 16 12" fill="none">
-                                            <path
-                                                d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
-                                                stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                            </path>
-                                            <path
-                                                d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
-                                                stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
-                                                stroke-linejoin="round">
-                                            </path>
-                                        </svg>
-                                    </a>
-                                </td>
-                            </tr>
+                                    <td class="px-4 py-2 border border-gray-200">
+                                        <div class="flex items-center gap-5">
+                                            <a href="{{ route('delegations.show', $drow->delegate->delegation_id) }}"
+                                                class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                    viewBox="0 0 16 12" fill="none">
+                                                    <path
+                                                        d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z"
+                                                        stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                    </path>
+                                                    <path
+                                                        d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z"
+                                                        stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                    </path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
+                                    <td colspan="12" class="px-4 py-2 border text-center">
+                                        {{ __db('no_data_found') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                            
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div> --}}
+        </div>
 
       @php
          $baseColor = '#B68A35';
@@ -986,12 +561,13 @@
                 chart: {
                     type: 'column'
                 },
+                credits: { enabled: false },
                 title: {
                     text: '',
                     align: 'left'
                 },
                 xAxis: {
-                    categories: ['Navy', 'Army', 'Air Force'],
+                    categories: @json($data['delegatesByInvitationStatus']['categories']),
                 },
                 yAxis: {
                     min: 0,
@@ -1023,184 +599,144 @@
                         dataLabels: {
                             enabled: true
                         }
+                    },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    window.location.href = '{{ route("admin.dashboard.tables",["table" => "invitations"]) }}';
+                                }
+                            }
+                        }
                     }
                 },
-                series: [{
-                        name: 'Waiting',
-                        data: [10, 5, 0],
-                        color: '#7c5e24'
-                    }, {
-                        name: 'Accepted',
-                        data: [5, 10, 20],
-                        color: '#b68a35'
-                    }, {
-                        name: 'Accepted secretary',
-                        data: [0, 2, 0],
-                        color: '#d7bc6d'
-                    }, {
-                        name: 'Accepted acting person',
-                        data: [0, 0, ],
-                        color: '#f0da8b'
-                    }, {
-                        name: 'Rejected',
-                        data: [3, 3, 5],
-                        color: '#e6d7a2'
-                    }
+                series: @json($data['delegatesByInvitationStatus']['series'])
 
-                ],
+            });
+
+            Highcharts.chart('ParticipationStatus', {
+                chart: {
+                    type: 'column'
+                },
+                credits: { enabled: false },
+                title: {
+                    text: '',
+                    align: 'left'
+                },
+                xAxis: {
+                    categories: @json($data['delegatesByParticipationStatus']['categories']),
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    },
+                    stackLabels: {
+                        enabled: true
+                    }
+                },
+                legend: {
+                    align: 'left',
+                    x: 0,
+                    verticalAlign: 'bottom',
+                    y: 10,
+                    floating: false,
+                    backgroundColor: 'var(--highcharts-background-color, #ffffff)',
+                    borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
+                    borderWidth: 0,
+                    shadow: false
+                },
+                tooltip: {
+                    headerFormat: '<b>{category}</b><br/>',
+                    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true
+                        }
+                    },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    window.location.href = '{{ route("admin.dashboard.tables",["table" => "participations"]) }}';
+                                }
+                            }
+                        }
+                    }
+                },
+                series: @json($data['delegatesByParticipationStatus']['series'])
+
 
             });
 
 
+            Highcharts.chart('AcceptedContinents', {
+                chart: {
+                    type: 'column'
+                },
+                credits: { enabled: false },
+                title: {
+                    text: '',
+                    align: 'left'
+                },
+                xAxis: {
+                    categories: @json( $data['invitationByContinents']['categories']),
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: ''
+                    },
+                    stackLabels: {
+                        enabled: true
+                    }
+                },
+                legend: {
+                    align: 'left',
+                    x: 0,
+                    verticalAlign: 'bottom',
+                    y: 10,
+                    floating: false,
+                    backgroundColor: 'var(--highcharts-background-color, #ffffff)',
+                    borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
+                    borderWidth: 0,
+                    shadow: false
+                },
+                tooltip: {
+                    headerFormat: '<b>{category}</b><br/>',
+                    pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: true
+                        }
+                    },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    window.location.href = '{{ route("admin.dashboard.tables",["table" => "continents"]) }}';
+                                }
+                            }
+                        }
+                    }
+                },
+                series: @json( $data['invitationByContinents']['series'])
 
-            // Highcharts.chart('ParticipationStatus', {
-            //     chart: {
-            //         type: 'column'
-            //     },
-            //     title: {
-            //         text: '',
-            //         align: 'left'
-            //     },
-            //     xAxis: {
-            //         categories: ['Navy', 'Army', 'Air Force'],
-            //     },
-            //     yAxis: {
-            //         min: 0,
-            //         title: {
-            //             text: ''
-            //         },
-            //         stackLabels: {
-            //             enabled: true
-            //         }
-            //     },
-            //     legend: {
-            //         align: 'left',
-            //         x: 0,
-            //         verticalAlign: 'bottom',
-            //         y: 10,
-            //         floating: false,
-            //         backgroundColor: 'var(--highcharts-background-color, #ffffff)',
-            //         borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
-            //         borderWidth: 0,
-            //         shadow: false
-            //     },
-            //     tooltip: {
-            //         headerFormat: '<b>{category}</b><br/>',
-            //         pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-            //     },
-            //     plotOptions: {
-            //         column: {
-            //             stacking: 'normal',
-            //             dataLabels: {
-            //                 enabled: true
-            //             }
-            //         }
-            //     },
-            //     series: [{
-            //             name: 'Not Yet',
-            //             data: [10, 5, 0],
-            //             color: '#7c5e24'
-            //         }, {
-            //             name: 'Partially arrived',
-            //             data: [5, 10, 20],
-            //             color: '#b68a35'
-            //         }, {
-            //             name: 'Arrived',
-            //             data: [0, 2, 0],
-            //             color: '#d7bc6d'
-            //         }, {
-            //             name: 'Partially departed ',
-            //             data: [0, 0, 5],
-            //             color: '#f0da8b'
-            //         }, {
-            //             name: 'Departed',
-            //             data: [3, 3, 5],
-            //             color: '#e6d7a2'
-            //         }
-
-            //     ],
-
-
-            // });
-
-
-            // Highcharts.chart('AcceptedContinents', {
-            //     chart: {
-            //         type: 'column'
-            //     },
-            //     title: {
-            //         text: '',
-            //         align: 'left'
-            //     },
-            //     xAxis: {
-            //         categories: ['Navy', 'Army', 'Air Force'],
-            //     },
-            //     yAxis: {
-            //         min: 0,
-            //         title: {
-            //             text: ''
-            //         },
-            //         stackLabels: {
-            //             enabled: true
-            //         }
-            //     },
-            //     legend: {
-            //         align: 'left',
-            //         x: 0,
-            //         verticalAlign: 'bottom',
-            //         y: 10,
-            //         floating: false,
-            //         backgroundColor: 'var(--highcharts-background-color, #ffffff)',
-            //         borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
-            //         borderWidth: 0,
-            //         shadow: false
-            //     },
-            //     tooltip: {
-            //         headerFormat: '<b>{category}</b><br/>',
-            //         pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-            //     },
-            //     plotOptions: {
-            //         column: {
-            //             stacking: 'normal',
-            //             dataLabels: {
-            //                 enabled: true
-            //             }
-            //         }
-            //     },
-            //     series: [{
-            //             name: 'Asia',
-            //             data: [1, 1, 1],
-            //             color: '#7c5e24'
-            //         }, {
-            //             name: 'Africa',
-            //             data: [0, 1, 3],
-            //             color: '#b68a35'
-            //         }, {
-            //             name: 'Europe',
-            //             data: [0, 2, 5],
-            //             color: '#d7bc6d'
-            //         }, {
-            //             name: 'America',
-            //             data: [1, 0, 1],
-            //             color: '#d7bc6d'
-            //         }, {
-            //             name: 'Gcc Countries	',
-            //             data: [3, 3, 5],
-            //             color: '#f0da8b'
-            //         }, {
-            //             name: 'Arab Countries',
-            //             data: [0, 3, 5],
-            //             color: '#e6d7a2'
-            //         }
-
-            //     ],
-
-            // });
+            });
 
             var labels = @json($data['delegatesByDivision']['labels'] ?? []);
             var series = @json($data['delegatesByDivision']['series'] ?? []);
             var colors = @json($colors ?? []);
-            // Prepare data array for Highcharts
+           
             var chartData = labels.map(function(label, i) {
                return {
                      name: label,
@@ -1216,7 +752,6 @@
                tooltip: {
                      pointFormat: '{point.name}: <b>{point.actual}</b>',
                      formatter: function() {
-                        // Show original count in tooltip
                         var original = @json($data['delegatesByDivision']['series'] ?? [])[this.point.index];
                         return '<b>' + this.point.name + '</b>: ' + original;
                      }
@@ -1229,9 +764,9 @@
                         dataLabels: {
                            enabled: true,
                            style: {
-                              fontSize: '9px',  // adjust the size as needed
-                              fontWeight: 'bold', // optional
-                              color: '#000'       // optional
+                              fontSize: '9px',  
+                              fontWeight: 'bold', 
+                              color: '#000' 
                            },
                            formatter: function() {
                                  var original = @json($data['delegatesByDivision']['series'] ?? [])[this.point.index];
@@ -1248,7 +783,7 @@
                   verticalAlign: 'bottom',
                   itemMarginBottom: 0,
                   itemStyle: {
-                     fontSize: '9px', // change to your desired size
+                     fontSize: '9px', 
                      fontWeight: 'normal',
                      color: '#333'
                   },
@@ -1324,7 +859,6 @@
                }]
             });
 
-
             Highcharts.chart('userOverviewDonutChart', {
                chart: {
                   type: 'pie',
@@ -1355,7 +889,7 @@
                   verticalAlign: 'bottom',
                   itemMarginBottom: 0,
                   itemStyle: {
-                     fontSize: '9px', // change to your desired size
+                     fontSize: '9px', 
                      fontWeight: 'normal',
                      color: '#333'
                   },
@@ -1363,7 +897,7 @@
                },
                colors: ['#B68A35', '#D7BC6D', '#E6D7A2'],
                series: [{
-                  name: 'Delegates',
+                  name: '{{ __db('delegates') }}',
                   data: [
                         { name: '{{ __db('arrived') }}', y: {{ $data['arrival_status']['arrived'] }} },
                         { name: '{{ __db('not_yet_arrived') }}', y: {{ $data['arrival_status']['not_yet_arrived'] }} },
