@@ -47,7 +47,7 @@
                                   : '-',
                           ],
                           [
-                              'label' => __db('delegation_id'),
+                              'label' => __db('delegation'),
                               'render' => fn($row) => $row->delegation->code ?? '-',
                           ],
                           [
@@ -70,7 +70,7 @@
                               'render' => function ($row) {
                                   if (!empty($row->other_member_id) && $row->otherMember) {
                                       $otherMemberName = $row->otherMember->name ?? '';
-                                      $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                                      $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
                                       if ($otherMemberId) {
                                           $with =
                                               '<a href="' .
@@ -78,7 +78,7 @@
                                                   'other_interview_member' => base64_encode($otherMemberId),
                                               ]) .
                                               '" class="!text-[#B68A35]">
-                                    <span class="block">Other Member ID: ' .
+                                    <span class="block">Other Member: ' .
                                               e($otherMemberId) .
                                               '</span>
                                 </a>';
