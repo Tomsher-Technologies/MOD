@@ -405,7 +405,6 @@
                         [
                             'label' => __db('accommodation'),
                             'render' => function ($row) {
-                                // If accommodation is not required (boolean field is false)
                                 if (!$row->accommodation) {
                                     return 'Not Required';
                                 }

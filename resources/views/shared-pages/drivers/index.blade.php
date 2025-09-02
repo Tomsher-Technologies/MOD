@@ -202,8 +202,7 @@
                                 </a>';
                                 }
 
-                                // Assign button
-                                if (can(['assign_drivers', 'driver_edit_drivers'])) {
+                                if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
                                     $assignUrl = route('drivers.assignIndex', $driver->id);
                                     $output .=
                                         '
