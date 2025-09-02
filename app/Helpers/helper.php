@@ -551,7 +551,8 @@ function getAllCountries()
 if (! function_exists('getAllDrivers')) {
     function getAllDrivers()
     {
-        return Driver::orderBy('code')
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        return Driver::where('event_id', $currentEventId)->orderBy('code')
             ->get();
     }
 }
@@ -559,7 +560,8 @@ if (! function_exists('getAllDrivers')) {
 if (! function_exists('getAllEscorts')) {
     function getAllEscorts()
     {
-        return Driver::orderBy('code')
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        return Driver::where('event_id', $currentEventId)->orderBy('code')
             ->get();
     }
 }

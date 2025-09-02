@@ -585,9 +585,23 @@
                 @php
                     $columns = [
                         [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('escort') . ' ' . __db('code'),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
+                            },
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
-                            'render' => fn($escort) => e($escort->military_number),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->military_number]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->military_number) . '</a>';
+                            },
                         ],
                         [
                             'label' => __db('title'),
@@ -597,11 +611,14 @@
                         [
                             'label' => __db('name_en'),
                             'key' => 'name',
-                            'render' => fn($escort) => e($escort->name_en),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->name_en) . '</a>';
+                            },
                         ],
                         [
-                            'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
+                            'label' => __db('phone_number'),
+                            'key' => 'phone_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
                         [
@@ -712,9 +729,23 @@
                 @php
                     $columns = [
                         [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('driver') . ' ' . __db('code'),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
+                            },
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
-                            'render' => fn($driver) => e($driver->military_number),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->military_number]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->military_number) . '</a>';
+                            },
                         ],
                         [
                             'label' => __db('title'),
@@ -724,17 +755,15 @@
                         [
                             'label' => __db('name_en'),
                             'key' => 'name_en',
-                            'render' => fn($driver) => e($driver->name_en),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->name_en) . '</a>';
+                            },
                         ],
                         [
-                            'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
-                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
-                        ],
-                        [
-                            'label' => __db('driver') . ' ' . __db('id'),
-                            'key' => 'driver_id',
-                            'render' => fn($driver) => e($driver->driver_id),
+                            'label' => __db('phone_number'),
+                            'key' => 'phone_number',
+                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->phone_number) . '</span>',
                         ],
                         [
                             'label' => __db('car') . ' ' . __db('type'),
@@ -905,20 +934,20 @@
                             'label' => __db('interview_with'),
                             'render' => function ($row) {
                                 if (!empty($row->other_member_id) && $row->otherMember) {
-                                      $otherMemberName = $row->otherMember->name ?? '';
-                                      $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
-                                      if ($otherMemberId) {
-                                          $with =
-                                              '<a href="' .
-                                              route('other-interview-members.show', [
-                                                  'other_interview_member' => base64_encode($otherMemberId),
-                                              ]) .
-                                              '" class="!text-[#B68A35]">
+                                    $otherMemberName = $row->otherMember->name ?? '';
+                                    $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
+                                    if ($otherMemberId) {
+                                        $with =
+                                            '<a href="' .
+                                            route('other-interview-members.show', [
+                                                'other_interview_member' => base64_encode($otherMemberId),
+                                            ]) .
+                                            '" class="!text-[#B68A35]">
                                     <span class="block">Other Member: ' .
-                                              e($otherMemberId) .
-                                              '</span>
+                                            e($otherMemberId) .
+                                            '</span>
                                 </a>';
-                                      }
+                                    }
                                 } else {
                                     $with =
                                         '<a href="' .

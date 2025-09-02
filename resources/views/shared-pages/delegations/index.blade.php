@@ -84,18 +84,28 @@
                             'label' => __db('escorts'),
                             'key' => 'escorts',
                             'render' => function ($delegation) {
-                                return $delegation->escorts->isNotEmpty()
-                                    ? $delegation->escorts->map(fn($escort) => e($escort->code))->implode('<br>')
-                                    : '-';
+                                if ($delegation->escorts->isEmpty()) {
+                                    return '-';
+                                }
+                                
+                                return $delegation->escorts->map(function ($escort) {
+                                    $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
+                                })->implode('<br>');
                             },
                         ],
                         [
                             'label' => __db('drivers'),
                             'key' => 'drivers',
                             'render' => function ($delegation) {
-                                return $delegation->drivers->isNotEmpty()
-                                    ? $delegation->drivers->map(fn($driver) => e($driver->code))->implode('<br>')
-                                    : '-';
+                                if ($delegation->drivers->isEmpty()) {
+                                    return '-';
+                                }
+                                
+                                return $delegation->drivers->map(function ($driver) {
+                                    $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
+                                })->implode('<br>');
                             },
                         ],
                         [

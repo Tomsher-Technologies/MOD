@@ -208,7 +208,9 @@ class DelegationController extends Controller
             $query->where('status_id', $statusId);
         }
 
-        $interviews = $query->orderBy('id', 'desc')->paginate(20);
+
+        $limit = $request->limit ? $request->limit : 20;
+        $interviews = $query->orderBy('id', 'desc')->paginate($limit);
 
         return view('admin.delegations.interviews', compact('interviews'));
     }
@@ -387,7 +389,9 @@ class DelegationController extends Controller
         }
 
 
-        $arrivals = $query->orderBy('date_time', 'desc')->paginate(10);
+        $limit = $request->limit ? $request->limit : 20;
+
+        $arrivals = $query->orderBy('date_time', 'desc')->paginate($limit);
 
         return view('admin.arrivals.index', compact('arrivals'));
     }
@@ -478,7 +482,9 @@ class DelegationController extends Controller
             }
         }
 
-        $departures = $query->orderBy('date_time', 'desc')->paginate(10);
+        $limit = $request->limit ? $request->limit : 20;
+
+        $departures = $query->orderBy('date_time', 'desc')->paginate($limit);
 
         return view('admin.departures.index', compact('departures'));
     }

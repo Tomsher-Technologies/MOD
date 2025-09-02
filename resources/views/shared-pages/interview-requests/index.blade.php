@@ -147,7 +147,7 @@
                       $noDataMessage = __db('no_interviews_found');
                   @endphp
 
-                  <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+                  <x-reusable-table :columns="$columns" :data="$data" :enableRowLimit="true" :noDataMessage="$noDataMessage" />
 
                   <div class="mt-4">
                       {{ $interviews->appends(request()->input())->links() }}

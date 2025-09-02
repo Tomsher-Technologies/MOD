@@ -61,6 +61,7 @@ class DriverController extends Controller
                     ->orWhere('driver_id', 'like', "%{$search}%")
                     ->orWhere('car_type', 'like', "%{$search}%")
                     ->orWhere('car_number', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
@@ -149,7 +150,7 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
             'unit_id.exists' => __db('unit_id_exists'),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
@@ -182,7 +183,7 @@ class DriverController extends Controller
 
     public function edit(string $id)
     {
-        $driver = Driver::findOrFail($id);
+        $driver = Driver::with('delegations')->findOrFail($id);
         $delegations = Delegation::all();
         $dropdowns = $this->loadDropdownOptions();
 
@@ -216,7 +217,7 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
             'unit_id.exists' => __db('unit_id_exists'),

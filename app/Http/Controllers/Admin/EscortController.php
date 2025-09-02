@@ -59,6 +59,7 @@ class EscortController extends Controller
                     ->orWhere('name_ar', 'like', "%{$search}%")
                     ->orWhere('military_number', 'like', "%{$search}%")
                     ->orWhere('phone_number', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
@@ -66,9 +67,9 @@ class EscortController extends Controller
             });
         }
 
-        if ($request->has('title') && !empty($request->title)) {
-            $titles = is_array($request->title) ? $request->title : [$request->title];
-            $query->whereIn('internal_ranking_id', $titles);
+        if ($request->has('title_id') && !empty($request->title_id)) {
+            $titles = is_array($request->title_id) ? $request->title_id : [$request->title_id];
+            $query->whereIn('title_id', $titles);
         }
 
         if ($request->has('gender_id') && !empty($request->gender_id)) {
@@ -92,7 +93,10 @@ class EscortController extends Controller
             });
         }
 
-        $escorts = $query->paginate(10);
+
+        $limit = $request->limit ? $request->limit : 20;
+
+        $escorts = $query->paginate($limit);
         $delegations = Delegation::where('event_id', $currentEventId)->get();
 
         return view('admin.escorts.index', compact('escorts', 'delegations'));
@@ -146,7 +150,7 @@ class EscortController extends Controller
             'delegation_id.exists' => __db('delegation_id_exists'),
             'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
             'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('escort_phone_number_max', ['max' => 255]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 14]),
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
@@ -225,7 +229,7 @@ class EscortController extends Controller
             'delegation_id.exists' => __db('delegation_id_exists'),
             'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
             'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('escort_phone_number_max', ['max' => 255]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 14]),
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
@@ -438,5 +442,4 @@ class EscortController extends Controller
             'ranks' => $ranks ? $ranks->options : collect(),
         ];
     }
-
 }

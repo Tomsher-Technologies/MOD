@@ -69,26 +69,27 @@
 
                     <label class="form-label">{{ __db('phone_number') }}:</label>
                     <input type="text" name="phone_number"
-                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('enter') }}">
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}" inputmode="numeric" pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                 </div>
 
-                <div class="col-span-4">
+                {{-- <div class="col-span-4">
                     <label class="form-label">{{ __db('driver') . ' ' . __db('id') }}:</label>
                     <input type="text" name="driver_id"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') }}">
-                </div>
+                </div> --}}
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('car') . ' ' . __db('type') }}:</label>
+                    <label class="form-label">{{ __db('vehicle') . ' ' . __db('type') }}:</label>
                     <input type="text" name="car_type"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') }}">
                 </div>
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('car') . ' ' . __db('number') }}:</label>
+                    <label class="form-label">{{ __db('vehicle') . ' ' . __db('number') }}:</label>
                     <input type="text" name="car_number"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') }}">

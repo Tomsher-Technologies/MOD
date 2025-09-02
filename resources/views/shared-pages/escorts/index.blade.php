@@ -67,6 +67,11 @@
                                 return $escorts->firstItem() + $key;
                             },
                         ],
+                        [
+                            'label' => __db('escort') . ' ' . __db('code'),
+                            'key' => 'escort_id',
+                            'render' => fn($escort) => e($escort->code),
+                        ],
 
                         [
                             'label' => __db('military_number'),
@@ -84,7 +89,7 @@
                             'render' => fn($escort) => e($escort->name_en),
                         ],
                         [
-                            'label' => __db('mobile_number'),
+                            'label' => __db('phone_number'),
                             'key' => 'phone_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
@@ -190,7 +195,7 @@
                     ];
                 @endphp
 
-                <x-reusable-table :columns="$columns" :data="$escorts" noDataMessage="No escorts found."
+                <x-reusable-table :columns="$columns" :data="$escorts" :enableRowLimit="true" noDataMessage="No escorts found."
                     :rowClass="function ($row) {
                         return $row->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
                     }" />

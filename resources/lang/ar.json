@@ -47,7 +47,7 @@
     "driver_name_ar_max": "قد لا يزيد اسم السائق (بالعربية) عن :max خانة",
     "driver_military_number_max": "قد لا يزيد الرقم العسكري للسائق عن :max خانة",
     "driver_title_max": "قد لا يزيد لقب السائق عن :max خانة",
-    "driver_mobile_number_max": "قد لا يزيد رقم هاتف السائق عن :max خانة",
+    "driver_phone_number_max": "قد لا يزيد رقم هاتف السائق عن :max خانة",
     "driver_id_max": "قد لا يزيد رقم هوية السائق عن :max خانة",
     "driver_car_type_max": "قد لا يزيد نوع سيارة السائق عن :max خانة",
     "driver_car_number_max": "قد لا يزيد رقم سيارة السائق عن :max خانة",

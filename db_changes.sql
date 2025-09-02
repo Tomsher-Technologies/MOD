@@ -427,3 +427,10 @@ ON DELETE SET NULL
 ON UPDATE CASCADE;
 
 ALTER TABLE `other_interview_members` CHANGE `status` `status` TINYINT(1) NULL DEFAULT NULL; 
+
+ALTER table drivers change column mobile_number phone_number text; 
+
+ALTER TABLE escorts 
+MODIFY name_ar VARCHAR(255)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;

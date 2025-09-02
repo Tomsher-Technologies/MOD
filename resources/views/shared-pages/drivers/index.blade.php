@@ -55,6 +55,11 @@
                             },
                         ],
                         [
+                            'label' => __db('driver') . ' ' . __db('code'),
+                            'key' => 'driver_code',
+                            'render' => fn($driver) => e($driver->code),
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
                             'render' => fn($driver) => e($driver->military_number),
@@ -70,23 +75,19 @@
                             'render' => fn($driver) => e($driver->name_en),
                         ],
                         [
-                            'label' => __db('mobile_number'),
+                            'label' => __db('phone_number'),
                             'key' => 'phone_number',
                             'render' => fn($driver) => '<span dir="ltr">' . e($driver->phone_number) . '</span>',
                         ],
+
                         [
-                            'label' => __db('driver') . ' ' . __db('id'),
-                            'key' => 'driver_id',
-                            'render' => fn($driver) => e($driver->driver_id),
-                        ],
-                        [
-                            'label' => __db('car') . ' ' . __db('type'),
-                            'key' => 'car_type',
+                            'label' => __db('vehicle') . ' ' . __db('type'),
+                            'key' => 'vehicle_type',
                             'render' => fn($driver) => e($driver->car_type),
                         ],
                         [
-                            'label' => __db('car') . ' ' . __db('number'),
-                            'key' => 'car_number',
+                            'label' => __db('vehicle') . ' ' . __db('number'),
+                            'key' => 'vehicle_number',
                             'render' => fn($driver) => e($driver->car_number),
                         ],
                         [
@@ -272,9 +273,9 @@
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle_type') }}</label>
                 <select name="car_type[]" multiple data-placeholder="{{ __db('select_vehicle_types') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getDropDown('vehicle_type')->options as $option)
-                        <option value="{{ $option->value }}" @if (in_array($option->value, request('car_type', []))) selected @endif>
-                            {{ $option->value }}</option>
+                    @foreach (getAllDrivers() as $driver)
+                        <option value="{{ $driver->car_type }}" @if (in_array($driver->car_type, request('car_type', []))) selected @endif>
+                            {{ $driver->car_type }}</option>
                     @endforeach
                 </select>
             </div>
