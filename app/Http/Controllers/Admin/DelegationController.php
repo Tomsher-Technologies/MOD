@@ -433,12 +433,8 @@ class DelegationController extends Controller
             $query->where('airport_id', $airportId);
         }
 
-        if ($status = $request->input('status')) {
-            if (is_array($status)) {
-                $query->whereIn('status', $status);
-            } else {
-                $query->where('status', $status);
-            }
+        if ($statusId = $request->input('status_id')) {
+            $query->where('status_id', $statusId);
         }
 
         $departures = $query->orderBy('date_time', 'desc')->paginate(10);

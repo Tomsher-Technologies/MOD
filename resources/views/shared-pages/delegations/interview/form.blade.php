@@ -135,7 +135,7 @@
                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                 d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
                         </svg>
-                        <span class="w-[150px]">{{ __db('delegation_id') }}</span>
+                        <span class="w-[150px]">{{ __db('search_delegation_id') }}</span>
                     </button>
                 </div>
 
@@ -211,6 +211,7 @@
 
                 @php
                     $continentOptions = getDropDown('continents');
+                    $countryOptions = getDropDown('country');
                 @endphp
                 <div>
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('continents') }}:</label>
@@ -231,6 +232,14 @@
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
                     <select id="modal-country" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_country') }}</option>
+                        @if ($countryOptions)
+                            @foreach ($countryOptions->options as $option)
+                                <option value="{{ $option->id }}"
+                                    {{ request('countryOptions') == $option->id ? 'selected' : '' }}>
+                                    {{ $option->value }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
                 </div>
             </div>
@@ -314,38 +323,10 @@
             const modalResults = document.getElementById('modal-search-results');
             const delegationsList = document.getElementById('modal-delegations-list');
             const membersSelect = document.getElementById('members-select');
-            const continentSelect = document.getElementById('modal-continent');
-            const countrySelect = document.getElementById('modal-country');
 
             let selectedDelegationId = null;
             let selectedDelegationCode = null;
             let selectedMembers = [];
-
-            // Load countries when continent is selected
-            continentSelect.addEventListener('change', function() {
-                const continentId = this.value;
-                countrySelect.innerHTML = '<option value="" selected disabled>{{ __db('select_country') }}</option>';
-                
-                if (continentId) {
-                    fetch(`/mod-admin/get-countries?continent_ids=${continentId}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        data.forEach(country => {
-                            const option = document.createElement('option');
-                            option.value = country.id;
-                            option.textContent = country.name;
-                            countrySelect.appendChild(option);
-                        });
-                    })
-                    .catch(() => {
-                        console.error('Failed to load countries');
-                    });
-                }
-            });
 
             function openModal() {
                 modal.classList.remove('hidden');
@@ -400,13 +381,7 @@
                     return;
                 }
 
-                // Build query parameters
-                let queryParams = [];
-                if (continentId) queryParams.push(`continent_id=${continentId}`);
-                if (countryId) queryParams.push(`country_id=${countryId}`);
-                const queryString = queryParams.join('&');
-
-                fetch(`${window.pageRoutes.delegationSearchByFilters}?${queryString}`, {
+                fetch(`${window.pageRoutes.delegationSearchByFilters}?continent_id=${continentId}&country_id=${countryId}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
                         }
@@ -428,6 +403,10 @@
                                     this.classList.add('bg-[#B68A35]', 'text-white');
                                     selectedDelegationId = delegation.id;
                                     selectedDelegationCode = delegation.code;
+
+                                    document.querySelector(
+                                            'input[name="to_delegate_id"]')
+                                        .value = delegation.code;
 
                                     modalSelectBtn.disabled = false;
                                     modalSelectBtn.classList.remove(
