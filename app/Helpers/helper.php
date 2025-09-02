@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -655,4 +656,14 @@ function shadeColor($hex, $percent)
     $b = max(0, min(255, $b + ($percent / 100 * 255)));
 
     return sprintf("#%02x%02x%02x", $r, $g, $b);
+}
+
+
+function humanize(string|null $text): string
+{
+    if (!$text) return 'N/A';
+
+    $text = str_replace('_', ' ', strtolower($text));
+
+    return ucwords($text);
 }

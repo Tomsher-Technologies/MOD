@@ -412,3 +412,16 @@ INSERT INTO `permissions`
 (122, 'admin', NULL, 'manage_alerts', 'Manage Alerts', 'web', 1, NULL, NULL),
 (123, 'admin', 122, 'add_alerts', 'Add Alerts', 'web', 1, NULL, NULL),
 (124, 'admin', 122, 'view_alerts', 'Edit Alerts', 'web', 1, NULL, NULL);
+
+
+ALTER TABLE `interviews`
+MODIFY COLUMN `other_member_id` BIGINT UNSIGNED NULL;
+
+ALTER TABLE `interviews`
+DROP FOREIGN KEY IF EXISTS `fk_interviews_other_member_id`;
+
+ALTER TABLE `interviews`
+ADD CONSTRAINT `fk_interviews_other_member_id`
+FOREIGN KEY (`other_member_id`) REFERENCES `other_interview_members`(`id`)
+ON DELETE SET NULL
+ON UPDATE CASCADE;

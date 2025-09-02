@@ -318,13 +318,32 @@ class DelegationController extends Controller
             });
         }
 
-        if ($fromDate = $request->input('from_date')) {
-            $query->whereDate('date_time', '>=', $fromDate);
+        if ($dateRange = $request->input('date_range')) {
+            $dates = explode(' - ', $dateRange);
+
+            if (count($dates) === 2) {
+                $fromDate = trim($dates[0]);
+                $toDate   = trim($dates[1]);
+
+                $query->whereDate('date_time', '>=', $fromDate)
+                    ->whereDate('date_time', '<=', $toDate);
+            }
+        } else {
+            if ($fromDate = $request->input('from_date')) {
+                $query->whereDate('date_time', '>=', $fromDate);
+            }
+
+            if ($toDate = $request->input('to_date')) {
+                $query->whereDate('date_time', '<=', $toDate);
+            }
         }
 
-        if ($toDate = $request->input('to_date')) {
-            $query->whereDate('date_time', '<=', $toDate);
+        if ($invitation_from = $request->input('invitation_from')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
+                $delegationQuery->where('invitation_from_id', $invitation_from);
+            });
         }
+
 
         if ($continentIds = $request->input('continent_id')) {
             if (is_array($continentIds)) {
@@ -374,7 +393,6 @@ class DelegationController extends Controller
 
     public function departuresIndex(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = DelegateTransport::where('type', 'departure')
@@ -409,17 +427,35 @@ class DelegationController extends Controller
             });
         }
 
-        if ($fromDate = $request->input('from_date')) {
-            $query->whereDate('date_time', '>=', $fromDate);
-        }
+        if ($dateRange = $request->input('date_range')) {
+            $dates = explode(' - ', $dateRange);
 
-        if ($toDate = $request->input('to_date')) {
-            $query->whereDate('date_time', '<=', $toDate);
+            if (count($dates) === 2) {
+                $fromDate = trim($dates[0]);
+                $toDate   = trim($dates[1]);
+
+                $query->whereDate('date_time', '>=', $fromDate)
+                    ->whereDate('date_time', '<=', $toDate);
+            }
+        } else {
+            if ($fromDate = $request->input('from_date')) {
+                $query->whereDate('date_time', '>=', $fromDate);
+            }
+
+            if ($toDate = $request->input('to_date')) {
+                $query->whereDate('date_time', '<=', $toDate);
+            }
         }
 
         if ($continentId = $request->input('continent_id')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
                 $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
+                $delegationQuery->where('invitation_from_id', $invitation_from);
             });
         }
 
@@ -433,8 +469,12 @@ class DelegationController extends Controller
             $query->where('airport_id', $airportId);
         }
 
-        if ($statusId = $request->input('status_id')) {
-            $query->where('status_id', $statusId);
+        if ($status = $request->input('status')) {
+            if (is_array($status)) {
+                $query->whereIn('status', $status);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         $departures = $query->orderBy('date_time', 'desc')->paginate(10);
@@ -480,7 +520,6 @@ class DelegationController extends Controller
             $transport->update($dataToSave);
             $this->updateParticipationStatus($transport->delegate);
 
-            // Log activity if there were changes and it was confirmed
             if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
@@ -824,7 +863,6 @@ class DelegationController extends Controller
             ],
         ];
 
-        // Use the processUpdate method for confirmation dialog
         $confirmationResult = $this->processUpdate($request, $delegation, $validated, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
@@ -1101,9 +1139,7 @@ class DelegationController extends Controller
 
     public function storeOrUpdateInterview(Request $request, Delegation $delegation, Interview $interview = null)
     {
-        // return response().json([
-        //     'res' => $req->all()
-        // ]);
+
 
         $isEditMode = $interview && $interview->exists;
 
@@ -1233,6 +1269,18 @@ class DelegationController extends Controller
                     'label' => 'name_en',
                 ],
             ],
+
+            'other_member_id' => [
+                'relation' => 'toMembers',
+                'type' => 'single',
+                'column' => 'other_member_id',
+                'display_with' => [
+                    'model' => \App\Models\OtherInterviewMember::class,
+                    'key' => 'id',
+                    'label' => 'name_en',
+                ],
+            ],
+
             'status_id' => [
                 'relation' => 'status',
                 'type' => 'single',
@@ -1252,6 +1300,7 @@ class DelegationController extends Controller
         }
 
         $dataToSave = $confirmationResult['data'];
+        $fieldsToNotify = $confirmationResult['notify'] ?? [];
 
         try {
             DB::beginTransaction();
@@ -1284,9 +1333,7 @@ class DelegationController extends Controller
                     submodule: 'interview',
                     action: 'update',
                     model: $interview,
-                    userId: auth()->id(),
                     changedFields: json_decode($request->input('changed_fields_json'), true),
-                    activityModelClass: \App\Models\DelegationActivity::class,
                     submoduleId: $interview->id,
                     delegationId: $delegation->id,
                     fieldsToNotify: $fieldsToNotify

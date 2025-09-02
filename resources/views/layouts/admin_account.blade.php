@@ -15,7 +15,6 @@
 
     <script src="{{ asset('assets/js/ajax-form-handler.js') }}"></script>
 
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @yield('style')
@@ -74,6 +73,147 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const fullscreenDiv = document.getElementById('fullDiv');
+
+
+            $('#fullscreenToggleBtn').on('click', function() {
+                const isInFullscreen =
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.mozFullScreenElement ||
+                    document.msFullscreenElement;
+
+                if (!isInFullscreen) {
+                    // Enter fullscreen
+                    if (fullscreenDiv.requestFullscreen) {
+                        fullscreenDiv.requestFullscreen();
+                    } else if (fullscreenDiv.webkitRequestFullscreen) {
+                        fullscreenDiv.webkitRequestFullscreen();
+                    } else if (fullscreenDiv.msRequestFullscreen) {
+                        fullscreenDiv.msRequestFullscreen();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('#fullscreenToggleBtn').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('#fullscreenToggleBtn').text('Go Fullscreen');
+                    }
+                });
+
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
+                        $('#fullscreenToggleBtn').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
+                        $('#fullscreenToggleBtn').text('Go Fullscreen');
+                    }
+                });
+
+            const fullscreenDiv1 = document.getElementById('fullDiv1');
+
+            $('#fullscreenToggleBtn1').on('click', function() {
+                const isInFullscreen =
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.mozFullScreenElement ||
+                    document.msFullscreenElement;
+
+                if (!isInFullscreen) {
+                    // Enter fullscreen
+                    if (fullscreenDiv1.requestFullscreen) {
+                        fullscreenDiv1.requestFullscreen();
+                    } else if (fullscreenDiv1.webkitRequestFullscreen) {
+                        fullscreenDiv1.webkitRequestFullscreen();
+                    } else if (fullscreenDiv1.msRequestFullscreen) {
+                        fullscreenDiv1.msRequestFullscreen();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('#fullscreenToggleBtn1').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('#fullscreenToggleBtn1').text('Go Fullscreen');
+                    }
+                });
+
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
+                        $('#fullscreenToggleBtn1').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
+                        $('#fullscreenToggleBtn1').text('Go Fullscreen');
+                    }
+                });
+
+
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,

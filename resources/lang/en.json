@@ -208,6 +208,6 @@
     "" : "",
     "" : "",
     "" : "",
-    "" : "",
-    "" : ""
+    "all_arrival_statuses": "All Arrival Statuses",
+    "all_departure_statuses": "All Departure Statuses"
 }

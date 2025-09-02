@@ -1,22 +1,28 @@
 <div x-data="{ isArrivalEditModalOpen: false }">
-    <div class="flex items-center justify-between gap-12 mb-4">
-
-        <input type="date"
-            class="p-3 !w-[20%] text-secondary-light !border-[#d1d5db] rounded-lg w-full border text-sm">
-        <form class="w-[75%]" action="{{ route('delegations.arrivalsIndex') }}" method="GET">
-            <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                    </svg>
+    <div class="flex items-center justify-between gap-4 mb-4">
+        <form class="flex gap-4 w-full" action="{{ route('delegations.arrivalsIndex') }}" method="GET">
+            <div class="flex flex-col">
+                <input type="text" class="form-control date-range" id="date_range" name="date_range"
+                    placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
+                    data-separator=" to " autocomplete="off" value="{{ request('date_range') ?? '' }}">
+            </div>
+            <div class="flex-1">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                    <input type="search" id="default-search" name="search_key" value="{{ request('search_key') }}"
+                        class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
+                        placeholder="{{ __db('Search by Delegation ID, Escorts, Drivers, Flight Number, Flight Name') }}" />
                 </div>
-                <input type="search" id="default-search" name="search_key" value="{{ request('search_key') }}"
-                    class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                    placeholder="{{ __db('Search by Delegation ID, Escorts, Drivers, Flight Number, Flight Name') }}" />
+            </div>
+            <div class="flex items-end">
                 <button type="submit"
-                    class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+                    class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
             </div>
         </form>
         <div class="text-center">
@@ -395,9 +401,6 @@
                 </select>
             </div>
 
-
-
-
             <div class="flex flex-col">
 
                 @php
@@ -427,8 +430,6 @@
                     @endforeach
                 </select>
             </div>
-
-
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('delegations.arrivalsIndex') }}"
@@ -441,8 +442,6 @@
 
 
 @section('script')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <script>
         $(document).ready(function() {
             $('.select2').select2({
@@ -498,14 +497,12 @@
                 });
             });
 
-            // Handle continent change to load countries
             const continentSelect = $("#continent");
             const countrySelect = $("#country");
 
             continentSelect.on("change", async function() {
                 const selectedContinent = $(this).val();
 
-                // Clear current options except the default
                 countrySelect.find('option[value!=""]').remove();
 
                 if (selectedContinent) {
@@ -514,7 +511,6 @@
                             `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
                         let countries = await response.json();
 
-                        // Add new options
                         countries.forEach(country => {
                             let option = new Option(country.name, country.id, false, false);
                             countrySelect.append(option);
@@ -527,80 +523,9 @@
                 }
             });
 
-            // Trigger continent change on page load if a continent is already selected
             const selectedContinent = continentSelect.val();
             if (selectedContinent) {
                 continentSelect.trigger("change");
-            }
-        });
-    </script>
-
-
-    <script>
-        const fullscreenDiv = document.getElementById('fullDiv');
-
-        $('#fullscreenToggleBtn').on('click', function() {
-            const isInFullscreen =
-                document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement;
-
-            if (!isInFullscreen) {
-                // Enter fullscreen
-                if (fullscreenDiv.requestFullscreen) {
-                    fullscreenDiv.requestFullscreen();
-                } else if (fullscreenDiv.webkitRequestFullscreen) {
-                    fullscreenDiv.webkitRequestFullscreen();
-                } else if (fullscreenDiv.msRequestFullscreen) {
-                    fullscreenDiv.msRequestFullscreen();
-                }
-            } else {
-                // Exit fullscreen
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
-                }
-            }
-        });
-
-        // Listen for fullscreen changes
-        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-            const isInFullscreen =
-                document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement;
-
-            if (isInFullscreen) {
-                $('.hide-when-fullscreen').hide();
-                $('#fullscreenToggleBtn').text('Exit Fullscreen');
-            } else {
-                $('.hide-when-fullscreen').show();
-                $('#fullscreenToggleBtn').text('Go Fullscreen');
-            }
-        });
-
-
-        // Listen for fullscreen changes
-        $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange', function() {
-            const isInFullscreen =
-                document.fullscreenElement ||
-                document.webkitFullscreenElement ||
-                document.mozFullScreenElement ||
-                document.msFullscreenElement;
-
-            if (isInFullscreen) {
-                $('.hide-when-fullscreen').hide();
-                $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
-                $('#fullscreenToggleBtn').text('Exit Fullscreen');
-            } else {
-                $('.hide-when-fullscreen').show();
-                $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
-                $('#fullscreenToggleBtn').text('Go Fullscreen');
             }
         });
     </script>
