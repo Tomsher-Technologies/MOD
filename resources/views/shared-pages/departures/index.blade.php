@@ -3,11 +3,19 @@
 @section('content')
     <div x-data="{ isDepartureEditModalOpen: false }">
 
-        <div class="flex items-center justify-between gap-12 mb-4">
-
-            <input type="date"
-                class="p-3 !w-[20%] text-secondary-light !border-[#d1d5db] rounded-lg w-full border text-sm">
-            <form class="w-[75%]" action="{{ route('delegations.departuresIndex') }}" method="GET">
+        <div class="flex items-center justify-between gap-4 mb-4">
+        <form class="flex gap-4 w-full" action="{{ route('delegations.departuresIndex') }}" method="GET">
+            <div class="flex flex-col">
+                <label class="text-sm text-gray-600">{{ __db('from_date') }}</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}"
+                    class="p-2 text-secondary-light border rounded-lg text-sm">
+            </div>
+            <div class="flex flex-col">
+                <label class="text-sm text-gray-600">{{ __db('to_date') }}</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}"
+                    class="p-2 text-secondary-light border rounded-lg text-sm">
+            </div>
+            <div class="flex-1">
                 <div class="relative">
                     <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                         <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -19,10 +27,13 @@
                     <input type="search" id="default-search" name="search_key" value="{{ request('search_key') }}"
                         class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
                         placeholder="{{ __db('Search by Delegation ID, Escorts, Drivers, Flight Number, Flight Name') }}" />
-                    <button type="submit"
-                        class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
                 </div>
-            </form>
+            </div>
+            <div class="flex items-end">
+                <button type="submit"
+                    class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+            </div>
+        </form>
             <div class="text-center">
                 <button
                     class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
@@ -375,10 +386,10 @@
                     @endphp
 
                     <label
-                        class="form-label block text-gray-700 font-medium">{{ __db('arrival') . ' ' . __db('status') }}</label>
+                        class="form-label block text-gray-700 font-medium">{{ __db('departure') . ' ' . __db('status') }}</label>
                     <select name="status[]" multiple data-placeholder="{{ __db('select') . ' ' . __db('status') }}"
                         class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                        <option value="">{{ __db('all_arrival_statuses') }}</option>
+                        <option value="">{{ __db('all_departure_statuses') }}</option>
                         @foreach ($statuses as $value => $label)
                             <option value="{{ $value }}"
                                 {{ is_array(request('status')) && in_array($label, request('status')) ? 'selected' : '' }}>

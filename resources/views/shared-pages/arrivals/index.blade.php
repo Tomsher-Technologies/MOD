@@ -1,22 +1,33 @@
 <div x-data="{ isArrivalEditModalOpen: false }">
-    <div class="flex items-center justify-between gap-12 mb-4">
-
-        <input type="date"
-            class="p-3 !w-[20%] text-secondary-light !border-[#d1d5db] rounded-lg w-full border text-sm">
-        <form class="w-[75%]" action="{{ route('delegations.arrivalsIndex') }}" method="GET">
-            <div class="relative">
-                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                    <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                    </svg>
+    <div class="flex items-center justify-between gap-4 mb-4">
+        <form class="flex gap-4 w-full" action="{{ route('delegations.arrivalsIndex') }}" method="GET">
+            <div class="flex flex-col">
+                <label class="text-sm text-gray-600">{{ __db('from_date') }}</label>
+                <input type="date" name="from_date" value="{{ request('from_date') }}"
+                    class="p-2 text-secondary-light border rounded-lg text-sm">
+            </div>
+            <div class="flex flex-col">
+                <label class="text-sm text-gray-600">{{ __db('to_date') }}</label>
+                <input type="date" name="to_date" value="{{ request('to_date') }}"
+                    class="p-2 text-secondary-light border rounded-lg text-sm">
+            </div>
+            <div class="flex-1">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                    <input type="search" id="default-search" name="search_key" value="{{ request('search_key') }}"
+                        class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
+                        placeholder="{{ __db('Search by Delegation ID, Escorts, Drivers, Flight Number, Flight Name') }}" />
                 </div>
-                <input type="search" id="default-search" name="search_key" value="{{ request('search_key') }}"
-                    class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                    placeholder="{{ __db('Search by Delegation ID, Escorts, Drivers, Flight Number, Flight Name') }}" />
+            </div>
+            <div class="flex items-end">
                 <button type="submit"
-                    class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+                    class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
             </div>
         </form>
         <div class="text-center">

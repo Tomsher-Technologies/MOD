@@ -47,7 +47,7 @@
                                   : '-',
                           ],
                           [
-                              'label' => __db('from_delegation'),
+                              'label' => __db('delegation_id'),
                               'render' => fn($row) => $row->delegation->code ?? '-',
                           ],
                           [
