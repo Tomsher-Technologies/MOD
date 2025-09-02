@@ -161,7 +161,7 @@
                 </div>
 
                 <div id="other-input" class="hidden" @class(['hidden' => $oldInterviewType !== 'other'])>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
+                    <label class="form-label block mb-1 rounded-l-s text-gray-700 font-medium">{{ __db('members') }}:</label>
                     <select name="other_member_id" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select') }}</option>
                         @foreach ($otherMembers as $member)

@@ -176,6 +176,7 @@ trait HandlesUpdateConfirmation
                     $displayOld = $originalValue;
                     $displayNew = $newValue;
 
+
                     if (isset($config['display_with'])) {
                         $dw = $config['display_with'];
                         $displayOld = $this->getDisplayLabel($dw['model'], $dw['key'], $dw['label'], $originalValue);
@@ -389,17 +390,20 @@ trait HandlesUpdateConfirmation
         }
     }
 
-
-    private function normalizeForComparison($value)
+    private function normalizeForComparison($value, $field = null)
     {
         if ($value === null || $value === '') {
             return null;
         }
 
-        try {
-            return Carbon::parse($value)->format('Y-m-d H:i:s');
-        } catch (\Exception $e) {
-            return $value;
+        if (Str::contains($field, 'date') || $value instanceof \Carbon\Carbon) {
+            try {
+                return Carbon::parse($value)->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return $value;
+            }
         }
+
+        return $value;
     }
 }

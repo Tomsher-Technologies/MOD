@@ -425,3 +425,5 @@ ADD CONSTRAINT `fk_interviews_other_member_id`
 FOREIGN KEY (`other_member_id`) REFERENCES `other_interview_members`(`id`)
 ON DELETE SET NULL
 ON UPDATE CASCADE;
+
+ALTER TABLE `other_interview_members` CHANGE `status` `status` TINYINT(1) NULL DEFAULT NULL; 

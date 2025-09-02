@@ -132,8 +132,15 @@
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
 
-                                $accommodation =  ($row->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-') : '-'  ;
-                               
+                                $accommodation = $row->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
+
                                 return $accommodation ?? '-';
                             },
                         ],
@@ -159,7 +166,8 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
@@ -177,7 +185,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ""),
+                            'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -208,7 +216,14 @@
                             'render' => function ($escort) {
                                 $room = $escort->currentRoomAssignment ?? null;
 
-                                $accommodation = ($escort->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-'): '-';
+                                $accommodation = $escort->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
                                 //;
                                 return $accommodation ?? '-';
                             },
@@ -223,7 +238,9 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
@@ -273,12 +290,19 @@
                             'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
                         ],
-                         [
+                        [
                             'label' => __db('accommodation'),
                             'render' => function ($driver) {
                                 $room = $driver->currentRoomAssignment ?? null;
 
-                                $accommodation =  ($driver->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-'): '-';
+                                $accommodation = $driver->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
                                 //;
                                 return $accommodation ?? '-';
                             },
@@ -319,8 +343,7 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}
-    </h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }} ({{ $delegation->interviews->count() }})</h2>
 
     @php
         $columns = [
@@ -400,7 +423,9 @@
     </div>
 
 
-    <h4 class="text-lg font-semibold mb-3 mt-6">{{ __db('attachments') }}</h4>
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('attachments') }} ({{ $delegation->attachments->count() }})
+    </h2>
 
     @php
         $columns = [
@@ -442,8 +467,12 @@
         $noDataMessage = __db('no_attachments_found');
     @endphp
 
-    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-        <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+            </div>
+        </div>
     </div>
 
 

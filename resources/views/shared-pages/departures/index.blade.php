@@ -376,7 +376,7 @@
                 @endphp
 
                 <label
-                    class="form-label block text-gray-700 font-medium">{{ __db('arrival') . ' ' . __db('status') }}</label>
+                    class="form-label block text-gray-700 font-medium">{{ __db('departure') . ' ' . __db('status') }}</label>
                 <select name="status[]" multiple data-placeholder="{{ __db('select') . ' ' . __db('status') }}"
                     class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_arrival_statuses') }}</option>

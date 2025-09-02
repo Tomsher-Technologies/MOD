@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class DelegationController extends Controller
@@ -497,6 +498,8 @@ class DelegationController extends Controller
             'date_time.date' => __db('date_time_date'),
         ]);
 
+        $validated['date_time'] = Carbon::parse($validated['date_time'])->format('Y-m-d H:i:s');
+
         $relationsToCompare = [
             'airport_id' => [
                 'display_with' => [
@@ -630,7 +633,10 @@ class DelegationController extends Controller
 
     public function addInterview(Delegation $delegation)
     {
-        $otherMembers = OtherInterviewMember::all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $otherMembers = OtherInterviewMember::where('event_id', $currentEventId)->where('status', 1)->get();
 
         return view('admin.delegations.add-interview', [
             'delegation' => $delegation,
@@ -645,7 +651,9 @@ class DelegationController extends Controller
             abort(404, 'Interview not found for this delegation.');
         }
 
-        $otherMembers = OtherInterviewMember::all();
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $otherMembers = OtherInterviewMember::where('event_id', $currentEventId)->where('status', 1)->get();
 
         $toDelegationMembers = [];
 
@@ -1192,7 +1200,7 @@ class DelegationController extends Controller
 
         $dataToProcess = [
             'delegation_id' => $delegation->id,
-            'date_time' => $validated['date_time'],
+            'date_time' => Carbon::parse($validated['date_time'])->format('Y-m-d H:i:s'),
             'from_delegate_ids' => $validated['from_delegate_ids'],
             'type' => $validated['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
             'interview_with' => $validated['interview_type'] === 'delegation' ? ($interviewWithDelegation->id ?? null) : null,
@@ -1271,9 +1279,9 @@ class DelegationController extends Controller
             ],
 
             'other_member_id' => [
-                'relation' => 'toMembers',
+                'relation' => 'otherMember',
                 'type' => 'single',
-                'column' => 'other_member_id',
+                'column' => 'id',
                 'display_with' => [
                     'model' => \App\Models\OtherInterviewMember::class,
                     'key' => 'id',

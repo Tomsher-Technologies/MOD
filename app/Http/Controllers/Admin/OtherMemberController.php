@@ -58,13 +58,13 @@ class OtherMemberController extends Controller
 
     public function store(Request $request)
     {
+
         $data = $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'status' => 'required|boolean',
         ]);
 
-        // Convert boolean to string for database storage
         $data['status'] = $request->input('status') ? '1' : '0';
 
         OtherInterviewMember::create($data);
@@ -89,18 +89,17 @@ class OtherMemberController extends Controller
         return view('admin.other_interview_members.edit', compact('interviewMember'));
     }
 
-    public function update(Request $request, OtherInterviewMember $interviewMember)
+    public function update(Request $request, $interviewMember)
     {
+
         $data = $request->validate([
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'status' => 'required|boolean',
         ]);
 
-        // Convert boolean to string for database storage
-        $data['status'] = $request->input('status') ? '1' : '0';
-        
-        $interviewMember->update($data);
+        $member = OtherInterviewMember::find($interviewMember);
+        $member->update($data);
 
         return redirect()->route('other-interview-members.index')->with('success', __db('interview_member') . __db('updated_successfully'));
     }
