@@ -6,7 +6,9 @@
         ($data instanceof \Illuminate\Contracts\Pagination\Paginator ||
             $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) &&
             $enableRowLimit)
-        <div class="flex justify-end items-center mb-2 mt-4">
+           
+        <div class="flex justify-end items-center mb-3">
+            
             <form method="GET">
                 @foreach (request()->except('limit', 'page') as $key => $value)
                     @if (is_array($value))
@@ -19,21 +21,21 @@
                     @endif
                 @endforeach
                 <select id="limit" name="limit" onchange="this.form.submit()"
-                    class="border rounded px-5 py-1 text-sm">
+                    class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
                     @foreach ([10, 25, 50, 100] as $size)
                         <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
                             {{ $size }}
                         </option>
                     @endforeach
                 </select>
-                <span class="ml-2 text-sm">rows</span>
+                <span class="mr-2 text-sm">rows</span>
             </form>
         </div>
     @endif
 
     <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
         <thead>
-            <tr>
+            <tr class="text-[11px]">
                 @foreach ($columns as $column)
                     @php
                         $permissionKey = $column['permission'] ?? null;
@@ -65,7 +67,7 @@
                 @endphp
 
                 @if (!$rowPermissions || can($rowPermissions))
-                    <tr class="text-sm align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                    <tr class="text-[9px]  align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
                         data-id="{{ $row->id }}">
                         @foreach ($columns as $column)
                             @php
