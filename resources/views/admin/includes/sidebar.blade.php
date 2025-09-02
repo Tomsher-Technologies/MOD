@@ -2,7 +2,7 @@
     <button type="button" class="sidebar-close-btn !mt-4">
         <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
     </button>
-    <div class="p-3 border-b">
+    <div class="p-3 border-b min-h-[105px]">
         <a href="#" class="">
             <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
         </a>
@@ -31,18 +31,12 @@
             <li>
                 <a href="{{ route('events.index') }}"
                     class="{{ areActiveRoutes(['events.index', 'events.create', 'events.edit']) }}">
-                    <svg class="pe-2" width="36" height="30" viewBox="0 0 24 24" fill="none"
-                        xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.5">
-                        <!-- Binding rings -->
-                        <path stroke-linecap="round" d="M8 3v2M16 3v2" />
-                        <!-- Calendar frame -->
-                        <rect x="3" y="5" width="18" height="16" rx="2" />
-                        <!-- Header divider -->
-                        <path stroke-linecap="round" d="M3 9h18" />
-                        <!-- Event star -->
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M12 12.25l.98 1.99 2.2.32-1.59 1.55.38 2.21L12 17.5l-1.97 1.02.38-2.21-1.59-1.55 2.2-.32L12 12.25z" />
-                    </svg>
+             
+
+                    <svg class="pe-2" width="40" height="30" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"/>
+</svg>
+
 
                     <span class="text-md">{{ __db('events') }}</span>
                 </a>
@@ -194,18 +188,10 @@
             <li>
                 <a href="{{ route('dropdowns.index') }}"
                     class="{{ areActiveRoutes(['dropdowns.index', 'dropdowns.options.show', 'dropdowns.bulk.import']) }}">
-                    <svg class="pe-2" width="36" height="30" viewBox="0 0 24 24" fill="none"
-                        xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.5">
-                    <!-- Document outline -->
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M7 3h6l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
-                    <!-- Folded corner -->
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M13 3v5h5"/>
-                    <!-- Pencil for editing -->
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M16.5 11.5l2 2-5.5 5.5H11v-2.9l5.5-5.5z"/>
-                    </svg>
+                    <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M19 6c0 1.657-3.134 3-7 3S5 7.657 5 6m14 0c0-1.657-3.134-3-7-3S5 4.343 5 6m14 0v6M5 6v6m0 0c0 1.657 3.134 3 7 3s7-1.343 7-3M5 12v6c0 1.657 3.134 3 7 3s7-1.343 7-3v-6"/>
+</svg>
+
 
                     <span class="text-md">{{ __db('dynamic_contents') }}</span>
                 </a>
@@ -216,11 +202,11 @@
             <li>
                 <a href="{{ route('staffs.index') }}"
                     class="{{ areActiveRoutes(['staffs.index', 'staffs.create', 'staffs.edit']) }}">
-                    <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
+
+                    <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="40" height="30" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-width="1.6" d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/>
+</svg>
+
                     <span class="text-md">{{ __db('staffs') }}</span>
                 </a>
             </li>
@@ -230,11 +216,9 @@
             <li>
                 <a href="{{ route('roles.index') }}"
                     class="{{ areActiveRoutes(['roles.create', 'roles.edit', 'roles.index']) }}">
-                    <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
+                    <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
+</svg>
                     <span class="text-md">{{ __db('roles_and_permission') }}</span>
                 </a>
             </li>
@@ -245,11 +229,10 @@
             <li>
                 <a href="{{ route('other-interview-members.index') }}"
                     class="{{ areActiveRoutes(['other-interview-members.create', 'otherInterviewMembers.edit', 'other-interview-members.index']) }}">
-                    <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
+                   <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M14.7141 15h4.268c.4043 0 .732-.3838.732-.8571V3.85714c0-.47338-.3277-.85714-.732-.85714H6.71411c-.55228 0-1 .44772-1 1v4m10.99999 7v-3h3v3h-3Zm-3 6H6.71411c-.55228 0-1-.4477-1-1 0-1.6569 1.34315-3 3-3h2.99999c1.6569 0 3 1.3431 3 3 0 .5523-.4477 1-1 1Zm-1-9.5c0 1.3807-1.1193 2.5-2.5 2.5s-2.49999-1.1193-2.49999-2.5S8.8334 9 10.2141 9s2.5 1.1193 2.5 2.5Z"/>
+</svg>
+
                     <span class="text-md">{{ __db('interview_members') }}</span>
                 </a>
             </li>
@@ -259,11 +242,10 @@
             <li>
                 <a href="{{ route('translations.index') }}"
                     class="{{ areActiveRoutes(['translations.create', 'translations.edit', 'translations.index']) }}">
-                    <svg class="pe-2" width="36" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
+  <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="m13 19 3.5-9 3.5 9m-6.125-2h5.25M3 7h7m0 0h2m-2 0c0 1.63-.793 3.926-2.239 5.655M7.5 6.818V5m.261 7.655C6.79 13.82 5.521 14.725 4 15m3.761-2.345L5 10m2.761 2.655L10.2 15"/>
+</svg>
+
                     <span class="text-md">{{ __db('label_translations') }}</span>
                 </a>
             </li>

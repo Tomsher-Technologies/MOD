@@ -4,7 +4,7 @@
 
 <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('label_translations') }}</h2>
-    <button class="bg-blue-600 text-white px-4 py-2 rounded" data-modal-target="addTranslationModal"
+    <button class="bg-[#a57d30] hover:bg-[#a57d30] text-white px-4 py-2 rounded" data-modal-target="addTranslationModal"
         data-modal-toggle="addTranslationModal">{{ __db('add_new') }}</button>
 </div>
 @php
@@ -42,7 +42,7 @@
 
             <table class="w-full text-left border border-gray-300">
                 <thead class="bg-gray-100">
-                    <tr>
+                    <tr class="text-[11px]">
                         <th class="p-3 !bg-[#B68A35] text-start text-white">#</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('label_key') }}</th>
                         @foreach ($languages as $lang)
@@ -56,7 +56,7 @@
                        @php
                            $langData = '';
                        @endphp
-                        <tr class="border-t">
+                        <tr class="border-t text-[9px]">
                             <td class="px-4 py-3 text-end" dir="ltr">
                                 {{ ($key+1) + ($translations->currentPage() - 1)*$translations->perPage() }}
                             </td>

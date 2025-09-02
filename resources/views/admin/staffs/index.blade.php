@@ -79,7 +79,7 @@
 
                 <table class="w-full text-left border border-gray-300">
                     <thead class="bg-gray-100">
-                        <tr>
+                        <tr class="text-[11px]">
                             <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('military_number') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }}</th>
@@ -93,7 +93,7 @@
                     </thead>
                     <tbody>
                         @forelse ($users as $key => $staff)
-                            <tr class="border-t">
+                            <tr class="border-t text-[9px]">
                                 <td class="px-4 py-3 text-center" dir="ltr">
                                     {{ $key + 1 + ($users->currentPage() - 1) * $users->perPage() }}
                                 </td>
