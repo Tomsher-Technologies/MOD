@@ -403,21 +403,25 @@
                             },
                         ],
                         [
-                            'label' => 'Accommodation',
+                            'label' => __db('accommodation'),
                             'render' => function ($row) {
-                                if ($row->accommodation_id) {
-                                    $accommodation = \App\Models\Accommodation::find($row->accommodation_id);
-                                    return $accommodation
-                                        ? e(
-                                            $accommodation->name .
-                                                ' - ' .
-                                                $accommodation->room_type .
-                                                ' - ' .
-                                                $accommodation->room_number,
-                                        )
-                                        : '-';
+                                // If accommodation is not required (boolean field is false)
+                                if (!$row->accommodation) {
+                                    return 'Not Required';
                                 }
-                                return '-';
+                                
+                                $room = $row->currentRoomAssignment ?? null;
+
+                                $accommodation = $row->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
+
+                                return $accommodation ?? '-';
                             },
                         ],
                         [

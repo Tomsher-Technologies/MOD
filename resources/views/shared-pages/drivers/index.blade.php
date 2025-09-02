@@ -263,7 +263,7 @@
                 <select name="title_id[]" multiple data-placeholder="{{ __db('select_titles') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getDropDown('title')->options as $option)
-                        <option value="{{ $option->value }}" @if (in_array($option->value, request('title_id', []))) selected @endif>
+                        <option value="{{ $option->id }}" @if (in_array($option->id, request('title_id', []))) selected @endif>
                             {{ $option->value }}</option>
                     @endforeach
                 </select>
