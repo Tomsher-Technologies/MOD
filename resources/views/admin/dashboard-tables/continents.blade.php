@@ -21,7 +21,7 @@
                     <div class="overflow-x-auto w-full">
                         <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
                             <thead>
-                                <tr class="text-[12px]">
+                                <tr class="text-[11px]">
                                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
                                     @foreach($data['invitationByContinentsTable']['continents'] as $continentName)
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ $continentName }}</th>

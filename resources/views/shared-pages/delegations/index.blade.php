@@ -310,7 +310,7 @@
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
                         data-modal-hide="column-visibility-modal">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -340,7 +340,7 @@
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
                         data-modal-hide="note-modal">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

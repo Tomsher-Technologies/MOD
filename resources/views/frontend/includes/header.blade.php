@@ -87,7 +87,7 @@
                             Notification
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 dark:text-white">05</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 ">05</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">

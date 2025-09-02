@@ -48,7 +48,7 @@
 
                 <div class="flex items-center justify-between mb-5">
 
-                    <h2 class="font-semibold mb-0 !text-[22px] mb-10 pb-4">{{ __db('arrivals') }}</h2>
+                    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('arrivals') }}</h2>
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
                         <img src="{{ getAdminEventLogo() }}" alt="">
@@ -63,7 +63,7 @@
 
                 </div>
 
-                <hr class="mx-6 border-neutral-200 h-5 ">
+                <hr class=" border-neutral-200 h-5 ">
                 @php
 
                     $statusLabels = [
