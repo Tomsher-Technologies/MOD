@@ -61,7 +61,7 @@
                                 ($delegations->currentPage() - 1) * $delegations->perPage(),
                         ],
                         [
-                            'label' => __db('delegation') . ' ' . __db('id'),
+                            'label' => __db('delegation'),
                             'key' => 'id',
                             'render' => fn($delegation) => e($delegation->code),
                         ],

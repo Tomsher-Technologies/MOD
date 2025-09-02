@@ -41,6 +41,13 @@
                   @php
                       $columns = [
                           [
+                              'label' => __db('sl_no'),
+                              'key' => 'sl_no',
+                              'render' => function ($row, $key) use ($interviews) {
+                                  return $interviews->firstItem() + $key;
+                              },
+                          ],
+                          [
                               'label' => __db('date_time'),
                               'render' => fn($row) => $row->date_time
                                   ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
@@ -48,7 +55,24 @@
                           ],
                           [
                               'label' => __db('delegation'),
-                              'render' => fn($row) => $row->delegation->code ?? '-',
+                              'render' => function ($row) {
+                                  $delegationUrl = route('delegations.show', $row->delegation->id);
+
+                                  return '
+                                                  <div class="flex items-center gap-2">
+                                                        ' .
+                                      '
+
+                                                        <a href="' .
+                                      $delegationUrl .
+                                      '" class="font-medium !text-[#B68A35] hover:underline">
+                                                            ' .
+                                      $row->delegation->code .
+                                      '
+                                                        </a>
+
+                                                        ';
+                              },
                           ],
                           [
                               'label' => __db('attended_by'),

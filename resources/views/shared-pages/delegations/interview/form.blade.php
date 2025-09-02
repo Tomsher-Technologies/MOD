@@ -124,7 +124,8 @@
                             ({{ __db('delegate_id') }}):</label>
                         <input type="text" id="delegation_code_input" name="interview_with_delegation_code"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300"
-                            placeholder="{{ __db('enter_code_or_search') }}" value="{{ $oldToDelegationCode }}">
+                            placeholder="{{ __db('delegation') . ' ' . __db('id') }}"
+                            value="{{ $oldToDelegationCode }}">
                         @error('interview_with_delegation_code')
                             <div class="text-red-600 mt-1">{{ $message }}</div>
                         @enderror
@@ -161,7 +162,8 @@
                 </div>
 
                 <div id="other-input" class="hidden" @class(['hidden' => $oldInterviewType !== 'other'])>
-                    <label class="form-label block mb-1 rounded-l-s text-gray-700 font-medium">{{ __db('members') }}:</label>
+                    <label
+                        class="form-label block mb-1 rounded-l-s text-gray-700 font-medium">{{ __db('members') }}:</label>
                     <select name="other_member_id" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select') }}</option>
                         @foreach ($otherMembers as $member)
@@ -268,6 +270,11 @@
     </script>
 
     <script>
+        window.currentDelegationId = "{{ $delegation->id }}";
+
+        window.currentDelegationCode = "{{ $delegation->code }}";
+
+
         window.pageRoutes = {
             delegationSearchByCode: @json(route('delegations.searchByCode')),
             delegationSearchByFilters: @json(route('delegations.search')),
@@ -321,29 +328,29 @@
             let selectedDelegationCode = null;
             let selectedMembers = [];
 
-            // Load countries when continent is selected
             continentSelect.addEventListener('change', function() {
                 const continentId = this.value;
-                countrySelect.innerHTML = '<option value="" selected disabled>{{ __db('select_country') }}</option>';
-                
+                countrySelect.innerHTML =
+                    '<option value="" selected disabled>{{ __db('select_country') }}</option>';
+
                 if (continentId) {
                     fetch(`/mod-admin/get-countries?continent_ids=${continentId}`, {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        data.forEach(country => {
-                            const option = document.createElement('option');
-                            option.value = country.id;
-                            option.textContent = country.name;
-                            countrySelect.appendChild(option);
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            data.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country.id;
+                                option.textContent = country.name;
+                                countrySelect.appendChild(option);
+                            });
+                        })
+                        .catch(() => {
+                            console.error('Failed to load countries');
                         });
-                    })
-                    .catch(() => {
-                        console.error('Failed to load countries');
-                    });
                 }
             });
 
@@ -367,6 +374,11 @@
                     return;
                 }
 
+                if (code === window.currentDelegationCode) {
+                    toastr.error("{{ __db('cannot_search_current_delegation') }}");
+                    return;
+                }
+
                 fetch(`${window.pageRoutes.delegationSearchByCode}?code=${encodeURIComponent(code)}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -374,7 +386,6 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        console.log("data", data);
 
                         if (data.success && data.members) {
                             populateMembers(data.members);
@@ -396,11 +407,10 @@
                 const countryId = document.getElementById('modal-country').value;
 
                 if (!continentId && !countryId) {
-                    alert('Please select at least Continent or Country.');
+                    toastr.error("{{ __db('select_continent_or_country') }}");
                     return;
                 }
 
-                // Build query parameters
                 let queryParams = [];
                 if (continentId) queryParams.push(`continent_id=${continentId}`);
                 if (countryId) queryParams.push(`country_id=${countryId}`);
@@ -414,8 +424,12 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
+                            const filteredDelegations = data?.delegations.filter(delegation =>
+                                Number(delegation
+                                    .id) !== Number(window.currentDelegationId));
+
                             delegationsList.innerHTML = '';
-                            data.delegations.forEach(delegation => {
+                            filteredDelegations.forEach(delegation => {
                                 const li = document.createElement('li');
                                 li.className = 'py-2 cursor-pointer hover:bg-gray-100';
                                 li.textContent =
@@ -430,11 +444,11 @@
                                     selectedDelegationCode = delegation.code;
 
                                     modalSelectBtn.disabled = false;
-                                    modalSelectBtn.classList.remove(
-                                        'hidden');
+                                    modalSelectBtn.classList.remove('hidden');
                                 });
                                 delegationsList.appendChild(li);
                             });
+
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");
 

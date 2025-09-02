@@ -208,7 +208,7 @@ class DelegationController extends Controller
             $query->where('status_id', $statusId);
         }
 
-        $interviews = $query->paginate(20);
+        $interviews = $query->orderBy('id', 'desc')->paginate(20);
 
         return view('admin.delegations.interviews', compact('interviews'));
     }
