@@ -129,9 +129,13 @@
                         ],
                         [
                             'label' => __db('accommodation'),
-                            'render' => fn($row) => property_exists($row, 'accommodation')
-                                ? $row->accommodation ?? '-'
-                                : '-',
+                            'render' => function ($row) {
+                                $room = $row->currentRoomAssignment ?? null;
+
+                                $accommodation =  ($row->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-') : '-'  ;
+                               
+                                return $accommodation ?? '-';
+                            },
                         ],
                         [
                             'label' => __db('arrival_status'),
@@ -207,6 +211,16 @@
                                 return e(implode(', ', $names));
                             },
                         ],
+                        [
+                            'label' => __db('accommodation'),
+                            'render' => function ($escort) {
+                                $room = $escort->currentRoomAssignment ?? null;
+
+                                $accommodation = ($escort->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-'): '-';
+                                //;
+                                return $accommodation ?? '-';
+                            },
+                        ],
                     ];
                 @endphp
 
@@ -274,6 +288,16 @@
                             'label' => __db('capacity'),
                             'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
+                        ],
+                         [
+                            'label' => __db('accommodation'),
+                            'render' => function ($driver) {
+                                $room = $driver->currentRoomAssignment ?? null;
+
+                                $accommodation =  ($driver->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-'): '-';
+                                //;
+                                return $accommodation ?? '-';
+                            },
                         ],
                         //             [
                         //                 'label' => __db('status'),
