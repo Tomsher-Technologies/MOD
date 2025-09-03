@@ -409,7 +409,7 @@
                         'to_be_arrived' => __db('to_be_arrived'),
                     ];
                     $departureStatuses = [
-                        // 'to_be_departed' => __db('to_be_departed'),
+                        'to_be_departed' => __db('to_be_departed'),
                         'departed' => __db('departed'),
                     ];
 

@@ -574,7 +574,7 @@ class DelegationController extends Controller
             'invitationStatus',
             'participationStatus',
             'attachments',
-            'delegates.delegateTransports'
+            'delegates.delegateTransports.airport'
         ])->findOrFail($id);
 
         $showArrival = $request->query('showArrival');
@@ -590,15 +590,15 @@ class DelegationController extends Controller
 
         $delegates = $delegation->delegates;
 
-        if ($showArrival && !$showDeparture) {
-            $delegates = $delegates->filter(function ($delegate) {
-                return !$delegate->delegateTransports->contains('type', 'arrival');
-            });
-        } elseif ($showDeparture && !$showArrival) {
-            $delegates = $delegates->filter(function ($delegate) {
-                return !$delegate->delegateTransports->contains('type', 'departure');
-            });
-        }
+        // if ($showArrival && !$showDeparture) {
+        //     $delegates = $delegates->filter(function ($delegate) {
+        //         return !$delegate->delegateTransports->contains('type', 'arrival');
+        //     });
+        // } elseif ($showDeparture && !$showArrival) {
+        //     $delegates = $delegates->filter(function ($delegate) {
+        //         return !$delegate->delegateTransports->contains('type', 'departure');
+        //     });
+        // }
 
         return view('admin.delegations.add-travel', compact('delegation', 'delegates', 'showArrival', 'showDeparture'));
     }
@@ -1087,29 +1087,55 @@ class DelegationController extends Controller
                 $delegate = $delegation->delegates()->findOrFail($delegateId);
 
                 if (isset($validated['arrival']['date_time']) && $validated['arrival']['date_time']) {
-                    $delegate->delegateTransports()->create([
-                        'type' => 'arrival',
-                        'mode' => $validated['arrival']['mode'],
-                        'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
-                        'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
-                        'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
-                        'date_time' => $validated['arrival']['date_time'] ?? null,
-                        'status' => $validated['arrival']['status'] ?? null,
-                        'comment' => $validated['arrival']['comment'] ?? null,
-                    ]);
+                    $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->first();
+                    if ($arrivalTransport) {
+                        $arrivalTransport->update([
+                            'mode' => $validated['arrival']['mode'],
+                            'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['arrival']['date_time'] ?? null,
+                            'status' => $validated['arrival']['status'] ?? null,
+                            'comment' => $validated['arrival']['comment'] ?? null,
+                        ]);
+                    } else {
+                        $delegate->delegateTransports()->create([
+                            'type' => 'arrival',
+                            'mode' => $validated['arrival']['mode'],
+                            'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['arrival']['date_time'] ?? null,
+                            'status' => $validated['arrival']['status'] ?? null,
+                            'comment' => $validated['arrival']['comment'] ?? null,
+                        ]);
+                    }
                 }
 
                 if (isset($validated['departure']['date_time']) && $validated['departure']['date_time']) {
-                    $delegate->delegateTransports()->create([
-                        'type' => 'departure',
-                        'mode' => $validated['departure']['mode'],
-                        'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
-                        'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
-                        'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
-                        'date_time' => $validated['departure']['date_time'] ?? null,
-                        'status' => $validated['departure']['status'] ?? null,
-                        'comment' => $validated['departure']['comment'] ?? null,
-                    ]);
+                    $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->first();
+                    if ($departureTransport) {
+                        $departureTransport->update([
+                            'mode' => $validated['departure']['mode'],
+                            'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['departure']['date_time'] ?? null,
+                            'status' => $validated['departure']['status'] ?? null,
+                            'comment' => $validated['departure']['comment'] ?? null,
+                        ]);
+                    } else {
+                        $delegate->delegateTransports()->create([
+                            'type' => 'departure',
+                            'mode' => $validated['departure']['mode'],
+                            'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['departure']['date_time'] ?? null,
+                            'status' => $validated['departure']['status'] ?? null,
+                            'comment' => $validated['departure']['comment'] ?? null,
+                        ]);
+                    }
                 }
 
                 $this->updateParticipationStatus($delegate);

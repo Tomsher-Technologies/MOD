@@ -74,7 +74,7 @@
                     @endphp
 
                 @if (!$rowPermissions || can($rowPermissions))
-                    <tr class="text-[9px]  align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                    <tr class="text-[9px] align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
                         data-id="{{ $row->id }}">
                         @foreach ($columns as $column)
                             @php
@@ -88,7 +88,7 @@
                             @endphp
 
                                 @if (!$colPermissions || can($colPermissions))
-                                    <td class="px-4 py-2 border border-gray-200"
+                                    <td class="px-4 py-2 border {{ $rowClass ? $rowClass($row) : 'border-gray-200' }}"
                                         data-column="{{ Str::slug($column['label']) }}">
                                         {!! $column['render']($row, $key) !!}
                                     </td>

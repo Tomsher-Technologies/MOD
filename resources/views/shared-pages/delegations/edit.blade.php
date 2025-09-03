@@ -132,7 +132,7 @@
                 @canany(['edit_delegations', 'delegate_edit_delegations'])
                     <div class="col-span-12 mt-6">
                         <button type="submit"
-                            class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition">
+                            class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition" @click="window.hasUnsavedAttachments = false">
                             {{ __db('update_delegation') }}
                         </button>
                     </div>
@@ -254,7 +254,8 @@
                                         <label class="form-label">{{ __db('title') }}</label>
                                         <select :name="`attachments[${index}][title_id]`"
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
-                                            x-model.number="attachment.title_id" :disabled="attachment.deleted">
+                                            x-model.number="attachment.title_id" :disabled="attachment.deleted"
+                                            @change="window.hasUnsavedAttachments = true">
                                             <option value="">{{ __db('select_title') }}</option>
                                             @foreach ($options as $option)
                                                 <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -267,14 +268,18 @@
                                         <input
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
                                             type="file" :name="`attachments[${index}][file]`"
-                                            @change="e => attachment.file = e.target.files[0]">
+                                            @change="e => { 
+                                                attachment.file = e.target.files[0];
+                                                window.hasUnsavedAttachments = true;
+                                            }">
                                     </div>
 
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('document_date') }}</label>
                                         <input type="date" :name="`attachments[${index}][document_date]`"
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
-                                            x-model="attachment.document_date" :disabled="attachment.deleted" />
+                                            x-model="attachment.document_date" :disabled="attachment.deleted" 
+                                            @change="window.hasUnsavedAttachments = true" />
                                     </div>
                                     <div class="col-span-3">
                                         <button type="button"
@@ -299,7 +304,7 @@
                             @canany(['edit_delegations', 'delegate_edit_delegations'])
                                 <div class="mt-6">
                                     <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-6 py-2"
-                                        x-show="attachments.length > 0">
+                                        x-show="attachments.length > 0" @click="window.hasUnsavedAttachments = false">
                                         {{ __db('save_attachments') }}
                                     </button>
                                 </div>
@@ -1038,9 +1043,7 @@
         close() {
             this.isAttachmentEditModalOpen = false;
         },
-        handleFileChange(e) {
-            this.attachment.file = e.target.files[0];
-        }
+   
     }" x-on:open-edit-attachment.window="open($event.detail)">
         <div x-show="isAttachmentEditModalOpen" x-transition:enter="ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
@@ -1068,7 +1071,7 @@
                         <div>
                             <label class="form-label block mb-1">{{ __db('title') }}</label>
                             <select name="attachments[0][title_id]" x-model="attachment.title_id"
-                                class="w-full p-2 border rounded">
+                                class="w-full p-2 border rounded" @change="handleTitleChange">
                                 <option value="">{{ __db('select_title') }}</option>
                                 @foreach ($attachmentTitleDropdown->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -1078,7 +1081,7 @@
                         <div>
                             <label class="form-label block mb-1">{{ __db('document_date') }}</label>
                             <input type="date" name="attachments[0][document_date]"
-                                x-model="attachment.document_date" class="w-full p-2 border rounded" />
+                                x-model="attachment.document_date" class="w-full p-2 border rounded" @change="handleDateChange" />
                         </div>
                         <div>
                             <label class="form-label block mb-1">{{ __db('replace_file') }}</label>
@@ -1098,7 +1101,7 @@
                                 class="btn border border-gray-300 px-4 py-2 rounded hover:bg-gray-100">
                                 {{ __db('cancel') }}
                             </button>
-                            <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2 rounded">
+                            <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2 rounded" @click="window.hasUnsavedAttachments = false">
                                 {{ __db('save') }}
                             </button>
                         </div>
@@ -1173,6 +1176,24 @@
             if (selectedContinent) {
                 $('#continent-select').trigger('change');
             }
+            
+            window.hasUnsavedAttachments = false;
+            
+            $('form[action="{{ route('delegations.updateAttachment', $delegation->id) }}"]').on('submit', function() {
+                window.hasUnsavedAttachments = false;
+            });
+            
+            $('button[type="submit"]').on('click', function() {
+                window.hasUnsavedAttachments = false;
+            });
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (window.hasUnsavedAttachments) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
         });
 
         function attachmentsComponent() {
@@ -1189,6 +1210,7 @@
                         file: null,
                         deleted: false,
                     });
+                    window.hasUnsavedAttachments = true;
                 },
 
                 toggleDelete(index) {
@@ -1198,6 +1220,7 @@
                     } else {
                         attachment.deleted = !attachment.deleted;
                     }
+                    window.hasUnsavedAttachments = true;
                 },
             };
         }

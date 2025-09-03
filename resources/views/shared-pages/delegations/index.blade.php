@@ -61,64 +61,6 @@
                                 ($delegations->currentPage() - 1) * $delegations->perPage(),
                         ],
                         [
-                            'label' => __db('delegation'),
-                            'key' => 'id',
-                            'render' => fn($delegation) => e($delegation->code),
-                        ],
-                        [
-                            'label' => __db('invitation_from'),
-                            'key' => 'invitation_from',
-                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
-                        ],
-                        [
-                            'label' => __db('team_head'),
-                            'key' => 'team_head',
-                            'render' => function ($delegation) {
-                                $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
-                                return $teamHeads->isNotEmpty()
-                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
-                                    : '-';
-                            },
-                        ],
-                        [
-                            'label' => __db('escorts'),
-                            'key' => 'escorts',
-                            'render' => function ($delegation) {
-                                if ($delegation->escorts->isEmpty()) {
-                                    return '-';
-                                }
-                                
-                                return $delegation->escorts->map(function ($escort) {
-                                    $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
-                                })->implode('<br>');
-                            },
-                        ],
-                        [
-                            'label' => __db('drivers'),
-                            'key' => 'drivers',
-                            'render' => function ($delegation) {
-                                if ($delegation->drivers->isEmpty()) {
-                                    return '-';
-                                }
-                                
-                                return $delegation->drivers->map(function ($driver) {
-                                    $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
-                                })->implode('<br>');
-                            },
-                        ],
-                        [
-                            'label' => __db('invitation_status'),
-                            'key' => 'invitation_status',
-                            'render' => fn($delegation) => e($delegation->invitationStatus->value ?? '-'),
-                        ],
-                        [
-                            'label' => __db('participation_status'),
-                            'key' => 'participation_status',
-                            'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
-                        ],
-                        [
                             'label' => __db('continent'),
                             'key' => 'continent',
                             'render' => fn($delegation) => e($delegation->continent->value ?? '-'),
@@ -144,6 +86,78 @@
                                 return $flag . ' ' . e($delegation->country->name);
                             },
                         ],
+                        [
+                            'label' => __db('team_head'),
+                            'key' => 'team_head',
+                            'render' => function ($delegation) {
+                                $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
+                                return $teamHeads->isNotEmpty()
+                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
+                                    : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('delegation'),
+                            'key' => 'id',
+                            'render' => fn($delegation) => e($delegation->code),
+                        ],
+                        [
+                            'label' => __db('invitation_from'),
+                            'key' => 'invitation_from',
+                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
+                        ],
+
+                        [
+                            'label' => __db('escorts'),
+                            'key' => 'escorts',
+                            'render' => function ($delegation) {
+                                if ($delegation->escorts->isEmpty()) {
+                                    return '-';
+                                }
+
+                                return $delegation->escorts
+                                    ->map(function ($escort) {
+                                        $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                        return '<a href="' .
+                                            $searchUrl .
+                                            '" class="text-[#B68A35] hover:underline">' .
+                                            e($escort->code) .
+                                            '</a>';
+                                    })
+                                    ->implode('<br>');
+                            },
+                        ],
+                        [
+                            'label' => __db('drivers'),
+                            'key' => 'drivers',
+                            'render' => function ($delegation) {
+                                if ($delegation->drivers->isEmpty()) {
+                                    return '-';
+                                }
+
+                                return $delegation->drivers
+                                    ->map(function ($driver) {
+                                        $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                        return '<a href="' .
+                                            $searchUrl .
+                                            '" class="text-[#B68A35] hover:underline">' .
+                                            e($driver->code) .
+                                            '</a>';
+                                    })
+                                    ->implode('<br>');
+                            },
+                        ],
+                        [
+                            'label' => __db('invitation_status'),
+                            'key' => 'invitation_status',
+                            'render' => fn($delegation) => e($delegation->invitationStatus->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('participation_status'),
+                            'key' => 'participation_status',
+                            'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
+                        ],
+
                         [
                             'key' => 'note',
                             'label' => __db('note'),
@@ -224,7 +238,7 @@
 
         <form action="{{ route('delegations.index') }}" method="GET">
             <div class="flex flex-col gap-2 mt-2">
-                
+
                 <div class="flex flex-col">
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
@@ -295,14 +309,6 @@
                         @endforeach
                     </select>
                 </div>
-                {{-- <select name="hotel_name"
-                    class="w-full rounded-lg border border-gray-300 text-sm">
-                    <option value="">{{ __db('select') }}</option>
-                    @foreach ($filterData['hotelNames'] as $hotel)
-                        <option value="{{ $hotel }}" {{ request('hotel_name') == $hotel ? 'selected' : '' }}>
-                            {{ $hotel }}</option>
-                    @endforeach
-                </select> --}}
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
                 <a href="{{ route('delegations.index') }}"
@@ -429,6 +435,15 @@
                     checkboxes.forEach(checkbox => {
                         checkbox.checked = savedPrefs[checkbox.value] !== false;
                     });
+                } else {
+                    const idCheckbox = Array.from(checkboxes).find(c => c.value === 'id');
+                    if (idCheckbox) {
+                        idCheckbox.checked = false;
+                        document.querySelectorAll(`th[data-column-key='id'], td[data-column-key='id']`).forEach(
+                            el => {
+                                el.style.display = 'none';
+                            });
+                    }
                 }
             };
 
@@ -456,6 +471,9 @@
 
             loadPreferences();
             applyVisibility();
+
+
+
 
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', applyVisibility);
