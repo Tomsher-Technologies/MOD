@@ -1,6 +1,11 @@
 <div class="">
     @php
         $isEditMode = $delegate->exists;
+
+        $existingTeamHead = $delegation->delegates
+            ->where('team_head', true)
+            ->when($isEditMode, fn($coll) => $coll->where('id', '!=', $delegate->id))
+            ->first();
     @endphp
 
     <x-back-btn title="{{ $isEditMode ? __db('edit_delegate') : __db('add_delegate') }}"
@@ -73,7 +78,8 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}: <span class="text-red-600">*</span></label>
-                    <select name="gender_id" required class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="gender_id" required
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="" disabled>{{ __db('select_gender') }}</option>
                         @foreach (getDropDown('gender')->options as $option)
                             <option value="{{ $option->id }}" @if (old('gender_id', $delegate->gender_id) == $option->id) selected @endif>
@@ -100,7 +106,8 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('relationship') }}:</label>
-                    <select name="relationship_id" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="relationship_id"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="">{{ __db('select_relationship') }}</option>
                         @foreach (getDropDown('relationship')->options as $option)
                             <option value="{{ $option->id }}" @if (old('relationship_id', $delegate->relationship_id) == $option->id) selected @endif>
@@ -113,7 +120,8 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('internal_ranking') }}:</label>
-                    <select name="internal_ranking_id" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <select name="internal_ranking_id"
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
                         <option value="">{{ __db('select_ranking') }}</option>
                         @foreach (getDropDown('internal_ranking')->options as $option)
                             <option value="{{ $option->id }}" @if (old('internal_ranking_id', $delegate->internal_ranking_id) == $option->id) selected @endif>
@@ -133,12 +141,14 @@
             </div>
 
             <div class="pt-6 mt-6 flex flex-wrap gap-8">
-                <div class="flex items-center gap-3">
-                    <input id="team-head" name="team_head" type="checkbox" value="1"
-                        class="h-5 w-5 text-blue-600 border-gray-300 rounded"
-                        @if (old('team_head', $delegate->team_head)) checked @endif />
-                    <label for="team-head" class="text-sm text-gray-700">{{ __db('team_head') }}</label>
-                </div>
+                @if (!$existingTeamHead)
+                    <div class="flex items-center gap-3">
+                        <input id="team-head" name="team_head" type="checkbox" value="1"
+                            class="h-5 w-5 text-blue-600 border-gray-300 rounded"
+                            @if (old('team_head', $delegate->team_head)) checked @endif />
+                        <label for="team-head" class="text-sm text-gray-700">{{ __db('team_head') }}</label>
+                    </div>
+                @endif
                 <div class="flex items-center gap-3">
                     <input id="badge-printed" name="badge_printed" type="checkbox" value="1"
                         class="h-5 w-5 text-blue-600 border-gray-300 rounded"

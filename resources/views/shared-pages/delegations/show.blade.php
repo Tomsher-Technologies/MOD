@@ -130,10 +130,22 @@
                         [
                             'label' => __db('accommodation'),
                             'render' => function ($row) {
+                                // If accommodation is not required (boolean field is false)
+                                if (!$row->accommodation) {
+                                    return 'Not Required';
+                                }
+                                
                                 $room = $row->currentRoomAssignment ?? null;
 
-                                $accommodation =  ($row->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-') : '-'  ;
-                               
+                                $accommodation = $row->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
+
                                 return $accommodation ?? '-';
                             },
                         ],
@@ -159,18 +171,11 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
-
-                    @canany(['add_escorts', 'escort_add_escorts'])
-                        <a href={{ route('escorts.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escort') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
@@ -178,23 +183,48 @@
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
+                            'label' => __db('escort') . ' ' . __db('code'),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($escort->code) .
+                                    '</a>';
+                            },
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
-                            'render' => fn($escort) => e($escort->military_number),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->military_number]);
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($escort->military_number) .
+                                    '</a>';
+                            },
                         ],
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ""),
+                            'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
                             'key' => 'name',
-                            'render' => fn($escort) => e($escort->name_en),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($escort->name_en) .
+                                    '</a>';
+                            },
                         ],
                         [
-                            'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
+                            'label' => __db('phone_number'),
+                            'key' => 'phone_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
                         [
@@ -216,7 +246,14 @@
                             'render' => function ($escort) {
                                 $room = $escort->currentRoomAssignment ?? null;
 
-                                $accommodation = ($escort->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-'): '-';
+                                $accommodation = $escort->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
                                 //;
                                 return $accommodation ?? '-';
                             },
@@ -231,18 +268,12 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
-
-                    @canany(['add_drivers', 'driver_add_drivers'])
-                        <a href={{ route('drivers.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
@@ -250,29 +281,49 @@
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
+                            'label' => __db('driver') . ' ' . __db('code'),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($driver->code) .
+                                    '</a>';
+                            },
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
-                            'render' => fn($driver) => e($driver->military_number),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->military_number]);
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($driver->military_number) .
+                                    '</a>';
+                            },
                         ],
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($driver) => e($driver->title),
+                            'render' => fn($driver) => e($driver->title->value),
                         ],
                         [
                             'label' => __db('name_en'),
                             'key' => 'name_en',
-                            'render' => fn($driver) => e($driver->name_en),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($driver->name_en) .
+                                    '</a>';
+                            },
                         ],
                         [
-                            'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
-                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
-                        ],
-                        [
-                            'label' => __db('driver') . ' ' . __db('id'),
-                            'key' => 'driver_id',
-                            'render' => fn($driver) => e($driver->driver_id),
+                            'label' => __db('phone_number'),
+                            'key' => 'phone_number',
+                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->phone_number) . '</span>',
                         ],
                         [
                             'label' => __db('car') . ' ' . __db('type'),
@@ -289,12 +340,19 @@
                             'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
                         ],
-                         [
+                        [
                             'label' => __db('accommodation'),
                             'render' => function ($driver) {
                                 $room = $driver->currentRoomAssignment ?? null;
 
-                                $accommodation =  ($driver->current_room_assignment_id) ? ($room?->hotel?->hotel_name .' - '.$room->roomType?->roomType?->value.' - '. $room?->room_number ?? '-'): '-';
+                                $accommodation = $driver->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
                                 //;
                                 return $accommodation ?? '-';
                             },
@@ -335,8 +393,7 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}
-    </h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }} ({{ $delegation->interviews->count() }})</h2>
 
     @php
         $columns = [
@@ -371,7 +428,7 @@
                 'render' => function ($row) {
                     if (!empty($row->other_member_id) && $row->otherMember) {
                         $otherMemberName = $row->otherMember->name ?? '';
-                        $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                        $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
                         if ($otherMemberId) {
                             $with =
                                 '<a href="' .
@@ -379,7 +436,7 @@
                                     'other_interview_member' => base64_encode($otherMemberId),
                                 ]) .
                                 '" class="!text-[#B68A35]">
-                                    <span class="block">Other Member ID: ' .
+                                    <span class="block">Other Member: ' .
                                 e($otherMemberId) .
                                 '</span>
                                 </a>';
@@ -416,7 +473,9 @@
     </div>
 
 
-    <h4 class="text-lg font-semibold mb-3 mt-6">{{ __db('attachments') }}</h4>
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('attachments') }} ({{ $delegation->attachments->count() }})
+    </h2>
 
     @php
         $columns = [
@@ -458,8 +517,12 @@
         $noDataMessage = __db('no_attachments_found');
     @endphp
 
-    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-        <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+            </div>
+        </div>
     </div>
 
 

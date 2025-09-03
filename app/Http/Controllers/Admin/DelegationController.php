@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class DelegationController extends Controller
@@ -75,8 +76,6 @@ class DelegationController extends Controller
         $this->middleware('permission:add_travels|delegate_edit_delegates', [
             'only' => ['addTravel', 'storeTravel', 'updateTravel']
         ]);
-
-
     }
 
     public function index(Request $request)
@@ -110,25 +109,44 @@ class DelegationController extends Controller
 
 
         if ($invitationFrom = $request->input('invitation_from')) {
-            $query->whereIn('invitation_from_id', $invitationFrom);
+            if (is_array($invitationFrom)) {
+                $query->whereIn('invitation_from_id', $invitationFrom);
+            } else {
+                $query->where('invitation_from_id', $invitationFrom);
+            }
         }
+
         if ($continentId = $request->input('continent_id')) {
-            $query->where('continent_id', $continentId);
+            if (is_array($continentId)) {
+                $query->whereIn('continent_id', $continentId);
+            } else {
+                $query->where('continent_id', $continentId);
+            }
         }
+
         if ($countryId = $request->input('country_id')) {
-            $query->where('country_id', $countryId);
+            if (is_array($countryId)) {
+                $query->whereIn('country_id', $countryId);
+            } else {
+                $query->where('country_id', $countryId);
+            }
         }
+
         if ($invitationStatusId = $request->input('invitation_status_id')) {
-            $query->where('invitation_status_id', $invitationStatusId);
+            if (is_array($invitationStatusId)) {
+                $query->whereIn('invitation_status_id', $invitationStatusId);
+            } else {
+                $query->where('invitation_status_id', $invitationStatusId);
+            }
         }
+
         if ($participationStatusId = $request->input('participation_status_id')) {
-            $query->where('participation_status_id', $participationStatusId);
+            if (is_array($participationStatusId)) {
+                $query->whereIn('participation_status_id', $participationStatusId);
+            } else {
+                $query->where('participation_status_id', $participationStatusId);
+            }
         }
-        // if ($hotelName = $request->input('hotel_name')) {
-        //     $query->whereHas('delegates', function ($delegateQuery) use ($hotelName) {
-        //         $delegateQuery->where('hotel_name', $hotelName);
-        //     });
-        // }
 
         $limit = $request->limit ? $request->limit : 20;
 
@@ -190,7 +208,9 @@ class DelegationController extends Controller
             $query->where('status_id', $statusId);
         }
 
-        $interviews = $query->paginate(20);
+
+        $limit = $request->limit ? $request->limit : 20;
+        $interviews = $query->orderBy('id', 'desc')->paginate($limit);
 
         return view('admin.delegations.interviews', compact('interviews'));
     }
@@ -267,7 +287,6 @@ class DelegationController extends Controller
 
     public function arrivalsIndex(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = DelegateTransport::where('type', 'arrival')
@@ -296,50 +315,89 @@ class DelegationController extends Controller
             });
         }
 
-        // Override with explicit event_id if provided
         if ($eventId = $request->input('event_id')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($eventId) {
                 $delegationQuery->where('event_id', $eventId);
             });
         }
 
-        if ($fromDate = $request->input('from_date')) {
-            $query->whereDate('date_time', '>=', $fromDate);
+        if ($dateRange = $request->input('date_range')) {
+            $dates = explode(' - ', $dateRange);
+
+            if (count($dates) === 2) {
+                $fromDate = trim($dates[0]);
+                $toDate   = trim($dates[1]);
+
+                $query->whereDate('date_time', '>=', $fromDate)
+                    ->whereDate('date_time', '<=', $toDate);
+            }
+        } else {
+            if ($fromDate = $request->input('from_date')) {
+                $query->whereDate('date_time', '>=', $fromDate);
+            }
+
+            if ($toDate = $request->input('to_date')) {
+                $query->whereDate('date_time', '<=', $toDate);
+            }
         }
 
-        if ($toDate = $request->input('to_date')) {
-            $query->whereDate('date_time', '<=', $toDate);
-        }
-
-        if ($continentId = $request->input('continent_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
-                $delegationQuery->where('continent_id', $continentId);
+        if ($invitation_from = $request->input('invitation_from')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
+                $delegationQuery->where('invitation_from_id', $invitation_from);
             });
         }
 
-        if ($countryId = $request->input('country_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
-                $delegationQuery->where('country_id', $countryId);
-            });
+
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
         }
 
-        if ($airportId = $request->input('airport_id')) {
-            $query->where('airport_id', $airportId);
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
         }
 
-        if ($statusId = $request->input('status')) {
-            $query->where('status', $statusId);
+        if ($airportIds = $request->input('airport_id')) {
+            if (is_array($airportIds)) {
+                $query->whereIn('airport_id', $airportIds);
+            } else {
+                $query->where('airport_id', $airportIds);
+            }
         }
 
-        $arrivals = $query->latest()->paginate(10);
+        if ($statusIds = $request->input('status')) {
+            if (is_array($statusIds)) {
+                $query->whereIn('status', $statusIds);
+            } else {
+                $query->where('status', $statusIds);
+            }
+        }
 
+
+        $limit = $request->limit ? $request->limit : 20;
+
+        $arrivals = $query->orderBy('date_time', 'desc')->paginate($limit);
 
         return view('admin.arrivals.index', compact('arrivals'));
     }
 
     public function departuresIndex(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = DelegateTransport::where('type', 'departure')
@@ -374,17 +432,35 @@ class DelegationController extends Controller
             });
         }
 
-        if ($fromDate = $request->input('from_date')) {
-            $query->whereDate('date_time', '>=', $fromDate);
-        }
+        if ($dateRange = $request->input('date_range')) {
+            $dates = explode(' - ', $dateRange);
 
-        if ($toDate = $request->input('to_date')) {
-            $query->whereDate('date_time', '<=', $toDate);
+            if (count($dates) === 2) {
+                $fromDate = trim($dates[0]);
+                $toDate   = trim($dates[1]);
+
+                $query->whereDate('date_time', '>=', $fromDate)
+                    ->whereDate('date_time', '<=', $toDate);
+            }
+        } else {
+            if ($fromDate = $request->input('from_date')) {
+                $query->whereDate('date_time', '>=', $fromDate);
+            }
+
+            if ($toDate = $request->input('to_date')) {
+                $query->whereDate('date_time', '<=', $toDate);
+            }
         }
 
         if ($continentId = $request->input('continent_id')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
                 $delegationQuery->where('continent_id', $continentId);
+            });
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
+                $delegationQuery->where('invitation_from_id', $invitation_from);
             });
         }
 
@@ -398,11 +474,17 @@ class DelegationController extends Controller
             $query->where('airport_id', $airportId);
         }
 
-        if ($statusId = $request->input('status_id')) {
-            $query->where('status_id', $statusId);
+        if ($status = $request->input('status')) {
+            if (is_array($status)) {
+                $query->whereIn('status', $status);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
-        $departures = $query->latest()->paginate(10);
+        $limit = $request->limit ? $request->limit : 20;
+
+        $departures = $query->orderBy('date_time', 'desc')->paginate($limit);
 
         return view('admin.departures.index', compact('departures'));
     }
@@ -421,6 +503,8 @@ class DelegationController extends Controller
             'flight_name.max' => __db('flight_name_max', ['max' => 255]),
             'date_time.date' => __db('date_time_date'),
         ]);
+
+        $validated['date_time'] = Carbon::parse($validated['date_time'])->format('Y-m-d H:i:s');
 
         $relationsToCompare = [
             'airport_id' => [
@@ -445,7 +529,6 @@ class DelegationController extends Controller
             $transport->update($dataToSave);
             $this->updateParticipationStatus($transport->delegate);
 
-            // Log activity if there were changes and it was confirmed
             if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
@@ -556,7 +639,10 @@ class DelegationController extends Controller
 
     public function addInterview(Delegation $delegation)
     {
-        $otherMembers = OtherInterviewMember::all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $otherMembers = OtherInterviewMember::where('event_id', $currentEventId)->where('status', 1)->get();
 
         return view('admin.delegations.add-interview', [
             'delegation' => $delegation,
@@ -571,7 +657,9 @@ class DelegationController extends Controller
             abort(404, 'Interview not found for this delegation.');
         }
 
-        $otherMembers = OtherInterviewMember::all();
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $otherMembers = OtherInterviewMember::where('event_id', $currentEventId)->where('status', 1)->get();
 
         $toDelegationMembers = [];
 
@@ -592,7 +680,7 @@ class DelegationController extends Controller
         $validated = $request->validate([
             'invitation_from_id' => 'required|exists:dropdown_options,id',
             'continent_id' => 'required|exists:dropdown_options,id',
-            'country_id' => 'required|exists:dropdown_options,id',
+            'country_id' => 'required',
             'invitation_status_id' => 'required|exists:dropdown_options,id',
             'participation_status_id' => 'required|exists:dropdown_options,id',
             'note1' => 'nullable|string',
@@ -732,7 +820,7 @@ class DelegationController extends Controller
         $validated = $request->validate([
             'invitation_from_id' => 'required|exists:dropdown_options,id',
             'continent_id' => 'required|exists:dropdown_options,id',
-            'country_id' => 'required|exists:dropdown_options,id',
+            'country_id' => 'required',
             'invitation_status_id' => 'required|exists:dropdown_options,id',
             'participation_status_id' => 'required|exists:dropdown_options,id',
             'note1' => 'nullable|string',
@@ -789,7 +877,6 @@ class DelegationController extends Controller
             ],
         ];
 
-        // Use the processUpdate method for confirmation dialog
         $confirmationResult = $this->processUpdate($request, $delegation, $validated, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
@@ -963,9 +1050,34 @@ class DelegationController extends Controller
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
             'departure.flight_name' => 'nullable|string|max:255',
-            'departure.date_time' => 'nullable|date',
+            'departure.date_time' => 'nullable|date|after:arrival.date_time',
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
+        ],  [
+            'delegate_ids.required' => __db('delegate_ids_required'),
+            'delegate_ids.array' => __db('delegate_ids_array'),
+            'delegate_ids.min' => __db('delegate_ids_min'),
+            'delegate_ids.*.integer' => __db('delegate_ids_integer'),
+            'delegate_ids.*.exists' => __db('delegate_ids_exists'),
+
+            'arrival.mode.in' => __db('arrival_mode_in'),
+            'arrival.airport_id.integer' => __db('arrival_airport_id_integer'),
+            'arrival.airport_id.exists' => __db('arrival_airport_id_exists'),
+            'arrival.flight_no.max' => __db('arrival_flight_no_max'),
+            'arrival.flight_name.max' => __db('arrival_flight_name_max'),
+            'arrival.date_time.date' => __db('arrival_date_time_date'),
+            'arrival.status.max' => __db('arrival_status_max'),
+            'arrival.comment.string' => __db('arrival_comment_string'),
+
+            'departure.mode.in' => __db('departure_mode_in'),
+            'departure.airport_id.integer' => __db('departure_airport_id_integer'),
+            'departure.airport_id.exists' => __db('departure_airport_id_exists'),
+            'departure.flight_no.max' => __db('departure_flight_no_max'),
+            'departure.flight_name.max' => __db('departure_flight_name_max'),
+            'departure.date_time.date' => __db('departure_date_time_date'),
+            'departure.date_time.after' => __db('departure_date_time_after'),
+            'departure.status.max' => __db('departure_status_max'),
+            'departure.comment.string' => __db('departure_comment_string'),
         ]);
 
         DB::beginTransaction();
@@ -1041,9 +1153,7 @@ class DelegationController extends Controller
 
     public function storeOrUpdateInterview(Request $request, Delegation $delegation, Interview $interview = null)
     {
-        // return response().json([
-        //     'res' => $req->all()
-        // ]);
+
 
         $isEditMode = $interview && $interview->exists;
 
@@ -1096,7 +1206,7 @@ class DelegationController extends Controller
 
         $dataToProcess = [
             'delegation_id' => $delegation->id,
-            'date_time' => $validated['date_time'],
+            'date_time' => Carbon::parse($validated['date_time'])->format('Y-m-d H:i:s'),
             'from_delegate_ids' => $validated['from_delegate_ids'],
             'type' => $validated['interview_type'] === 'delegation' ? 'del_del' : 'del_others',
             'interview_with' => $validated['interview_type'] === 'delegation' ? ($interviewWithDelegation->id ?? null) : null,
@@ -1173,6 +1283,18 @@ class DelegationController extends Controller
                     'label' => 'name_en',
                 ],
             ],
+
+            'other_member_id' => [
+                'relation' => 'otherMember',
+                'type' => 'single',
+                'column' => 'id',
+                'display_with' => [
+                    'model' => \App\Models\OtherInterviewMember::class,
+                    'key' => 'id',
+                    'label' => 'name_en',
+                ],
+            ],
+
             'status_id' => [
                 'relation' => 'status',
                 'type' => 'single',
@@ -1192,6 +1314,7 @@ class DelegationController extends Controller
         }
 
         $dataToSave = $confirmationResult['data'];
+        $fieldsToNotify = $confirmationResult['notify'] ?? [];
 
         try {
             DB::beginTransaction();
@@ -1224,9 +1347,7 @@ class DelegationController extends Controller
                     submodule: 'interview',
                     action: 'update',
                     model: $interview,
-                    userId: auth()->id(),
                     changedFields: json_decode($request->input('changed_fields_json'), true),
-                    activityModelClass: \App\Models\DelegationActivity::class,
                     submoduleId: $interview->id,
                     delegationId: $delegation->id,
                     fieldsToNotify: $fieldsToNotify
@@ -1280,7 +1401,7 @@ class DelegationController extends Controller
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
             'departure.flight_name' => 'nullable|string|max:255',
-            'departure.date_time' => 'nullable|date',
+            'departure.date_time' => 'nullable|date|after:arrival.date_time',
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
@@ -1299,7 +1420,7 @@ class DelegationController extends Controller
             'departure.airport_id.exists' => __db('airport_id_exists'),
             'departure.flight_no.max' => __db('flight_no_max', ['max' => 255]),
             'departure.flight_name.max' => __db('flight_name_max', ['max' => 255]),
-            'departure.date_time.date' => __db('date_time_date'),
+            'departure.date_time.after' => __db('departure_date_after_arrival_date'),
         ]);
 
         if ($validator->fails()) {
@@ -1408,6 +1529,14 @@ class DelegationController extends Controller
             ],
             "status" => []
         ];
+
+        if (!isset($dataToProcess['arrival']['date_time']) || empty($dataToProcess['arrival']['date_time'])) {
+            unset($dataToProcess['arrival']);
+        }
+
+        if (!isset($dataToProcess['departure']['date_time']) || empty($dataToProcess['departure']['date_time'])) {
+            unset($dataToProcess['departure']);
+        }
 
         $confirmationResult = $this->processUpdate($request, $delegate, $dataToProcess, $relationsToCompare);
 

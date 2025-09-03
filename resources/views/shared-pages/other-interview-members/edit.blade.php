@@ -12,9 +12,10 @@
         </a>
     </div>
 
-    <form action="{{ route('other-interview-members.update', $interviewMember) }}" method="POST" autocomplete="off">
+    <form action="{{ route('other-interview-members.update', $interviewMember->id) }}" method="POST" autocomplete="off">
         @csrf
         @method('PUT')
+
         <div class="bg-white rounded-lg p-6 mb-10 mt-4">
             <div class="bg-white p-6 grid grid-cols-1 gap-5 mb-4">
                 <div>

@@ -26,7 +26,7 @@ class DriverFactory extends Factory
             'title' => $this->faker->title,
             'name_ar' => $this->faker->name,
             'name_en' => $this->faker->name,
-            'mobile_number' => $this->faker->phoneNumber,
+            'phone_number' => $this->faker->phoneNumber,
             'driver_id' => $this->faker->unique()->numerify('########'),
             'car_type' => $this->faker->word,
             'car_number' => $this->faker->bothify('??####'),

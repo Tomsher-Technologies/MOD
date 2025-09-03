@@ -12,7 +12,7 @@
     ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? '-'],
     ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom?->value ?? '-'],
     ['label' => __db('continent'), 'render' => fn($row) => $row->continent?->value ?? '-'],
-    ['label' => __db('country'), 'render' => fn($row) => $row->country?->value ?? '-'],
+    ['label' => __db('country'), 'render' => fn($row) => $row->country?->name ?? '-'],
     ['label' => __db('invitation_status'), 'render' => fn($row) => $row->invitationStatus?->value ?? '-'],
     ['label' => __db('participation_status'), 'render' => fn($row) => $row->participationStatus?->value ?? '-'],
     ];
