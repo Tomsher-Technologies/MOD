@@ -12,9 +12,13 @@ use Illuminate\Support\Str;
 
 trait HandlesUpdateConfirmation
 {
-    private function formatDisplayValue($value, $field = null)
+    private function formatDisplayValue($value, $field = null, $model = null)
     {
         if ($field === 'status') {
+            if ($model instanceof \App\Models\DelegateTransport) {
+                return humanize($value) ?? 'N/A';
+            }
+
             return $value == 1 ? 'Active' : 'Inactive';
         }
 
@@ -66,7 +70,7 @@ trait HandlesUpdateConfirmation
 
             $isChanged = $isBooleanField
                 ? ((bool) $originalValue !== (bool) $newValue)
-                : ($originalValue != $newValue);
+                : ($this->normalizeForComparison($originalValue) != $this->normalizeForComparison($newValue));
 
             if ($isChanged) {
                 $displayLabel = null;
@@ -84,8 +88,8 @@ trait HandlesUpdateConfirmation
 
                 $changedFields[$key] = [
                     'label' => Str::headline(str_replace('_id', '', $key)),
-                    'old' => $this->formatDisplayValue($originalValue, $key),
-                    'new' => $this->formatDisplayValue($newValue, $key),
+                    'old' => $this->formatDisplayValue($originalValue, $key, $model),
+                    'new' => $this->formatDisplayValue($newValue, $key, $model),
                 ];
             }
         }
@@ -145,19 +149,23 @@ trait HandlesUpdateConfirmation
                     foreach ($submittedRelationData as $field => $value) {
                         $originalValue = $existingRelatedModel ? $existingRelatedModel->{$field} : null;
 
-                        if ($field === 'date_time' && ($originalValue || $value)) {
-                            if (!$originalValue || !Carbon::parse($originalValue)->eq(Carbon::parse($value))) {
-                                $changedFields["{$requestKey}.{$field}"] = [
-                                    'label' => Str::headline($requestKey . ' Date Time'),
-                                    'old' => $originalValue ? Carbon::parse($originalValue)->format('Y-m-d h:i A') : 'N/A',
-                                    'new' => $value ? Carbon::parse($value)->format('Y-m-d h:i A') : 'N/A',
-                                ];
+                        $originalNormalized = $this->normalizeForComparison($originalValue);
+                        $newNormalized = $this->normalizeForComparison($value);
+
+                        if ($originalNormalized != $newNormalized) {
+                            $oldDisplay = $originalValue;
+                            $newDisplay = $value;
+
+                            try {
+                                if ($originalValue) $oldDisplay = Carbon::parse($originalValue)->format('Y-m-d h:i A');
+                                if ($value) $newDisplay = Carbon::parse($value)->format('Y-m-d h:i A');
+                            } catch (\Exception $e) {
                             }
-                        } elseif ($originalValue != $value) {
+
                             $changedFields["{$requestKey}.{$field}"] = [
                                 'label' => Str::headline($requestKey . ' ' . str_replace('_id', '', $field)),
-                                'old' => $this->formatDisplayValue($originalValue),
-                                'new' => $this->formatDisplayValue($value),
+                                'old' => $this->formatDisplayValue($oldDisplay),
+                                'new' => $this->formatDisplayValue($newDisplay),
                             ];
                         }
                     }
@@ -167,6 +175,7 @@ trait HandlesUpdateConfirmation
 
                     $displayOld = $originalValue;
                     $displayNew = $newValue;
+
 
                     if (isset($config['display_with'])) {
                         $dw = $config['display_with'];
@@ -255,8 +264,7 @@ trait HandlesUpdateConfirmation
         if (!$eventId && $model) {
             if ($model->hasAttribute('event_id') && $model->event_id) {
                 $eventId = $model->event_id;
-            }
-            elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
+            } elseif ($model instanceof \App\Models\Delegate && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
             } elseif ($model instanceof \App\Models\Interview && $model->delegation && $model->delegation->event_id) {
                 $eventId = $model->delegation->event_id;
@@ -286,13 +294,12 @@ trait HandlesUpdateConfirmation
 
         try {
             $activity = $activityModelClass::create($activityData);
-            
-            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room' ])) {
+
+            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room'])) {
                 $this->sendNotification($activity, $action, $module, $delegationId);
-            }
-            elseif ($action === 'update' && !empty($fieldsToNotify) && !empty($changedFields)) {
+            } elseif ($action === 'update' && !empty($fieldsToNotify) && !empty($changedFields)) {
                 $notifiedChanges = array_intersect_key($changedFields, array_flip($fieldsToNotify));
-                
+
                 if (!empty($notifiedChanges)) {
                     $notificationActivity = clone $activity;
                     $notificationActivity->changes = $notifiedChanges;
@@ -381,5 +388,22 @@ trait HandlesUpdateConfirmation
         foreach ($users as $user) {
             $user->notify(new \App\Notifications\CommonNotification($notificationData));
         }
+    }
+
+    private function normalizeForComparison($value, $field = null)
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (Str::contains($field, 'date') || $value instanceof \Carbon\Carbon) {
+            try {
+                return Carbon::parse($value)->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                return $value;
+            }
+        }
+
+        return $value;
     }
 }

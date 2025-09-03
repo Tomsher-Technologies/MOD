@@ -22,14 +22,11 @@ class UpdateFlightStatuses extends Command
      */
     protected $description = 'Automatically update flight statuses based on current time';
 
-    /**
-     * Execute the console command.
-     */
+
     public function handle()
     {
         $this->info('Updating flight statuses...');
         
-        // Get the "Arrived" status ID from dropdown options
         $arrivalStatusDropdown = \App\Models\Dropdown::where('code', 'arrival_status')->first();
         
         if (!$arrivalStatusDropdown) {
@@ -65,7 +62,6 @@ class UpdateFlightStatuses extends Command
             $departedStatus = $departureStatusDropdown->options()->where('value', 'Departed')->first();
             
             if ($departedStatus) {
-                // Update all past departures to "Departed" status, regardless of current status
                 $passedDepartures = DelegateTransport::where('type', 'departure')
                     ->where('date_time', '<', Carbon::now())
                     ->get();
@@ -73,7 +69,6 @@ class UpdateFlightStatuses extends Command
                 $departedCount = 0;
                 
                 foreach ($passedDepartures as $departure) {
-                    // Only update if the current status is not already "Departed"
                     if ($departure->status_id != $departedStatus->id) {
                         $departure->update(['status_id' => $departedStatus->id]);
                         $departedCount++;

@@ -25,8 +25,7 @@
 
     <!-- Escorts -->
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
-        <form id="escort-form" action="{{ route('escorts.update', $escort->id) }}" method="POST"
-            data-ajax-form="true">
+        <form id="escort-form" action="{{ route('escorts.update', $escort->id) }}" method="POST" data-ajax-form="true">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-12 gap-5">
@@ -64,9 +63,12 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('phone_number') }}:</label>
+
                     <input type="text" name="phone_number"
-                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('enter') }}" value="{{ old('phone_number', $escort->phone_number) }}">
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}" inputmode="numeric" pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                        value="{{ old('phone_number', $escort->phone_number) }}">
                 </div>
 
 
@@ -145,6 +147,13 @@
         </form>
     </div>
 
-    <h2 class="font-semibold mb-0 !text-[22px] mt-6">{{ __db('reassign') }}</h2>
+    @php
+        $hasActiveAssignment = $escort->delegations()->where('status', 1)->exists();
+    @endphp
+
+    <h2 class="font-semibold !text-[22px] mt-6 mb-6">
+        {{ $hasActiveAssignment ? __db('reassign') : __db('assign') }}
+    </h2>
+
     <x-assign-delegation-with-search :escort="$escort" />
 </div>

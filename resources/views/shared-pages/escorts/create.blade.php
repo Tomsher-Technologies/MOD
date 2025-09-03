@@ -79,8 +79,10 @@
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('phone_number') }}:</label>
                     <input type="text" name="phone_number"
-                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('enter') }}">
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}" inputmode="numeric" pattern="[0-9]*"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+
                 </div>
 
                 <div class="col-span-4">

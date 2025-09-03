@@ -26,9 +26,9 @@
                             class="block w-[150px] p-2.5 text-secondary-light text-sm border border-[#d1d5db] rounded-lg">
                             <option value="">{{ __db('select_status') }}</option>
                             <option value="1" {{ request()->status == 1 ? 'selected' : '' }}>
-                                {{ __db('completed') }}</option>
+                                {{ __db('active') }}</option>
                             <option value="2" {{ request()->status == 2 ? 'selected' : '' }}>
-                                {{ __db('not_completed') }}</option>
+                                {{ __db('inactive') }}</option>
                         </select>
                     </div>
 

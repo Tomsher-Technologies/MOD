@@ -124,7 +124,8 @@
                             ({{ __db('delegate_id') }}):</label>
                         <input type="text" id="delegation_code_input" name="interview_with_delegation_code"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300"
-                            placeholder="{{ __db('enter_code_or_search') }}" value="{{ $oldToDelegationCode }}">
+                            placeholder="{{ __db('delegation') . ' ' . __db('id') }}"
+                            value="{{ $oldToDelegationCode }}">
                         @error('interview_with_delegation_code')
                             <div class="text-red-600 mt-1">{{ $message }}</div>
                         @enderror
@@ -135,7 +136,7 @@
                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                 d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
                         </svg>
-                        <span class="w-[150px]">{{ __db('search_delegation_id') }}</span>
+                        <span class="w-[150px]">{{ __db('delegation_id') }}</span>
                     </button>
                 </div>
 
@@ -161,7 +162,8 @@
                 </div>
 
                 <div id="other-input" class="hidden" @class(['hidden' => $oldInterviewType !== 'other'])>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('members') }}:</label>
+                    <label
+                        class="form-label block mb-1 rounded-l-s text-gray-700 font-medium">{{ __db('members') }}:</label>
                     <select name="other_member_id" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select') }}</option>
                         @foreach ($otherMembers as $member)
@@ -211,7 +213,6 @@
 
                 @php
                     $continentOptions = getDropDown('continents');
-                    $countryOptions = getDropDown('country');
                 @endphp
                 <div>
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('continents') }}:</label>
@@ -232,14 +233,6 @@
                     <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
                     <select id="modal-country" class="p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_country') }}</option>
-                        @if ($countryOptions)
-                            @foreach ($countryOptions->options as $option)
-                                <option value="{{ $option->id }}"
-                                    {{ request('countryOptions') == $option->id ? 'selected' : '' }}>
-                                    {{ $option->value }}
-                                </option>
-                            @endforeach
-                        @endif
                     </select>
                 </div>
             </div>
@@ -277,6 +270,11 @@
     </script>
 
     <script>
+        window.currentDelegationId = "{{ $delegation->id }}";
+
+        window.currentDelegationCode = "{{ $delegation->code }}";
+
+
         window.pageRoutes = {
             delegationSearchByCode: @json(route('delegations.searchByCode')),
             delegationSearchByFilters: @json(route('delegations.search')),
@@ -323,10 +321,38 @@
             const modalResults = document.getElementById('modal-search-results');
             const delegationsList = document.getElementById('modal-delegations-list');
             const membersSelect = document.getElementById('members-select');
+            const continentSelect = document.getElementById('modal-continent');
+            const countrySelect = document.getElementById('modal-country');
 
             let selectedDelegationId = null;
             let selectedDelegationCode = null;
             let selectedMembers = [];
+
+            continentSelect.addEventListener('change', function() {
+                const continentId = this.value;
+                countrySelect.innerHTML =
+                    '<option value="" selected disabled>{{ __db('select_country') }}</option>';
+
+                if (continentId) {
+                    fetch(`/mod-admin/get-countries?continent_ids=${continentId}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            data.forEach(country => {
+                                const option = document.createElement('option');
+                                option.value = country.id;
+                                option.textContent = country.name;
+                                countrySelect.appendChild(option);
+                            });
+                        })
+                        .catch(() => {
+                            console.error('Failed to load countries');
+                        });
+                }
+            });
 
             function openModal() {
                 modal.classList.remove('hidden');
@@ -348,6 +374,11 @@
                     return;
                 }
 
+                if (code === window.currentDelegationCode) {
+                    toastr.error("{{ __db('cannot_search_current_delegation') }}");
+                    return;
+                }
+
                 fetch(`${window.pageRoutes.delegationSearchByCode}?code=${encodeURIComponent(code)}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -355,7 +386,6 @@
                     })
                     .then(res => res.json())
                     .then(data => {
-                        console.log("data", data);
 
                         if (data.success && data.members) {
                             populateMembers(data.members);
@@ -377,11 +407,16 @@
                 const countryId = document.getElementById('modal-country').value;
 
                 if (!continentId && !countryId) {
-                    alert('Please select at least Continent or Country.');
+                    toastr.error("{{ __db('select_continent_or_country') }}");
                     return;
                 }
 
-                fetch(`${window.pageRoutes.delegationSearchByFilters}?continent_id=${continentId}&country_id=${countryId}`, {
+                let queryParams = [];
+                if (continentId) queryParams.push(`continent_id=${continentId}`);
+                if (countryId) queryParams.push(`country_id=${countryId}`);
+                const queryString = queryParams.join('&');
+
+                fetch(`${window.pageRoutes.delegationSearchByFilters}?${queryString}`, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
                         }
@@ -389,8 +424,12 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
+                            const filteredDelegations = data?.delegations.filter(delegation =>
+                                Number(delegation
+                                    .id) !== Number(window.currentDelegationId));
+
                             delegationsList.innerHTML = '';
-                            data.delegations.forEach(delegation => {
+                            filteredDelegations.forEach(delegation => {
                                 const li = document.createElement('li');
                                 li.className = 'py-2 cursor-pointer hover:bg-gray-100';
                                 li.textContent =
@@ -404,16 +443,12 @@
                                     selectedDelegationId = delegation.id;
                                     selectedDelegationCode = delegation.code;
 
-                                    document.querySelector(
-                                            'input[name="to_delegate_id"]')
-                                        .value = delegation.code;
-
                                     modalSelectBtn.disabled = false;
-                                    modalSelectBtn.classList.remove(
-                                        'hidden');
+                                    modalSelectBtn.classList.remove('hidden');
                                 });
                                 delegationsList.appendChild(li);
                             });
+
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");
 
