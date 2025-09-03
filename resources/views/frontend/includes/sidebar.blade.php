@@ -2,7 +2,7 @@
     <button type="button" class="sidebar-close-btn !mt-4">
         <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
     </button>
-    <div class="p-3 border-b">
+    <div class="p-3 border-b min-h-[105px]">
         <a href="#" class="">
             <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
         </a>

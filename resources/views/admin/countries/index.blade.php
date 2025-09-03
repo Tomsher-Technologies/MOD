@@ -150,13 +150,13 @@
 
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('name') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name') }}</label>
                                 <input type="text" name="name" value="{{ old('name') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('short_code') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}</label>
                                 <input type="text" name="short_code" value="{{ old('short_code') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
@@ -183,7 +183,7 @@
 
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('sort_order') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
                                 <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}"
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
@@ -199,7 +199,7 @@
 
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('status') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
                                 <select name="status" class="w-full border border-gray-300 rounded p-2">
                                     <option value="1" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('active') }}
                                     </option>

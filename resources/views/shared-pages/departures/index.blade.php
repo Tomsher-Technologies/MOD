@@ -43,7 +43,7 @@
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
                     <div class="flex items-center justify-between mb-5">
-                        <h2 class="font-semibold mb-0 !text-[22px] mb-10 pb-4">{{ __db('departures') }}</h2>
+                        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('departures') }}</h2>
                         <div class="full-screen-logo flex items-center gap-8 hidden">
                             <img src="{{ getAdminEventLogo() }}" alt="">
                             <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
@@ -57,7 +57,7 @@
 
                     </div>
 
-                    <hr class="mx-6 border-neutral-200 h-5 ">
+                    <hr class=" border-neutral-200 h-5 ">
                     @php
                         $columns = [
                             [

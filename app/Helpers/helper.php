@@ -29,7 +29,7 @@ if (!function_exists('getBaseURL')) {
 
 //highlights the selected navigation on admin panel
 if (!function_exists('areActiveRoutes')) {
-    function areActiveRoutes(array $routes, $output = "!text-[#B68A35] py-2 px-4 rounded-lg !bg-[#F9F7ED]")
+    function areActiveRoutes(array $routes, $output = "!text-[#B68A35] rounded-lg !bg-[#F9F7ED]")
     {
         foreach ($routes as $route) {
             if (Route::currentRouteName() == $route) return $output;

@@ -125,17 +125,17 @@
                                         @csrf
                                         @method('PUT')
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Value</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Value</label>
                                             <input type="text" name="value" value="{{ $option->value }}" required
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sort Order</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Sort Order</label>
                                             <input type="number" name="sort_order" value="{{ $option->sort_order ?? 0 }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Status</label>
                                             <select name="status" class="w-full border border-gray-300 rounded p-2">
                                                 <option value="1" {{ $option->status ? 'selected' : '' }}>Active</option>
                                                 <option value="0" {{ !$option->status ? 'selected' : '' }}>Inactive</option>
