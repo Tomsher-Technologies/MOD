@@ -48,6 +48,16 @@
                                     {{ __db('inactive') }}</option>
                             </select>
                         </div>
+                        <div class="flex-1 min-w-[150px]">
+                            <select name="continent_id" class="w-full border border-gray-300 rounded p-2">
+                                <option value="">{{ __db('all_continents') }}</option>
+                                @foreach (getDropDown('continents')->options as $option)
+                                    <option value="{{ $option->id }}" {{ request('continent_id') == $option->id ? 'selected' : '' }}>
+                                        {{ $option->value }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="flex items-center gap-2">
                             <button type="submit"
                                 class="bg-[#B68A35] text-white px-4 py-2 rounded mr-2">{{ __db('filter') }}</button>
@@ -150,21 +160,21 @@
 
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('name') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name') }}</label>
                                 <input type="text" name="name" value="{{ old('name') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('short_code') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}</label>
                                 <input type="text" name="short_code" value="{{ old('short_code') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
 
 
                             <div class="mb-4">
-                                <label class="form-label">{{ __db('continent') }}:</label>
-                                <select name="continent_id"
+                                <label class="form-label">{{ __db('continent') }}*:</label>
+                                <select name="continent_id" required
                                     class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                     <option value="">{{ __db('select_continent') }}</option>
                                     @foreach (getDropDown('continents')->options as $option)
@@ -183,12 +193,12 @@
 
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('sort_order') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
                                 <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}"
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
 
-                            <div class="col-span-3">
+                            <div class="col-span-3 mb-4">
                                 <label class="form-label">{{ __db('flag') }}</label>
                                 <input type="file" name="flag" id="image"
                                     class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
@@ -199,7 +209,7 @@
 
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">{{ __db('status') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
                                 <select name="status" class="w-full border border-gray-300 rounded p-2">
                                     <option value="1" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('active') }}
                                     </option>
@@ -254,9 +264,9 @@
 
                         <div class="mb-4">
                             <label class="form-label">{{ __db('continent') }}:</label>
-                            <select name="continent_id"
+                            <select name="continent_id" required
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                <option disabled>{{ __('Select Continent') }}</option>
+                                <option value="" disabled selected>{{ __('Select Continent') }}</option>
                                 @foreach (getDropDown('continents')->options as $option)
                                     <option value="{{ $option->id }}"
                                         {{ old('continent_id', $country->continent_id) == $option->id ? 'selected' : '' }}>
@@ -272,7 +282,7 @@
 
                         <div class="mb-4">
                             <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('sort_order') }}</label>
-                            <input type="number" name="sort_order"
+                            <input type="number" name="sort_order" required
                                 value="{{ old('sort_order', $country->sort_order ?? 0) }}"
                                 class="w-full border border-gray-300 rounded p-2">
                         </div>

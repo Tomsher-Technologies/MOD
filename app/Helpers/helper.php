@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,7 +30,7 @@ if (!function_exists('getBaseURL')) {
 
 //highlights the selected navigation on admin panel
 if (!function_exists('areActiveRoutes')) {
-    function areActiveRoutes(array $routes, $output = "!text-[#B68A35] py-2 px-4 rounded-lg !bg-[#F9F7ED]")
+    function areActiveRoutes(array $routes, $output = "!text-[#B68A35] rounded-lg !bg-[#F9F7ED]")
     {
         foreach ($routes as $route) {
             if (Route::currentRouteName() == $route) return $output;
@@ -550,7 +551,8 @@ function getAllCountries()
 if (! function_exists('getAllDrivers')) {
     function getAllDrivers()
     {
-        return Driver::orderBy('code')
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        return Driver::where('event_id', $currentEventId)->orderBy('code')
             ->get();
     }
 }
@@ -558,7 +560,8 @@ if (! function_exists('getAllDrivers')) {
 if (! function_exists('getAllEscorts')) {
     function getAllEscorts()
     {
-        return Driver::orderBy('code')
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        return Driver::where('event_id', $currentEventId)->orderBy('code')
             ->get();
     }
 }
@@ -655,4 +658,14 @@ function shadeColor($hex, $percent)
     $b = max(0, min(255, $b + ($percent / 100 * 255)));
 
     return sprintf("#%02x%02x%02x", $r, $g, $b);
+}
+
+
+function humanize(string|null $text): string
+{
+    if (!$text) return 'N/A';
+
+    $text = str_replace('_', ' ', strtolower($text));
+
+    return ucwords($text);
 }

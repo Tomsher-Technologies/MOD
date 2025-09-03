@@ -15,7 +15,6 @@
 
     <script src="{{ asset('assets/js/ajax-form-handler.js') }}"></script>
 
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @yield('style')
@@ -37,7 +36,7 @@
             class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
             <div class="relative p-4 w-full max-w-md max-h-full">
                 <!-- Modal content -->
-                <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+                <div class="relative bg-white rounded-lg shadow-sm ">
                     <!-- Modal header -->
                     <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t  border-gray-200">
                         <h3 class="text-xl font-semibold text-gray-900 ">
@@ -74,6 +73,147 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const fullscreenDiv = document.getElementById('fullDiv');
+
+
+            $('#fullscreenToggleBtn').on('click', function() {
+                const isInFullscreen =
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.mozFullScreenElement ||
+                    document.msFullscreenElement;
+
+                if (!isInFullscreen) {
+                    // Enter fullscreen
+                    if (fullscreenDiv.requestFullscreen) {
+                        fullscreenDiv.requestFullscreen();
+                    } else if (fullscreenDiv.webkitRequestFullscreen) {
+                        fullscreenDiv.webkitRequestFullscreen();
+                    } else if (fullscreenDiv.msRequestFullscreen) {
+                        fullscreenDiv.msRequestFullscreen();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('#fullscreenToggleBtn').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('#fullscreenToggleBtn').text('Go Fullscreen');
+                    }
+                });
+
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
+                        $('#fullscreenToggleBtn').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
+                        $('#fullscreenToggleBtn').text('Go Fullscreen');
+                    }
+                });
+
+            const fullscreenDiv1 = document.getElementById('fullDiv1');
+
+            $('#fullscreenToggleBtn1').on('click', function() {
+                const isInFullscreen =
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement ||
+                    document.mozFullScreenElement ||
+                    document.msFullscreenElement;
+
+                if (!isInFullscreen) {
+                    // Enter fullscreen
+                    if (fullscreenDiv1.requestFullscreen) {
+                        fullscreenDiv1.requestFullscreen();
+                    } else if (fullscreenDiv1.webkitRequestFullscreen) {
+                        fullscreenDiv1.webkitRequestFullscreen();
+                    } else if (fullscreenDiv1.msRequestFullscreen) {
+                        fullscreenDiv1.msRequestFullscreen();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            });
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('#fullscreenToggleBtn1').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('#fullscreenToggleBtn1').text('Go Fullscreen');
+                    }
+                });
+
+
+            // Listen for fullscreen changes
+            $(document).on('fullscreenchange webkitfullscreenchange mozfullscreenchange MSFullscreenChange',
+                function() {
+                    const isInFullscreen =
+                        document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
+
+                    if (isInFullscreen) {
+                        $('.hide-when-fullscreen').hide();
+                        $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
+                        $('#fullscreenToggleBtn1').text('Exit Fullscreen');
+                    } else {
+                        $('.hide-when-fullscreen').show();
+                        $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
+                        $('#fullscreenToggleBtn1').text('Go Fullscreen');
+                    }
+                });
+
+
+
             toastr.options = {
                 closeButton: true,
                 progressBar: true,

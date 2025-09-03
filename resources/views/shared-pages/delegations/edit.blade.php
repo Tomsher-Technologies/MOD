@@ -403,21 +403,24 @@
                             },
                         ],
                         [
-                            'label' => 'Accommodation',
+                            'label' => __db('accommodation'),
                             'render' => function ($row) {
-                                if ($row->accommodation_id) {
-                                    $accommodation = \App\Models\Accommodation::find($row->accommodation_id);
-                                    return $accommodation
-                                        ? e(
-                                            $accommodation->name .
-                                                ' - ' .
-                                                $accommodation->room_type .
-                                                ' - ' .
-                                                $accommodation->room_number,
-                                        )
-                                        : '-';
+                                if (!$row->accommodation) {
+                                    return 'Not Required';
                                 }
-                                return '-';
+                                
+                                $room = $row->currentRoomAssignment ?? null;
+
+                                $accommodation = $row->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
+
+                                return $accommodation ?? '-';
                             },
                         ],
                         [
@@ -493,7 +496,7 @@
                                         {{ __db('transport_information_for') }}
                                         {{ $delegate->name_en ?? '-' }}</h3>
                                     <button type="button"
-                                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
                                         data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
@@ -567,23 +570,41 @@
 
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
+        <div class="flex items-center gap-3">
+            @canany(['add_escorts', 'escort_add_escorts'])
+                <a href={{ route('escorts.index') }}
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+            @endcanany
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('escorts') }}</h4>
-                    @canany(['add_escorts', 'escort_add_escorts'])
-                        <a href={{ route('escorts.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('escort') . ' ' . __db('code'),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
+                            },
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
-                            'render' => fn($escort) => e($escort->military_number),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->military_number]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->military_number) . '</a>';
+                            },
                         ],
                         [
                             'label' => __db('title'),
@@ -593,11 +614,14 @@
                         [
                             'label' => __db('name_en'),
                             'key' => 'name',
-                            'render' => fn($escort) => e($escort->name_en),
+                            'render' => function ($escort) {
+                                $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->name_en) . '</a>';
+                            },
                         ],
                         [
-                            'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
+                            'label' => __db('phone_number'),
+                            'key' => 'phone_number',
                             'render' => fn($escort) => '<span dir="ltr">' . e($escort->phone_number) . '</span>',
                         ],
                         [
@@ -660,7 +684,7 @@
                                                 csrf_field() .
                                                 '<input type="hidden" name="delegation_id" value="' .
                                                 $delegation->id .
-                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
+                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
                                                 e($delegation->code) .
                                                 '</span></button></form>';
                                         }
@@ -669,7 +693,7 @@
                                         $output .=
                                             '<a href="' .
                                             $assignUrl .
-                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-xs flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
                                     }
                                 }
                                 $output .= '</div>';
@@ -686,23 +710,45 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+
+
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+
+        <div class="flex items-center gap-3">
+            @canany(['add_drivers', 'driver_add_drivers'])
+                <a href={{ route('drivers.index') }}
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+            @endcanany
+        </div>
+    </div>
+
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('drivers') }}</h4>
-                    @canany(['add_drivers', 'driver_add_drivers'])
-                        <a href={{ route('drivers.index') }}
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-                    @endcanany
-                </div>
                 @php
                     $columns = [
                         [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('driver') . ' ' . __db('code'),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
+                            },
+                        ],
+                        [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
-                            'render' => fn($driver) => e($driver->military_number),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->military_number]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->military_number) . '</a>';
+                            },
                         ],
                         [
                             'label' => __db('title'),
@@ -712,17 +758,15 @@
                         [
                             'label' => __db('name_en'),
                             'key' => 'name_en',
-                            'render' => fn($driver) => e($driver->name_en),
+                            'render' => function ($driver) {
+                                $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
+                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->name_en) . '</a>';
+                            },
                         ],
                         [
-                            'label' => __db('mobile_number'),
-                            'key' => 'mobile_number',
-                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->mobile_number) . '</span>',
-                        ],
-                        [
-                            'label' => __db('driver') . ' ' . __db('id'),
-                            'key' => 'driver_id',
-                            'render' => fn($driver) => e($driver->driver_id),
+                            'label' => __db('phone_number'),
+                            'key' => 'phone_number',
+                            'render' => fn($driver) => '<span dir="ltr">' . e($driver->phone_number) . '</span>',
                         ],
                         [
                             'label' => __db('car') . ' ' . __db('type'),
@@ -787,7 +831,7 @@
                                                 '<input type="hidden" name="delegation_id" value="' .
                                                 $delegation->id .
                                                 '" />
-                                                    <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                                                    <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto">
                                                         <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                                                         <span> Unassign from ' .
                                                 e($delegation->code) .
@@ -800,7 +844,7 @@
                                         $output .=
                                             '<a href="' .
                                             $assignUrl .
-                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-sm flex items-center gap-2 py-1 text-sm rounded-lg me-auto">
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-xs flex items-center gap-2 py-1 rounded-lg me-auto">
                                                 <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
                                                 <span> Assign</span>
                                             </a>';
@@ -829,19 +873,22 @@
     <hr class="mx-6 border-neutral-200 h-10">
 
 
+
+
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
+        <div class="flex items-center gap-3">
+            @canany(['add_interviews', 'delegate_edit_delegations'])
+                <a href="{{ route('delegations.addInterview', $delegation) }}"
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
+            @endcanany
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h4 class="font-semibold text-lg">{{ __db('interviews') }}</h4>
-                    @canany(['add_interviews', 'delegate_edit_delegations'])
-                        <a href="{{ route('delegations.addInterview', $delegation) }}"
-                            class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
-                    @endcanany
-                </div>
-
                 @php
                     $delegatesCollection = collect($delegation->delegates)->mapWithKeys(function ($delegate) {
                         return [(int) $delegate->id => $delegate];
@@ -891,7 +938,7 @@
                             'render' => function ($row) {
                                 if (!empty($row->other_member_id) && $row->otherMember) {
                                     $otherMemberName = $row->otherMember->name ?? '';
-                                    $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                                    $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
                                     if ($otherMemberId) {
                                         $with =
                                             '<a href="' .
@@ -899,7 +946,7 @@
                                                 'other_interview_member' => base64_encode($otherMemberId),
                                             ]) .
                                             '" class="!text-[#B68A35]">
-                                    <span class="block">Other Member ID: ' .
+                                    <span class="block">Other Member: ' .
                                             e($otherMemberId) .
                                             '</span>
                                 </a>';
@@ -973,7 +1020,6 @@
                     ];
 
                 @endphp
-
                 <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
@@ -1088,32 +1134,34 @@
 
     <script>
         $(document).ready(function() {
-            // Initialize Select2
             $('.select2').select2({
                 placeholder: "Select an option",
                 allowClear: true
             });
 
-            // Handle continent change to load countries
+            const delegationCountryId = @json(old('country_id', $delegation->country_id));
+
             $('#continent-select').on('change', function() {
                 const continentId = $(this).val();
                 const countrySelect = $('#country-select');
 
-                // Clear current options except the default
                 countrySelect.find('option[value!=""]').remove();
 
                 if (continentId) {
-                    // Load countries for selected continent
                     $.get('{{ route('countries.by-continent') }}', {
                         continent_ids: continentId
                     }, function(data) {
-                        // Add new options
                         $.each(data, function(index, country) {
                             countrySelect.append(new Option(country.name, country.id, false,
                                 false));
                         });
 
-                        // Refresh Select2
+                        if (delegationCountryId) {
+                            countrySelect.val(delegationCountryId);
+                        } else {
+                            countrySelect.val(null);
+                        }
+
                         countrySelect.trigger('change');
                     }).fail(function() {
                         console.log('Failed to load countries');
@@ -1121,7 +1169,6 @@
                 }
             });
 
-            // Trigger continent change on page load if a continent is already selected
             const selectedContinent = $('#continent-select').val();
             if (selectedContinent) {
                 $('#continent-select').trigger('change');

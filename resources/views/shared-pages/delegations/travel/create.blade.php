@@ -3,7 +3,7 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('add_travel_details') }} </h2>
         <a href="{{ route('delegations.show', $delegation->id) }}" id="add-attachment-btn"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
@@ -28,7 +28,27 @@
             ['label' => __db('delegation_id'), 'render' => fn($row) => e($row->code ?? '')],
             ['label' => __db('invitation_from'), 'render' => fn($row) => e($row->invitationFrom->value ?? '')],
             ['label' => __db('continent'), 'render' => fn($row) => e($row->continent->value ?? '')],
-            ['label' => __db('country'), 'render' => fn($row) => e($row->country->value ?? '')],
+            [
+                'label' => __db('country'),
+                'key' => 'country',
+                'render' => function ($row) {
+                    if (!$row->country) {
+                        return '-';
+                    }
+
+                    $flag = $row->country->flag
+                        ? '<img src="' .
+                            getUploadedImage($row->country->flag) .
+                            '" 
+                                        alt="' .
+                            e($row->country->name) .
+                            ' flag" 
+                                        class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
+                        : '';
+
+                    return $flag . ' ' . e($row->country->name);
+                },
+            ],
             ['label' => __db('invitation_status'), 'render' => fn($row) => e($row->invitationStatus->value ?? '')],
             [
                 'label' => __db('participation_status'),
@@ -53,8 +73,7 @@
     <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }}
     </h2>
 
-    <form method="POST" action="{{ route('delegations.storeTravel', $delegation->id) }}"
-        enctype="multipart/form-data">
+    <form method="POST" action="{{ route('delegations.storeTravel', $delegation->id) }}" enctype="multipart/form-data">
         @csrf
 
         @php
@@ -70,8 +89,11 @@
                 ],
                 [
                     'label' => __db('sl_no'),
-                    'render' => fn($row) => e($row->code ?? ''),
+                    'render' => function ($row, $key) {
+                        return $key;
+                    },
                 ],
+
                 [
                     'label' => __db('title'),
                     'render' => fn($row) => e($row->title->value ?? ''),
@@ -82,7 +104,7 @@
                         $badge = $row->team_head
                             ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                             : '';
-                        return $badge . '<div class="block">' . e($row->value_en ?? '-') . '</div>';
+                        return $badge . '<div class="block">' . e($row->name_en ?? '-') . '</div>';
                     },
                 ],
                 [

@@ -10,10 +10,10 @@
                 $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
             @endphp
 
-            <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="inline-block">
+            <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="me-3 inline-block">
                 @csrf
                 <select name="event_id" id="current-event-select"
-                    class="p-2 rounded border border-neutral-300 text-neutral-700 cursor-pointer"
+                    class="p-2 !pe-10 text-sm rounded border border-neutral-300 text-neutral-700 cursor-pointer"
                     onchange="document.getElementById('currentEventForm').submit();" title="{{ __db('select_event') }}">
                     @foreach ($events as $event)
                         <option value="{{ $event->id }}" {{ $currentEventId == $event->id ? 'selected' : '' }}>
@@ -134,7 +134,7 @@
                             {{ __db('notifications') }}
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 dark:text-white">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 ">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
@@ -218,7 +218,7 @@
                             {{ __db('alerts') }}
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 dark:text-white">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 ">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
                     </div>
                    
                     <div class="scroll-sm !border-t-0">
@@ -265,10 +265,10 @@
                 <div id="alertModal" tabindex="-1" aria-hidden="true"
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative p-4 w-full max-w-2xl max-h-full">
-                        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                        <div class="relative bg-white rounded-lg shadow ">
                             <div
-                                class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-                                <h3 class="text-xl font-semibold text-gray-900 dark:text-white" id="alertModalTitle">
+                                class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
+                                <h3 class="text-xl font-semibold text-gray-900 " id="alertModalTitle">
                                     {{ __db('alert') }}
                                 </h3>
                                 <button type="button"
@@ -289,9 +289,9 @@
                                 </p>
                             </div>
                             <div
-                                class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                                class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                 <button onclick="closeAlertModal()" type="button"
-                                    class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                                    class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400  dark:hover:text-white dark:hover:bg-gray-700">
                                     {{ __db('close') }}
                                 </button>
                                 <a href="{{ route('alerts.index') }}" id="viewAllAlertsBtn" type="button"

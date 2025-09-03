@@ -61,7 +61,7 @@
                                 ($delegations->currentPage() - 1) * $delegations->perPage(),
                         ],
                         [
-                            'label' => __db('delegation') . ' ' . __db('id'),
+                            'label' => __db('delegation'),
                             'key' => 'id',
                             'render' => fn($delegation) => e($delegation->code),
                         ],
@@ -84,18 +84,28 @@
                             'label' => __db('escorts'),
                             'key' => 'escorts',
                             'render' => function ($delegation) {
-                                return $delegation->escorts->isNotEmpty()
-                                    ? $delegation->escorts->map(fn($escort) => e($escort->code))->implode('<br>')
-                                    : '-';
+                                if ($delegation->escorts->isEmpty()) {
+                                    return '-';
+                                }
+                                
+                                return $delegation->escorts->map(function ($escort) {
+                                    $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
+                                })->implode('<br>');
                             },
                         ],
                         [
                             'label' => __db('drivers'),
                             'key' => 'drivers',
                             'render' => function ($delegation) {
-                                return $delegation->drivers->isNotEmpty()
-                                    ? $delegation->drivers->map(fn($driver) => e($driver->code))->implode('<br>')
-                                    : '-';
+                                if ($delegation->drivers->isEmpty()) {
+                                    return '-';
+                                }
+                                
+                                return $delegation->drivers->map(function ($driver) {
+                                    $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
+                                })->implode('<br>');
                             },
                         ],
                         [
@@ -310,7 +320,7 @@
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
                         data-modal-hide="column-visibility-modal">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -340,7 +350,7 @@
                 <div class="flex items-start justify-between p-4 border-b rounded-t">
                     <h3 class="text-xl font-semibold text-gray-900">{{ __db('note') }}</h3>
                     <button type="button"
-                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
                         data-modal-hide="note-modal">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

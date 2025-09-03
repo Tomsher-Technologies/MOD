@@ -42,7 +42,7 @@
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
                             <select id="country_id" class="select2 p-3 rounded-lg w-full border text-sm">
-                                <option selected="" disabled="">{{ __db('Select Country') }}</option>
+                                <option value="" selected="">{{ __db('All') }}</option>
                                 @foreach (getAllCountries() as $country)
                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
                                 @endforeach
@@ -78,7 +78,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Rows will be populated by AJAX --}}
                 </tbody>
             </table>
 
@@ -94,32 +93,31 @@
 <div id="assignConfirmationModal"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-        <h2 class="text-lg font-semibold mb-4">{{ __db('This driver already has an assignment') }}</h2>
-        <p class="mb-6">{{ __db('Do you want to reassign (continue history) or replace (end previous)?') }}</p>
+        <h2 class="text-lg font-semibold mb-4">{{ __db('already_assigned') }}</h2>
+        <p class="mb-6">{{ __db('replace_or_reassign') }}?</p>
 
-        <!-- Reassign Date Field (hidden by default) -->
         <div id="reassignDateWrapper" class="hidden mb-6">
             <label for="reassignDate" class="block text-gray-700 font-medium mb-2">
-                {{ __db('Start Date for New Delegation') }}
+                {{ __db('start_date_for_delegation') }}
             </label>
             <input type="date" id="reassignDate"
                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" />
             <p class="text-red-500 text-sm mt-1 hidden" id="dateError">
-                {{ __db('Start date is required.') }}
+                {{ __db('start_date_required') }}
             </p>
         </div>
 
         <div class="flex justify-end gap-4">
             <button type="button" id="cancelModal"
                 class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
-                {{ __db('Cancel') }}
+                {{ __db('cancel') }}
             </button>
             <button type="button" id="reassignBtn"
                 class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-                {{ __db('Reassign') }}
+                {{ __db('reassign') }}
             </button>
             <button type="button" id="replaceBtn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
-                {{ __db('Replace') }}
+                {{ __db('replace') }}
             </button>
         </div>
     </div>

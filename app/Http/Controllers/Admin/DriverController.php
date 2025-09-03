@@ -61,6 +61,7 @@ class DriverController extends Controller
                     ->orWhere('driver_id', 'like', "%{$search}%")
                     ->orWhere('car_type', 'like', "%{$search}%")
                     ->orWhere('car_number', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
@@ -68,19 +69,23 @@ class DriverController extends Controller
         }
 
         if ($request->has('title_id') && !empty($request->title_id)) {
-            $query->whereIn('title_id', $request->title_id);
+            $titleIds = is_array($request->title_id) ? $request->title_id : [$request->title_id];
+            $query->whereIn('title_id', $titleIds);
         }
 
         if ($request->has('car_type') && !empty($request->car_type)) {
-            $query->whereIn('car_type', $request->car_type);
+            $carTypes = is_array($request->car_type) ? $request->car_type : [$request->car_type];
+            $query->whereIn('car_type', $carTypes);
         }
 
         if ($request->has('car_number') && !empty($request->car_number)) {
-            $query->whereIn('car_number', $request->car_number);
+            $carNumbers = is_array($request->car_number) ? $request->car_number : [$request->car_number];
+            $query->whereIn('car_number', $carNumbers);
         }
 
         if ($request->has('capacity') && !empty($request->capacity)) {
-            $query->whereIn('capacity', $request->capacity);
+            $capacities = is_array($request->capacity) ? $request->capacity : [$request->capacity];
+            $query->whereIn('capacity', $capacities);
         }
 
         if ($request->has('delegation_id') && !empty($request->delegation_id)) {
@@ -145,7 +150,7 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
             'unit_id.exists' => __db('unit_id_exists'),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
@@ -178,7 +183,7 @@ class DriverController extends Controller
 
     public function edit(string $id)
     {
-        $driver = Driver::findOrFail($id);
+        $driver = Driver::with('delegations')->findOrFail($id);
         $delegations = Delegation::all();
         $dropdowns = $this->loadDropdownOptions();
 
@@ -212,7 +217,7 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('driver_phone_number_max', ['max' => 255]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
             'unit_id.exists' => __db('unit_id_exists'),

@@ -6,7 +6,9 @@
         ($data instanceof \Illuminate\Contracts\Pagination\Paginator ||
             $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) &&
             $enableRowLimit)
-        <div class="flex justify-end items-center mb-2 mt-4">
+           
+        <div class="flex justify-end items-center mb-3">
+            
             <form method="GET">
                 @foreach (request()->except('limit', 'page') as $key => $value)
                     @if (is_array($value))
@@ -19,21 +21,21 @@
                     @endif
                 @endforeach
                 <select id="limit" name="limit" onchange="this.form.submit()"
-                    class="border rounded px-5 py-1 text-sm">
+                    class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
                     @foreach ([10, 25, 50, 100] as $size)
                         <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
                             {{ $size }}
                         </option>
                     @endforeach
                 </select>
-                <span class="ml-2 text-sm">rows</span>
+                <span class="mr-2 text-sm">rows</span>
             </form>
         </div>
     @endif
 
     <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
         <thead>
-            <tr>
+            <tr class="text-[11px]">
                 @foreach ($columns as $column)
                     @php
                         $permissionKey = $column['permission'] ?? null;
@@ -54,18 +56,25 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($data as $key => $row)
-                @php
-                    $rowPermissionsKey = $row->permission ?? null;
-                    $rowPermissions = null;
+            @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+                <tr>
+                    <td class="px-4 py-2 border border-gray-200 text-center" colspan="{{ count($columns) }}">
+                        {{ $noDataMessage ?? 'No data found.' }}
+                    </td>
+                </tr>
+            @else
+                @foreach ($data as $key => $row)
+                    @php
+                        $rowPermissionsKey = $row->permission ?? null;
+                        $rowPermissions = null;
 
-                    if ($rowPermissionsKey) {
-                        $rowPermissions = is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey];
-                    }
-                @endphp
+                        if ($rowPermissionsKey) {
+                            $rowPermissions = is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey];
+                        }
+                    @endphp
 
                 @if (!$rowPermissions || can($rowPermissions))
-                    <tr class="text-sm align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                    <tr class="text-[9px]  align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
                         data-id="{{ $row->id }}">
                         @foreach ($columns as $column)
                             @php
@@ -78,17 +87,17 @@
                                 }
                             @endphp
 
-                            @if (!$colPermissions || can($colPermissions))
-                                <td class="px-4 py-2 border border-gray-200"
-                                    data-column="{{ Str::slug($column['label']) }}">
-                                    {!! $column['render']($row, $key) !!}
-                                </td>
-                            @endif
-                        @endforeach
-                    </tr>
-                @endif
-            @endforeach
-
+                                @if (!$colPermissions || can($colPermissions))
+                                    <td class="px-4 py-2 border border-gray-200"
+                                        data-column="{{ Str::slug($column['label']) }}">
+                                        {!! $column['render']($row, $key) !!}
+                                    </td>
+                                @endif
+                            @endforeach
+                        </tr>
+                    @endif
+                @endforeach
+            @endif
         </tbody>
 
     </table>

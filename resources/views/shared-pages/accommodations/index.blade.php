@@ -20,13 +20,12 @@
                     <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownDefaultButton">
                         <li>
                             <a href="{{ route('accommodations.create') }}"
-                                class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') .' '.
-                                __db('manually') }}</a>
+                                class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') . ' ' . __db('manually') }}</a>
                         </li>
                         @can('import_accommodations')
                             <li>
-                                <a href="{{ route('accommodations.import.form') }}" class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' .
-                                    __db('hotel') .' '. __db('bulk') }}</a>
+                                <a href="{{ route('accommodations.import.form') }}"
+                                    class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') . ' ' . __db('bulk') }}</a>
                             </li>
                         @endcan
                     </ul>
@@ -35,7 +34,8 @@
 
 
             @canany(['view_external_members', 'assign_external_members'])
-                <a href="{{ route('admin.view-external-members') }}" class="btn text-md ms-4 mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg ">{{ __db('view'). ' ' . __db('external_member') }}</a>
+                <a href="{{ route('admin.view-external-members') }}"
+                    class="btn text-md ms-4 mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg ">{{ __db('view') . ' ' . __db('external_member') }}</a>
             @endcan
 
         </div>
@@ -52,10 +52,12 @@
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}
                             </th>
-                            <th scope="col" class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('hotel_name') }}
                             </th>
-                            <th scope="col" class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('address') }}
                             </th>
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
@@ -82,21 +84,20 @@
                                 <td class="px-3 py-3 border border-gray-200">
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
-                                <td class="px-3 py-3 border border-gray-200 !text-[#B68A35]">
-                                    <a href="#">
-                                        {{ $hotel->hotel_name ?? "-" }}
-                                    </a>
+                                <td class="px-3 py-3 border border-gray-200">
+                                    {{ $hotel->hotel_name ?? '-' }}
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
-                                    {{ $hotel->address ?? "-" }}
+                                    {{ $hotel->address ?? '-' }}
                                 </td>
                                 <td class="px-3 py-3 text-end border border-gray-200" dir="ltr">
-                                    {{ $hotel->contact_number ?? "-" }}
+                                    {{ $hotel->contact_number ?? '-' }}
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
-                                    @if($hotel->contacts)
+                                    @if ($hotel->contacts)
                                         @foreach ($hotel->contacts as $contact_person)
-                                            <div class="mb-2">{{ $contact_person->name ?? "-" }} - {{ $contact_person->phone ?? "-" }}</div>
+                                            <div class="mb-2">{{ $contact_person->name ?? '-' }} -
+                                                {{ $contact_person->phone ?? '-' }}</div>
                                         @endforeach
                                     @endif
                                 </td>
@@ -106,25 +107,27 @@
                                         $total_rooms = 0;
                                         $assigned_rooms = 0;
                                     @endphp
-                                    @if($hotel->rooms)
+                                    @if ($hotel->rooms)
                                         @foreach ($hotel->rooms as $room)
-                                            <div class="mb-2">{{ $room->roomType->value ?? "-" }} - {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
+                                            <div class="mb-2">{{ $room->roomType->value ?? '-' }} -
+                                                {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
                                             @php
                                                 $total_rooms += $room->total_rooms;
                                                 $assigned_rooms += $room->assigned_rooms;
                                             @endphp
                                         @endforeach
                                     @endif
-                                  
+
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
                                     {{ $assigned_rooms }}/{{ $total_rooms }}
                                 </td>
-                                
+
                                 <td class="px-3 py-2 border border-gray-200">
                                     <div class="flex align-center gap-4">
                                         @canany(['edit_accommodations', 'hotel_edit_accommodations'])
-                                            <a href="{{ route('accommodations.edit', ['id' => base64_encode($hotel->id)]) }}" title="{{ __db('edit_hotel') }}">
+                                            <a href="{{ route('accommodations.edit', ['id' => base64_encode($hotel->id)]) }}"
+                                                title="{{ __db('edit_hotel') }}">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     viewBox="0 0 512 512">
                                                     <path
@@ -133,11 +136,16 @@
                                                 </svg>
                                             </a>
                                         @endcanany
-                                        
+
                                         @canany(['assign_external_members'])
-                                            <a href="{{ route('external_accommodations.add', ['id' => base64_encode($hotel->id)]) }}" title="{{ __db('add_external_accommodation') }}">
-                                                <svg class=" text-[#B68A35]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"  width="20" height="20" fill="none" viewBox="0 0 24 24">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 14v4.833A1.166 1.166 0 0 1 16.833 20H5.167A1.167 1.167 0 0 1 4 18.833V7.167A1.166 1.166 0 0 1 5.167 6h4.618m4.447-2H20v5.768m-7.889 2.121 7.778-7.778"/>
+                                            <a href="{{ route('external_accommodations.add', ['id' => base64_encode($hotel->id)]) }}"
+                                                title="{{ __db('add_external_accommodation') }}">
+                                                <svg class=" text-[#B68A35]" aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                    fill="none" viewBox="0 0 24 24">
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="2"
+                                                        d="M18 14v4.833A1.166 1.166 0 0 1 16.833 20H5.167A1.167 1.167 0 0 1 4 18.833V7.167A1.166 1.166 0 0 1 5.167 6h4.618m4.447-2H20v5.768m-7.889 2.121 7.778-7.778" />
                                                 </svg>
                                             </a>
                                         @endcanany
@@ -173,5 +181,4 @@
     </div>
 </div>
 @section('script')
-
 @endsection

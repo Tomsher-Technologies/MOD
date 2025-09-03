@@ -3,7 +3,7 @@
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('add_delegation') }}</h2>
         <a href="{{ route('delegations.index') }}"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
@@ -23,8 +23,8 @@
         </div>
     @endif
 
-    <form id="create-delegation-form" action="{{ route('delegations.store') ?? '#' }}" method="POST"
-        autocomplete="off" enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
+    <form id="create-delegation-form" action="{{ route('delegations.store') ?? '#' }}" method="POST" autocomplete="off"
+        enctype="multipart/form-data" class="bg-white h-full w-full rounded-lg border-0 p-6 mb-10">
         @csrf
         <div>
 
@@ -471,7 +471,6 @@
                                 </div>
                             </div>
 
-                            <!-- Checkboxes -->
                             <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" :id="`team-head-${index}`"
@@ -480,6 +479,7 @@
                                         x-model="delegate.team_head" />
                                     <label :for="`team-head-${index}`"
                                         class="text-sm text-gray-700">{{ __db('team_head') }}</label>
+
                                 </div>
                                 <div class="flex items-center gap-3">
                                     <input type="checkbox" :id="`badge-printed-${index}`"
@@ -610,8 +610,6 @@
         window.attachmentsFieldErrors = @json($errors->getBag('default')->toArray());
         window.delegatesData = @json($delegatesData);
         window.delegatesFieldErrors = @json($errors->getBag('default')->toArray());
-
-
     </script>
 
     <script>
@@ -619,6 +617,13 @@
             return {
                 delegates: window.delegatesData && window.delegatesData.length > 0 ?
                     window.delegatesData : [],
+
+                canToggleTeamHead(delegate) {
+                    const anyOtherTeamHead = this.delegates.some(d => d.team_head && d.tmp_id !== delegate.tmp_id);
+                    return !anyOtherTeamHead || delegate.team_head;
+                },
+
+
                 addDelegate() {
                     const maxTmpId = Math.max(...this.delegates.map(d => d.tmp_id || 0), 0);
                     const newTmpId = maxTmpId + 1;

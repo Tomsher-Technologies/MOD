@@ -15,7 +15,7 @@
         </a>
     </div>
 
-    <div class=" mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div class=" mx-auto px-4 sm:px-6 lg:px-0 py-8 space-y-8">
         {{-- Event Header --}}
         <div class="bg-white shadow rounded-xl p-6">
             <h2 class="text-2xl font-bold text-primary-700 mb-6">
@@ -109,7 +109,7 @@
                 </h3>
 
                 @if ($event->status === 0)
-                    <button class="openAssignModalBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    <button class="openAssignModalBtn bg-[#B68A35] text-white px-4 py-2 rounded hover:bg-[#a57d30]"
                         data-module="{{ $module }}">
                         {{ __db('assign_users_to') }} {{ ucfirst(__db($module)) }}
                     </button>
@@ -154,7 +154,7 @@
             <!-- Modal Content -->
             <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
                 <button
-                    class="closeAssignModalBtn absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+                    class="closeAssignModalBtn absolute top-3 left-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
                 <h2 class="text-xl font-semibold mb-4">{{ __db('assign_users_to') }} {{ ucfirst(__db($module)) }} {{ __db('module') }}</h2>
 
@@ -184,7 +184,7 @@
                     </select>
 
                     <div class="text-right">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        <button type="submit" class="bg-[#a57d30] text-white px-4 py-2 rounded hover:bg-[#a57d30]">
                             {{ __db('assign') }}
                         </button>
                     </div>
@@ -197,7 +197,7 @@
         {{-- @if (!empty($assignedUsers))
         @foreach($assignedUsers as $module => $users)
         <div class="bg-white rounded-lg shadow p-6 mb-10">
-            <button class="openAssignModalBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
+            <button class="openAssignModalBtn bg-[#B68A35] text-white px-4 py-2 rounded hover:bg-[#a57d30] mb-4"
                 data-module="{{ $module }}">
                 Assign Users to {{ ucfirst($module) }}
             </button>
@@ -244,7 +244,7 @@
 
             <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative">
                 <button
-                    class="closeAssignModalBtn absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+                    class="closeAssignModalBtn absolute top-3 left-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
                 <h2 class="text-xl font-semibold mb-4">Assign Users to {{ ucfirst($module) }} Module</h2>
 
@@ -276,7 +276,7 @@
                     </select>
 
                     <div class="text-right">
-                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        <button type="submit" class="bg-[#a57d30] text-white px-4 py-2 rounded hover:bg-[#a57d30]">
                             Assign
                         </button>
                     </div>

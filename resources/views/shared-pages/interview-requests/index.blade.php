@@ -41,14 +41,38 @@
                   @php
                       $columns = [
                           [
+                              'label' => __db('sl_no'),
+                              'key' => 'sl_no',
+                              'render' => function ($row, $key) use ($interviews) {
+                                  return $interviews->firstItem() + $key;
+                              },
+                          ],
+                          [
                               'label' => __db('date_time'),
                               'render' => fn($row) => $row->date_time
                                   ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
                                   : '-',
                           ],
                           [
-                              'label' => __db('from_delegation'),
-                              'render' => fn($row) => $row->delegation->code ?? '-',
+                              'label' => __db('delegation'),
+                              'render' => function ($row) {
+                                  $delegationUrl = route('delegations.show', $row->delegation->id);
+
+                                  return '
+                                                  <div class="flex items-center gap-2">
+                                                        ' .
+                                      '
+
+                                                        <a href="' .
+                                      $delegationUrl .
+                                      '" class="font-medium !text-[#B68A35] hover:underline">
+                                                            ' .
+                                      $row->delegation->code .
+                                      '
+                                                        </a>
+
+                                                        ';
+                              },
                           ],
                           [
                               'label' => __db('attended_by'),
@@ -70,7 +94,7 @@
                               'render' => function ($row) {
                                   if (!empty($row->other_member_id) && $row->otherMember) {
                                       $otherMemberName = $row->otherMember->name ?? '';
-                                      $otherMemberId = $row->otherMember->id ?? $row->other_member_id;
+                                      $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
                                       if ($otherMemberId) {
                                           $with =
                                               '<a href="' .
@@ -78,7 +102,7 @@
                                                   'other_interview_member' => base64_encode($otherMemberId),
                                               ]) .
                                               '" class="!text-[#B68A35]">
-                                    <span class="block">Other Member ID: ' .
+                                    <span class="block">Other Member: ' .
                                               e($otherMemberId) .
                                               '</span>
                                 </a>';
@@ -123,7 +147,7 @@
                       $noDataMessage = __db('no_interviews_found');
                   @endphp
 
-                  <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+                  <x-reusable-table :columns="$columns" :data="$data" :enableRowLimit="true" :noDataMessage="$noDataMessage" />
 
                   <div class="mt-4">
                       {{ $interviews->appends(request()->input())->links() }}

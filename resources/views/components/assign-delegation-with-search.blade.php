@@ -39,7 +39,7 @@
                             <label
                                 class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
                             <select id="country_id" class="select2 p-3 rounded-lg w-full border text-sm">
-                                <option value="" selected="" disabled="">{{ __db('select') . ' ' . __db('country') }}
+                                <option value="" selected="">{{ __db('All') }}</option>
                                 </option>
                                 @foreach (getAllCountries() as $country)
                                     <option value="{{ $country->id }}">{{ $country->name }}</option>
@@ -63,7 +63,6 @@
         <hr class="mx-6">
         <div id="delegationTable">
             <hr class="mx-6 border-neutral-200 h-5" />
-            <!-- Main Table -->
             <table class="table-auto mb-0 !border-[#F9F7ED] w-full border border-collapse">
                 <thead>
                     <tr>
@@ -76,7 +75,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Rows will be populated by AJAX --}}
                 </tbody>
             </table>
 
@@ -95,7 +93,6 @@
         const countryIdInput = document.getElementById('country_id');
         const delegationTableBody = document.querySelector('#delegationTable tbody');
 
-        // Define pageRoutes here or ensure they are globally available
         const pageRoutes = {
             delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
             delegationSearch: "{{ route('delegations.search') }}",
