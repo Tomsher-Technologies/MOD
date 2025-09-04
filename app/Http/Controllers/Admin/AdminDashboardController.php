@@ -25,6 +25,7 @@ class AdminDashboardController extends Controller
     
     public function dashboard(){
    
+        $lang = app()->getLocale() ?? 'en';
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $totalDelegates = Delegate::whereHas('delegation', function ($q) use ($currentEventId) {
@@ -60,7 +61,7 @@ class AdminDashboardController extends Controller
                                         ->where('dropdown_options.status', 1)
                                         ->groupBy('dropdown_options.id', 'dropdown_options.value', 'dropdown_options.sort_order')
                                         ->orderBy('dropdown_options.sort_order')
-                                        ->select('dropdown_options.value as department_name', DB::raw('COUNT(delegations.id) as total'))
+                                        ->select(DB::raw($lang === 'ar' ? 'COALESCE(dropdown_options.value_ar, dropdown_options.value) as department_name' : 'dropdown_options.value as department_name'), DB::raw('COUNT(delegations.id) as total'))
                                         ->get();
 
         $seriesDelegatesByDivision = $delegatesByDivision->pluck('total')->toArray();   
@@ -205,14 +206,14 @@ class AdminDashboardController extends Controller
                             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
                             ->where('dropdowns.code', 'departments')
                             ->where('d.status', 1)
-                            ->select('d.id', 'd.value')
+                            ->select('d.id', DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                             ->get();
 
         $statusesList = DB::table('dropdown_options as d')
                             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
                             ->where('dropdowns.code', 'invitation_status')
                             ->where('d.status', 1)
-                            ->select('d.id', 'd.value')
+                            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                             ->get();
 
         $rawData = DB::table('delegates')
@@ -322,7 +323,7 @@ class AdminDashboardController extends Controller
                                 $q->select('id')->from('dropdowns')->where('code', 'continents')->limit(1);
                             })
                             ->where('status', 1)
-                            ->pluck('value', 'id');
+                            ->pluck( DB::raw($lang === 'ar' ? 'COALESCE(value_ar, value) as value' : 'value as value'), 'id');
 
         $rawDataContinents = DB::table('delegations')
                             ->where('event_id', $currentEventId)
@@ -427,14 +428,16 @@ class AdminDashboardController extends Controller
 
     public function dashboardTables($table) {
        
+        $lang = app()->getLocale() ?? 'en';
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $departments = DB::table('dropdown_options as d')
                             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
                             ->where('dropdowns.code', 'departments')
                             ->where('d.status', 1)
-                            ->select('d.id', 'd.value')
+                            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                             ->get();
+                           
 
         if($table == 'invitations') {
 
@@ -442,7 +445,7 @@ class AdminDashboardController extends Controller
                                 ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
                                 ->where('dropdowns.code', 'invitation_status')
                                 ->where('d.status', 1)
-                                ->select('d.id', 'd.value')
+                                ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                                 ->get();
 
             $rawData = DB::table('delegates')
@@ -615,7 +618,7 @@ class AdminDashboardController extends Controller
                                 $q->select('id')->from('dropdowns')->where('code', 'continents')->limit(1);
                             })
                             ->where('status', 1)
-                            ->pluck('value', 'id');
+                            ->pluck( DB::raw($lang === 'ar' ? 'COALESCE(value_ar, value) as value' : 'value as value'), 'id');
 
             $rawDataContinents = DB::table('delegations')
                                 ->where('event_id', $currentEventId)
@@ -696,7 +699,7 @@ class AdminDashboardController extends Controller
                                         ->where('dropdown_options.status', 1)
                                         ->groupBy('dropdown_options.id', 'dropdown_options.value', 'dropdown_options.sort_order')
                                         ->orderBy('dropdown_options.sort_order')
-                                        ->select('dropdown_options.value as department_name', DB::raw('COUNT(delegations.id) as total'))
+                                        ->select(DB::raw($lang === 'ar' ? 'COALESCE(dropdown_options.value_ar, dropdown_options.value) as department_name' : 'dropdown_options.value as department_name'), DB::raw('COUNT(delegations.id) as total'))
                                         ->get();
 
             $seriesDelegatesByDivision = $delegatesByDivision->pluck('total')->toArray();   

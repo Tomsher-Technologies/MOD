@@ -405,7 +405,7 @@
 -- ALTER TABLE `external_member_assignments` ADD FOREIGN KEY (`assigned_by`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
 
-php artisan migrate;
+-- php artisan migrate;
 
 -- INSERT INTO `permissions` 
 -- (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
@@ -436,8 +436,8 @@ php artisan migrate;
 -- COLLATE utf8mb4_unicode_ci;
 
 
-INSERT INTO `permissions` 
- (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
- (125, 'admin', 25, 'badge_print_export', 'Export Badge Printed', 'web', 1, NULL, NULL);
+-- INSERT INTO `permissions` 
+--  (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+--  (125, 'admin', 25, 'badge_print_export', 'Export Badge Printed', 'web', 1, NULL, NULL);
 
- alter table dropdown_options add column value_ar text after value;
+--  alter table dropdown_options add column value_ar text after value;
