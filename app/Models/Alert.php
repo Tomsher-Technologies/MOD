@@ -21,6 +21,54 @@ class Alert extends Model
         'send_to_all' => 'boolean'
     ];
 
+    public function setTitleAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['title'] = json_encode($value);
+        } else {
+            $this->attributes['title'] = $value;
+        }
+    }
+
+    public function setMessageAttribute($value)
+    {
+        if (is_array($value)) {
+            $this->attributes['message'] = json_encode($value);
+        } else {
+            $this->attributes['message'] = $value;
+        }
+    }
+
+    public function getTitleAttribute($value)
+    {
+        $title = json_decode($value, true);
+        
+        if (is_array($title)) {
+            $lang = getActiveLanguage();
+            if ($lang !== 'en' && isset($title['ar'])) {
+                return $title['ar'];
+            }
+            return $title['en'] ?? '';
+        }
+        
+        return $value;
+    }
+
+    public function getMessageAttribute($value)
+    {
+        $message = json_decode($value, true);
+        
+        if (is_array($message)) {
+            $lang = getActiveLanguage();
+            if ($lang !== 'en' && isset($message['ar'])) {
+                return $message['ar'];
+            }
+            return $message['en'] ?? '';
+        }
+        
+        return $value;
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
