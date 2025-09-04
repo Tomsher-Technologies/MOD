@@ -39,8 +39,6 @@
             </button>
         </div>
     </div>
-    <!-- Escorts -->
-    <!-- Arrival Section -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
@@ -74,45 +72,51 @@
                     $columns = [
                         [
                             'label' => __db('sl_no'),
-                            'render' => fn($row, $key) => $key +
-                                1 +
-                                ($arrivals->currentPage() - 1) * $arrivals->perPage(),
+                            'render' => fn($row, $key) => $key + 1 + (($paginator ?? $arrivals)->currentPage() - 1) * ($paginator ?? $arrivals)->perPage(),
                         ],
                         [
                             'label' => __db('delegation'),
-                            'render' => fn($row) => $row->delegate->delegation->code ?? '-',
+                            'render' => fn($row) => $row['delegation']->code ?? '-',
                         ],
                         [
                             'label' => __db('continent'),
-                            'render' => fn($row) => $row->delegate->delegation->continent->value ?? '-',
+                            'render' => fn($row) => $row['delegation']->continent->value ?? '-',
                         ],
                         [
                             'label' => __db('country'),
                             'key' => 'country',
                             'render' => function ($row) {
-                                if (!$row->delegate->delegation->country) {
+                                if (!$row['delegation']->country) {
                                     return '-';
                                 }
 
-                                $flag = $row->delegate->delegation->country->flag
+                                $flag = $row['delegation']->country->flag
                                     ? '<img src="' .
-                                        getUploadedImage($row->delegate->delegation->country->flag) .
+                                        getUploadedImage($row['delegation']->country->flag) .
                                         '" 
                                         alt="' .
-                                        e($row->delegate->delegation->country->name) .
+                                        e($row['delegation']->country->name) .
                                         ' flag" 
                                         class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
                                     : '';
 
-                                return $flag . ' ' . e($row->delegate->delegation->country->name);
+                                return $flag . ' ' . e($row['delegation']->country->name);
                             },
                         ],
-                        ['label' => __db('delegates'), 'render' => fn($row) => $row->delegate->name_en ?? '-'],
+                        ['label' => __db('invitation_from'), 'render' => fn($row) => $row['delegation']->invitationFrom->value ?? '-'],
+                        [
+                            'label' => __db('delegates'),
+                            'render' => function ($row) {
+                                return collect($row['delegates'])->map(function ($delegate) {
+                                    return e($delegate->name_en);
+                                })->implode('<br>');
+                            },
+                        ],
                         [
                             'label' => __db('escorts'),
                             'render' => function ($row) {
-                                return $row->delegate->delegation->escorts->isNotEmpty()
-                                    ? $row->delegate->delegation->escorts
+                                return $row['delegation']->escorts->isNotEmpty()
+                                    ? $row['delegation']->escorts
                                         ->map(fn($escort) => e($escort->code))
                                         ->implode('<br>')
                                     : '-';
@@ -121,47 +125,52 @@
                         [
                             'label' => __db('drivers'),
                             'render' => function ($row) {
-                                return $row->delegate->delegation->drivers->isNotEmpty()
-                                    ? $row->delegate->delegation->drivers
+                                return $row['delegation']->drivers->isNotEmpty()
+                                    ? $row['delegation']->drivers
                                         ->map(fn($drivers) => e($drivers->code))
                                         ->implode('<br>')
                                     : '-';
                             },
                         ],
-                        ['label' => __db('to_airport'), 'render' => fn($row) => $row->airport->value ?? '-'],
+                        ['label' => __db('to_airport'), 'render' => fn($row) => $row['airport']->value ?? '-'],
                         [
                             'label' => __db('date_time'),
-                            'render' => fn($row) => $row->date_time
-                                ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                            'render' => fn($row) => $row['date_time']
+                                ? \Carbon\Carbon::parse($row['date_time'])->format('Y-m-d h:i A')
                                 : '-',
                         ],
                         [
                             'label' => __db('flight') . ' ' . __db('number'),
-                            'render' => fn($row) => $row->flight_no ?? '-',
+                            'render' => fn($row) => $row['flight_no'] ?? '-',
                         ],
                         [
                             'label' => __db('flight') . ' ' . __db('name'),
-                            'render' => fn($row) => $row->flight_name ?? '-',
+                            'render' => fn($row) => $row['flight_name'] ?? '-',
                         ],
                         [
                             'label' => __db('arrival') . ' ' . __db('status'),
                             'render' => function ($row) use ($statusLabels) {
-                                return $row->status ?? '-';
+                                return $row['status'] ?? '-';
                             },
                         ],
                         [
                             'label' => __db('actions'),
                             'permission' => ['add_travels', 'delegate_add_delegates'],
                             'render' => function ($row) {
+                                $firstTransport = $row['transports'][0] ?? null;
+                                if (!$firstTransport) {
+                                    return '-';
+                                }
+                                
                                 $arrivalData = [
-                                    'id' => $row->id,
-                                    'airport_id' => $row->airport_id,
-                                    'flight_no' => $row->flight_no,
-                                    'flight_name' => $row->flight_name,
-                                    'date_time' => $row->date_time
-                                        ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d\TH:i')
+                                    'id' => $firstTransport->id,
+                                    'airport_id' => $firstTransport->airport_id,
+                                    'flight_no' => $firstTransport->flight_no,
+                                    'flight_name' => $firstTransport->flight_name,
+                                    'date_time' => $firstTransport->date_time
+                                        ? \Carbon\Carbon::parse($firstTransport->date_time)->format('Y-m-d\TH:i')
                                         : '',
-                                    'status' => $row->status,
+                                    'status' => $firstTransport->status,
                                 ];
                                 $json = htmlspecialchars(json_encode($arrivalData), ENT_QUOTES, 'UTF-8');
                                 return '<button type="button" class="edit-arrival-btn text-[#B68A35]" data-arrival=\'' .
@@ -180,14 +189,13 @@
                     $rowClass = function ($row) use ($bgClass) {
                         $now = \Carbon\Carbon::now();
 
-                        $statusName =
-                            is_object($row->status) && isset($row->status->value) ? $row->status->value : $row->status;
+                        $statusName = is_object($row['status']) && isset($row['status']->value) ? $row['status']->value : $row['status'];
 
-                        if (!$row->date_time) {
+                        if (!$row['date_time']) {
                             return $bgClass[$statusName] ?? 'bg-[#fff]';
                         }
 
-                        $rowDateTime = \Carbon\Carbon::parse($row->date_time);
+                        $rowDateTime = \Carbon\Carbon::parse($row['date_time']);
 
                         if ($statusName === 'to_be_arrived') {
                             if ($rowDateTime->between($now->copy()->subHour(), $now->copy()->addHour())) {
@@ -197,8 +205,6 @@
                             if ($rowDateTime->gt($now->copy()->addHour())) {
                                 return 'bg-[#fff]';
                             }
-
-                            return 'bg-[#fff]';
                         }
 
                         if ($statusName === 'arrived') {
@@ -209,7 +215,8 @@
                     };
                 @endphp
 
-                <x-reusable-table :columns="$columns" :enableRowLimit="true" :data="$arrivals" :row-class="$rowClass" />
+                <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table" :enableColumnListBtn="true"
+                    :data="$paginator ?? $arrivals" :row-class="$rowClass" />
 
                 <div class="mt-3 flex items-center flex-wrap gap-4">
 
@@ -229,6 +236,17 @@
                     </div>
 
                 </div>
+
+                <!-- Pagination -->
+                @if (isset($paginator))
+                    <div class="mt-4">
+                        {{ $paginator->links() }}
+                    </div>
+                @else
+                    <div class="mt-4">
+                        {{ $arrivals->links() }}
+                    </div>
+                @endif
 
             </div>
         </div>

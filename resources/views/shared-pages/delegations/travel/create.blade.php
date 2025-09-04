@@ -135,7 +135,12 @@
                 ],
                 [
                     'label' => __db('flight_details'),
-                    'render' => function ($row) use ($existingArrivals, $existingDepartures, $showDeparture, $showArrival) {
+                    'render' => function ($row) use (
+                        $existingArrivals,
+                        $existingDepartures,
+                        $showDeparture,
+                        $showArrival,
+                    ) {
                         $details = [];
 
                         if (isset($existingArrivals[$row->id]) && $showArrival) {
@@ -221,6 +226,10 @@
         @endif
 
         <div class="flex justify-start gap-5 items-center mt-6">
+
+            <button type="submit" name="submit_exit" id="submit_exit" value="1"
+                class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_and_exit') }}</button>
+
             <button type="submit" name="submit_add_transport" id="submit_add_transport" value="1"
                 class="btn text-md !bg-[#B68A35] text-white rounded-lg py-3 px-5">{{ __db('submit_and_add_new_flight_details') }}</button>
 
@@ -234,13 +243,10 @@
                     class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_add_arrival') }}</button>
             @endif
 
-            @if (!$showArrival && !$showDeparture)
-                <button type="submit" name="submit_exit" id="submit_exit" value="1"
-                    class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_and_exit') }}</button>
-            @endif
-
             <button type="submit" name="submit_add_interview" id="submit_add_interview" value="1"
                 class="btn text-md !bg-[#D7BC6D] text-white rounded-lg py-3 px-5">{{ __db('submit_add_interview') }}</button>
+
+
         </div>
 
 

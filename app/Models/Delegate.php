@@ -22,7 +22,8 @@ class Delegate extends Model
         'accommodation_id',
         'accommodation',
         'team_head',
-        'badge_printed', 'current_room_assignment_id'
+        'badge_printed',
+        'current_room_assignment_id'
     ];
 
     protected $casts = [
@@ -87,8 +88,22 @@ class Delegate extends Model
         return $this->morphMany(RoomAssignment::class, 'assignable');
     }
 
+
     public function currentRoomAssignment()
     {
         return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
+    }
+
+    public function getTranslation($field = '', $lang = false)
+    {
+        $lang = $lang == false ? getActiveLanguage() : $lang;
+
+        if ($lang !== 'en') {
+            $field =  $field . '_ar';
+        } else {
+            $field =  $field . '_en';
+        }
+
+        return $this->$field;
     }
 }

@@ -50,7 +50,7 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
             <div class="bg-white h-full w-full rounded-lg border-0 p-10">
-                <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" tableId="delegationDetails" :data="$data" :noDataMessage="$noDataMessage" />
 
                 <hr class="my-5">
 
@@ -62,8 +62,8 @@
                 @endphp
 
                 <div class="grid grid-cols-2 gap-6 mt-3">
-                    <x-reusable-table :columns="$note1_columns" :data="$data" :noDataMessage="$noDataMessage" />
-                    <x-reusable-table :columns="$note2_columns" :data="$data" :noDataMessage="$noDataMessage" />
+                    <x-reusable-table :columns="$note1_columns" tableId="not1Table"  :data="$data" :noDataMessage="$noDataMessage" />
+                    <x-reusable-table :columns="$note2_columns" :data="$data" tableId="note2Table"  :noDataMessage="$noDataMessage" />
                 </div>
             </div>
         </div>
@@ -130,7 +130,6 @@
                         [
                             'label' => __db('accommodation'),
                             'render' => function ($row) {
-                                // If accommodation is not required (boolean field is false)
                                 if (!$row->accommodation) {
                                     return 'Not Required';
                                 }
@@ -165,7 +164,7 @@
                     $noDataMessage = __db('no_delegates_found');
                 @endphp
 
-                <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns"  table-id="delegatesTable" :enableColumnListBtn="true"  :data="$data" :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>
@@ -261,7 +260,7 @@
                     ];
                 @endphp
 
-                <x-reusable-table :data="$delegation->escorts" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->escorts" table-id="escortsTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
 
         </div>
@@ -386,7 +385,7 @@
                 @endphp
 
 
-                <x-reusable-table :data="$delegation->drivers" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->drivers" table-id="driversTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
 
         </div>
@@ -467,7 +466,7 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" table-id="interviewsTable" :data="$data" :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>
@@ -520,7 +519,7 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <x-reusable-table :columns="$columns" :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" table-id="attachmentsTable" :data="$data" :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>

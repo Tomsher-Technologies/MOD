@@ -296,6 +296,7 @@ class DelegationController extends Controller
                 'delegate.delegation.escorts',
                 'delegate.delegation.drivers',
                 'airport',
+                'delegate.delegation.invitationFrom',
                 // 'status'
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
@@ -391,9 +392,21 @@ class DelegationController extends Controller
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $arrivals = $query->orderBy('date_time', 'desc')->paginate($limit);
+        $allArrivals = $query->orderBy('date_time', 'desc')->get();
 
-        return view('admin.arrivals.index', compact('arrivals'));
+        $groupedArrivals = $this->groupTransports($allArrivals);
+
+        $currentPage = $request->input('page', 1);
+
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect($groupedArrivals)->forPage($currentPage, $limit),
+            count($groupedArrivals),
+            $limit,
+            $currentPage,
+            ['path' => $request->url(), 'pageName' => 'page']
+        );
+
+        return view('admin.arrivals.index', compact('paginator'));
     }
 
     public function departuresIndex(Request $request)
@@ -404,9 +417,10 @@ class DelegationController extends Controller
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
-                // 'delegate.escort',
-                // 'delegate.driver',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
                 'airport',
+                'delegate.delegation.invitationFrom',
                 // 'status'
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
@@ -452,41 +466,68 @@ class DelegationController extends Controller
             }
         }
 
-        if ($continentId = $request->input('continent_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
-                $delegationQuery->where('continent_id', $continentId);
-            });
-        }
-
         if ($invitation_from = $request->input('invitation_from')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
                 $delegationQuery->where('invitation_from_id', $invitation_from);
             });
         }
 
-        if ($countryId = $request->input('country_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
-                $delegationQuery->where('country_id', $countryId);
-            });
-        }
-
-        if ($airportId = $request->input('airport_id')) {
-            $query->where('airport_id', $airportId);
-        }
-
-        if ($status = $request->input('status')) {
-            if (is_array($status)) {
-                $query->whereIn('status', $status);
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
             } else {
-                $query->where('status', $status);
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($airportIds = $request->input('airport_id')) {
+            if (is_array($airportIds)) {
+                $query->whereIn('airport_id', $airportIds);
+            } else {
+                $query->where('airport_id', $airportIds);
+            }
+        }
+
+        if ($statusIds = $request->input('status')) {
+            if (is_array($statusIds)) {
+                $query->whereIn('status', $statusIds);
+            } else {
+                $query->where('status', $statusIds);
             }
         }
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $departures = $query->orderBy('date_time', 'desc')->paginate($limit);
+        $allDepartures = $query->orderBy('date_time', 'desc')->get();
 
-        return view('admin.departures.index', compact('departures'));
+        $groupedDepartures = $this->groupTransports($allDepartures);
+
+        $currentPage = $request->input('page', 1);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect($groupedDepartures)->forPage($currentPage, $limit),
+            count($groupedDepartures),
+            $limit,
+            $currentPage,
+            ['path' => $request->url(), 'pageName' => 'page']
+        );
+
+        return view('admin.departures.index', compact('paginator'));
     }
 
     public function updateTravel(Request $request, DelegateTransport $transport)
@@ -1847,5 +1888,55 @@ class DelegationController extends Controller
             $delegate->participation_status = $newStatus;
             $delegate->save();
         }
+    }
+
+    private function groupTransports($transports)
+    {
+        $groups = [];
+
+        foreach ($transports as $transport) {
+            $key = $this->createGroupKey($transport);
+
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'delegation' => $transport->delegate->delegation,
+                    'date_time' => $transport->date_time,
+                    'flight_no' => $transport->flight_no,
+                    'flight_name' => $transport->flight_name,
+                    'airport' => $transport->airport,
+                    'status' => $transport->status,
+                    'transports' => [],
+                    'delegates' => [],
+                ];
+            }
+
+            $groups[$key]['transports'][] = $transport;
+            
+            $delegateExists = false;
+            foreach ($groups[$key]['delegates'] as $existingDelegate) {
+                if ($existingDelegate->id === $transport->delegate->id) {
+                    $delegateExists = true;
+                    break;
+                }
+            }
+            
+            if (!$delegateExists) {
+                $groups[$key]['delegates'][] = $transport->delegate;
+            }
+        }
+
+        return array_values($groups);
+    }
+
+    private function createGroupKey($transport)
+    {
+        return md5(
+            $transport->delegate->delegation_id .
+            ($transport->date_time ?? '') .
+            ($transport->flight_no ?? '') .
+            ($transport->flight_name ?? '') .
+            ($transport->airport_id ?? '') .
+            ($transport->status ?? '')
+        );
     }
 }
