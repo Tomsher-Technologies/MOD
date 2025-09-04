@@ -157,13 +157,15 @@
                             'label' => __db('actions'),
                             'permission' => ['add_travels', 'delegate_add_delegates'],
                             'render' => function ($row) {
-                                $firstTransport = $row['transports'][0] ?? null;
-                                if (!$firstTransport) {
+                                $transportIds = collect($row['transports'])->pluck('id')->toArray();
+                                if (empty($transportIds)) {
                                     return '-';
                                 }
                                 
+                                $firstTransport = $row['transports'][0];
+                                
                                 $arrivalData = [
-                                    'id' => $firstTransport->id,
+                                    'ids' => $transportIds,
                                     'airport_id' => $firstTransport->airport_id,
                                     'flight_no' => $firstTransport->flight_no,
                                     'flight_name' => $firstTransport->flight_name,
@@ -237,7 +239,6 @@
 
                 </div>
 
-                <!-- Pagination -->
                 @if (isset($paginator))
                     <div class="mt-4">
                         {{ $paginator->links() }}
@@ -253,8 +254,6 @@
     </div>
 
 </div>
-
-<!-- Arrival Edit Modal -->
 
 <div x-data="{
     isArrivalEditModalOpen: false,
@@ -277,10 +276,18 @@
                 </button>
             </div>
 
-            <form :action="`{{ url('mod-admin/travel-update') }}/${arrival.id}`" method="POST" class="space-y-6"
+            <form :action="`{{ url('mod-admin/travel-update') }}/${arrival.ids && arrival.ids.length > 0 ? arrival.ids[0] : arrival.id}`" method="POST" class="space-y-6"
                 data-ajax-form="true">
                 @csrf
                 @method('POST')
+                
+                <template x-if="arrival.ids">
+                    <div>
+                        <template x-for="id in arrival.ids" :key="id">
+                            <input type="hidden" name="ids[]" :value="id">
+                        </template>
+                    </div>
+                </template>
 
                 <div class="grid grid-cols-5 gap-5">
                     <div>

@@ -532,6 +532,14 @@ class DelegationController extends Controller
 
     public function updateTravel(Request $request, DelegateTransport $transport)
     {
+        $transportIds = $request->input('ids');
+
+        if ($transportIds && is_array($transportIds)) {
+            $transports = DelegateTransport::whereIn('id', $transportIds)->get();
+        } else {
+            $transports = collect([$transport]);
+        }
+
         $validated = $request->validate([
             'airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'flight_no' => 'nullable|string|max:255',
@@ -557,7 +565,8 @@ class DelegationController extends Controller
             ],
         ];
 
-        $confirmationResult = $this->processUpdate($request, $transport, $validated, $relationsToCompare);
+        $firstTransport = $transports->first();
+        $confirmationResult = $this->processUpdate($request, $firstTransport, $validated, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
             return $confirmationResult;
@@ -567,8 +576,10 @@ class DelegationController extends Controller
         $fieldsToNotify = $confirmationResult['notify'] ?? [];
 
         try {
-            $transport->update($dataToSave);
-            $this->updateParticipationStatus($transport->delegate);
+            foreach ($transports as $t) {
+                $t->update($dataToSave);
+                $this->updateParticipationStatus($t->delegate);
+            }
 
             if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
@@ -576,11 +587,8 @@ class DelegationController extends Controller
                     $this->logActivity(
                         module: 'Travel',
                         action: 'update',
-                        model: $transport,
-                        changedFields: $changes,
-                        submoduleId: $transport->id,
-                        delegationId: $transport->delegate->delegation_id ?? null,
-                        fieldsToNotify: $fieldsToNotify
+                        model: $firstTransport,
+                        fieldsToNotify: $fieldsToNotify,
                     );
                 }
             }
@@ -597,6 +605,7 @@ class DelegationController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to update record.'], 500);
         }
     }
+
 
     public function getTravelDetails(DelegateTransport $transport)
     {
@@ -1911,7 +1920,7 @@ class DelegationController extends Controller
             }
 
             $groups[$key]['transports'][] = $transport;
-            
+
             $delegateExists = false;
             foreach ($groups[$key]['delegates'] as $existingDelegate) {
                 if ($existingDelegate->id === $transport->delegate->id) {
@@ -1919,7 +1928,7 @@ class DelegationController extends Controller
                     break;
                 }
             }
-            
+
             if (!$delegateExists) {
                 $groups[$key]['delegates'][] = $transport->delegate;
             }
@@ -1932,11 +1941,11 @@ class DelegationController extends Controller
     {
         return md5(
             $transport->delegate->delegation_id .
-            ($transport->date_time ?? '') .
-            ($transport->flight_no ?? '') .
-            ($transport->flight_name ?? '') .
-            ($transport->airport_id ?? '') .
-            ($transport->status ?? '')
+                ($transport->date_time ?? '') .
+                ($transport->flight_no ?? '') .
+                ($transport->flight_name ?? '') .
+                ($transport->airport_id ?? '') .
+                ($transport->status ?? '')
         );
     }
 }

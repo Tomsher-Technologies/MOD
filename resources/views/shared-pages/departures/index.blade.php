@@ -148,14 +148,15 @@
                                 'label' => __db('actions'),
                                 'permission' => ['add_travels', 'delegate_edit_delegations'],
                                 'render' => function ($row) {
-                                    // For grouped view, we'll show actions for the first transport
-                                    $firstTransport = $row['transports'][0] ?? null;
-                                    if (!$firstTransport) {
+                                    $transportIds = collect($row['transports'])->pluck('id')->toArray();
+                                    if (empty($transportIds)) {
                                         return '-';
                                     }
                                     
+                                    $firstTransport = $row['transports'][0];
+                                    
                                     $departureData = [
-                                        'id' => $firstTransport->id,
+                                        'ids' => $transportIds,
                                         'airport_id' => $firstTransport->airport_id,
                                         'flight_no' => $firstTransport->flight_no,
                                         'flight_name' => $firstTransport->flight_name,
@@ -221,7 +222,6 @@
                     </div>
                 </div>
 
-                <!-- Pagination -->
                 @if (isset($paginator))
                     <div class="mt-4">
                         {{ $paginator->links() }}
@@ -238,7 +238,6 @@
 
 </div>
 
-<!-- Departure Edit Modal -->
 <div x-data="{
     isDepartureEditModalOpen: false,
     departure: {},
@@ -260,10 +259,18 @@
                 </button>
             </div>
 
-            <form :action="`{{ url('mod-admin/travel-update') }}/${departure.id}`" method="POST" class="space-y-6"
+            <form :action="`{{ url('mod-admin/travel-update') }}/${departure.ids && departure.ids.length > 0 ? departure.ids[0] : departure.id}`" method="POST" class="space-y-6"
                 data-ajax-form="true">
                 @csrf
                 @method('POST')
+                
+                <template x-if="departure.ids">
+                    <div>
+                        <template x-for="id in departure.ids" :key="id">
+                            <input type="hidden" name="ids[]" :value="id">
+                        </template>
+                    </div>
+                </template>
 
                 <div class="grid grid-cols-5 gap-5">
                     <div>
