@@ -35,7 +35,7 @@
 
     <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
         <thead>
-            <tr class="text-[11px]">
+            <tr class="text-[13px]">
                 @foreach ($columns as $column)
                     @php
                         $permissionKey = $column['permission'] ?? null;
@@ -74,7 +74,7 @@
                     @endphp
 
                 @if (!$rowPermissions || can($rowPermissions))
-                    <tr class="text-[9px]  align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                    <tr class="text-[12px]  align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
                         data-id="{{ $row->id }}">
                         @foreach ($columns as $column)
                             @php
@@ -109,7 +109,7 @@
                 $data instanceof \Illuminate\Contracts\Pagination\Paginator ||
                     $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
                 <div class="mt-4">
-                    {{ $data->links() }}
+                    {{ $data->appends(request()->input())->links() }}
                 </div>
             @endif
 

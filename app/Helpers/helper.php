@@ -543,8 +543,7 @@ if (!function_exists('getRouteForPage')) {
 
 function getAllCountries()
 {
-    return Country::orderBy('name')
-        ->get();
+    return Country::where('status', 1)->orderBy('sort_order', 'asc')->get();
 }
 
 
@@ -552,7 +551,7 @@ if (! function_exists('getAllDrivers')) {
     function getAllDrivers()
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
-        return Driver::where('event_id', $currentEventId)->orderBy('code')
+        return Driver::where('event_id', $currentEventId)->where('status', 1)->orderBy('code')
             ->get();
     }
 }
@@ -561,7 +560,7 @@ if (! function_exists('getAllEscorts')) {
     function getAllEscorts()
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
-        return Driver::where('event_id', $currentEventId)->orderBy('code')
+        return Escort::where('event_id', $currentEventId)->where('status', 1)->orderBy('code')
             ->get();
     }
 }
@@ -571,20 +570,11 @@ if (! function_exists('getCountriesByContinent')) {
     function getCountriesByContinent($continentId)
     {
         return Country::where('continent_id', $continentId)
-            ->orderBy('name')
-            ->get();
+                        ->where('status', 1)
+                        ->orderBy('sort_order', 'asc')
+                        ->get();
     }
 }
-
-if (! function_exists('getCountriesByContinent')) {
-    function getCountriesByContinent($continentId)
-    {
-        return Country::where('continent_id', $continentId)
-            ->orderBy('name')
-            ->get();
-    }
-}
-
 
 if (!function_exists('can')) {
     function can(string|array $permissions): bool

@@ -1,6 +1,15 @@
 <div>
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all_delegations') }}</h2>
+        <a href="{{ route('accommodations.index') }}"
+            class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 12H5m14 0-4 4m4-4-4-4" />
+            </svg>
+            <span>{{ __db('back') }}</span>
+        </a>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
@@ -19,6 +28,9 @@
                             <input type="search" id="default-search" name="search" value="{{ request('search') }}"
                                 class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
                                 placeholder="Search by ID, Escorts, Drivers, Team Head" />
+
+                            <a href="{{ route('accommodation-delegations') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                                {{ __db('reset') }}</a>
                             <button type="submit"
                                 class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">Search</button>
                         </div>
@@ -61,7 +73,7 @@
                                 ($delegations->currentPage() - 1) * $delegations->perPage(),
                         ],
                         [
-                            'label' => __db('delegation') . ' ' . __db('id'),
+                            'label' => __db('delegation'),
                             'key' => 'id',
                             'render' => fn($delegation) => e($delegation->code),
                         ],
@@ -84,18 +96,28 @@
                             'label' => __db('escorts'),
                             'key' => 'escorts',
                             'render' => function ($delegation) {
-                                return $delegation->escorts->isNotEmpty()
-                                    ? $delegation->escorts->map(fn($escort) => e($escort->code))->implode('<br>')
-                                    : '-';
+                                if ($delegation->escorts->isEmpty()) {
+                                    return '-';
+                                }
+                                
+                                return $delegation->escorts->map(function ($escort) {
+                                    $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
+                                })->implode('<br>');
                             },
                         ],
                         [
                             'label' => __db('drivers'),
                             'key' => 'drivers',
                             'render' => function ($delegation) {
-                                return $delegation->drivers->isNotEmpty()
-                                    ? $delegation->drivers->map(fn($driver) => e($driver->code))->implode('<br>')
-                                    : '-';
+                                if ($delegation->drivers->isEmpty()) {
+                                    return '-';
+                                }
+                                
+                                return $delegation->drivers->map(function ($driver) {
+                                    $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
+                                })->implode('<br>');
                             },
                         ],
                         [
@@ -107,6 +129,32 @@
                             'label' => __db('participation_status'),
                             'key' => 'participation_status',
                             'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('continent'),
+                            'key' => 'continent',
+                            'render' => fn($delegation) => e($delegation->continent->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('country'),
+                            'key' => 'country',
+                            'render' => function ($delegation) {
+                                if (!$delegation->country) {
+                                    return '-';
+                                }
+
+                                $flag = $delegation->country->flag
+                                    ? '<img src="' .
+                                        getUploadedImage($delegation->country->flag) .
+                                        '" 
+                                        alt="' .
+                                        e($delegation->country->name) .
+                                        ' flag" 
+                                        class="inline-block w-6 h-4 mr-2 rounded-sm object-cover" />'
+                                    : '';
+
+                                return $flag . ' ' . e($delegation->country->name);
+                            },
                         ],
                         [
                             'key' => 'note',
@@ -152,7 +200,7 @@
                         if($status == 1){
                             return 'bg-[#acf3bc]';
                         }elseif ($status == 2) {
-                            return 'bg-[#e6d7a2]';
+                            return 'bg-[#ffefb8b5]';
                         }else {
                             return 'bg-[#fff]';
                         }
@@ -161,15 +209,13 @@
 
                 @endphp
 
-                <x-reusable-table :data="$delegations" :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
+                <x-reusable-table :data="$delegations"  :enableRowLimit="true" :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
 
-                <div class="mt-4">
-                    {{ $delegations->appends(request()->input())->links() }}
-                </div>
+                
 
                 <div class="flex items-center justify-start gap-6 mt-4">
                      <div class="mt-3 flex items-center justify-start gap-3 ">
-                        <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
+                        <div class="h-5 w-5 bg-[#ffefb8b5] rounded"></div>
                         <span class="text-gray-800 text-sm">{{ __db('partially_accommodated') }} </span>
                      </div>
                      <div class="mt-3 flex items-center justify-start gap-3 ">
@@ -197,55 +243,81 @@
         </button>
 
         <form action="{{ route('accommodation-delegations') }}" method="GET">
-            <div class="flex flex-col gap-4 mt-4">
-                <select name="invitation_from[]" placeholder="Invitation From" multiple
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getDropDown('internal_ranking')->options as $option)
-                        <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
-                            {{ $option->value }}</option>
-                    @endforeach
-                </select>
-                <select name="continent_id"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_continents') }}</option>
-                    @foreach (getDropDown('continents')->options as $continent)
-                        <option value="{{ $continent->id }}"
-                            {{ request('continent_id') == $continent->id ? 'selected' : '' }}>{{ $continent->value }}
-                        </option>
-                    @endforeach
-                </select>
-                <select name="country_id"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_countries') }}</option>
-                    @foreach (getDropDown('country')->options as $country)
-                        <option value="{{ $country->id }}"
-                            {{ request('country_id') == $country->id ? 'selected' : '' }}>
-                            {{ $country->value }}</option>
-                    @endforeach
-                </select>
-                <select name="invitation_status_id"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_invitation_statuses') }}</option>
-                    @foreach (getDropDown('invitation_status')->options as $status)
-                        <option value="{{ $status->id }}"
-                            {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
-                            {{ $status->value }}
-                        </option>
-                    @endforeach
-                </select>
-                <select name="participation_status_id"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_participation_statuses') }}</option>
-                    @foreach (getDropDown('participation_status')->options as $status)
-                        <option value="{{ $status->id }}"
-                            {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
-                            {{ $status->value }}
-                        </option>
-                    @endforeach
-                </select>
+            <div class="flex flex-col gap-2 mt-2">
+                
+                <div class="flex flex-col">
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                    <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('departments')->options as $option)
+                            <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
+                                {{ $option->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                    <select multiple name="continent_id[]" id="continent-select"
+                        data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('continents')->options as $continent)
+                            <option value="{{ $continent->id }}"
+                                {{ is_array(request('continent_id')) && in_array($continent->id, request('continent_id')) ? 'selected' : '' }}>
+                                {{ $continent->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                    <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getAllCountries() as $option)
+                            <option value="{{ $option->id }}"
+                                {{ is_array(request('country_id')) && in_array($option->id, request('country_id')) ? 'selected' : '' }}>
+                                {{ $option->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label
+                        class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
+                    <select multiple name="invitation_status_id" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('invitation_status')->options as $status)
+                            <option value="{{ $status->id }}"
+                                {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
+                                {{ $status->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label
+                        class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
+                    <select multiple name="participation_status_id" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('participation_status')->options as $status)
+                            <option value="{{ $status->id }}"
+                                {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
+                                {{ $status->value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 {{-- <select name="hotel_name"
-                    class="w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
-                    <option value="">{{ __db('all_hotel_names') }}</option>
+                    class="w-full rounded-lg border border-gray-300 text-sm">
+                    <option value="">{{ __db('select') }}</option>
                     @foreach ($filterData['hotelNames'] as $hotel)
                         <option value="{{ $hotel }}" {{ request('hotel_name') == $hotel ? 'selected' : '' }}>
                             {{ $hotel }}</option>
@@ -254,9 +326,9 @@
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
                 <a href="{{ route('accommodation-delegations') }}"
-                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
                 <button type="submit"
-                    class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
+                    class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
             </div>
         </form>
     </div>
@@ -412,6 +484,48 @@
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', applyVisibility);
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+
+            let initiallySelectedCountries = $('#country-select').val() || [];
+
+            $('#continent-select').on('change', function() {
+                const continentId = $(this).val();
+                const countrySelect = $('#country-select');
+
+                countrySelect.find('option[value!=""]').remove();
+
+                if (continentId) {
+                    $.get('{{ route('countries.by-continent') }}', {
+                        continent_ids: continentId
+                    }, function(data) {
+                        $.each(data, function(index, country) {
+                            const isSelected = initiallySelectedCountries.includes(country
+                                .id.toString());
+
+                            countrySelect.append(new Option(country.name, country.id, false,
+                                isSelected));
+                        });
+
+                        countrySelect.trigger('change');
+                    }).fail(function() {
+                        console.log('Failed to load countries');
+                    });
+                } else {
+                    countrySelect.val(null).trigger('change');
+                }
+            });
+
+            const selectedContinent = $('#continent-select').val();
+            if (selectedContinent && selectedContinent.length > 0) {
+                $('#continent-select').trigger('change');
+            }
         });
     </script>
 @endsection

@@ -16,6 +16,7 @@
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('room_type') }}:</label>
                     <select name="rooms[${roomIndex}][room_type]" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <option value="">{{ __db('select') }}</option>
                         @foreach ($roomTypes as $roomType)
                             <option value="{{ $roomType->id }}">{{ $roomType->value }}</option>
                         @endforeach
@@ -189,38 +190,44 @@
             let roomId = $(this).data('id');
             let routeUrl = "{{ route('accommodation-rooms.destroy', ':id') }} ".replace(':id', roomId);
 
-            if (assigned != 0) {
-                toastr.error("{{ __db('this_room_type_has_been_assigned') }}");
-                return;
-            }
+            if (!isNaN(assigned) && assigned !== null && assigned !== undefined) {
+                if (assigned != 0) {
+                    toastr.error("{{ __db('this_room_type_has_been_assigned') }}");
+                    return;
+                }
 
-            Swal.fire({
-                title: "{{ __db('are_you_sure') }}",
-                text: "{{ __db('room_type_will_be_deleted') }}",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: "{{ __db('yes') }}"
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: routeUrl,
-                        type: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                            'Accept': 'application/json'
-                        },
-                        success: function (data) {
-                            toastr.success("{{ __db('room_type_deleted') }}");
-                            thisRoom.closest('.room-row').remove()
-                        },
-                        error: function (xhr) {
-                            toastr.error("{{ __db('something_went_wrong') }}");
+                if (assigned == 0) {
+                    Swal.fire({
+                        title: "{{ __db('are_you_sure') }}",
+                        text: "{{ __db('room_type_will_be_deleted') }}",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: "{{ __db('yes') }}"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: routeUrl,
+                                type: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                                    'Accept': 'application/json'
+                                },
+                                success: function (data) {
+                                    toastr.success("{{ __db('room_type_deleted') }}");
+                                    thisRoom.closest('.room-row').remove()
+                                },
+                                error: function (xhr) {
+                                    toastr.error("{{ __db('something_went_wrong') }}");
+                                }
+                            });
                         }
                     });
                 }
-            });
+            }else{
+                thisRoom.closest('.room-row').remove();
+            }
         });
     });
 </script>
