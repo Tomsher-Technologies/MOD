@@ -393,6 +393,7 @@
             }
 
             window.location.href = url.toString();
+
         }
 
         function exportSelectedDelegates() {
@@ -423,6 +424,10 @@
             }
 
             window.location.href = url.toString();
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         }
     </script>
 @endsection
