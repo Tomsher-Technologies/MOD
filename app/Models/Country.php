@@ -8,6 +8,7 @@ class Country extends Model
 {
     protected $fillable = [
         'name',
+        'name_ar',
         'continent_id',
         'short_code',
         'sort_order',
@@ -21,5 +22,16 @@ class Country extends Model
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'continents');
             });
+    }
+
+    public function getNameAttribute($value)
+    {
+        $lang = getActiveLanguage();
+        
+        if ($lang !== 'en' && !empty($this->attributes['name_ar'])) {
+            return $this->attributes['name_ar'];
+        }
+        
+        return $value;
     }
 }

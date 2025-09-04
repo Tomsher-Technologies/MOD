@@ -441,3 +441,5 @@ INSERT INTO `permissions`
  (125, 'admin', 25, 'badge_print_export', 'Export Badge Printed', 'web', 1, NULL, NULL);
 
  alter table dropdown_options add column value_ar text after value;
+
+ alter table countries add column name_ar text;
