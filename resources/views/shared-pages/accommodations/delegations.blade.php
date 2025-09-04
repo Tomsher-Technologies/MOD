@@ -29,24 +29,13 @@
                                 class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
                                 placeholder="Search by ID, Escorts, Drivers, Team Head" />
 
-                            <a href="{{ route('accommodation-delegations') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                            <a href="{{ route('accommodation-delegations') }}"
+                                class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                 {{ __db('reset') }}</a>
                             <button type="submit"
                                 class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">Search</button>
                         </div>
                     </form>
-
-                    <button data-modal-target="column-visibility-modal" data-modal-toggle="column-visibility-modal"
-                        type="button"
-                        class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg me-auto">
-                        <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
-                        </svg>
-                        <span>{{ __db('column_list') }}</span>
-                    </button>
 
                     <div class="text-center">
                         <button
@@ -71,64 +60,6 @@
                             'render' => fn($row, $key) => $key +
                                 1 +
                                 ($delegations->currentPage() - 1) * $delegations->perPage(),
-                        ],
-                        [
-                            'label' => __db('delegation'),
-                            'key' => 'id',
-                            'render' => fn($delegation) => e($delegation->code),
-                        ],
-                        [
-                            'label' => __db('invitation_from'),
-                            'key' => 'invitation_from',
-                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
-                        ],
-                        [
-                            'label' => __db('team_head'),
-                            'key' => 'team_head',
-                            'render' => function ($delegation) {
-                                $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
-                                return $teamHeads->isNotEmpty()
-                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
-                                    : '-';
-                            },
-                        ],
-                        [
-                            'label' => __db('escorts'),
-                            'key' => 'escorts',
-                            'render' => function ($delegation) {
-                                if ($delegation->escorts->isEmpty()) {
-                                    return '-';
-                                }
-                                
-                                return $delegation->escorts->map(function ($escort) {
-                                    $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
-                                })->implode('<br>');
-                            },
-                        ],
-                        [
-                            'label' => __db('drivers'),
-                            'key' => 'drivers',
-                            'render' => function ($delegation) {
-                                if ($delegation->drivers->isEmpty()) {
-                                    return '-';
-                                }
-                                
-                                return $delegation->drivers->map(function ($driver) {
-                                    $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                    return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
-                                })->implode('<br>');
-                            },
-                        ],
-                        [
-                            'label' => __db('invitation_status'),
-                            'key' => 'invitation_status',
-                            'render' => fn($delegation) => e($delegation->invitationStatus->value ?? '-'),
-                        ],
-                        [
-                            'label' => __db('participation_status'),
-                            'key' => 'participation_status',
-                            'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
                         ],
                         [
                             'label' => __db('continent'),
@@ -157,6 +88,78 @@
                             },
                         ],
                         [
+                            'label' => __db('team_head'),
+                            'key' => 'team_head',
+                            'render' => function ($delegation) {
+                                $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
+                                return $teamHeads->isNotEmpty()
+                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
+                                    : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('delegation'),
+                            'key' => 'id',
+                            'render' => fn($delegation) => e($delegation->code),
+                        ],
+                        [
+                            'label' => __db('invitation_from'),
+                            'key' => 'invitation_from',
+                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
+                        ],
+
+                        [
+                            'label' => __db('escorts'),
+                            'key' => 'escorts',
+                            'render' => function ($delegation) {
+                                if ($delegation->escorts->isEmpty()) {
+                                    return '-';
+                                }
+
+                                return $delegation->escorts
+                                    ->map(function ($escort) {
+                                        $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                        return '<a href="' .
+                                            $searchUrl .
+                                            '" class="text-[#B68A35] hover:underline">' .
+                                            e($escort->code) .
+                                            '</a>';
+                                    })
+                                    ->implode('<br>');
+                            },
+                        ],
+                        [
+                            'label' => __db('drivers'),
+                            'key' => 'drivers',
+                            'render' => function ($delegation) {
+                                if ($delegation->drivers->isEmpty()) {
+                                    return '-';
+                                }
+
+                                return $delegation->drivers
+                                    ->map(function ($driver) {
+                                        $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                        return '<a href="' .
+                                            $searchUrl .
+                                            '" class="text-[#B68A35] hover:underline">' .
+                                            e($driver->code) .
+                                            '</a>';
+                                    })
+                                    ->implode('<br>');
+                            },
+                        ],
+                        [
+                            'label' => __db('invitation_status'),
+                            'key' => 'invitation_status',
+                            'render' => fn($delegation) => e($delegation->invitationStatus->value ?? '-'),
+                        ],
+                        [
+                            'label' => __db('participation_status'),
+                            'key' => 'participation_status',
+                            'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
+                        ],
+
+                        [
                             'key' => 'note',
                             'label' => __db('note'),
                             'render' => function ($d) {
@@ -166,10 +169,10 @@
                                 return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
                                     data-modal-target="note-modal" data-modal-toggle="note-modal"
                                     data-note1="' .
-                                    e($d->note1) . 
+                                    e($d->note1) .
                                     '"
                                     data-note2="' .
-                                    e($d->note2) . 
+                                    e($d->note2) .
                                     '"
                                     aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
@@ -181,11 +184,11 @@
                             'key' => __db('actions'),
                             'render' => function ($delegation) {
                                 $buttons = '';
-                                
+
                                 if (auth()->user() && auth()->user()->can('view_accommodation_delegations')) {
-                                    $buttons .= 
+                                    $buttons .=
                                         '<a href="' .
-                                        route('accommodation-delegation-view', $delegation->id) . 
+                                        route('accommodation-delegation-view', $delegation->id) .
                                         '" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                         <svg xmlns=\'http://www.w3.org/2000/svg\' width=\'18\' height=\'18\' viewBox=\'0 0 16 12\' fill=\'none\'><path d=\'M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z\' stroke=\'#7C5E24\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\' /><path d=\'M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z\' stroke=\'#7C5E24\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'></svg>
                                     </a>';
@@ -197,31 +200,38 @@
 
                     $rowClass = function ($row) {
                         $status = getRoomAssignmentStatus($row->id);
-                        if($status == 1){
+                        if ($status == 1) {
                             return 'bg-[#acf3bc]';
-                        }elseif ($status == 2) {
+                        } elseif ($status == 2) {
                             return 'bg-[#ffefb8b5]';
-                        }else {
+                        } else {
                             return 'bg-[#fff]';
                         }
-                        
                     };
-
                 @endphp
 
-                <x-reusable-table :data="$delegations"  :enableRowLimit="true" :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
-
-                
+                <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :row-class="$rowClass"
+                    :enableColumnListBtn="true" :defaultVisibleKeys="[
+                        'sl_no',
+                        'continent',
+                        'team_head',
+                        'invitation_from',
+                        'escorts',
+                        'drivers',
+                        'invitation_status',
+                        'participation_status',
+                        'note',
+                    ]" :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 <div class="flex items-center justify-start gap-6 mt-4">
-                     <div class="mt-3 flex items-center justify-start gap-3 ">
+                    <div class="mt-3 flex items-center justify-start gap-3 ">
                         <div class="h-5 w-5 bg-[#ffefb8b5] rounded"></div>
                         <span class="text-gray-800 text-sm">{{ __db('partially_accommodated') }} </span>
-                     </div>
-                     <div class="mt-3 flex items-center justify-start gap-3 ">
+                    </div>
+                    <div class="mt-3 flex items-center justify-start gap-3 ">
                         <div class="h-5 w-5 bg-[#acf3bc] rounded"></div>
                         <span class="text-gray-800 text-sm">{{ __db('fully_accommodated') }}</span>
-                     </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -244,9 +254,10 @@
 
         <form action="{{ route('accommodation-delegations') }}" method="GET">
             <div class="flex flex-col gap-2 mt-2">
-                
+
                 <div class="flex flex-col">
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                    <label
+                        class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>

@@ -475,16 +475,46 @@ class AccommodationController extends Controller
         return redirect()->back()->with('success', __db('room_assigned'));
     }
 
-    public function getExternalMembers()
+    public function getExternalMembers(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
-        request()->session()->put('external_members_last_url', url()->full());
-        $externalMembers = ExternalMemberAssignment::with('hotel')
-                                ->whereHas('hotel', function ($hotelQuery) use ($currentEventId) {
-                                    $hotelQuery->where('event_id', $currentEventId);
-                                })
-                                ->where('active_status', 1)->orderBy('id', 'desc')->paginate(10);
-        return view('admin.accommodations.view-external-members', compact('externalMembers'));
+        $request->session()->put('external_members_last_url', url()->full());
+        
+        $externalMembersQuery = ExternalMemberAssignment::with(['hotel', 'roomType.roomType'])
+            ->whereHas('hotel', function ($hotelQuery) use ($currentEventId) {
+                $hotelQuery->where('event_id', $currentEventId);
+            })
+            ->where('active_status', 1);
+            
+        if ($search = $request->input('search')) {
+            $externalMembersQuery->where('name', 'like', '%' . $search . '%');
+        }
+        
+        if ($hotelId = $request->input('hotel_id')) {
+            $externalMembersQuery->where('hotel_id', $hotelId);
+        }
+        
+        if ($roomTypeId = $request->input('room_type_id')) {
+            $externalMembersQuery->where('room_type_id', $roomTypeId);
+        }
+        
+        $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->paginate(10);
+        
+        $hotels = Accommodation::where('event_id', $currentEventId)
+                    ->where('status', 1)
+                    ->orderBy('hotel_name', 'asc')
+                    ->get();
+                    
+        $roomTypes = AccommodationRoom::with('roomType')
+                        ->whereHas('accommodation', function ($query) use ($currentEventId) {
+                            $query->where('event_id', $currentEventId);
+                        })
+                        ->orderBy('id', 'asc')
+                        ->get()
+                        ->unique('room_type_id')
+                        ->values();
+        
+        return view('admin.accommodations.view-external-members', compact('externalMembers', 'hotels', 'roomTypes'));
     }
 
     public function editExternalMembers($id)

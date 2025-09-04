@@ -147,7 +147,7 @@
                             });
                         } else {
                             delegationTableBody.innerHTML =
-                                '<tr><td colspan="5" class="text-center py-4">{{ __db('No delegations found.') }}</td></tr>';
+                                '<tr><td colspan="5" class="text-center py-4">{{ __db('no') . " " . __db('delegations') . " " . __db('found') }}</td></tr>';
                         }
                     } else {
                         delegationTableBody.innerHTML =
