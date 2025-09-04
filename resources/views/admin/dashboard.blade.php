@@ -107,7 +107,11 @@
             <div class="col-span-8 sm:col-span-8 xl:col-span-8">
                 <div class="bg-white h-full rounded-lg border-0 p-4">
                     <div class="border-b border-neutral-200 pb-4 mb-4">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('delegations_by_division') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-medium mb-0">
+                            <a href="{{ route("admin.dashboard.tables",["table" => "divisions"]) }}">
+                                {{ __db('delegations_by_division') }}
+                            </a>
+                        </h6>
                     </div>
                     <div id="pieChart"></div>
                 </div>
@@ -115,7 +119,11 @@
             <div class="col-span-4 sm:col-span-4 xl:col-span-4">
                 <div class="bg-white h-full rounded-lg border-0 p-4">
                     <div class="border-b border-neutral-200 pb-4 mb-4">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('delegation_assignments') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-medium mb-0">
+                            <a href="{{ route("admin.dashboard.tables",["table" => "assignments"]) }}">
+                                {{ __db('delegation_assignments') }}
+                            </a>
+                        </h6>
                     </div>
                     <div id="columnChart" class=""></div>
                 </div>
@@ -123,7 +131,11 @@
             <div class="col-span-5 sm:col-span-5 xl:col-span-5">
                 <div class="bg-white h-full rounded-lg border-0 p-4">
                     <div class="border-b border-neutral-200 pb-4 mb-4">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('arrival_status') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-medium mb-0"> 
+                            <a href="{{ route("admin.dashboard.tables",["table" => "arrival"]) }}">
+                                {{ __db('arrival_status') }}
+                            </a>
+                        </h6>
                     </div>
                     <div id="userOverviewDonutChart" class="apexcharts-tooltip-z-none"></div>
                 </div>
@@ -781,7 +793,17 @@
                         },
                         borderWidth: 3,
                         borderColor: '#ffffff'
-                     }
+                    },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    window.location.href = '{{ route("admin.dashboard.tables",["table" => "divisions"]) }}';
+                                }
+                            }
+                        }
+                    }
                },
                legend: {
                   layout: 'horizontal',
@@ -835,7 +857,17 @@
                         borderRadius: 4,
                         pointPadding: 0.2,
                         borderWidth: 0
-                     }
+                     },
+                     series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    window.location.href = '{{ route("admin.dashboard.tables",["table" => "assignments"]) }}';
+                                }
+                            }
+                        }
+                    }
                },
                colors: ['#e6d7a2', '#B68A35'],
                legend: {
@@ -874,21 +906,31 @@
                title: {
                   text: ''
                },
-               plotOptions: {
-                  pie: {
-                        innerSize: '50%', 
-                        showInLegend: true,
-                        dataLabels: {
-                           enabled: true,
-                           style: {
-                              fontSize: '9px',  
-                              fontWeight: 'bold', 
-                              color: '#000'       
-                           },
-                           format: '{point.name}: {point.percentage:.1f}%'
+                plotOptions: {
+                    pie: {
+                            innerSize: '50%', 
+                            showInLegend: true,
+                            dataLabels: {
+                            enabled: true,
+                            style: {
+                                fontSize: '9px',  
+                                fontWeight: 'bold', 
+                                color: '#000'       
+                            },
+                            format: '{point.name}: {point.percentage:.1f}%'
+                            }
+                    },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    window.location.href = '{{ route("admin.dashboard.tables",["table" => "arrival"]) }}';
+                                }
+                            }
                         }
-                  }
-               },
+                    }
+                },
                legend: {
                   layout: 'horizontal',
                   align: 'center',
@@ -901,12 +943,13 @@
                   },
                   navigation: { enabled: true } 
                },
-               colors: ['#B68A35', '#D7BC6D', '#E6D7A2'],
+               colors: ['#B68A35', '#F2ECCF', '#D7BC6D', '#E6D7A2'],
                series: [{
                   name: '{{ __db('delegates') }}',
                   data: [
+                        { name: '{{ __db('to_be_arrived') }}', y: {{ $data['arrival_status']['to_be_arrived'] }} },
                         { name: '{{ __db('arrived') }}', y: {{ $data['arrival_status']['arrived'] }} },
-                        { name: '{{ __db('not_yet_arrived') }}', y: {{ $data['arrival_status']['not_yet_arrived'] }} },
+                        { name: '{{ __db('to_be_departed') }}', y: {{ $data['arrival_status']['to_be_departed'] }} },
                         { name: '{{ __db('departed') }}', y: {{ $data['arrival_status']['departed'] }} }
                   ]
                }]

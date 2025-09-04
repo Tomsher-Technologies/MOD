@@ -16,43 +16,197 @@
                             </svg>
                             <span>{{ __db('back') }}</span>
                         </a>
+                        <button onclick="printSection('print_area')"  class="btn text-sm !bg-[#B68A35] text-white rounded-lg py-2 px-3">
+                            {{ __db('print') }}
+                        </button>
+                       
                     </div>
 
-                    <div class="overflow-x-auto w-full">
-                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
-                            <thead>
-                                <tr class="text-[13px]">
-                                    <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
-                                    @foreach($data['invitationByContinentsTable']['continents'] as $continentName)
-                                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ $continentName }}</th>
-                                    @endforeach
-                                    <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('total') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($data['invitationByContinentsTable']['rows'] as $row)
-                                    <tr class=" text-[12px] align-[middle]">
-                                        <td class="px-4 py-2 border border-gray-200">{{ $row['department'] }}</td>
-                                        @foreach($data['invitationByContinentsTable']['continents'] as $continentId => $continentName)
-                                            <td class="px-4 text-center py-2 border border-gray-200">{{ $row['continents'][$continentId] ?? 0 }}</td>
+                    <div id="print_area">
+                        <div class="w-full mt-12">
+                            <div id="AcceptedContinents"></div>
+                        </div>
+
+                        <div class="w-full mt-6">
+                            <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
+                                <thead>
+                                    <tr class="text-[13px]">
+                                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
+                                        @foreach($data['invitationByContinentsTable']['continents'] as $continentName)
+                                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ $continentName }}</th>
                                         @endforeach
-                                        <td class="px-4 py-2 text-center border border-gray-200"><strong>{{ $row['total'] }}</strong></td>
+                                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('total') }}</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot>
-                                <tr class=" align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[16px]">
-                                    <th class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</th>
-                                    @foreach($data['invitationByContinentsTable']['continents'] as $continentId => $continentName)
-                                        <th class="text-center px-4 py-2 border border-gray-200">{{ $data['invitationByContinentsTable']['colTotals'][$continentId] ?? 0 }}</th>
+                                </thead>
+                                <tbody>
+                                    @foreach($data['invitationByContinentsTable']['rows'] as $row)
+                                        <tr class=" text-[12px] align-[middle]">
+                                            <td class="px-4 py-2 border border-gray-200">{{ $row['department'] }}</td>
+                                            @foreach($data['invitationByContinentsTable']['continents'] as $continentId => $continentName)
+                                                <td class="px-4 text-center py-2 border border-gray-200">{{ $row['continents'][$continentId] ?? 0 }}</td>
+                                            @endforeach
+                                            <td class="px-4 py-2 text-center border border-gray-200"><strong>{{ $row['total'] }}</strong></td>
+                                        </tr>
                                     @endforeach
-                                    <th class="text-center px-4 py-2 border border-gray-200">{{ $data['invitationByContinentsTable']['colTotals']['row_total'] ?? 0 }}</th>
-                                </tr>
-                            </tfoot>
-                        </table>
+
+                                    <tr class=" align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[16px]">
+                                        <th class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</th>
+                                        @foreach($data['invitationByContinentsTable']['continents'] as $continentId => $continentName)
+                                            <th class="text-center px-4 py-2 border border-gray-200">{{ $data['invitationByContinentsTable']['colTotals'][$continentId] ?? 0 }}</th>
+                                        @endforeach
+                                        <th class="text-center px-4 py-2 border border-gray-200">{{ $data['invitationByContinentsTable']['colTotals']['row_total'] ?? 0 }}</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div> 
         </div>
     </div>
+@endsection
+
+@section('script')
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        Highcharts.chart('AcceptedContinents', {
+            chart: {
+                type: 'column'
+            },
+            credits: { enabled: false },
+            title: {
+                text: '',
+                align: 'left'
+            },
+            xAxis: {
+                categories: @json( $data['invitationByContinents']['categories']),
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: ''
+                },
+                stackLabels: {
+                    enabled: true
+                }
+            },
+            legend: {
+                align: 'left',
+                x: 0,
+                verticalAlign: 'bottom',
+                y: 10,
+                floating: false,
+                backgroundColor: 'var(--highcharts-background-color, #ffffff)',
+                borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
+                borderWidth: 0,
+                shadow: false
+            },
+            tooltip: {
+                headerFormat: '<b>{category}</b><br/>',
+                pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: true
+                    }
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function () {
+                                window.location.href = '{{ route("admin.dashboard.tables",["table" => "continents"]) }}';
+                            }
+                        }
+                    }
+                }
+            },
+            series: @json( $data['invitationByContinents']['series'])
+
+        });
+
+    });
+    // function printSection(divId) {
+    //     let content = document.getElementById(divId).innerHTML;
+    //     let mywindow = window.open('', 'PRINT', 'height=800,width=1200');
+
+    //     mywindow.document.write('<html><head><title>' + document.title  + '</title>');
+    //     // Include Tailwind/your CSS
+    //     mywindow.document.write('<link rel="stylesheet" href="{{ asset('build/assets/app-BJwf0WQN.css') }}">');
+    //     mywindow.document.write('<link rel="stylesheet" href="{{ asset('build/assets/app-DeCezn19.css') }}">');
+    //     mywindow.document.write('</head><body>');
+    //     mywindow.document.write(content);
+    //     mywindow.document.write('</body></html>');
+
+    //     mywindow.document.close(); 
+    //     mywindow.focus(); 
+
+    //     mywindow.print();
+    //     mywindow.close();
+
+    //     return true;
+    // }
+
+   function printSection(divId, chartId = null) {
+    const contentDiv = document.getElementById(divId);
+    const clonedContent = contentDiv.cloneNode(true);
+
+    if (chartId) {
+        const chart = Highcharts.charts.find(c => c && c.renderTo.id === chartId);
+        if (chart) {
+            const svg = chart.getSVG({
+                exporting: {
+                    sourceWidth: chart.chartWidth,
+                    sourceHeight: chart.chartHeight
+                }
+            });
+
+            const chartContainer = clonedContent.querySelector(`#${chartId}`);
+            if (chartContainer) {
+                // Make chart responsive by wrapping SVG in a div with 100% width
+                chartContainer.innerHTML = `
+                    <div style="width:100%; max-width:${chart.chartWidth}px;">
+                        ${svg}
+                    </div>
+                `;
+                // Optionally scale SVG to fit container
+                const svgEl = chartContainer.querySelector('svg');
+                svgEl.setAttribute('width', '100%');
+                svgEl.setAttribute('height', 'auto');
+            }
+        }
+    }
+
+    const printWindow = window.open('', 'PRINT', 'height=800,width=1200');
+    printWindow.document.write('<html><head><title>' + document.title + '</title>');
+
+
+    // Print-specific styles
+    printWindow.document.write('<style>' +
+        '@media print {' +
+        '.no-print { display: none !important; }' +
+        'table { border-collapse: collapse !important; width: 100%; }' +
+        'th, td { border: 1px solid #cbac71 !important; padding: 0.5rem !important; }' +
+        'th { background-color: #B68A35 !important; color: #fff !important; }' +
+        'svg { max-width: 100%; height: auto; }' +
+        '}' +
+        '</style>'
+    );
+
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(clonedContent.outerHTML);
+    printWindow.document.write('</body></html>');
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+    }, 500);
+}
+   
+</script>
 @endsection
