@@ -51,7 +51,7 @@
                         <div class="col-span-4">
                             <label class="form-label">{{ __db('room_type') }}:</label>
                             <select name="rooms[0][room_type]" id="room_type" class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                <option value="">{{ __db('choose_option') }}</option>
+                                <option value="">{{ __db('select') }}</option>
                                 @foreach ($roomTypes as $roomType)
                                     <option value="{{ $roomType->id }}">{{ $roomType->value }}</option>
                                 @endforeach

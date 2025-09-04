@@ -18,7 +18,7 @@
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
             <thead>
-                <tr>
+                <tr class="text-[13px]">
                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('hotel_name') }}
                     </th>
                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
@@ -40,7 +40,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="text-xs align-[middle]">
+                <tr class="text-[12px] align-[middle]">
                     <td class="px-4 py-3 border border-gray-200">
                         {{ $hotel->hotel_name ?? '' }}
                     </td>
