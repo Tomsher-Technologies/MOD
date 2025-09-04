@@ -6,10 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class DropdownOption extends Model
 {
-    protected $fillable = ['dropdown_id', 'value', 'sort_order', 'status'];
+    protected $fillable = ['dropdown_id', 'value', 'value_ar', 'sort_order', 'status'];
 
     public function dropdown()
     {
         return $this->belongsTo(Dropdown::class);
+    }
+
+    public function getValueAttribute($value)
+    {
+        $lang = getActiveLanguage();
+        
+        if ($lang !== 'en' && !empty($this->attributes['value_ar'])) {
+            return $this->attributes['value_ar'];
+        }
+        
+        return $value;
     }
 }

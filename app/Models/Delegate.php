@@ -39,6 +39,7 @@ class Delegate extends Model
                 $q->where('code', 'title');
             });
     }
+    
     public function gender()
     {
         return $this->belongsTo(DropdownOption::class, 'gender_id')
@@ -47,6 +48,7 @@ class Delegate extends Model
             });
     }
 
+
     public function relationship()
     {
         return $this->belongsTo(DropdownOption::class, 'relationship_id')
@@ -54,6 +56,7 @@ class Delegate extends Model
                 $q->where('code', 'relationship');
             });
     }
+
 
     public function internalRanking()
     {
