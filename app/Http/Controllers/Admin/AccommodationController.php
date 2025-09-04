@@ -161,7 +161,16 @@ class AccommodationController extends Controller
 
     public function accommodationDelegations(Request $request)
     {
-        $query = Delegation::with(['invitationFrom', 'continent', 'country', 'invitationStatus', 'participationStatus', 'delegates', 'escorts'])->orderBy('id', 'desc');
+        $query = Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates',
+            'escorts',
+            'drivers'
+        ])->orderBy('id', 'desc');
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
@@ -174,34 +183,58 @@ class AccommodationController extends Controller
                     })
                     ->orWhereHas('escorts', function ($escortQuery) use ($search) {
                         $escortQuery->where('name_en', 'like', "%{$search}%")
-                            ->orWhere('name_ar', 'like', "%{$search}%");
+                            ->orWhere('name_ar', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%");
+                    })->orWhereHas('drivers', function ($driversQuery) use ($search) {
+                        $driversQuery->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%");
                     });
             });
         }
 
 
         if ($invitationFrom = $request->input('invitation_from')) {
-            $query->whereIn('invitation_from_id', $invitationFrom);
-        }
-        if ($continentId = $request->input('continent_id')) {
-            $query->where('continent_id', $continentId);
-        }
-        if ($countryId = $request->input('country_id')) {
-            $query->where('country_id', $countryId);
-        }
-        if ($invitationStatusId = $request->input('invitation_status_id')) {
-            $query->where('invitation_status_id', $invitationStatusId);
-        }
-        if ($participationStatusId = $request->input('participation_status_id')) {
-            $query->where('participation_status_id', $participationStatusId);
-        }
-        if ($hotelName = $request->input('hotel_name')) {
-            $query->whereHas('delegates', function ($delegateQuery) use ($hotelName) {
-                $delegateQuery->where('hotel_name', $hotelName);
-            });
+            if (is_array($invitationFrom)) {
+                $query->whereIn('invitation_from_id', $invitationFrom);
+            } else {
+                $query->where('invitation_from_id', $invitationFrom);
+            }
         }
 
-        $delegations = $query->paginate(20);
+        if ($continentId = $request->input('continent_id')) {
+            if (is_array($continentId)) {
+                $query->whereIn('continent_id', $continentId);
+            } else {
+                $query->where('continent_id', $continentId);
+            }
+        }
+
+        if ($countryId = $request->input('country_id')) {
+            if (is_array($countryId)) {
+                $query->whereIn('country_id', $countryId);
+            } else {
+                $query->where('country_id', $countryId);
+            }
+        }
+
+        if ($invitationStatusId = $request->input('invitation_status_id')) {
+            if (is_array($invitationStatusId)) {
+                $query->whereIn('invitation_status_id', $invitationStatusId);
+            } else {
+                $query->where('invitation_status_id', $invitationStatusId);
+            }
+        }
+
+        if ($participationStatusId = $request->input('participation_status_id')) {
+            if (is_array($participationStatusId)) {
+                $query->whereIn('participation_status_id', $participationStatusId);
+            } else {
+                $query->where('participation_status_id', $participationStatusId);
+            }
+        }
+
+        $limit = $request->limit ? $request->limit : 20;
+
+        $delegations = $query->paginate($limit);
         return view('admin.accommodations.delegations', compact('delegations'));
     }
 
@@ -221,13 +254,19 @@ class AccommodationController extends Controller
             'drivers'
         ])->findOrFail($id);
 
-        $hotels = Accommodation::where('status', 1)->where('event_id', session('current_event_id', getDefaultEventId() ?? null))->orderBy('hotel_name', 'asc')->get();
+        $hotels = Accommodation::where('status', 1)
+                    ->whereHas('rooms', function ($q) {
+                        $q->where('available_rooms', '>', 0);
+                    })
+                    ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
+                    ->orderBy('hotel_name', 'asc')
+                    ->get();
         return view('admin.accommodations.delegations-show', compact('delegation', 'hotels'));
     }
 
     public function getHotelRooms($id)
     {
-        $rooms = AccommodationRoom::with('roomType')
+        $rooms = AccommodationRoom::with('roomType','accommodation')
             ->where('accommodation_id', $id)
             ->get();
 
@@ -438,8 +477,13 @@ class AccommodationController extends Controller
 
     public function getExternalMembers()
     {
+        $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
         request()->session()->put('external_members_last_url', url()->full());
-        $externalMembers = ExternalMemberAssignment::where('active_status', 1)->orderBy('id', 'desc')->paginate(10);
+        $externalMembers = ExternalMemberAssignment::with('hotel')
+                                ->whereHas('hotel', function ($hotelQuery) use ($currentEventId) {
+                                    $hotelQuery->where('event_id', $currentEventId);
+                                })
+                                ->where('active_status', 1)->orderBy('id', 'desc')->paginate(10);
         return view('admin.accommodations.view-external-members', compact('externalMembers'));
     }
 
