@@ -486,24 +486,20 @@ class AccommodationController extends Controller
             })
             ->where('active_status', 1);
             
-        // Apply search filter
         if ($search = $request->input('search')) {
             $externalMembersQuery->where('name', 'like', '%' . $search . '%');
         }
         
-        // Apply hotel filter
         if ($hotelId = $request->input('hotel_id')) {
             $externalMembersQuery->where('hotel_id', $hotelId);
         }
         
-        // Apply room type filter
         if ($roomTypeId = $request->input('room_type_id')) {
             $externalMembersQuery->where('room_type_id', $roomTypeId);
         }
         
         $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->paginate(10);
         
-        // Get data for filter dropdowns
         $hotels = Accommodation::where('event_id', $currentEventId)
                     ->where('status', 1)
                     ->orderBy('hotel_name', 'asc')
