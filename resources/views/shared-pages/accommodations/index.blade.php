@@ -48,7 +48,7 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                     <thead>
-                        <tr class="text-[10px]">
+                        <tr class="text-[13px]">
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}
                             </th>
@@ -80,7 +80,7 @@
                     </thead>
                     <tbody>
                         @forelse ( $accommodations as $key => $hotel )
-                            <tr class="text-xs align-[middle]">
+                            <tr class="text-[12px] align-[middle]">
                                 <td class="px-3 py-3 border border-gray-200">
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
