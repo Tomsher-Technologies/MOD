@@ -1948,4 +1948,162 @@ class DelegationController extends Controller
                 ($transport->status ?? '')
         );
     }
+
+
+    public function badgePrintedIndex(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        // Get all delegates with their delegations
+        $query = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+            'title'
+        ])
+        ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+            $delegationQuery->where('event_id', $currentEventId);
+        });
+
+        // Apply filters
+        if ($searchKey = $request->input('search_key')) {
+            $query->where(function ($q) use ($searchKey) {
+                $q->where('name_en', 'like', "%{$searchKey}%")
+                    ->orWhere('name_ar', 'like', "%{$searchKey}%")
+                    ->orWhere('code', 'like', "%{$searchKey}%")
+                    ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
+                        $delegationQuery->where('code', 'like', "%{$searchKey}%");
+                    });
+            });
+        }
+
+        // Filter by badge printed status
+        $badgePrintedFilter = $request->input('badge_printed');
+        if ($badgePrintedFilter !== null) {
+            if ($badgePrintedFilter == '1') {
+                $query->where('badge_printed', true);
+            } elseif ($badgePrintedFilter == '0') {
+                $query->where('badge_printed', false);
+            }
+        }
+
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                $delegationQuery->where('invitation_from_id', $invitation_from);
+            });
+        }
+
+        $limit = $request->limit ? $request->limit : 20;
+
+        $delegates = $query->orderBy('id', 'desc')->paginate($limit);
+
+        return view('admin.delegates.badge-printed-index', compact('delegates'));
+    }
+
+    public function updateBadgePrintedStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'delegate_id' => 'required|integer|exists:delegates,id',
+            'badge_printed' => 'required|boolean',
+        ]);
+
+        try {
+            $delegate = Delegate::findOrFail($validated['delegate_id']);
+            $delegate->badge_printed = $validated['badge_printed'];
+            $delegate->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => __db('badge_printed_status_updated_successfully')
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Badge Printed Status Update Failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => __db('badge_printed_status_update_failed')
+            ], 500);
+        }
+    }
+
+    public function exportNonBadgePrinted(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        // Get non-badge printed delegates
+        $delegates = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+            'title'
+        ])
+        ->where('badge_printed', false)
+        ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+            $delegationQuery->where('event_id', $currentEventId);
+        })
+        ->get();
+
+        // Create Excel export
+        return Excel::download(new class($delegates) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
+            protected $delegates;
+
+            public function __construct($delegates)
+            {
+                $this->delegates = $delegates;
+            }
+
+            public function collection()
+            {
+                return $this->delegates->map(function ($delegate) {
+                    return [
+                        'Delegate Code' => $delegate->code,
+                        'Delegate Name' => $delegate->name_en,
+                        'Delegation Code' => $delegate->delegation->code,
+                        'Country' => $delegate->delegation->country->name ?? '',
+                        'Continent' => $delegate->delegation->continent->value ?? '',
+                        'Invitation From' => $delegate->delegation->invitationFrom->value ?? '',
+                        'Title' => $delegate->title->value ?? '',
+                        'Designation' => $delegate->designation_en,
+                    ];
+                });
+            }
+
+            public function headings(): array
+            {
+                return [
+                    'Delegate Code',
+                    'Delegate Name',
+                    'Delegation Code',
+                    'Country',
+                    'Continent',
+                    'Invitation From',
+                    'Title',
+                    'Designation',
+                ];
+            }
+        }, 'non-badge-printed-delegates.xlsx');
+    }
 }

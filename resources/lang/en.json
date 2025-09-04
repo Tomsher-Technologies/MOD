@@ -190,7 +190,7 @@
     "replace" : "Replace",
     "delegates_with_flight_details" : "Delegates with flight details",
     "delegates_without_flight_details" : "Delegates without flight details",
-    "" : "",
+    "error_occured" : "An error occurred",
     "" : "",
     "" : "",
     "" : "",
@@ -209,5 +209,13 @@
     "" : "",
     "" : "",
     "all_arrival_statuses": "All Arrival Statuses",
-    "all_departure_statuses": "All Departure Statuses"
+    "all_departure_statuses": "All Departure Statuses",
+    "badge_printed_delegates" : "Badge Printed Delegates",
+    "delegate_code" : "Delegate Code",
+    "delegate_name" : "Delegate Name",
+    "badge_printed" : "Badge Printed",
+    "not_badge_printed" : "Not Badge Printed",
+    "export_to_excel" : "Export to Excel",
+    "badge_printed_status_updated_successfully" : "Badge printed status updated successfully",
+    "badge_printed_status_update_failed" : "Failed to update badge printed status"
 }
