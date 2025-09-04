@@ -434,3 +434,8 @@ php artisan migrate;
 -- MODIFY name_ar VARCHAR(255)
 -- CHARACTER SET utf8mb4
 -- COLLATE utf8mb4_unicode_ci;
+
+
+INSERT INTO `permissions` 
+ (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+ (125, 'admin', 25, 'badge_print_export', 'Export Badge Printed', 'web', 1, NULL, NULL);

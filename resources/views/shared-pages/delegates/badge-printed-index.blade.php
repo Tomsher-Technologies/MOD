@@ -58,15 +58,17 @@
                             <button type="submit"
                                 class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
                         </div>
-
-                        @if (request('badge_printed') == '0')
-                            <div class="flex items-center">
-                                <button type="button" onclick="exportSelectedDelegates()"
-                                    class="!text-white !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                    {{ __db('export_to_excel') }}
-                                </button>
-                            </div>
-                        @endif
+                        
+                        @canany(['badge_print_export'])
+                            @if (request('badge_printed') == '0')
+                                <div class="flex items-center">
+                                    <button type="button" onclick="exportSelectedDelegates()"
+                                        class="!text-white !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                        {{ __db('export_to_excel') }}
+                                    </button>
+                                </div>
+                            @endif
+                        @endcanany
 
                     </form>
 

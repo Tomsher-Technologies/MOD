@@ -79,6 +79,15 @@ class DelegationController extends Controller
         $this->middleware('permission:add_travels|delegate_edit_delegates', [
             'only' => ['addTravel', 'storeTravel', 'updateTravel']
         ]);
+
+        $this->middleware('permission:edit_delegations|delegate_edit_delegations', [
+            'only' => ['badgePrintedIndex']
+        ]);
+
+        // Badge Print Export
+        $this->middleware('permission:badge_print_export', [
+            'only' => ['exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
+        ]);
     }
 
     public function index(Request $request)
@@ -1963,9 +1972,9 @@ class DelegationController extends Controller
             'delegation.invitationFrom',
             'title'
         ])
-        ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-            $delegationQuery->where('event_id', $currentEventId);
-        });
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
@@ -2059,11 +2068,11 @@ class DelegationController extends Controller
             'delegation.invitationFrom',
             'title'
         ])
-        ->where('badge_printed', false)
-        ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-            $delegationQuery->where('event_id', $currentEventId);
-        })
-        ->get();
+            ->where('badge_printed', false)
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            })
+            ->get();
 
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
     }
@@ -2078,17 +2087,17 @@ class DelegationController extends Controller
             'delegation.invitationFrom',
             'title'
         ])
-        ->where('badge_printed', false)
-        ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-            $delegationQuery->where('event_id', $currentEventId);
-        });
+            ->where('badge_printed', false)
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
 
         $delegates = $query->get();
 
         $selectedDelegateIds = $request->input('delegate_ids');
         if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
             $delegates = $delegates->whereIn('id', $selectedDelegateIds);
-            
+
             Delegate::whereIn('id', $selectedDelegateIds)->update(['badge_printed' => true]);
         }
 
