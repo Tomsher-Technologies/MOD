@@ -12,6 +12,8 @@ use App\Models\Dropdown;
 use App\Models\Interview;
 use App\Models\InterviewMember;
 use App\Models\OtherInterviewMember;
+use App\Exports\BadgePrintedDelegatesExport;
+use App\Exports\NonBadgePrintedDelegatesExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DelegationController extends Controller
 {
@@ -1954,7 +1957,6 @@ class DelegationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
 
-        // Get all delegates with their delegations
         $query = Delegate::with([
             'delegation.country',
             'delegation.continent',
@@ -1965,7 +1967,6 @@ class DelegationController extends Controller
             $delegationQuery->where('event_id', $currentEventId);
         });
 
-        // Apply filters
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
                 $q->where('name_en', 'like', "%{$searchKey}%")
@@ -1977,7 +1978,6 @@ class DelegationController extends Controller
             });
         }
 
-        // Filter by badge printed status
         $badgePrintedFilter = $request->input('badge_printed');
         if ($badgePrintedFilter !== null) {
             if ($badgePrintedFilter == '1') {
@@ -2053,7 +2053,6 @@ class DelegationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
 
-        // Get non-badge printed delegates
         $delegates = Delegate::with([
             'delegation.country',
             'delegation.continent',
@@ -2066,44 +2065,33 @@ class DelegationController extends Controller
         })
         ->get();
 
-        // Create Excel export
-        return Excel::download(new class($delegates) implements \Maatwebsite\Excel\Concerns\FromCollection, \Maatwebsite\Excel\Concerns\WithHeadings {
-            protected $delegates;
+        return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
+    }
 
-            public function __construct($delegates)
-            {
-                $this->delegates = $delegates;
-            }
+    public function exportNonBadgePrintedDelegates(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
 
-            public function collection()
-            {
-                return $this->delegates->map(function ($delegate) {
-                    return [
-                        'Delegate Code' => $delegate->code,
-                        'Delegate Name' => $delegate->name_en,
-                        'Delegation Code' => $delegate->delegation->code,
-                        'Country' => $delegate->delegation->country->name ?? '',
-                        'Continent' => $delegate->delegation->continent->value ?? '',
-                        'Invitation From' => $delegate->delegation->invitationFrom->value ?? '',
-                        'Title' => $delegate->title->value ?? '',
-                        'Designation' => $delegate->designation_en,
-                    ];
-                });
-            }
+        $query = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+            'title'
+        ])
+        ->where('badge_printed', false)
+        ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+            $delegationQuery->where('event_id', $currentEventId);
+        });
 
-            public function headings(): array
-            {
-                return [
-                    'Delegate Code',
-                    'Delegate Name',
-                    'Delegation Code',
-                    'Country',
-                    'Continent',
-                    'Invitation From',
-                    'Title',
-                    'Designation',
-                ];
-            }
-        }, 'non-badge-printed-delegates.xlsx');
+        $delegates = $query->get();
+
+        $selectedDelegateIds = $request->input('delegate_ids');
+        if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
+            $delegates = $delegates->whereIn('id', $selectedDelegateIds);
+            
+            Delegate::whereIn('id', $selectedDelegateIds)->update(['badge_printed' => true]);
+        }
+
+        return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
     }
 }

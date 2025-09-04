@@ -23,46 +23,48 @@
     $modalId = $tableId . '-column-visibility-modal';
 @endphp
 
-<div class="mb-2 flex items-center justify-between">
-    @if ($enableColumnListBtn)
-        <button data-modal-target="{{ $modalId }}" data-modal-toggle="{{ $modalId }}" type="button"
-            class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg">
-            <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
-            </svg>
-            <span>{{ __db('column_list') }}</span>
-        </button>
-    @endif
+@if ($enableColumnListBtn || $enableRowLimit)
+    <div class="mb-2 flex items-center justify-between">
+        @if ($enableColumnListBtn)
+            <button data-modal-target="{{ $modalId }}" data-modal-toggle="{{ $modalId }}" type="button"
+                class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg">
+                <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                    height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+                </svg>
+                <span>{{ __db('column_list') }}</span>
+            </button>
+        @endif
 
-    @if (
-        ($data instanceof \Illuminate\Contracts\Pagination\Paginator ||
-            $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) &&
-            $enableRowLimit)
-        <form method="GET">
-            @foreach (request()->except('limit', 'page') as $key => $value)
-                @if (is_array($value))
-                    @foreach ($value as $subKey => $subValue)
-                        <input type="hidden" name="{{ $key }}[{{ $subKey }}]"
-                            value="{{ $subValue }}">
-                    @endforeach
-                @else
-                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                @endif
-            @endforeach
-            <select id="limit" name="limit" onchange="this.form.submit()"
-                class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
-                @foreach ([10, 25, 50, 100] as $size)
-                    <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
-                        {{ $size }}
-                    </option>
+        @if (
+            ($data instanceof \Illuminate\Contracts\Pagination\Paginator ||
+                $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) &&
+                $enableRowLimit)
+            <form method="GET">
+                @foreach (request()->except('limit', 'page') as $key => $value)
+                    @if (is_array($value))
+                        @foreach ($value as $subKey => $subValue)
+                            <input type="hidden" name="{{ $key }}[{{ $subKey }}]"
+                                value="{{ $subValue }}">
+                        @endforeach
+                    @else
+                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                    @endif
                 @endforeach
-            </select>
-            <span class="mr-2 text-sm">rows</span>
-        </form>
-    @endif
-</div>
+                <select id="limit" name="limit" onchange="this.form.submit()"
+                    class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
+                    @foreach ([10, 25, 50, 100] as $size)
+                        <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
+                            {{ $size }}
+                        </option>
+                    @endforeach
+                </select>
+                <span class="mr-2 text-sm">rows</span>
+            </form>
+        @endif
+    </div>
+@endif
 
 <table class="table-auto mb-0 !border-[#F9F7ED] w-full" id="{{ $tableId }}">
     <thead>
@@ -76,7 +78,7 @@
                             : [$permissionKey])
                         : null;
                 @endphp
-                @if ((!$colPermissions || can($colPermissions)) && $column['key'] !== 'action')
+                @if (!$colPermissions || can($colPermissions))
                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]"
                         data-column-key="{{ $column['key'] }}">
                         {{ $column['label'] }}

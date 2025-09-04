@@ -15,79 +15,87 @@
 }">
 
     <div class="flex items-center justify-between gap-4 mb-4">
-        <form class="flex gap-4 w-full" action="{{ route('delegates.badgePrintedIndex') }}" method="GET">
-            <div class="flex-1">
-                <div class="relative">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                        <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                    </div>
-                    <input type="search" id="default-search" name="search_key" value="{{ request('search_key') }}"
-                        class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                        placeholder="{{ __db('Search by Delegate Name, Code, Delegation Code') }}" />
-                </div>
-            </div>
+        <h2 class="font-semibold mb-0 !text-[22px]">
+            {{ __db('badge') . ' ' . __db('printed') . ' ' . __db('delegates') }}</h2>
 
-            <div class="flex items-end">
-                <select name="badge_printed" x-model="badgePrintedFilter"
-                    class="p-2.5 rounded-lg border text-sm !border-[#d1d5db]">
-                    <option value="">{{ __db('All Delegates') }}</option>
-                    <option value="1" {{ request('badge_printed') == '1' ? 'selected' : '' }}>
-                        {{ __db('Badge Printed') }}</option>
-                    <option value="0" {{ request('badge_printed') == '0' ? 'selected' : '' }}>
-                        {{ __db('Not Badge Printed') }}</option>
-                </select>
-            </div>
-
-            <div class="flex items-end">
-                <button type="submit"
-                    class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
-            </div>
-
-            @if (request('badge_printed') == '0')
-                <div class="flex items-end">
-                    <button type="button" onclick="exportNonBadgePrinted()"
-                        class="!text-white !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                        {{ __db('export_to_excel') }}
-                    </button>
-                </div>
-            @endif
-        </form>
-
-        <div class="text-center">
-            <button
-                class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
-                type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
-                aria-controls="filter-drawer">
-                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                    height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
-                        d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z" />
-                </svg>
-                <span>{{ __db('filter') }}</span>
-            </button>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class="flex items-center justify-between mb-5">
-                    <h2 class="font-semibold mb-0 !text-[22px]">
-                        {{ __db('badge') . ' ' . __db('printed') . ' ' . __db('delegates') }}</h2>
+
+
+                    <form class="flex gap-4 w-full" action="{{ route('delegates.badgePrintedIndex') }}" method="GET">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg class="w-4 h-3 text-black" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                    </svg>
+                                </div>
+                                <input type="search" id="default-search" name="search_key"
+                                    value="{{ request('search_key') }}"
+                                    class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
+                                    placeholder="{{ __db('Search by Delegate Name, Code, Delegation Code') }}" />
+                            </div>
+                        </div>
+
+                        <div class="flex items-end">
+                            <select name="badge_printed" x-model="badgePrintedFilter"
+                                class="p-2.5 rounded-lg border text-sm !border-[#d1d5db]">
+                                <option value="">{{ __db('All Delegates') }}</option>
+                                <option value="1" {{ request('badge_printed') == '1' ? 'selected' : '' }}>
+                                    {{ __db('Badge Printed') }}</option>
+                                <option value="0" {{ request('badge_printed') == '0' ? 'selected' : '' }}>
+                                    {{ __db('Not Badge Printed') }}</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-end">
+                            <button type="submit"
+                                class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+                        </div>
+
+                        @if (request('badge_printed') == '0')
+                            <div class="flex items-center">
+                                <button type="button" onclick="exportSelectedDelegates()"
+                                    class="!text-white !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                    {{ __db('export_to_excel') }}
+                                </button>
+                            </div>
+                        @endif
+
+                    </form>
+
+                    <div class="text-center">
+                        <button
+                            class="text-white mr-4 flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                            type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
+                            aria-controls="filter-drawer">
+                            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                                    d="M18.796 4H5.204a1 1 0 0 0-.753 1.659l5.302 6.058a1 1 0 0 1 .247.659v4.874a.5.5 0 0 0 .2.4l3 2.25a.5.5 0 0 0 .8-.4v-7.124a1 1 0 0 1 .247-.659l5.302-6.059c.566-.646.106-1.658-.753-1.658Z" />
+                            </svg>
+                            <span>{{ __db('filter') }}</span>
+                        </button>
+                    </div>
+
+
+
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
                         <img src="{{ getAdminEventLogo() }}" alt="">
                         <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
                     </div>
 
-                    <a href="#" id="fullscreenToggleBtn"
+                    {{-- <a href="#" id="fullscreenToggleBtn"
                         class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
                         <span>{{ __db('go_fullscreen') }}</span>
-                    </a>
+                    </a> --}}
                 </div>
 
                 <hr class=" border-neutral-200 h-5 ">
@@ -101,17 +109,29 @@
                                 ($delegates->currentPage() - 1) * $delegates->perPage(),
                         ],
                         [
-                            'label' => __db('delegate_code'),
-                            'render' => fn($row) => $row->code ?? '-',
+                            'label' => __db('delegation'),
+                            'render' => function ($row) {
+                                $delegationUrl = route('delegations.show', $row->delegation);
+
+                                return '
+                                                 
+
+                                                        <a href="' .
+                                    $delegationUrl .
+                                    '" class="font-medium !text-[#B68A35] hover:underline">
+                                                            ' .
+                                    $row->delegation->code .
+                                    '
+                                                        </a>
+
+                                                        ';
+                            },
                         ],
                         [
                             'label' => __db('delegate_name'),
                             'render' => fn($row) => $row->name_en ?? '-',
                         ],
-                        [
-                            'label' => __db('delegation'),
-                            'render' => fn($row) => $row->delegation->code ?? '-',
-                        ],
+
                         [
                             'label' => __db('country'),
                             'render' => function ($row) {
@@ -163,7 +183,7 @@
                                     onchange="handleBadgePrintedChange(' .
                                     $row->id .
                                     ', this.checked)"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 delegate-checkbox">
                             ';
                             },
                         ],
@@ -181,7 +201,7 @@
     </div>
 
     <div id="filter-drawer"
-        class="fixed top-0 right-0 z-40 h-screen p-4 overflow-y-auto bg-white w-80 transition-transform translate-x-full"
+        class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
         tabindex="-1">
         <h5 class="text-base font-semibold text-gray-900">
             {{ __db('filter') }}
@@ -309,6 +329,16 @@
                 const delegateId = checkbox.getAttribute('data-delegate-id');
                 originalBadgePrintedStatus[delegateId] = checkbox.checked;
             });
+
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('.delegate-checkbox');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
         });
 
         function handleBadgePrintedChange(delegateId, isChecked) {
@@ -354,46 +384,45 @@
                 });
         }
 
-        function exportNonBadgePrinted() {
-            const checkedDelegates = [];
-            document.querySelectorAll('input[data-delegate-id]:checked').forEach(checkbox => {
-                const delegateId = checkbox.getAttribute('data-delegate-id');
-                if (!originalBadgePrintedStatus[delegateId]) {
-                    checkedDelegates.push(delegateId);
-                }
+        function exportBadgePrintedDelegates() {
+            const url = new URL('{{ route('delegates.exportBadgePrintedDelegates') }}', window.location.origin);
+
+            const badgePrintedFilter = document.querySelector('select[name="badge_printed"]');
+            if (badgePrintedFilter) {
+                url.searchParams.append('badge_printed', badgePrintedFilter.value);
+            }
+
+            window.location.href = url.toString();
+        }
+
+        function exportSelectedDelegates() {
+            const selectedCheckboxes = document.querySelectorAll('.delegate-checkbox:checked');
+            const selectedDelegateIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.getAttribute(
+                'data-delegate-id'));
+
+            if (selectedDelegateIds.length === 0) {
+                toastr.warning('{{ __db('please_select_at_least_one_delegate') }}');
+                return;
+            }
+
+            let exportRoute = '{{ route('delegates.exportBadgePrintedDelegates') }}';
+            const badgePrintedFilter = document.querySelector('select[name="badge_printed"]');
+            if (badgePrintedFilter && badgePrintedFilter.value === '0') {
+                exportRoute = '{{ route('delegates.exportNonBadgePrintedDelegates') }}';
+            }
+
+            const url = new URL(exportRoute, window.location.origin);
+
+            selectedDelegateIds.forEach(id => {
+                url.searchParams.append('delegate_ids[]', id);
             });
 
-            const updatePromises = checkedDelegates.map(delegateId => {
-                return fetch('{{ route('delegates.updateBadgePrintedStatus') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
-                        },
-                        body: JSON.stringify({
-                            delegate_id: delegateId,
-                            badge_printed: true
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            originalBadgePrintedStatus[delegateId] = true;
-                            return Promise.resolve();
-                        } else {
-                            return Promise.reject(data.message);
-                        }
-                    });
-            });
+            const badgePrintedFilterValue = document.querySelector('select[name="badge_printed"]');
+            if (badgePrintedFilterValue) {
+                url.searchParams.append('badge_printed', badgePrintedFilterValue.value);
+            }
 
-            Promise.all(updatePromises)
-                .then(() => {
-                    window.location.href = '{{ route('delegates.exportNonBadgePrinted') }}';
-                })
-                .catch(error => {
-                    toastr.error('{{ __db('error_occured') }}' + error);
-                });
+            window.location.href = url.toString();
         }
     </script>
 @endsection
