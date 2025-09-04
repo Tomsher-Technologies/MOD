@@ -7,9 +7,9 @@
         <h2 class="font-semibold mb-0 !text-[22px]">Options for: {{ $dropdown->name }}</h2>
     </div>
 
-    <div>
+    <div class="flex items-center">
         @can('add_dropdown_options')
-            <button data-modal-target="add-option" data-modal-toggle="add-option" class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg ">
+            <button data-modal-target="add-option" data-modal-toggle="add-option" class="ml-2 btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                 <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                     height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -19,14 +19,12 @@
             </button>
         @endcan
 
-        <a href="{{ route('dropdowns.index') }}">
-            <button type="button" class="float-left btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">
+        <a href="{{ route('dropdowns.index') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
             </svg>
-            
-             {{ __db('back') }}</button>
+            {{ __db('back') }}
         </a>
 
     </div>
@@ -71,7 +69,7 @@
             </div>
             <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                 <thead>
-                    <tr>
+                    <tr class="text-[13px]">
                         <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('sort_order') }}</th>
@@ -82,7 +80,7 @@
                 <tbody>
                     
                     @forelse($options as $key => $option)
-                        <tr class="odd:bg-[#F9F7ED] align-[middle]">
+                        <tr class="odd:bg-[#F9F7ED] align-[middle] text-[12px]" >
                             <td class="px-4 py-3 text-center" dir="ltr">
                                 {{ ($key+1) }}
                             </td>

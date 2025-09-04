@@ -42,7 +42,7 @@
 
             <table class="w-full text-left border border-gray-300">
                 <thead class="bg-gray-100">
-                    <tr class="text-[11px]">
+                    <tr class="text-[13px]">
                         <th class="p-3 !bg-[#B68A35] text-start text-white">#</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('label_key') }}</th>
                         @foreach ($languages as $lang)
@@ -56,7 +56,7 @@
                        @php
                            $langData = '';
                        @endphp
-                        <tr class="border-t text-[9px]">
+                        <tr class="border-t text-[12px]">
                             <td class="px-4 py-3 text-end" dir="ltr">
                                 {{ ($key+1) + ($translations->currentPage() - 1)*$translations->perPage() }}
                             </td>

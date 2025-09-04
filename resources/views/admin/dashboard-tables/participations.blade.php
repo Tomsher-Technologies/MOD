@@ -21,7 +21,7 @@
                     <div class="overflow-x-auto w-full">
                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
                             <thead>
-                                <tr class="text-[11px]">
+                                <tr class="text-[13px]">
                                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
                                     @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
                                         <th scope="col" class=" text-center p-3 !bg-[#B68A35] text-white border !border-[#cbac71]">{{ __db($status) }}</th>
@@ -32,7 +32,7 @@
                             <tbody>
 
                                 @foreach($data['delegatesByParticipationTable']['departments'] as $dept)
-                                    <tr class="align-[middle] text-[11px]">
+                                    <tr class="align-[middle] text-[12px]">
                                         <td class="px-4 py-2 border border-gray-200">{{ $dept->value }}</td>
                                         @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
                                             <td class="px-4 py-2 text-center border border-gray-200">

@@ -45,7 +45,7 @@
 
             <table class="w-full text-left border border-gray-300">
                 <thead class="bg-gray-100">
-                    <tr class="text-[11px]">
+                    <tr class="text-[13px]">
                         <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('event_code') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }} (EN)</th>
@@ -60,7 +60,7 @@
                 </thead>
                 <tbody>
                     @forelse($events as $key => $event)
-                        <tr class="odd:bg-[#F9F7ED] align-[middle] text-[9px]">
+                        <tr class="odd:bg-[#F9F7ED] align-[middle] text-[12px]">
                             <td class="px-4 py-3 text-end" dir="ltr">
                                 {{ ($key+1) + ($events->currentPage() - 1)*$events->perPage() }}
                             </td>
