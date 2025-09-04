@@ -158,7 +158,7 @@
                 <div class="flex items-center gap-3">
                     <input id="accommodation" name="accommodation" type="checkbox" value="1"
                         class="h-5 w-5 text-blue-600 border-gray-300 rounded"
-                        @if (old('accommodation', $delegate->accommodation)) checked @endif>
+                        @if (old('accommodation', isset($delegate->accommodation) ? $delegate->accommodation : true)) checked @endif>
                     <label for="accommodation" class="text-sm text-gray-700">{{ __db('accommodation') }}</label>
                 </div>
             </div>

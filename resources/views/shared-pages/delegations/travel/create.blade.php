@@ -3,8 +3,8 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('add_travel_details') }} </h2>
         <a href="{{ route('delegations.show', $delegation->id) }}" id="add-attachment-btn"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
             </svg>
@@ -77,6 +77,20 @@
         @csrf
 
         @php
+            $existingArrivals = [];
+            $existingDepartures = [];
+
+            foreach ($delegates as $delegate) {
+                $arrival = $delegate->delegateTransports->firstWhere('type', 'arrival');
+                if ($arrival) {
+                    $existingArrivals[$delegate->id] = $arrival;
+                }
+
+                $departure = $delegate->delegateTransports->firstWhere('type', 'departure');
+                if ($departure) {
+                    $existingDepartures[$delegate->id] = $departure;
+                }
+            }
 
             $columns = [
                 [
@@ -119,13 +133,75 @@
                     'label' => __db('gender'),
                     'render' => fn($row) => e($row->gender->value ?? ''),
                 ],
+                [
+                    'label' => __db('flight_details'),
+                    'render' => function ($row) use (
+                        $existingArrivals,
+                        $existingDepartures,
+                        $showDeparture,
+                        $showArrival,
+                    ) {
+                        $details = [];
+
+                        if (isset($existingArrivals[$row->id]) && $showArrival) {
+                            $arrival = $existingArrivals[$row->id];
+                            $flightInfo = [];
+                            if ($arrival->flight_name) {
+                                $flightInfo[] = e($arrival->flight_name);
+                            }
+                            if ($arrival->flight_no) {
+                                $flightInfo[] = e($arrival->flight_no);
+                            }
+                            if ($arrival->airport) {
+                                $flightInfo[] = e($arrival->airport->value);
+                            }
+                            $details[] = '<strong>' . __db('arrival') . ':</strong> ' . implode(', ', $flightInfo);
+                        }
+
+                        if (isset($existingDepartures[$row->id]) && $showDeparture) {
+                            $departure = $existingDepartures[$row->id];
+                            $flightInfo = [];
+                            if ($departure->flight_name) {
+                                $flightInfo[] = e($departure->flight_name);
+                            }
+                            if ($departure->flight_no) {
+                                $flightInfo[] = e($departure->flight_no);
+                            }
+                            if ($departure->airport) {
+                                $flightInfo[] = e($departure->airport->value);
+                            }
+                            $details[] = '<strong>' . __db('departure') . ':</strong> ' . implode(', ', $flightInfo);
+                        }
+
+                        if (empty($details)) {
+                            return '<span class="text-gray-800">' . __db('no_flight_details') . '</span>';
+                        }
+
+                        return implode('<br>', $details);
+                    },
+                ],
             ];
         @endphp
 
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
             <div class="xl:col-span-12 h-full">
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                    <x-reusable-table :columns="$columns" :data="$delegates" />
+
+                    <x-reusable-table :columns="$columns" :data="$delegates" :rowClass="function ($row) use ($existingArrivals, $existingDepartures) {
+                        $hasTravel = isset($existingArrivals[$row->id]) || isset($existingDepartures[$row->id]);
+                        return $hasTravel ? 'bg-green-100 border-green-300' : 'bg-yellow-100 border-yellow-300';
+                    }" />
+
+                    <div class="mt-4 flex flex-wrap gap-4 text-sm">
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 bg-green-100 border border-green-300 mr-2"></div>
+                            <span>{{ __db('delegates_with_flight_details') }}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 bg-yellow-100 border border-yellow-300 mr-2"></div>
+                            <span>{{ __db('delegates_without_flight_details') }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -150,6 +226,10 @@
         @endif
 
         <div class="flex justify-start gap-5 items-center mt-6">
+
+            <button type="submit" name="submit_exit" id="submit_exit" value="1"
+                class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_and_exit') }}</button>
+
             <button type="submit" name="submit_add_transport" id="submit_add_transport" value="1"
                 class="btn text-md !bg-[#B68A35] text-white rounded-lg py-3 px-5">{{ __db('submit_and_add_new_flight_details') }}</button>
 
@@ -163,13 +243,10 @@
                     class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_add_arrival') }}</button>
             @endif
 
-            @if (!$showArrival && !$showDeparture)
-                <button type="submit" name="submit_exit" id="submit_exit" value="1"
-                    class="btn text-md border !border-[#B68A35] !text-[#B68A35] rounded-lg py-3 px-5">{{ __db('submit_and_exit') }}</button>
-            @endif
-
             <button type="submit" name="submit_add_interview" id="submit_add_interview" value="1"
                 class="btn text-md !bg-[#D7BC6D] text-white rounded-lg py-3 px-5">{{ __db('submit_add_interview') }}</button>
+
+
         </div>
 
 
