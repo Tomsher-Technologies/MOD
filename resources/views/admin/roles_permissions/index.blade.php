@@ -49,7 +49,7 @@
 
             <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                 <thead>
-                    <tr>
+                    <tr class="text-[13px]">
                         <th class="p-3 !bg-[#B68A35] text-start text-white">#</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('role_name') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('module') }}</th>
@@ -58,7 +58,7 @@
                 </thead>
                 <tbody>
                     @forelse($roles as $key => $role)
-                        <tr class="odd:bg-[#F9F7ED] align-[middle]">
+                        <tr class="odd:bg-[#F9F7ED] align-[middle] text-[12px]">
                             <td class="px-4 py-3 text-end" dir="ltr">
                                 {{ ($key+1) + ($roles->currentPage() - 1)*$roles->perPage() }}
                             </td>

@@ -31,7 +31,7 @@
 
                 <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                     <thead>
-                        <tr class="text-[11px]">
+                        <tr class="text-[13px]">
                             <th class="p-3 !bg-[#B68A35] text-start text-white">#</th>
                             <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('name') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-start text-white">{{ __db('code') }}</th>
@@ -40,7 +40,7 @@
                     </thead>
                     <tbody>
                         @forelse($dropdowns as $key => $dropdown)
-                            <tr class="border border-gray-200  align-[middle]">
+                            <tr class="border border-gray-200  align-[middle] text-[12px]">
                                 <td class="px-4 py-3 text-end" dir="ltr">
                                     {{ $key + 1 }}
                                 </td>
@@ -76,7 +76,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr class="text-[9px] text-sm align-[middle]">
+                            <tr class="text-[12px] text-sm align-[middle]">
                                 <td class="px-4 py-3 text-center " colspan="3" dir="ltr">
                                     {{ __db('no_data_found') }}
                                 </td>
