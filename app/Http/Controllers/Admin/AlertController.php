@@ -28,10 +28,12 @@ class AlertController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             'message' => 'required|string',
+            'message_ar' => 'required|string',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             'users' => 'required|array',
-            'users.*' => 'exists:users,id'
+            'users.*' => 'required|in:all,' . implode(',', User::pluck('id')->toArray())
         ]);
         
         $attachmentPath = null;
@@ -39,9 +41,19 @@ class AlertController extends Controller
             $attachmentPath = $request->file('attachment')->store('alerts', 'public');
         }
         
+        $multilingualMessage = [
+            'en' => $request->message,
+            'ar' => $request->message_ar
+        ];
+        
+        $multilingualTitle = [
+            'en' => $request->title,
+            'ar' => $request->title_ar
+        ];
+        
         $alert = Alert::create([
-            'title' => $request->title,
-            'message' => $request->message,
+            'title' => $multilingualTitle,
+            'message' => $multilingualMessage,
             'attachment' => $attachmentPath,
             'send_to_all' => in_array('all', $request->users),
             'created_by' => auth()->id()
@@ -61,11 +73,12 @@ class AlertController extends Controller
             
             $notificationData = [
                 'delegation_id' => null,
-                'message' => $request->message,
+                'message' => $multilingualMessage,
+                'title' => $multilingualTitle,
                 'module' => 'Alert',
                 'action' => 'alert',
                 'changes' => [
-                    'title' => $request->title
+                    'title' => $multilingualTitle
                 ],
                 'created_at' => now(),
                 'alert_id' => $alert->id

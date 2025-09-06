@@ -29,6 +29,17 @@ class Driver extends Model
         'current_room_assignment_id'
     ];
 
+    public function getNameAttribute()
+    {
+        $lang = getActiveLanguage();
+        
+        if ($lang !== 'en' && !empty($this->attributes['name_ar'])) {
+            return $this->attributes['name_ar'];
+        }
+        
+        return $this->attributes['name_en'] ?? '';
+    }
+
     protected static function booted()
     {
         static::creating(function ($driver) {

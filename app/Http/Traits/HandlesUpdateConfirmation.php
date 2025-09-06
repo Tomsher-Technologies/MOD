@@ -312,25 +312,38 @@ trait HandlesUpdateConfirmation
         }
     }
 
-    protected function generateActivityMessage(string $action, string $module, ?array $changedFields = null): string
+    protected function generateActivityMessage(string $action, string $module, ?array $changedFields = null): array
     {
         $user = auth()->user();
         $userName = $user ? $user->name : 'Someone';
 
         if ($action === 'create') {
-            return "{$module} was created by {$userName}.";
+            return [
+                'en' => "{$module} was created by {$userName}.",
+                'ar' => "تم إنشاء {$module} بواسطة {$userName}."
+            ];
         }
         if ($action === 'create-excel') {
-            return "{$module} was created by {$userName} from an Excel file.";
+            return [
+                'en' => "{$module} was created by {$userName} from an Excel file.",
+                'ar' => "تم إنشاء {$module} بواسطة {$userName} من ملف Excel."
+            ];
         }
         if ($action === 'update' && $changedFields) {
-            $changesSummary = collect($changedFields)
-                ->map(fn($change, $key) => "{$change['label']}: '{$change['old']}' => '{$change['new']}'")
-                ->implode('; ');
-            return "{$userName} updated {$module}: {$changesSummary}.";
+            $changeCount = count($changedFields);
+            $changesText = $changeCount == 1 ? '1 field' : "{$changeCount} fields";
+            $changesTextAr = $changeCount == 1 ? 'حقل واحد' : "{$changeCount} حقول";
+            
+            return [
+                'en' => "{$userName} updated {$module} ({$changesText} changed).",
+                'ar' => "{$userName} قام بتحديث {$module} (تم تغيير {$changesTextAr})."
+            ];
         }
         if ($action === 'delete') {
-            return "{$module} was deleted by {$userName}.";
+            return [
+                'en' => "{$module} was deleted by {$userName}.",
+                'ar' => "تم حذف {$module} بواسطة {$userName}."
+            ];
         }
 
         if ($action === 'assign-room' && $changedFields) {
@@ -338,38 +351,56 @@ trait HandlesUpdateConfirmation
             $hotelName = $changedFields['hotel_name'] ?? 'Unknown Hotel';
             $roomNumber = $changedFields['room_number'] ?? 'N/A';
 
-            return "{$userName} assigned {$member_name} to Room ({$roomNumber}) at {$hotelName}.";
+            return [
+                'en' => "{$userName} assigned {$member_name} to Room ({$roomNumber}) at {$hotelName}.",
+                'ar' => "{$userName} قام بتعيين {$member_name} في الغرفة ({$roomNumber}) في {$hotelName}."
+            ];
         }
 
         if ($action === 'assign-escorts' && $changedFields) {
             $escortName = $changedFields['escort_name'] ?? 'Unknown Escort';
             $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
 
-            return "{$userName} assigned escort {$escortName} to delegation {$delegationCode}.";
+            return [
+                'en' => "{$userName} assigned escort {$escortName} to delegation {$delegationCode}.",
+                'ar' => "{$userName} قام بتعيين المرافق {$escortName} للوفد {$delegationCode}."
+            ];
         }
 
         if ($action === 'unassign-escorts' && $changedFields) {
             $escortName = $changedFields['escort_name'] ?? 'Unknown Escort';
             $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
 
-            return "{$userName} unassigned escort {$escortName} from delegation {$delegationCode}.";
+            return [
+                'en' => "{$userName} unassigned escort {$escortName} from delegation {$delegationCode}.",
+                'ar' => "{$userName} قام بإلغاء تعيين المرافق {$escortName} من الوفد {$delegationCode}."
+            ];
         }
 
         if ($action === 'assign-drivers' && $changedFields) {
             $driverName = $changedFields['driver_name'] ?? 'Unknown Driver';
             $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
 
-            return "{$userName} assigned driver {$driverName} to delegation {$delegationCode}.";
+            return [
+                'en' => "{$userName} assigned driver {$driverName} to delegation {$delegationCode}.",
+                'ar' => "{$userName} قام بتعيين السائق {$driverName} للوفد {$delegationCode}."
+            ];
         }
 
         if ($action === 'unassign-drivers' && $changedFields) {
             $driverName = $changedFields['driver_name'] ?? 'Unknown Driver';
             $delegationCode = $changedFields['delegation_code'] ?? 'Unknown Delegation';
 
-            return "{$userName} unassigned driver {$driverName} from delegation {$delegationCode}.";
+            return [
+                'en' => "{$userName} unassigned driver {$driverName} from delegation {$delegationCode}.",
+                'ar' => "{$userName} قام بإلغاء تعيين السائق {$driverName} من الوفد {$delegationCode}."
+            ];
         }
 
-        return "{$userName} performed {$action} on {$module}.";
+        return [
+            'en' => "{$userName} performed {$action} on {$module}.",
+            'ar' => "{$userName} قام ب{$action} على {$module}."
+        ];
     }
 
     protected function sendNotification($activity, $action, $module, $delegationId = null)

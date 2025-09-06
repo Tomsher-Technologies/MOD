@@ -54,6 +54,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get user's notifications
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable')->orderBy('created_at', 'desc');
+    }
+
+    /**
      * Get user's unread notifications
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany

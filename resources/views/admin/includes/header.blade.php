@@ -327,7 +327,6 @@
 @section('script')
     <script>
         function showLatestAlertModal() {
-            // Get the latest unread alert notification
             fetch('/mod-admin/alerts/latest', {
                 method: 'GET',
                 headers: {
@@ -338,18 +337,14 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.alert) {
-                    // Set modal content
                     document.getElementById('alertModalTitle').textContent = data.alert.title;
                     document.getElementById('alertModalMessage').textContent = data.alert.message;
                     
-                    // Set the view all alerts button to point to the specific alert
                     document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
                     
-                    // Show the modal
                     document.getElementById('alertModal').classList.remove('hidden');
                     document.getElementById('alertModal').classList.add('flex');
                     
-                    // Mark alert as read
                     if (data.alert.id > 0) {
                         fetch('/mod-admin/alerts/' + data.alert.id + '/mark-as-read', {
                             method: 'POST',
@@ -360,7 +355,6 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            // Update alert count in header
                             const alertCountElement = document.querySelector('#dropdownAlert .badge');
                             if (alertCountElement) {
                                 let count = parseInt(alertCountElement.textContent) || 0;
@@ -371,13 +365,11 @@
                         });
                     }
                 } else {
-                    // If no alerts, just open the dropdown as usual
                     document.getElementById('dropdownAlert').classList.toggle('hidden');
                 }
             })
             .catch(error => {
                 console.error('Error fetching latest alert:', error);
-                // If error, just open the dropdown as usual
                 document.getElementById('dropdownAlert').classList.toggle('hidden');
             });
         }
