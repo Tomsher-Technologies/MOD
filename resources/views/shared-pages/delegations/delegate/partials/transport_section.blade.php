@@ -67,24 +67,30 @@
                     'to_be_arrived' => __db('to_be_arrived'),
                 ];
                 $departureStatuses = [
-                    // 'to_be_departed' => __db('to_be_departed'),
+                    'to_be_departed' => __db('to_be_departed'),
                     'departed' => __db('departed'),
                 ];
 
                 $statuses = $type === 'arrival' ? $arrivalStatuses : $departureStatuses;
 
-                $selectedStatus = old($type . '.status', $transport->status ?? '');
+                $selectedStatus = old(
+                    $type . '.status',
+                    $transport->status ?? ($type === 'arrival' ? 'to_be_arrived' : 'to_be_departed'),
+                );
+
             @endphp
 
-            <select name="{{ $type }}[status]"
-                class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
-                <option value="">{{ __db('select_status') }}</option>
-                @foreach ($statuses as $value => $label)
-                    <option value="{{ $value }}" @if ($selectedStatus == $value) selected @endif>
-                        {{ $label }}</option>
-                @endforeach
-            </select>
-
+            <div>
+                <label class="form-label block mb-1 text-sm">{{ __db('status') }}:</label>
+                <select name="{{ $type }}[status]"
+                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    <option value="">{{ __db('select_status') }}</option>
+                    @foreach ($statuses as $value => $label)
+                        <option value="{{ $value }}" @if ($selectedStatus == $value) selected @endif>
+                            {{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
     </div>
 

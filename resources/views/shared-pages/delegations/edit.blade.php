@@ -132,7 +132,8 @@
                 @canany(['edit_delegations', 'delegate_edit_delegations'])
                     <div class="col-span-12 mt-6">
                         <button type="submit"
-                            class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition">
+                            class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition"
+                            @click="window.hasUnsavedAttachments = false">
                             {{ __db('update_delegation') }}
                         </button>
                     </div>
@@ -254,7 +255,8 @@
                                         <label class="form-label">{{ __db('title') }}</label>
                                         <select :name="`attachments[${index}][title_id]`"
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
-                                            x-model.number="attachment.title_id" :disabled="attachment.deleted">
+                                            x-model.number="attachment.title_id" :disabled="attachment.deleted"
+                                            @change="window.hasUnsavedAttachments = true">
                                             <option value="">{{ __db('select_title') }}</option>
                                             @foreach ($options as $option)
                                                 <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -267,14 +269,18 @@
                                         <input
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
                                             type="file" :name="`attachments[${index}][file]`"
-                                            @change="e => attachment.file = e.target.files[0]">
+                                            @change="e => { 
+                                                attachment.file = e.target.files[0];
+                                                window.hasUnsavedAttachments = true;
+                                            }">
                                     </div>
 
                                     <div class="col-span-3">
                                         <label class="form-label">{{ __db('document_date') }}</label>
                                         <input type="date" :name="`attachments[${index}][document_date]`"
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
-                                            x-model="attachment.document_date" :disabled="attachment.deleted" />
+                                            x-model="attachment.document_date" :disabled="attachment.deleted"
+                                            @change="window.hasUnsavedAttachments = true" />
                                     </div>
                                     <div class="col-span-3">
                                         <button type="button"
@@ -299,7 +305,7 @@
                             @canany(['edit_delegations', 'delegate_edit_delegations'])
                                 <div class="mt-6">
                                     <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-6 py-2"
-                                        x-show="attachments.length > 0">
+                                        x-show="attachments.length > 0" @click="window.hasUnsavedAttachments = false">
                                         {{ __db('save_attachments') }}
                                     </button>
                                 </div>
@@ -359,18 +365,32 @@
                             'render' => fn($escort) => e($escort->title->value ?? ''),
                         ],
                         [
-                            'label' => __db('name'),
+                            'label' => __db('name_en'),
                             'render' => function ($row) {
                                 $teamHeadBadge = $row->team_head
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
                                     : '';
-                                $name = $row->name_en ?: $row->name_ar ?: 'Unnamed';
+                                $name = $row->name_en ?: '';
                                 return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
                             },
                         ],
                         [
-                            'label' => __db('designation'),
+                            'label' => __db('name_ar'),
+                            'render' => function ($row) {
+                                $teamHeadBadge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
+                                    : '';
+                                $name = $row->name_ar ?: '';
+                                return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('designation_en'),
                             'render' => fn($row) => $row->designation_en ?: $row->designation_ar ?: '-',
+                        ],
+                        [
+                            'label' => __db('designation_ar'),
+                            'render' => fn($row) => $row->designation_ar ?: '-',
                         ],
                         [
                             'label' => __db('internal_ranking'),
@@ -408,7 +428,7 @@
                                 if (!$row->accommodation) {
                                     return 'Not Required';
                                 }
-                                
+
                                 $room = $row->currentRoomAssignment ?? null;
 
                                 $accommodation = $row->current_room_assignment_id
@@ -484,7 +504,9 @@
                     $noDataMessage = __db('no_data_found');
                 @endphp
 
-                <x-reusable-table :data="$delegation->delegates" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->delegates" :defaultVisibleKeys="['sl_no', 'title', 'name_ar', 'designation_ar', 'internal_ranking', 'gender', 
+                    'parent_id', 'relationship', 'badge_printed', 'participation_status', 'accommodation', 'arrival_status', 'action']" table-id="delegatesTableEdit" :enableColumnListBtn="true"
+                    :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 @foreach ($delegation->delegates as $delegate)
                     <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
@@ -595,7 +617,11 @@
                             'label' => __db('escort') . ' ' . __db('code'),
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->code) . '</a>';
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($escort->code) .
+                                    '</a>';
                             },
                         ],
                         [
@@ -603,7 +629,11 @@
                             'key' => 'military_number',
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->military_number]);
-                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->military_number) . '</a>';
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($escort->military_number) .
+                                    '</a>';
                             },
                         ],
                         [
@@ -616,7 +646,11 @@
                             'key' => 'name',
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
-                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($escort->name_en) . '</a>';
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($escort->name_en) .
+                                    '</a>';
                             },
                         ],
                         [
@@ -739,7 +773,11 @@
                             'label' => __db('driver') . ' ' . __db('code'),
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->code) . '</a>';
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($driver->code) .
+                                    '</a>';
                             },
                         ],
                         [
@@ -747,7 +785,11 @@
                             'key' => 'military_number',
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->military_number]);
-                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->military_number) . '</a>';
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($driver->military_number) .
+                                    '</a>';
                             },
                         ],
                         [
@@ -760,7 +802,11 @@
                             'key' => 'name_en',
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
-                                return '<a href="' . $searchUrl . '" class="text-[#B68A35] hover:underline">' . e($driver->name_en) . '</a>';
+                                return '<a href="' .
+                                    $searchUrl .
+                                    '" class="text-[#B68A35] hover:underline">' .
+                                    e($driver->name_en) .
+                                    '</a>';
                             },
                         ],
                         [
@@ -1038,9 +1084,7 @@
         close() {
             this.isAttachmentEditModalOpen = false;
         },
-        handleFileChange(e) {
-            this.attachment.file = e.target.files[0];
-        }
+    
     }" x-on:open-edit-attachment.window="open($event.detail)">
         <div x-show="isAttachmentEditModalOpen" x-transition:enter="ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100"
@@ -1068,7 +1112,7 @@
                         <div>
                             <label class="form-label block mb-1">{{ __db('title') }}</label>
                             <select name="attachments[0][title_id]" x-model="attachment.title_id"
-                                class="w-full p-2 border rounded">
+                                class="w-full p-2 border rounded" @change="handleTitleChange">
                                 <option value="">{{ __db('select_title') }}</option>
                                 @foreach ($attachmentTitleDropdown->options as $option)
                                     <option value="{{ $option->id }}">{{ $option->value }}</option>
@@ -1078,7 +1122,8 @@
                         <div>
                             <label class="form-label block mb-1">{{ __db('document_date') }}</label>
                             <input type="date" name="attachments[0][document_date]"
-                                x-model="attachment.document_date" class="w-full p-2 border rounded" />
+                                x-model="attachment.document_date" class="w-full p-2 border rounded"
+                                @change="handleDateChange" />
                         </div>
                         <div>
                             <label class="form-label block mb-1">{{ __db('replace_file') }}</label>
@@ -1098,7 +1143,8 @@
                                 class="btn border border-gray-300 px-4 py-2 rounded hover:bg-gray-100">
                                 {{ __db('cancel') }}
                             </button>
-                            <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2 rounded">
+                            <button type="submit" class="btn !bg-[#B68A35] text-white px-6 py-2 rounded"
+                                @click="window.hasUnsavedAttachments = false">
                                 {{ __db('save') }}
                             </button>
                         </div>
@@ -1113,8 +1159,6 @@
 
 
 @section('script')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.edit-attachment-btn').forEach(btn => {
@@ -1133,12 +1177,7 @@
     </script>
 
     <script>
-        $(document).ready(function() {
-            $('.select2').select2({
-                placeholder: "Select an option",
-                allowClear: true
-            });
-
+        document.addEventListener('DOMContentLoaded', () => {
             const delegationCountryId = @json(old('country_id', $delegation->country_id));
 
             $('#continent-select').on('change', function() {
@@ -1173,6 +1212,25 @@
             if (selectedContinent) {
                 $('#continent-select').trigger('change');
             }
+
+            window.hasUnsavedAttachments = false;
+
+            $('form[action="{{ route('delegations.updateAttachment', $delegation->id) }}"]').on('submit',
+                function() {
+                    window.hasUnsavedAttachments = false;
+                });
+
+            $('button[type="submit"]').on('click', function() {
+                window.hasUnsavedAttachments = false;
+            });
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (window.hasUnsavedAttachments) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
         });
 
         function attachmentsComponent() {
@@ -1189,6 +1247,7 @@
                         file: null,
                         deleted: false,
                     });
+                    window.hasUnsavedAttachments = true;
                 },
 
                 toggleDelete(index) {
@@ -1198,6 +1257,7 @@
                     } else {
                         attachment.deleted = !attachment.deleted;
                     }
+                    window.hasUnsavedAttachments = true;
                 },
             };
         }

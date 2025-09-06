@@ -1,4 +1,4 @@
-@extends('layouts.admin_account', ['title' => __db('delegates_by_participation_status')])
+@extends('layouts.admin_account', ['title' => __db('delegations_by_division')])
 
 @section('content')
     <div class="">
@@ -6,8 +6,9 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('delegates_by_participation_status') }}</h4>
-                        <div class="flex items-center gap-2">
+                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('delegations_by_division') }}</h4>
+
+                        <div class="flex items-center gap-2 no-print">
                             <button onclick="printSection('print_area')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
                                 <svg class="ml-1 w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -16,9 +17,8 @@
 
                                 {{ __db('print') }}
                             </button>
-
                             <a href="{{ route('admin.dashboard') }}"
-                                class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3 no-print">
+                                class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                                 <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     fill="none" viewBox="0 0 24 24">
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -29,112 +29,118 @@
                         </div>
                     </div>
 
-                    <div class="w-full mt-12">
-                        <div id="ParticipationStatus"></div>
+                    <div class="overflow-x-auto w-full mb-6">
+                        <div id="pieChart"></div>   
                     </div>
 
-                    <div class="w-full mt-6">
-                       <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
+                    <div class="overflow-x-auto w-full">
+                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]">
                             <thead>
                                 <tr class="text-[13px]">
                                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
-                                    @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
-                                        <th scope="col" class=" text-center p-3 !bg-[#B68A35] text-white border !border-[#cbac71]">{{ __db($status) }}</th>
-                                    @endforeach
-                                    <th scope="col" class="p-3 !bg-[#B68A35]  text-center text-white border !border-[#cbac71]">{{ __db('total') }}</th>
+                                    <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('count') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-
-                                @foreach($data['delegatesByParticipationTable']['departments'] as $dept)
-                                    <tr class="align-[middle] text-[12px]">
-                                        <td class="px-4 py-2 border border-gray-200">{{ $dept->value }}</td>
-                                        @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
-                                            <td class="px-4 py-2 text-center border border-gray-200">
-                                                {{ $data['delegatesByParticipationTable']['tableData'][$dept->id][$status] ?? 0 }}
-                                            </td>
-                                        @endforeach
-                                        <td class="px-4 py-2 text-center border border-gray-200"><strong>{{ $data['delegatesByParticipationTable']['rowTotals'][$dept->id] }}</strong></td>
+                                @foreach($delegatesByDivision as $division)
+                                    <tr class=" text-[12px] align-[middle]">
+                                        <td class="px-4 py-2 border border-gray-200">{{ $division->department_name }}</td>
+                                        <td class="px-4 text-center py-2 border border-gray-200">{{ $division->total }}</td>
                                     </tr>
                                 @endforeach
-                                <tr class="  align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[16px]">
-                                    <th class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</th>
-                                    @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
-                                        <th class="px-4 py-2 border border-gray-200 ">{{ $data['delegatesByParticipationTable']['colTotals'][$status] }}</th>
-                                    @endforeach
-                                    <th class="px-4 py-2 border border-gray-200">{{ $data['delegatesByParticipationTable']['grandTotal'] }}</th>
-                                </tr>
+                            
                             </tbody>
-                           
-                        </table>
                         
+                        </table>
                     </div>
                 </div>
             </div> 
         </div>
     </div>
+
+    @php
+        $baseColor = '#B68A35';
+        $labelsCount = count($data['delegatesByDivision']['labels']);
+        $colors = [];
+
+        $spread = 30; // +/- percentage from base color
+
+        for ($i = 0; $i < $labelsCount; $i++) {
+        // Alternate dark/light slices
+        $position = ($i % 2 == 0) ? -1 : 1; // even = darker, odd = lighter
+        $step = ceil($i / 2); // step away from base
+        $percent = $position * ($spread * $step / max(1, ceil($labelsCount / 2)));
+        
+        $colors[] = shadeColor($baseColor, $percent);
+        }
+    @endphp
+
 @endsection
 
 @section('script')
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        Highcharts.chart('ParticipationStatus', {
-            chart: {
-                type: 'column'
-            },
+        var labels = @json($data['delegatesByDivision']['labels'] ?? []);
+        var series = @json($data['delegatesByDivision']['series'] ?? []);
+        var colors = @json($colors ?? []);
+            
+        var chartData = labels.map(function(label, i) {
+            return {
+                    name: label,
+                    y: series[i],
+                    color: colors[i] || '#B68A35' // fallback color
+            };
+        });
+
+        Highcharts.chart('pieChart', {
+            chart: { type: 'pie', height: 400 },
             credits: { enabled: false },
-            title: {
-                text: '',
-                align: 'left'
-            },
-            xAxis: {
-                categories: @json($data['delegatesByParticipationStatus']['categories']),
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: ''
-                },
-                stackLabels: {
-                    enabled: true
-                }
-            },
-            legend: {
-                align: 'left',
-                x: 0,
-                verticalAlign: 'bottom',
-                y: 10,
-                floating: false,
-                backgroundColor: 'var(--highcharts-background-color, #ffffff)',
-                borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
-                borderWidth: 0,
-                shadow: false
-            },
+            title: { text: null },
             tooltip: {
-                headerFormat: '<b>{category}</b><br/>',
-                pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                    pointFormat: '{point.name}: <b>{point.actual}</b>',
+                    formatter: function() {
+                    var original = @json($data['delegatesByDivision']['series'] ?? [])[this.point.index];
+                    return '<b>' + this.point.name + '</b>: ' + original;
+                    }
             },
             plotOptions: {
-                column: {
-                    stacking: 'normal',
-                    dataLabels: {
-                        enabled: true
-                    }
-                },
-                series: {
+                    pie: {
+                    allowPointSelect: true,
                     cursor: 'pointer',
-                    point: {
-                        events: {
-                            click: function () {
-                                window.location.href = '{{ route("admin.dashboard.tables",["table" => "participations"]) }}';
-                            }
+                    showInLegend: true,
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '11px',  
+                            fontWeight: 'bold', 
+                            color: '#000' 
+                        },
+                        formatter: function() {
+                                var original = @json($data['delegatesByDivision']['series'] ?? [])[this.point.index];
+                                return this.point.name + '('+ original +') ' ;
                         }
+                    },
+                    borderWidth: 3,
+                    borderColor: '#ffffff'
                     }
-                }
             },
-            series: @json($data['delegatesByParticipationStatus']['series'])
-
-
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                itemMarginBottom: 0,
+                itemStyle: {
+                    fontSize: '11px', 
+                    fontWeight: 'normal',
+                    color: '#333'
+                },
+                navigation: { enabled: true } 
+            },
+            series: [{
+                    name: "{{ __db('delegates') }}",
+                    colorByPoint: true,
+                    data: chartData
+            }]
         });
     });
 
@@ -194,6 +200,5 @@
             printWindow.close();
         }, 500);
     }
-   
 </script>
 @endsection

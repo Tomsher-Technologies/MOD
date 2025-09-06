@@ -1,4 +1,4 @@
-@extends('layouts.admin_account', ['title' => __db('delegates_invitation_status')])
+@extends('layouts.admin_account', ['title' => __db('arrival_status')])
 
 @section('content')
     <div class="">
@@ -6,8 +6,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('delegates_invitation_status') }}</h4>
-                        
+                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('arrival_status') }}</h4>
                         <div class="flex items-center gap-2 no-print">
                             <button onclick="printSection('print_area')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
                                 <svg class="ml-1 w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -29,49 +28,44 @@
                         </div>
                     </div>
 
-                    <div>
-                        <div class="w-full mt-12">
-                            <div id="InvitationStatus"></div>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-[50%]">
+                            <div id="userOverviewDonutChart" class="apexcharts-tooltip-z-none"></div>
                         </div>
 
-                        <div class="w-full mt-6">
-                            <table class="table-auto mb-0  !border-[#F9F7ED] w-full max-h-full h-[400px]">
+                        <div class="w-[45%] ml-2">
+                            @php
+                                $arrivalData = $data['arrival_status'];
+                                $totalCount = array_sum($arrivalData);
+                            @endphp
+                            <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[200px]">
                                 <thead>
                                     <tr class="text-[13px]">
-                                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                            {{ __db('department') }}
-                                        </th>
-                                        @foreach($data['delegatesByInvitationStatusTable']['statuses'] as $status)
-                                            <th  scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
-                                                {{ $status->value }}
-                                            </th>
-                                        @endforeach
-                                        <th  scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
-                                            {{ __db('total') }}
-                                        </th>
+                                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('status') }}</th>
+                                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('count') }}</th>
+                                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('percentage') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($data['delegatesByInvitationStatusTable']['departments'] as $dept)
-                                        <tr class=" align-[middle] text-[12px]">
-                                            <td class="px-4 py-2 border border-gray-200">{{ $dept->value }}</td>
-                                            @foreach($data['delegatesByInvitationStatusTable']['statuses'] as $status)
-                                                <td class="px-4 text-center py-2 border border-gray-200">
-                                                    {{ $data['delegatesByInvitationStatusTable']['tableData'][$dept->id][$status->id] }}
-                                                </td>
-                                            @endforeach
-                                            <td class="px-4 py-2 text-center border border-gray-200 text-[13px]"><strong>{{ $data['delegatesByInvitationStatusTable']['rowTotals'][$dept->id] }}</strong></td>
+                                    @foreach ($arrivalData as $status => $count)
+                                        <tr>
+                                            <td class="border border-gray-300 px-4 py-2 capitalize">
+                                                {{ __db($status) }}
+                                            </td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center">{{ $count }}</td>
+                                            <td class="border border-gray-300 px-4 py-2 text-center">
+                                                {{ $totalCount > 0 ? number_format(($count / $totalCount) * 100, 2) : 0 }}%
+                                            </td>
                                         </tr>
                                     @endforeach
                                     <tr class=" align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[16px]">
-                                        <th class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</th>
-                                        @foreach($data['delegatesByInvitationStatusTable']['statuses'] as $status)
-                                            <th class="px-4 py-2 border border-gray-200">{{ $data['delegatesByInvitationStatusTable']['colTotals'][$status->id] }}</th>
-                                        @endforeach
-                                        <th class="px-4 py-2 border border-gray-200">{{ $data['delegatesByInvitationStatusTable']['grandTotal'] }}</th>
+                                        <td class="px-4 py-2 border border-gray-200">{{ __db('total') }}</td>
+                                        <td class="px-4 py-2 text-center border border-gray-200">{{ $totalCount }}</td>
+                                        <td class="px-4 py-2 text-center border border-gray-200">
+                                            {{ $totalCount > 0 ? number_format($totalCount / $totalCount * 100, 2) : 0 }}% </td>
                                     </tr>
                                 </tbody>
-                               
+                              
                             </table>
                         </div>
                     </div>
@@ -84,65 +78,55 @@
 @section('script')
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        window.invitationChart = Highcharts.chart('InvitationStatus', {
+        Highcharts.chart('userOverviewDonutChart', {
             chart: {
-                type: 'column'
+                type: 'pie',
+                height: 400
             },
             credits: { enabled: false },
             title: {
-                text: '',
-                align: 'left'
+                text: ''
             },
-            xAxis: {
-                categories: @json($data['delegatesByInvitationStatus']['categories']),
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: ''
-                },
-                stackLabels: {
-                    enabled: true
+            plotOptions: {
+                pie: {
+                    innerSize: '50%', 
+                    showInLegend: true,
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '11px',  
+                            fontWeight: 'bold', 
+                            color: '#000'       
+                        },
+                        format: '{point.name}: {point.percentage:.1f}%'
+                    }
                 }
             },
             legend: {
-                align: 'left',
-                x: 0,
+                layout: 'horizontal',
+                align: 'center',
                 verticalAlign: 'bottom',
-                y: 10,
-                floating: false,
-                backgroundColor: 'var(--highcharts-background-color, #ffffff)',
-                borderColor: 'var(--highcharts-neutral-color-20, #cccccc)',
-                borderWidth: 0,
-                shadow: false
-            },
-            tooltip: {
-                headerFormat: '<b>{category}</b><br/>',
-                pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
-            },
-            plotOptions: {
-                column: {
-                    stacking: 'normal',
-                    dataLabels: {
-                        enabled: true
-                    }
+                itemMarginBottom: 0,
+                itemStyle: {
+                    fontSize: '11px', 
+                    fontWeight: 'normal',
+                    color: '#333'
                 },
-                series: {
-                    cursor: 'pointer',
-                    point: {
-                        events: {
-                            click: function () {
-                                window.location.href = '{{ route("admin.dashboard.tables",["table" => "invitations"]) }}';
-                            }
-                        }
-                    }
-                }
+                navigation: { enabled: true } 
             },
-            series: @json($data['delegatesByInvitationStatus']['series'])
-
+            colors: ['#B68A35', '#F2ECCF', '#D7BC6D', '#E6D7A2'],
+            series: [{
+                name: '{{ __db('delegates') }}',
+                data: [
+                    { name: '{{ __db('to_be_arrived') }}', y: {{ $data['arrival_status']['to_be_arrived'] }} },
+                    { name: '{{ __db('arrived') }}', y: {{ $data['arrival_status']['arrived'] }} },
+                    { name: '{{ __db('to_be_departed') }}', y: {{ $data['arrival_status']['to_be_departed'] }} },
+                    { name: '{{ __db('departed') }}', y: {{ $data['arrival_status']['departed'] }} }
+                ]
+            }]
         });
     });
-    
+
     function printSection(divId, chartId = null) {
         const contentDiv = document.getElementById(divId);
         const clonedContent = contentDiv.cloneNode(true);

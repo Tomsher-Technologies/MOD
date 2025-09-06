@@ -27,6 +27,7 @@ class CountryController extends Controller
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('name', 'like', "%$keyword%")
+                    ->orWhere('name_ar', 'like', "%$keyword%")
                     ->orWhere('short_code', 'like', "%$keyword%");
             });
         }
@@ -57,6 +58,7 @@ class CountryController extends Controller
         $data = $request->validate(
             [
                 'name' => 'required|string|max:255|unique:countries',
+                'name_ar' => 'nullable|string|max:255',
                 'short_code' => 'required|string|max:10|unique:countries',
                 'sort_order' => 'nullable|integer',
                 'flag' => 'nullable|mimes:jpeg,png,jpg,webp,svg,avif|max:2048',
@@ -89,6 +91,7 @@ class CountryController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255|unique:countries,name,' . $country->id,
+            'name_ar' => 'nullable|string|max:255',
             'short_code' => 'required|string|max:10|unique:countries,short_code,' . $country->id,
             'sort_order' => 'nullable|integer',
             'flag' => 'nullable|mimes:jpeg,png,jpg,webp,svg,avif|max:2048',
@@ -144,7 +147,7 @@ class CountryController extends Controller
         }
 
         $countries = Country::whereIn('continent_id', $continentIds)
-            ->select('id', 'name')
+            ->select('id', 'name', 'name_ar')
             ->orderBy('name')
             ->get();
 

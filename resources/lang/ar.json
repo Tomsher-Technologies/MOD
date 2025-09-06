@@ -166,5 +166,13 @@
     "all_arrival_statuses": "جميع حالات الوصول",
     "all_departure_statuses": "جميع حالات المغادرة",
     "this_will_permanently_delete_the_external_member": "سيتم حذف العضو الخارجي بشكل دائم.",
-    "external_member_deleted": "تم حذف العضو الخارجي بنجاح."
+    "external_member_deleted": "تم حذف العضو الخارجي بنجاح.",
+    "badge_printed_delegates" : "المندوبون المطبوعة الشارة",
+    "delegate_code" : "رمز المندوب",
+    "delegate_name" : "اسم المندوب",
+    "badge_printed" : "الشارة مطبوعة",
+    "not_badge_printed" : "الشارة غير مطبوعة",
+    "export_to_excel" : "تصدير إلى إكسل",
+    "badge_printed_status_updated_successfully" : "تم تحديث حالة طباعة الشارة بنجاح",
+    "badge_printed_status_update_failed" : "فشل تحديث حالة طباعة الشارة"
 }

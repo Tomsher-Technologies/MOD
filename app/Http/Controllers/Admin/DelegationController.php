@@ -12,6 +12,8 @@ use App\Models\Dropdown;
 use App\Models\Interview;
 use App\Models\InterviewMember;
 use App\Models\OtherInterviewMember;
+use App\Exports\BadgePrintedDelegatesExport;
+use App\Exports\NonBadgePrintedDelegatesExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DelegationController extends Controller
 {
@@ -75,6 +78,15 @@ class DelegationController extends Controller
         // === Travels ===
         $this->middleware('permission:add_travels|delegate_edit_delegates', [
             'only' => ['addTravel', 'storeTravel', 'updateTravel']
+        ]);
+
+        $this->middleware('permission:edit_delegations|delegate_edit_delegations', [
+            'only' => ['badgePrintedIndex']
+        ]);
+
+        // Badge Print Export
+        $this->middleware('permission:badge_print_export', [
+            'only' => ['exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
         ]);
     }
 
@@ -296,6 +308,7 @@ class DelegationController extends Controller
                 'delegate.delegation.escorts',
                 'delegate.delegation.drivers',
                 'airport',
+                'delegate.delegation.invitationFrom',
                 // 'status'
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
@@ -391,9 +404,21 @@ class DelegationController extends Controller
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $arrivals = $query->orderBy('date_time', 'desc')->paginate($limit);
+        $allArrivals = $query->orderBy('date_time', 'desc')->get();
 
-        return view('admin.arrivals.index', compact('arrivals'));
+        $groupedArrivals = $this->groupTransports($allArrivals);
+
+        $currentPage = $request->input('page', 1);
+
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect($groupedArrivals)->forPage($currentPage, $limit),
+            count($groupedArrivals),
+            $limit,
+            $currentPage,
+            ['path' => $request->url(), 'pageName' => 'page']
+        );
+
+        return view('admin.arrivals.index', compact('paginator'));
     }
 
     public function departuresIndex(Request $request)
@@ -404,9 +429,10 @@ class DelegationController extends Controller
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
-                // 'delegate.escort',
-                // 'delegate.driver',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
                 'airport',
+                'delegate.delegation.invitationFrom',
                 // 'status'
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
@@ -452,45 +478,80 @@ class DelegationController extends Controller
             }
         }
 
-        if ($continentId = $request->input('continent_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentId) {
-                $delegationQuery->where('continent_id', $continentId);
-            });
-        }
-
         if ($invitation_from = $request->input('invitation_from')) {
             $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
                 $delegationQuery->where('invitation_from_id', $invitation_from);
             });
         }
 
-        if ($countryId = $request->input('country_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryId) {
-                $delegationQuery->where('country_id', $countryId);
-            });
-        }
-
-        if ($airportId = $request->input('airport_id')) {
-            $query->where('airport_id', $airportId);
-        }
-
-        if ($status = $request->input('status')) {
-            if (is_array($status)) {
-                $query->whereIn('status', $status);
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
             } else {
-                $query->where('status', $status);
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($airportIds = $request->input('airport_id')) {
+            if (is_array($airportIds)) {
+                $query->whereIn('airport_id', $airportIds);
+            } else {
+                $query->where('airport_id', $airportIds);
+            }
+        }
+
+        if ($statusIds = $request->input('status')) {
+            if (is_array($statusIds)) {
+                $query->whereIn('status', $statusIds);
+            } else {
+                $query->where('status', $statusIds);
             }
         }
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $departures = $query->orderBy('date_time', 'desc')->paginate($limit);
+        $allDepartures = $query->orderBy('date_time', 'desc')->get();
 
-        return view('admin.departures.index', compact('departures'));
+        $groupedDepartures = $this->groupTransports($allDepartures);
+
+        $currentPage = $request->input('page', 1);
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect($groupedDepartures)->forPage($currentPage, $limit),
+            count($groupedDepartures),
+            $limit,
+            $currentPage,
+            ['path' => $request->url(), 'pageName' => 'page']
+        );
+
+        return view('admin.departures.index', compact('paginator'));
     }
 
     public function updateTravel(Request $request, DelegateTransport $transport)
     {
+        $transportIds = $request->input('ids');
+
+        if ($transportIds && is_array($transportIds)) {
+            $transports = DelegateTransport::whereIn('id', $transportIds)->get();
+        } else {
+            $transports = collect([$transport]);
+        }
+
         $validated = $request->validate([
             'airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'flight_no' => 'nullable|string|max:255',
@@ -516,7 +577,8 @@ class DelegationController extends Controller
             ],
         ];
 
-        $confirmationResult = $this->processUpdate($request, $transport, $validated, $relationsToCompare);
+        $firstTransport = $transports->first();
+        $confirmationResult = $this->processUpdate($request, $firstTransport, $validated, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
             return $confirmationResult;
@@ -526,8 +588,10 @@ class DelegationController extends Controller
         $fieldsToNotify = $confirmationResult['notify'] ?? [];
 
         try {
-            $transport->update($dataToSave);
-            $this->updateParticipationStatus($transport->delegate);
+            foreach ($transports as $t) {
+                $t->update($dataToSave);
+                $this->updateParticipationStatus($t->delegate);
+            }
 
             if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
@@ -535,11 +599,8 @@ class DelegationController extends Controller
                     $this->logActivity(
                         module: 'Travel',
                         action: 'update',
-                        model: $transport,
-                        changedFields: $changes,
-                        submoduleId: $transport->id,
-                        delegationId: $transport->delegate->delegation_id ?? null,
-                        fieldsToNotify: $fieldsToNotify
+                        model: $firstTransport,
+                        fieldsToNotify: $fieldsToNotify,
                     );
                 }
             }
@@ -556,6 +617,7 @@ class DelegationController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to update record.'], 500);
         }
     }
+
 
     public function getTravelDetails(DelegateTransport $transport)
     {
@@ -574,7 +636,7 @@ class DelegationController extends Controller
             'invitationStatus',
             'participationStatus',
             'attachments',
-            'delegates.delegateTransports'
+            'delegates.delegateTransports.airport'
         ])->findOrFail($id);
 
         $showArrival = $request->query('showArrival');
@@ -590,15 +652,15 @@ class DelegationController extends Controller
 
         $delegates = $delegation->delegates;
 
-        if ($showArrival && !$showDeparture) {
-            $delegates = $delegates->filter(function ($delegate) {
-                return !$delegate->delegateTransports->contains('type', 'arrival');
-            });
-        } elseif ($showDeparture && !$showArrival) {
-            $delegates = $delegates->filter(function ($delegate) {
-                return !$delegate->delegateTransports->contains('type', 'departure');
-            });
-        }
+        // if ($showArrival && !$showDeparture) {
+        //     $delegates = $delegates->filter(function ($delegate) {
+        //         return !$delegate->delegateTransports->contains('type', 'arrival');
+        //     });
+        // } elseif ($showDeparture && !$showArrival) {
+        //     $delegates = $delegates->filter(function ($delegate) {
+        //         return !$delegate->delegateTransports->contains('type', 'departure');
+        //     });
+        // }
 
         return view('admin.delegations.add-travel', compact('delegation', 'delegates', 'showArrival', 'showDeparture'));
     }
@@ -1087,29 +1149,55 @@ class DelegationController extends Controller
                 $delegate = $delegation->delegates()->findOrFail($delegateId);
 
                 if (isset($validated['arrival']['date_time']) && $validated['arrival']['date_time']) {
-                    $delegate->delegateTransports()->create([
-                        'type' => 'arrival',
-                        'mode' => $validated['arrival']['mode'],
-                        'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
-                        'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
-                        'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
-                        'date_time' => $validated['arrival']['date_time'] ?? null,
-                        'status' => $validated['arrival']['status'] ?? null,
-                        'comment' => $validated['arrival']['comment'] ?? null,
-                    ]);
+                    $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->first();
+                    if ($arrivalTransport) {
+                        $arrivalTransport->update([
+                            'mode' => $validated['arrival']['mode'],
+                            'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['arrival']['date_time'] ?? null,
+                            'status' => $validated['arrival']['status'] ?? null,
+                            'comment' => $validated['arrival']['comment'] ?? null,
+                        ]);
+                    } else {
+                        $delegate->delegateTransports()->create([
+                            'type' => 'arrival',
+                            'mode' => $validated['arrival']['mode'],
+                            'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['arrival']['date_time'] ?? null,
+                            'status' => $validated['arrival']['status'] ?? null,
+                            'comment' => $validated['arrival']['comment'] ?? null,
+                        ]);
+                    }
                 }
 
                 if (isset($validated['departure']['date_time']) && $validated['departure']['date_time']) {
-                    $delegate->delegateTransports()->create([
-                        'type' => 'departure',
-                        'mode' => $validated['departure']['mode'],
-                        'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
-                        'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
-                        'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
-                        'date_time' => $validated['departure']['date_time'] ?? null,
-                        'status' => $validated['departure']['status'] ?? null,
-                        'comment' => $validated['departure']['comment'] ?? null,
-                    ]);
+                    $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->first();
+                    if ($departureTransport) {
+                        $departureTransport->update([
+                            'mode' => $validated['departure']['mode'],
+                            'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['departure']['date_time'] ?? null,
+                            'status' => $validated['departure']['status'] ?? null,
+                            'comment' => $validated['departure']['comment'] ?? null,
+                        ]);
+                    } else {
+                        $delegate->delegateTransports()->create([
+                            'type' => 'departure',
+                            'mode' => $validated['departure']['mode'],
+                            'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
+                            'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
+                            'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
+                            'date_time' => $validated['departure']['date_time'] ?? null,
+                            'status' => $validated['departure']['status'] ?? null,
+                            'comment' => $validated['departure']['comment'] ?? null,
+                        ]);
+                    }
                 }
 
                 $this->updateParticipationStatus($delegate);
@@ -1821,5 +1909,198 @@ class DelegationController extends Controller
             $delegate->participation_status = $newStatus;
             $delegate->save();
         }
+    }
+
+    private function groupTransports($transports)
+    {
+        $groups = [];
+
+        foreach ($transports as $transport) {
+            $key = $this->createGroupKey($transport);
+
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'delegation' => $transport->delegate->delegation,
+                    'date_time' => $transport->date_time,
+                    'flight_no' => $transport->flight_no,
+                    'flight_name' => $transport->flight_name,
+                    'airport' => $transport->airport,
+                    'status' => $transport->status,
+                    'transports' => [],
+                    'delegates' => [],
+                ];
+            }
+
+            $groups[$key]['transports'][] = $transport;
+
+            $delegateExists = false;
+            foreach ($groups[$key]['delegates'] as $existingDelegate) {
+                if ($existingDelegate->id === $transport->delegate->id) {
+                    $delegateExists = true;
+                    break;
+                }
+            }
+
+            if (!$delegateExists) {
+                $groups[$key]['delegates'][] = $transport->delegate;
+            }
+        }
+
+        return array_values($groups);
+    }
+
+    private function createGroupKey($transport)
+    {
+        return md5(
+            $transport->delegate->delegation_id .
+                ($transport->date_time ?? '') .
+                ($transport->flight_no ?? '') .
+                ($transport->flight_name ?? '') .
+                ($transport->airport_id ?? '') .
+                ($transport->status ?? '')
+        );
+    }
+
+
+    public function badgePrintedIndex(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+            'title'
+        ])
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
+
+        if ($searchKey = $request->input('search_key')) {
+            $query->where(function ($q) use ($searchKey) {
+                $q->where('name_en', 'like', "%{$searchKey}%")
+                    ->orWhere('name_ar', 'like', "%{$searchKey}%")
+                    ->orWhere('code', 'like', "%{$searchKey}%")
+                    ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
+                        $delegationQuery->where('code', 'like', "%{$searchKey}%");
+                    });
+            });
+        }
+
+        $badgePrintedFilter = $request->input('badge_printed');
+        if ($badgePrintedFilter !== null) {
+            if ($badgePrintedFilter == '1') {
+                $query->where('badge_printed', true);
+            } elseif ($badgePrintedFilter == '0') {
+                $query->where('badge_printed', false);
+            }
+        }
+
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                $delegationQuery->where('invitation_from_id', $invitation_from);
+            });
+        }
+
+        $limit = $request->limit ? $request->limit : 20;
+
+        $delegates = $query->orderBy('id', 'desc')->paginate($limit);
+
+        return view('admin.delegates.badge-printed-index', compact('delegates'));
+    }
+
+    public function updateBadgePrintedStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'delegate_id' => 'required|integer|exists:delegates,id',
+            'badge_printed' => 'required|boolean',
+        ]);
+
+        try {
+            $delegate = Delegate::findOrFail($validated['delegate_id']);
+            $delegate->badge_printed = $validated['badge_printed'];
+            $delegate->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => __db('badge_printed_status_updated_successfully')
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Badge Printed Status Update Failed: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => __db('badge_printed_status_update_failed')
+            ], 500);
+        }
+    }
+
+    public function exportNonBadgePrinted(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $delegates = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+            'title'
+        ])
+            ->where('badge_printed', false)
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            })
+            ->get();
+
+        return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
+    }
+
+    public function exportNonBadgePrintedDelegates(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+            'title'
+        ])
+            ->where('badge_printed', false)
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
+
+        $delegates = $query->get();
+
+        $selectedDelegateIds = $request->input('delegate_ids');
+        if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
+            $delegates = $delegates->whereIn('id', $selectedDelegateIds);
+
+            Delegate::whereIn('id', $selectedDelegateIds)->update(['badge_printed' => true]);
+        }
+
+        return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
     }
 }

@@ -167,6 +167,13 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/alerts/latest', [AlertController::class, 'getLatestAlert'])->name('alerts.latest');
     Route::post('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.markAsRead');
 
+    // Badge Printed Delegates
+    Route::get('/badge-printed-delegates', [DelegationController::class, 'badgePrintedIndex'])->name('delegates.badgePrintedIndex');
+    Route::post('/badge-printed-status', [DelegationController::class, 'updateBadgePrintedStatus'])->name('delegates.updateBadgePrintedStatus');
+    Route::get('/export-non-badge-printed', [DelegationController::class, 'exportNonBadgePrinted'])->name('delegates.exportNonBadgePrinted');
+    Route::get('/export-badge-printed-delegates', [DelegationController::class, 'exportBadgePrintedDelegates'])->name('delegates.exportBadgePrintedDelegates');
+    Route::get('/export-non-badge-printed-delegates', [DelegationController::class, 'exportNonBadgePrintedDelegates'])->name('delegates.exportNonBadgePrintedDelegates');
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

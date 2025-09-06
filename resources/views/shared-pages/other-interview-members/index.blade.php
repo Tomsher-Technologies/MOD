@@ -56,17 +56,17 @@
                                 ($other_interview_members->currentPage() - 1) * $other_interview_members->perPage();
                         },
                     ],
-                    [
-                        'label' => __db('event_code'),
-                        'render' => function ($member) {
-                            return ($member->event?->code ?? '-') .
-                                ($member->event?->is_default
-                                    ? ' <span class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">' .
-                                        __db('default') .
-                                        '</span>'
-                                    : '');
-                        },
-                    ],
+                    // [
+                    //     'label' => __db('event_code'),
+                    //     'render' => function ($member) {
+                    //         return ($member->event?->code ?? '-') .
+                    //             ($member->event?->is_default
+                    //                 ? ' <span class="inline-block rounded bg-green-500 px-2 py-1 text-xs font-semibold text-white">' .
+                    //                     __db('default') .
+                    //                     '</span>'
+                    //                 : '');
+                    //     },
+                    // ],
                     [
                         'label' => __db('name_en'),
                         'render' => fn($member) => e($member->name_en),
