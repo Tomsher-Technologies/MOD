@@ -32,14 +32,11 @@
                 </div>
             @endcanany
 
-
             @canany(['view_external_members', 'assign_external_members'])
                 <a href="{{ route('admin.view-external-members') }}"
                     class="btn text-md ms-4 mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg ">{{ __db('view') . ' ' . __db('external_member') }}</a>
             @endcan
-
         </div>
-
     </div>
 
     <!-- Escorts -->
@@ -85,7 +82,9 @@
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
-                                    {{ $hotel->hotel_name ?? '-' }}
+                                    <a href="{{ route('accommodations.show', $hotel->id) }}" class="text-[#B68A35] hover:underline">
+                                        {{ $hotel->hotel_name ?? '-' }}
+                                    </a>
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
                                     {{ $hotel->address ?? '-' }}
