@@ -10,22 +10,24 @@
                 $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
             @endphp
 
-            <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="me-3 inline-block">
-                @csrf
-                <select name="event_id" id="current-event-select"
-                    class="p-2 !pe-10 text-sm rounded border border-neutral-300 text-neutral-700 cursor-pointer"
-                    onchange="document.getElementById('currentEventForm').submit();" title="{{ __db('select_event') }}">
-                    @foreach ($events as $event)
-                        <option value="{{ $event->id }}" {{ $currentEventId == $event->id ? 'selected' : '' }}>
-                            {{ $event->code }} - {{ $event->name_en }}
-                            @if ($event->is_default)
-                                ({{ __db('default') }})
-                            @endif
-                        </option>
-                    @endforeach
-                </select>
-            </form>
-
+            @if(Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'super_admin' || Auth::user()->user_type == 'staff')
+                <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="me-3 inline-block">
+                    @csrf
+                    <select name="event_id" id="current-event-select"
+                        class="p-2 !pe-10 text-sm rounded border border-neutral-300 text-neutral-700 cursor-pointer"
+                        onchange="document.getElementById('currentEventForm').submit();" title="{{ __db('select_event') }}">
+                        @foreach ($events as $event)
+                            <option value="{{ $event->id }}" {{ $currentEventId == $event->id ? 'selected' : '' }}>
+                                {{ $event->code }} - {{ $event->name_en }}
+                                @if ($event->is_default)
+                                    ({{ __db('default') }})
+                                @endif
+                            </option>
+                        @endforeach
+                    </select>
+                </form>
+            @endif
+            
             @php
                 $currentRoute = Route::currentRouteName();
 
