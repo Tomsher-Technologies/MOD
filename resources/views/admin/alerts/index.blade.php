@@ -4,12 +4,16 @@
     <div class="dashboard-main-body">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('alerts') }}</h2>
-            <a href="{{ route('alerts.create') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-                <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
-                </svg>
-                <span>{{ __db('create_alert') }}</span>
-            </a>
+
+            @canany(['add_alerts'])
+                <a href="{{ route('alerts.create') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
+                    </svg>
+                    <span>{{ __db('create_alert') }}</span>
+                </a>
+            @endcanany
+            
         </div>
 
         <div class="bg-white h-full w-full rounded-lg border-0 p-6">
