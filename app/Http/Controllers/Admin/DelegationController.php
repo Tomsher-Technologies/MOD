@@ -1638,6 +1638,29 @@ class DelegationController extends Controller
         try {
             DB::beginTransaction();
 
+            if($isEditMode){
+                $newAccommodation = $request->has('accommodation') ? 1 : 0;
+                if ($newAccommodation == 0) {
+                    if ($delegate->current_room_assignment_id) {
+                        $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
+
+                        if ($oldAssignment) {
+                            $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                            if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                $oldRoom->save();
+                            }
+
+                            $oldAssignment->active_status = 0;
+                            $oldAssignment->save();
+                        }
+
+                        $delegate->current_room_assignment_id = null;
+                        $delegate->save();
+                    }
+                }
+            }
+
             $finalDelegateData = Arr::except($dataToSave, ['arrival', 'departure']);
             $delegate->update($finalDelegateData);
 
@@ -1646,7 +1669,7 @@ class DelegationController extends Controller
             $this->updateParticipationStatus($delegate);
 
             DB::commit();
-
+            
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
@@ -1693,6 +1716,21 @@ class DelegationController extends Controller
                 submoduleId: $delegate->id,
                 delegationId: $delegation->id
             );
+
+            if ($delegate->current_room_assignment_id) {
+                $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
+
+                if ($oldAssignment) {
+                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        $oldRoom->save();
+                    }
+
+                    $oldAssignment->active_status = 0;
+                    $oldAssignment->save();
+                }
+            }
 
             $delegate->delete();
 

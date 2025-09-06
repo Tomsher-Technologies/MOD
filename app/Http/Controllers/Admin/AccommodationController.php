@@ -132,6 +132,31 @@ class AccommodationController extends Controller
         return redirect()->route('accommodations.index')->with('success',  __db('accommodation') . __db('updated_successfully'));
     }
 
+    public function showHotel($hotelId)
+    {
+        $hotel = Accommodation::with('rooms')->findOrFail($hotelId);
+
+        // Delegates
+        $delegates = RoomAssignment::with('assignable')
+            ->where('hotel_id', $hotelId)
+            ->where('assignable_type', \App\Models\Delegate::class)
+            ->get();
+
+        // Escorts
+        $escorts = RoomAssignment::with('assignable')
+            ->where('hotel_id', $hotelId)
+            ->where('assignable_type', \App\Models\Escort::class)
+            ->get();
+
+        // Drivers
+        $drivers = RoomAssignment::with('assignable')
+            ->where('hotel_id', $hotelId)
+            ->where('assignable_type', \App\Models\Driver::class)
+            ->get();
+
+        return view('hotels.show', compact('hotel', 'delegates', 'escorts', 'drivers'));
+    }
+
     public function destroyRooms($id)
     {
         AccommodationRoom::destroy($id);

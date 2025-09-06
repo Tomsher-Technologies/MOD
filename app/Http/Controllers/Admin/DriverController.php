@@ -435,6 +435,24 @@ class DriverController extends Controller
             ]
         );
 
+        if ($driver->current_room_assignment_id) {
+            $oldAssignment = \App\Models\RoomAssignment::find($driver->current_room_assignment_id);
+
+            if ($oldAssignment) {
+                $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    $oldRoom->save();
+                }
+
+                $oldAssignment->active_status = 0;
+                $oldAssignment->save();
+            }
+
+            $driver->current_room_assignment_id = null;
+            $driver->save();
+        }
+
         return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }
 
