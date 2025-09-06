@@ -24,6 +24,7 @@ class DelegationActivity extends Model
 
     protected $casts = [
         'changes' => 'array',
+        'message' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

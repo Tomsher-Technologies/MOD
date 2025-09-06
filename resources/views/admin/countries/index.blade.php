@@ -52,7 +52,8 @@
                             <select name="continent_id" class="w-full border border-gray-300 rounded p-2">
                                 <option value="">{{ __db('all_continents') }}</option>
                                 @foreach (getDropDown('continents')->options as $option)
-                                    <option value="{{ $option->id }}" {{ request('continent_id') == $option->id ? 'selected' : '' }}>
+                                    <option value="{{ $option->id }}"
+                                        {{ request('continent_id') == $option->id ? 'selected' : '' }}>
                                         {{ $option->value }}
                                     </option>
                                 @endforeach
@@ -76,6 +77,7 @@
                             },
                         ],
                         ['label' => __db('name'), 'render' => fn($country) => e($country->name)],
+                        ['label' => 'Name (Arabic)', 'render' => fn($country) => e($country->name_ar ?? '')],
                         ['label' => __db('short_code'), 'render' => fn($country) => e($country->short_code)],
                         ['label' => __db('continent'), 'render' => fn($country) => e($country->continent->value ?? '')],
                         [
@@ -159,9 +161,14 @@
                             @csrf
 
                             <div class="mb-4">
-                                <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name') }}</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name') }}</label>
                                 <input type="text" name="name" value="{{ old('name') }}" required
+                                    class="w-full border border-gray-300 rounded p-2">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block mb-2 text-sm font-medium text-gray-900 ">Name (Arabic)</label>
+                                <input type="text" name="name_ar" value="{{ old('name_ar') }}"
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
                             <div class="mb-4">
@@ -208,8 +215,7 @@
                             </div>
 
                             <div class="mb-4">
-                                <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
                                 <select name="status" class="w-full border border-gray-300 rounded p-2">
                                     <option value="1" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('active') }}
                                     </option>
@@ -250,7 +256,13 @@
 
                         <div class="mb-4">
                             <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name') }}</label>
-                            <input type="text" name="name" value="{{ old('name', $country->name) }}" required
+                            <input type="text" name="name" value="{{ old('name', $country->pluck('name')) }}"
+                                required class="w-full border border-gray-300 rounded p-2">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name_ar') }}</label>
+                            <input type="text" name="name_ar" value="{{ old('name_ar', $country->name_ar) }}"
                                 class="w-full border border-gray-300 rounded p-2">
                         </div>
 

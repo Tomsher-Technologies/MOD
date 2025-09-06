@@ -71,6 +71,7 @@ class DropdownController extends Controller
     {
         $request->validate([
             'value' => 'required|string|max:255',
+            'value_ar' => 'nullable|string|max:255',
         ]);
 
         // Get the Country dropdown
@@ -93,6 +94,7 @@ class DropdownController extends Controller
         $country = DropdownOption::create([
             'dropdown_id' => $countryDropdown->id,
             'value' => $request->value,
+            'value_ar' => $request->value_ar,
             'sort_order' => 0, // You can modify this as needed
             'status' => 1
         ]);
@@ -105,16 +107,17 @@ class DropdownController extends Controller
         $request->validate([
             'dropdown_id' => 'required|exists:dropdowns,id',
             'value' => 'required|string',
+            'value_ar' => 'nullable|string',
             'sort_order' => 'nullable|integer',
         ]);
 
-        DropdownOption::create($request->only('dropdown_id', 'value', 'sort_order'));
+        DropdownOption::create($request->only('dropdown_id', 'value', 'value_ar', 'sort_order'));
         return back()->with('success', 'Option added successfully');
     }
 
     public function updateOption(Request $request, DropdownOption $option)
     {
-        $option->update($request->only('value', 'sort_order', 'status'));
+        $option->update($request->only('value', 'value_ar', 'sort_order', 'status'));
         return back()->with('success', 'Option updated successfully');
     }
 

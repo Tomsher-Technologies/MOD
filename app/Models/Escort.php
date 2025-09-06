@@ -36,6 +36,17 @@ class Escort extends Model
         'spoken_languages' => 'array',
     ];
 
+    public function getNameAttribute()
+    {
+        $lang = getActiveLanguage();
+        
+        if ($lang !== 'en' && !empty($this->attributes['name_ar'])) {
+            return $this->attributes['name_ar'];
+        }
+        
+        return $this->attributes['name_en'] ?? '';
+    }
+
     protected static function booted()
     {
         static::creating(function ($escort) {
