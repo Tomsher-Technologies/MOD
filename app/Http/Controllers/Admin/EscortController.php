@@ -17,29 +17,29 @@ class EscortController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:view_escorts|delegate_view_escorts|escort_view_escorts|hotel_view_escorts', [
+        $this->middleware('permission:view_escorts|delegate_view_escorts|escort_view_escorts|driver_view_escorts|hotel_view_escorts', [
             'only' => ['index', 'search']
         ]);
 
-        $this->middleware('permission:add_escorts|driver_add_escorts', [
+        $this->middleware('permission:add_escorts|escort_add_escorts', [
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:assign_escorts|driver_edit_escorts', [
+        $this->middleware('permission:assign_escorts|escort_edit_escorts', [
             'only' => ['assign']
         ]);
 
 
-        $this->middleware('permission:unassign_escorts|driver_edit_escorts', [
+        $this->middleware('permission:unassign_escorts|escort_edit_escorts', [
             'only' => ['unassign']
         ]);
 
 
-        $this->middleware('permission:edit_escorts|driver_edit_escorts', [
+        $this->middleware('permission:edit_escorts|escort_edit_escorts', [
             'only' => ['edit', 'update']
         ]);
 
-        $this->middleware('permission:delete_escorts|driver_delete_escorts', [
+        $this->middleware('permission:delete_escorts|escort_delete_escorts', [
             'only' => ['destroy']
         ]);
     }
@@ -170,6 +170,8 @@ class EscortController extends Controller
             $escortData['spoken_languages'] = null;
         }
 
+        $escortData['title'] = $escortData['title_id'] ?? null;
+        unset($escortData['title_id']);
         $escort = Escort::create($escortData);
 
         $this->logActivity(
@@ -424,6 +426,24 @@ class EscortController extends Controller
                 'delegation_code' => $delegation->code
             ]
         );
+
+        if ($escort->current_room_assignment_id) {
+            $oldAssignment = \App\Models\RoomAssignment::find($escort->current_room_assignment_id);
+
+            if ($oldAssignment) {
+                $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    $oldRoom->save();
+                }
+
+                $oldAssignment->active_status = 0;
+                $oldAssignment->save();
+            }
+
+            $escort->current_room_assignment_id = null;
+            $escort->save();
+        }
 
         return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
     }

@@ -4,7 +4,7 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('accommodations') }}</h2>
 
         <div>
-            @canany(['add_accommodations', 'hotel_add_accommodations'])
+            @canany(['add_accommodations', 'hotel_add_accommodations', 'import_accommodations', 'hotel_import_accommodations'])
                 <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
                     class="btn !text-[#B68A35] !bg-[#E6D7A2]  text-md rounded-lg px-6 py-3 text-center inline-flex items-center"
                     type="button">
@@ -22,7 +22,7 @@
                             <a href="{{ route('accommodations.create') }}"
                                 class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') . ' ' . __db('manually') }}</a>
                         </li>
-                        @can('import_accommodations')
+                        @canany(['import_accommodations', 'hotel_import_accommodations'])
                             <li>
                                 <a href="{{ route('accommodations.import.form') }}"
                                     class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') . ' ' . __db('bulk') }}</a>
@@ -32,14 +32,11 @@
                 </div>
             @endcanany
 
-
-            @canany(['view_external_members', 'assign_external_members'])
+            @canany(['view_external_members', 'assign_external_members','hotel_view_external_members', 'hotel_assign_external_members'])
                 <a href="{{ route('admin.view-external-members') }}"
                     class="btn text-md ms-4 mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg ">{{ __db('view') . ' ' . __db('external_member') }}</a>
             @endcan
-
         </div>
-
     </div>
 
     <!-- Escorts -->
@@ -85,7 +82,9 @@
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
-                                    {{ $hotel->hotel_name ?? '-' }}
+                                    <a href="{{ route('accommodations.show', $hotel->id) }}" class="text-[#B68A35] hover:underline">
+                                        {{ $hotel->hotel_name ?? '-' }}
+                                    </a>
                                 </td>
                                 <td class="px-3 py-3 border border-gray-200">
                                     {{ $hotel->address ?? '-' }}
@@ -137,7 +136,7 @@
                                             </a>
                                         @endcanany
 
-                                        @canany(['assign_external_members'])
+                                        @canany(['assign_external_members','hotel_assign_external_members'])
                                             <a href="{{ route('external_accommodations.add', ['id' => base64_encode($hotel->id)]) }}"
                                                 title="{{ __db('add_external_accommodation') }}">
                                                 <svg class=" text-[#B68A35]" aria-hidden="true"

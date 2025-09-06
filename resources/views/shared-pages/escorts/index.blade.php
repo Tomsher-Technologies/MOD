@@ -165,18 +165,20 @@
                                 }
                                 if ($escort->status == 1) {
                                     if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
-                                        foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
-                                            $unassignUrl = route('escorts.unassign', $escort->id);
-                                            $output .=
-                                                '<form action="' .
-                                                $unassignUrl .
-                                                '" method="POST" style="display:inline;">' .
-                                                csrf_field() .
-                                                '<input type="hidden" name="delegation_id" value="' .
-                                                $delegation->id .
-                                                '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
-                                                e($delegation->code) .
-                                                '</span></button></form>';
+                                        if (can(['unassign_escorts', 'escort_edit_escorts'])) {
+                                            foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
+                                                $unassignUrl = route('escorts.unassign', $escort->id);
+                                                $output .=
+                                                    '<form action="' .
+                                                    $unassignUrl .
+                                                    '" method="POST" style="display:inline;">' .
+                                                    csrf_field() .
+                                                    '<input type="hidden" name="delegation_id" value="' .
+                                                    $delegation->id .
+                                                    '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
+                                                    e($delegation->code) .
+                                                    '</span></button></form>';
+                                            }
                                         }
                                     } else {
                                         if (can(['assign_escorts', 'escort_edit_escorts'])) {

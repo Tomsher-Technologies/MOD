@@ -53,19 +53,19 @@
                     'delegations.index' => [
                         'text' => __db('add_new_delegation'),
                         'link' => route('delegations.create'),
-                        'permission' => ['add_delegations'],
+                        'permission' => ['add_delegations', 'delegate_add_delegations'],
                     ],
                     'escorts.index' => [
                         'text' => __db('add_escort'),
                         'link' => route('escorts.create'),
                         // 'permission' => 'add_escorts',
-                        'permission' => ['add_delegations'],
+                        'permission' => ['add_escorts', 'escort_add_escorts'],
                     ],
                     'drivers.index' => [
                         'text' => __db('add_driver'),
                         'link' => route('drivers.create'),
                         // 'permission' => 'add_escorts',
-                        'permission' => ['add_drivers'],
+                        'permission' => ['add_drivers', 'driver_add_drivers'],
                     ],
                     'accommodations.index' => [
                         'text' => __db('add_accommodation'),

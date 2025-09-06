@@ -13,7 +13,7 @@ class Driver extends Model
     protected $fillable = [
         'code',
         'military_number',
-        'title_id',
+        'title',
         'name_ar',
         'name_en',
         'phone_number',
@@ -62,11 +62,20 @@ class Driver extends Model
 
     public function title()
     {
-        return $this->belongsTo(DropdownOption::class, 'title_id')
+        return $this->belongsTo(DropdownOption::class, 'title')
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'title');
             });
     }
+
+     public function title_value()
+    {
+        return $this->belongsTo(DropdownOption::class, 'title')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'title');
+            });
+    }
+
 
     public function unit()
     {

@@ -17,7 +17,7 @@ class DriverController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:view_drivers|delegate_view_drivers|escort_view_drivers|hotel_view_drivers', [
+        $this->middleware('permission:view_drivers|delegate_view_drivers|escort_view_drivers|driver_view_drivers|hotel_view_drivers', [
             'only' => ['index', 'search']
         ]);
 
@@ -161,6 +161,8 @@ class DriverController extends Controller
 
         $driverData = $request->all();
 
+        $driverData['title'] = $driverData['title_id'] ?? null;
+        unset($driverData['title_id']);
         $driver = Driver::create($driverData);
 
         $this->logActivity(
@@ -230,7 +232,7 @@ class DriverController extends Controller
         $driver = Driver::findOrFail($id);
 
         $relationsToCompare = [
-            'title_id' => [
+            'title' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,
                     'key' => 'id',
@@ -272,6 +274,9 @@ class DriverController extends Controller
 
         $dataToSave = $confirmationResult['data'];
         $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
+        $dataToSave['title'] = $dataToSave['title_id'] ?? null;
+        unset($dataToSave['title_id']);
 
         $driver->update($dataToSave);
 
@@ -392,7 +397,7 @@ class DriverController extends Controller
             ]
         );
 
-        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver assigned successfully.'));
+        return redirect()->route('drivers.index')->with('success', __db('Driver assigned successfully.'));
     }
 
 
@@ -434,6 +439,24 @@ class DriverController extends Controller
                 'delegation_code' => $delegation->code
             ]
         );
+
+        if ($driver->current_room_assignment_id) {
+            $oldAssignment = \App\Models\RoomAssignment::find($driver->current_room_assignment_id);
+
+            if ($oldAssignment) {
+                $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    $oldRoom->save();
+                }
+
+                $oldAssignment->active_status = 0;
+                $oldAssignment->save();
+            }
+
+            $driver->current_room_assignment_id = null;
+            $driver->save();
+        }
 
         return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
     }

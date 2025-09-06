@@ -46,10 +46,10 @@
             @endcanany
 
             @canany(['manage_delegations', 'delegate_manage_delegations', 'escort_manage_delegations',
-                'driver_manage_delegation', 'hotel_manage_delegations'])
+                'driver_manage_delegations', 'hotel_manage_delegations'])
                 <li>
                     <a href="{{ route('delegations.index') }}"
-                        class="{{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit']) }}">
+                        class="{{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit','delegations.show']) }}">
                         <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36"
                             height="30" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"

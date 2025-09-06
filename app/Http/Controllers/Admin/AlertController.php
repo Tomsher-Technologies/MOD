@@ -14,7 +14,7 @@ class AlertController extends Controller
     public function index(Request $request)
     {
         $alerts = Alert::with('creator')->latest()->paginate(10);
-        
+    
         return view('admin.alerts.index', compact('alerts'));
     }
     

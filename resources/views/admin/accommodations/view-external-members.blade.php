@@ -94,7 +94,7 @@
                             </td>
                             <td class="px-4 py-3 border border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @canany(['assign_external_members'])
+                                    @canany(['assign_external_members','hotel_assign_external_members'])
                                         <a href="{{ route('external-members.edit', $member->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
