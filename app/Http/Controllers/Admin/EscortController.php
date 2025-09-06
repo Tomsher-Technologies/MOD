@@ -21,25 +21,25 @@ class EscortController extends Controller
             'only' => ['index', 'search']
         ]);
 
-        $this->middleware('permission:add_escorts|driver_add_escorts', [
+        $this->middleware('permission:add_escorts|escort_add_escorts', [
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:assign_escorts|driver_edit_escorts', [
+        $this->middleware('permission:assign_escorts|escort_edit_escorts', [
             'only' => ['assign']
         ]);
 
 
-        $this->middleware('permission:unassign_escorts|driver_edit_escorts', [
+        $this->middleware('permission:unassign_escorts|escort_edit_escorts', [
             'only' => ['unassign']
         ]);
 
 
-        $this->middleware('permission:edit_escorts|driver_edit_escorts', [
+        $this->middleware('permission:edit_escorts|escort_edit_escorts', [
             'only' => ['edit', 'update']
         ]);
 
-        $this->middleware('permission:delete_escorts|driver_delete_escorts', [
+        $this->middleware('permission:delete_escorts|escort_delete_escorts', [
             'only' => ['destroy']
         ]);
     }
