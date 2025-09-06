@@ -50,12 +50,17 @@ class LoginController extends Controller
      // Logout the user
     public function logout(Request $request)
     {
+        $user = Auth::user();
         Auth::logout();
-        if ($request->is('mod-admin/*') || $request->is('mod-admin')) {
-            return redirect()->route('admin.login');
-        }
 
-        return redirect()->route('login');
+        // if ($request->is('mod-admin/*') || $request->is('mod-admin')) {
+        //     return redirect()->route('admin.login');
+        // }
+        if(in_array($user->user_type, ['delegate', 'hotel', 'escort', 'driver'])){
+            return redirect()->route('login');
+        }
+        
+        return redirect()->route('admin.login');
     }
 
 }

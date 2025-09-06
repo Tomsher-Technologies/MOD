@@ -51,7 +51,8 @@ class AuthController extends Controller
             session(['current_event_id' => $eventId]);
             session(['current_module' => $roleAssignment->module]);
 
-            return redirect()->route($roleAssignment->module . '.dashboard');
+            // return redirect()->route($roleAssignment->module . '.dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         return back()->withErrors(['password' => __db('invalid_credentials')]);
