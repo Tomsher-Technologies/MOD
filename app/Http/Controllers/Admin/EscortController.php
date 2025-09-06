@@ -17,7 +17,7 @@ class EscortController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:view_escorts|delegate_view_escorts|escort_view_escorts|hotel_view_escorts', [
+        $this->middleware('permission:view_escorts|delegate_view_escorts|escort_view_escorts|driver_view_escorts|hotel_view_escorts', [
             'only' => ['index', 'search']
         ]);
 
@@ -170,6 +170,8 @@ class EscortController extends Controller
             $escortData['spoken_languages'] = null;
         }
 
+        $escortData['title'] = $escortData['title_id'] ?? null;
+        unset($escortData['title_id']);
         $escort = Escort::create($escortData);
 
         $this->logActivity(

@@ -85,7 +85,7 @@
                         ],
                         [
                             'label' => __db('title'),
-                            'render' => fn($row) => $row->title->value ?? '-',
+                            'render' => fn($row) => $row->title?->value ?? '-',
                         ],
                         [
                             'label' => __db('name'),
@@ -207,7 +207,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ''),
+                            'render' => fn($escort) => e($escort->title_value?->value ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -305,7 +305,7 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($driver) => e($driver->title->value),
+                            'render' => fn($driver) => e($driver->title_value?->value),
                         ],
                         [
                             'label' => __db('name_en'),
@@ -484,7 +484,7 @@
             ],
             [
                 'label' => __db('title'),
-                'render' => fn($row) => $row->title->value ?? '-',
+                'render' => fn($row) => $row->title?->value ?? '-',
             ],
             // [
             //     'label' => __db('file_name'),

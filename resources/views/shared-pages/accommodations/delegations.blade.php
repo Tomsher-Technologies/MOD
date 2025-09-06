@@ -185,7 +185,7 @@
                             'render' => function ($delegation) {
                                 $buttons = '';
 
-                                if (auth()->user() && auth()->user()->can('view_accommodation_delegations')) {
+                                if (auth()->user() && auth()->user()->canany(['view_accommodation_delegations','hotel_view_accommodation_delegations'])) {
                                     $buttons .=
                                         '<a href="' .
                                         route('accommodation-delegation-view', $delegation->id) .

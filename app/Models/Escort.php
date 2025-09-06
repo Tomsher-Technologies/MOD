@@ -22,7 +22,7 @@ class Escort extends Model
         'spoken_languages',
         'internal_ranking_id',
         'status',
-        'title_id',
+        'title',
         'unit_id',
         'rank',
         'phone_number',
@@ -69,6 +69,14 @@ class Escort extends Model
     public function title()
     {
         return $this->belongsTo(DropdownOption::class, 'title_id')
+            ->whereHas('dropdown', function ($q) {
+                $q->where('code', 'title');
+            });
+    }
+
+      public function title_value()
+    {
+        return $this->belongsTo(DropdownOption::class, 'title')
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'title');
             });

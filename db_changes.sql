@@ -440,6 +440,14 @@
 --  (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
 --  (125, 'admin', 25, 'badge_print_export', 'Export Badge Printed', 'web', 1, NULL, NULL);
 
- alter table dropdown_options add column value_ar text after value;
+--  alter table dropdown_options add column value_ar text after value;
 
- alter table countries add column name_ar text;
+--  alter table countries add column name_ar text;
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_accommodations', 'Assign Accommodations', 'web', '1', current_timestamp(), current_timestamp());
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_import_accommodations', 'Import Accommodations', 'web', '1', current_timestamp(), current_timestamp());
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_accommodation_delegations', 'View Accommodation Delegations', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
