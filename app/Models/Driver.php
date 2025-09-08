@@ -62,7 +62,7 @@ class Driver extends Model
 
     public function title()
     {
-        return $this->belongsTo(DropdownOption::class, 'title')
+        return $this->belongsTo(DropdownOption::class, 'title_id')
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'title');
             });
@@ -70,7 +70,7 @@ class Driver extends Model
 
      public function title_value()
     {
-        return $this->belongsTo(DropdownOption::class, 'title')
+        return $this->belongsTo(DropdownOption::class, 'title_id')
             ->whereHas('dropdown', function ($q) {
                 $q->where('code', 'title');
             });
