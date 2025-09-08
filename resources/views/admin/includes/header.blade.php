@@ -74,6 +74,11 @@
                         'link' => route('accommodation-delegations'),
                         'permission' => ['view_accommodation_delegations', 'hotel_view_accommodation_delegations'],
                     ],
+                    'news.index' => [
+                        'text' => __db('add_news'),
+                        'link' => route('news.create'),
+                        'permission' => ['add_news'],
+                    ],
                 ];
                 $config = $buttonConfig[$currentRoute] ?? null;
             @endphp

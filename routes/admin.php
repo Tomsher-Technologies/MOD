@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\AccommodationController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\AlertController;
+use App\Http\Controllers\Admin\NewsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -173,6 +174,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/export-non-badge-printed', [DelegationController::class, 'exportNonBadgePrinted'])->name('delegates.exportNonBadgePrinted');
     Route::get('/export-badge-printed-delegates', [DelegationController::class, 'exportBadgePrintedDelegates'])->name('delegates.exportBadgePrintedDelegates');
     Route::get('/export-non-badge-printed-delegates', [DelegationController::class, 'exportNonBadgePrintedDelegates'])->name('delegates.exportNonBadgePrintedDelegates');
+
+    //Manage news
+    Route::resource('news', NewsController::class);
+    Route::post('/news/status', [NewsController::class, 'updateStatus'])->name('news.status');
 
 });
 

@@ -215,6 +215,22 @@
                 </li>
             @endcanany
 
+            @canany(['manage_news'])
+                <li>
+                    <a href="{{ route('news.index') }}"
+                        class="{{ areActiveRoutes(['news.index', 'news.edit', 'news.create']) }}">
+                        <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                    d="M7 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2z" />
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                    d="M8 8h8M8 12h5" />
+                        </svg>
+
+                        <span class="text-md">{{ __db('news') }}</span>
+                    </a>
+                </li>
+            @endcanany
+
             @canany(['manage_staff'])
                 <li>
                     <a href="{{ route('staffs.index') }}"

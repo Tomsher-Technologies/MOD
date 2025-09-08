@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('event')])
 
 @section('content')
-<div class="dashboard-main-body ">
+<div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('update_event_details') }}</h2>
         <a href="{{ Session::has('events_last_url') ? Session::get('events_last_url') : route('events.index') }}" id="add-attachment-btn" class="float-left btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">

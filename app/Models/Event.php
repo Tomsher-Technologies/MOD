@@ -33,6 +33,18 @@ class Event extends Model
         return $this->hasMany(InterviewMember::class);
     }
 
+    public function getTranslation($field = '', $lang = false)
+    {
+        $lang = $lang == false ? getActiveLanguage() : $lang;
+
+        if ($lang !== 'en') {
+            $field = $field.'_ar';
+        }else{
+            $field = $field.'_en';
+        }
+
+        return $this->$field;
+    }
 
 
     public function generateEventCode()

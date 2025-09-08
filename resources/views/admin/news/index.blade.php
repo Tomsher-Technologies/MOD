@@ -1,27 +1,16 @@
-@extends('layouts.admin_account', ['title' => __db('view') . ' ' . __db('external_accommodations')])
+@extends('layouts.admin_account', ['title' => __db('all') . ' ' . __db('news')])
 
 @section('content')
     <div class="">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('external_accommodations') }}</h2>
-            <a href="{{ route('accommodations.index') }}"
-                class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                    height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 12H5m14 0-4 4m4-4-4-4" />
-                </svg>
-                <span>{{ __db('back') }}</span>
-            </a>
+            <h2 class="font-semibold mb-0 !text-[22px]">{{__db('all') . ' ' . __db('news') }}</h2>
+            
         </div>
-
-
-
         <!-- DAdd Delegation -->
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
             <div class=" mb-4 flex items-center justify-between gap-3">
-                <form class="w-[50%] me-4" action="{{ route('admin.view-external-members') }}" method="GET">
+                <form class="w-[50%] me-4" action="{{ route('news.index') }}" method="GET">
                     <div class="relative">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -32,9 +21,15 @@
                         </div>
                         <input type="search" id="default-search" name="search" value="{{ request('search') }}"
                             class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                            placeholder="{{ __db('search_by_name') }}" />
-                        <button type="submit"
-                            class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+                            placeholder="{{ __db('search_by_title') }}" />
+
+                        <div class="flex">
+                            <a href="{{ route('news.index') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                                    {{ __db('reset') }}</a>
+
+                            <button type="submit"
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+                        </div>
                     </div>
                 </form>
 
@@ -56,46 +51,62 @@
             <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                 <thead>
                     <tr class="text-[13px]">
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('sl_no') }}
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                            {{ __db('name') }}
+                            {{ __db('title') }}
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                            {{ __db('hotel') }}
+                            {{ __db('image') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                            {{ __db('room_type') }}
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                            {{ __db('event') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                            {{ __db('room_number') }}
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                            {{ __db('date') }}
                         </th>
+
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('status') }}</th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                             {{ __db('actions') }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($externalMembers as $key => $member)
+                    @forelse ($news as $key => $new)
                         <tr class="text-[12px] align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">{{ $externalMembers->firstItem() + $key }}</td>
+                            <td class="px-4 py-2 border text-center border-gray-200">{{ $news->firstItem() + $key }}</td>
                             <td class="px-4 py-3 border border-gray-200">
-                                {{ $member->name ?? '' }}
-                            </td>
-                            <td class="px-4 py-3 border border-gray-200">
-                                {{ $member->hotel?->hotel_name ?? '' }}
-                            </td>
-                            <td class="px-4 border border-gray-200 py-3">
-                                {{ $member->roomType?->roomType?->value ?? '' }}
-                            </td>
-                            <td class="px-4 border border-gray-200 py-3">
-                                {{ $member->room_number ?? '' }}
+                                {{ $new->getTranslation('title') ?? '' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200">
+                                <img src="{{ asset(getUploadedImage($new->image)) }}" class="h-20 w-20">
+                            </td>
+                            <td class="px-4 border text-center border-gray-200 py-3">
+                                {{ $new->event?->name_en ?? '' }}
+                            </td>
+                            <td class="px-4 border text-center border-gray-200 py-3">
+                                {{ $new->news_date ? \Carbon\Carbon::parse($new->news_date)->format('d M Y') : '-' }}
+                            </td>
+                            <td class="px-4 py-3 border border-gray-200 text-center">
+                                @can('edit_news')
+                                    <div class=" items-center">
+                                        <label for="switch-{{ $key }}" class="relative inline-block w-11 h-6">
+                                            <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $new->id }}"
+                                                class="sr-only peer" {{ $new->status == 1 ? 'checked' : '' }} />
+
+                                            <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
+                                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+                                        </label>
+                                    </div>
+                                @endcan
+                            </td>
+                            
+                            <td class="px-4 py-3 border text-center border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @canany(['assign_external_members','hotel_assign_external_members'])
-                                        <a href="{{ route('external-members.edit', $member->id) }}">
+                                    @canany(['edit_news'])
+                                        <a href="{{ route('news.edit', $new->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
                                                 <path
@@ -103,12 +114,14 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </a>
+                                    @endcanany
 
-                                        <form action="{{ route('admin.external-members.destroy', $member->id) }}"
-                                            method="POST" class="delete-external-form">
+                                    @canany(['delete_news'])
+                                        <form action="{{ route('news.destroy', $new->id) }}"
+                                            method="POST" class="delete-news-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="delete-external text-red-600 hover:text-red-800">
+                                            <button class="delete-news text-red-600 hover:text-red-800">
                                                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                     fill="none" viewBox="0 0 24 24">
                                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -122,13 +135,21 @@
                             </td>
                         </tr>
                     @empty
+                        <tr class="px-4 py-2 text-center text-neutral-500">
+                            <td colspan="10">
+                                {{ __db('no_data_found') }}
+                            </td>
+                        </tr>
                     @endforelse
 
                 </tbody>
             </table>
+            <div class="mt-4">
+                {{ $news->appends(request()->input())->links() }}
+            </div>
         </div>
 
-        <div id="filter-drawer"
+       <div id="filter-drawer"
             class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
             tabindex="-1" aria-labelledby="drawer-label">
             <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
@@ -143,36 +164,27 @@
                 <span class="sr-only">{{ __db('close_menu') }}</span>
             </button>
 
-            <form action="{{ route('admin.view-external-members') }}" method="GET">
+            <form action="{{ route('news.index') }}" method="GET">
                 <div class="flex flex-col gap-2 mt-2">
                     <div class="flex flex-col">
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('hotel') }}</label>
-                        <select name="hotel_id" data-placeholder="{{ __db('select') }}"
-                            class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                            <option value="">{{ __db('select') }}</option>
-                            @foreach ($hotels as $hotel)
-                                <option value="{{ $hotel->id }}" @if (request('hotel_id') == $hotel->id) selected @endif>
-                                    {{ $hotel->hotel_name }}
-                                </option>
+                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('event') }}</label>
+                        <select name="event_id" id="event_id" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                            <option value="">{{ __db('select') . ' ' . __db('event') }}</option>
+                            @foreach ($events as $event)
+                                <option value="{{ $event->id }}" {{ request('event_id') == $event->id ? 'selected' : '' }}>{{ $event->getTranslation('name') }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div class="flex flex-col">
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('room_type') }}</label>
-                        <select name="room_type_id" data-placeholder="{{ __db('select') }}"
-                            class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                            <option value="">{{ __db('select') }}</option>
-                            @foreach ($roomTypes as $roomType)
-                                <option value="{{ $roomType->id }}" @if (request('room_type_id') == $roomType->id) selected @endif>
-                                    {{ $roomType->roomType->value }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('news_date') }}</label>
+                        <input type="text" class="form-control date-range" id="date_range" name="date_range"
+                    placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
+                    data-separator=" to " autocomplete="off"  value="{{ request('date_range') ?? '' }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-6">
-                    <a href="{{ route('admin.view-external-members') }}"
+                    <a href="{{ route('news.index') }}"
                         class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
                     <button type="submit"
                         class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
@@ -183,31 +195,31 @@
 @endsection
 
 @section('script')
-    <script>
-        document.querySelectorAll('.delete-external-form').forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: '{{ __db('are_you_sure') }}',
-                    text: "{{ __db('this_will_permanently_delete_the_external_member') }}",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#B68A35',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
+<script>
+    function update_status(el) {
+        if (el.checked) {
+            var status = 1;
+        } else {
+            var status = 0;
+        }
+        $.post('{{ route('news.status') }}', {
+            _token: '{{ csrf_token() }}',
+            id: el.value,
+            status: status
+        }, function(data) {
+            if (data == 1) {
+                toastr.success("{{ __db('status_updated') }}");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
 
-        document.addEventListener('DOMContentLoaded', function() {
-            $('.select2').select2({
-                placeholder: "{{ __db('select') }}",
-                allowClear: true
-            });
+            } else {
+                toastr.error("{{ __db('something_went_wrong') }}");
+                setTimeout(function() {
+                    window.location.reload();
+                }, 2000);
+            }
         });
-    </script>
+    }
+</script>
 @endsection

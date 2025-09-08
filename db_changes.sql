@@ -451,3 +451,37 @@ INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_
 
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+-- Live
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', NULL, 'manage_news', 'Manage News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 131, 'add_news', 'Add News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 131, 'view_news', 'View News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 131, 'edit_news', 'Edit News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 131, 'delete_news', 'Delete News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+CREATE TABLE IF NOT EXISTS `news` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id` bigint UNSIGNED DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `news_date` date DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `news_translations` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `news_id` bigint UNSIGNED DEFAULT NULL,
+  `lang` varchar(5) DEFAULT NULL,
+  `title` text,
+  `description` longtext,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `news_id` (`news_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `news_translations`
+  ADD CONSTRAINT `news_translations_ibfk_1` FOREIGN KEY (`news_id`) REFERENCES `news` (`id`) ON DELETE CASCADE;
