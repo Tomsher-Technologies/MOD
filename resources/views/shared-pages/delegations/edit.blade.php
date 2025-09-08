@@ -362,7 +362,7 @@
                         ],
                         [
                             'label' => __db('title'),
-                            'render' => fn($escort) => e($escort->title->value ?? ''),
+                            'render' => fn($row) => $row->title?->value ?? '-',
                         ],
                         [
                             'label' => __db('name_en'),
@@ -674,25 +674,43 @@
                         ],
 
                         [
+                            'label' => __db('accommodation'),
+                            'render' => function ($escort) {
+                                $room = $escort->currentRoomAssignment ?? null;
+
+                                $accommodation = $escort->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
+                                //;
+                                return $accommodation ?? '-';
+                            },
+                        ],
+
+                        [
                             'label' => __db('status'),
                             'key' => 'status',
                             'permission' => ['edit_escorts', 'escort_edit_escorts'],
                             'render' => function ($escort) {
                                 return '<div class="flex items-center">
-                <label for="switch-' .
-                                    $escort->id .
-                                    '" class="relative inline-block w-11 h-6">
-                    <input type="checkbox" id="switch-' .
-                                    $escort->id .
-                                    '" onchange="update_escort_status(this)" value="' .
-                                    $escort->id .
-                                    '" class="sr-only peer" ' .
-                                    ($escort->status == 1 ? 'checked' : '') .
-                                    ' />
-                    <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
-                    <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
-                </label>
-            </div>';
+                                    <label for="switch-' .
+                                                        $escort->id .
+                                                        '" class="relative inline-block w-11 h-6">
+                                        <input type="checkbox" id="switch-' .
+                                                        $escort->id .
+                                                        '" onchange="update_escort_status(this)" value="' .
+                                                        $escort->id .
+                                                        '" class="sr-only peer" ' .
+                                                        ($escort->status == 1 ? 'checked' : '') .
+                                                        ' />
+                                        <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
+                                        <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
+                                    </label>
+                                </div>';
                             },
                         ],
                         [
@@ -828,6 +846,23 @@
                             'label' => __db('capacity'),
                             'key' => 'capacity',
                             'render' => fn($driver) => e($driver->capacity),
+                        ],
+                        [
+                            'label' => __db('accommodation'),
+                            'render' => function ($driver) {
+                                $room = $driver->currentRoomAssignment ?? null;
+
+                                $accommodation = $driver->current_room_assignment_id
+                                    ? $room?->hotel?->hotel_name .
+                                            ' - ' .
+                                            $room->roomType?->roomType?->value .
+                                            ' - ' .
+                                            $room?->room_number ??
+                                        '-'
+                                    : '-';
+                                //;
+                                return $accommodation ?? '-';
+                            },
                         ],
                         [
                             'label' => __db('status'),
