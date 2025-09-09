@@ -140,12 +140,27 @@
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
-                            @forelse(auth()->user()->unreadNonAlertNotifications()->take(5) as $notification)
+                            @php
+                                $unreadNotifications = auth()->user()->unreadNonAlertNotifications()->take(5)->get();
+                            @endphp
+                            @forelse($unreadNotifications as $notification)
                                 @php
                                     $data = is_string($notification->data)
                                         ? json_decode($notification->data, true)
                                         : $notification->data;
-                                    $message = $data['message'] ?? __db('new_notification');
+                                    $message = '';
+                                    if (isset($data['message'])) {
+                                        if (is_array($data['message'])) {
+                                            $lang = getActiveLanguage();
+                                            if ($lang !== 'en' && isset($data['message']['ar'])) {
+                                                $message = $data['message']['ar'];
+                                            } else {
+                                                $message = $data['message']['en'] ?? '';
+                                            }
+                                        } else {
+                                            $message = $data['message'];
+                                        }
+                                    }
                                     $module = $data['module'] ?? null;
                                     $action = $data['action'] ?? null;
                                     $delegationId = $data['delegation_id'] ?? null;
@@ -225,20 +240,60 @@
                    
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
-                            @forelse(auth()->user()->unreadNotifications()->whereNotNull('alert_id')->latest()->take(5) as $notification)
+                            @php
+                                $unreadAlerts = auth()->user()->unreadNotifications()->whereNotNull('alert_id')->latest()->take(5)->get();
+                            @endphp
+                            @forelse($unreadAlerts as $notification)
                                 @php
                                     $data = is_string($notification->data)
                                         ? json_decode($notification->data, true)
                                         : $notification->data;
-                                    $message = $data['message'] ?? __db('new_alert');
-                                    $title = $data['changes']['title'] ?? __db('alert');
+                                    $message = '';
+                                    if (isset($data['message'])) {
+                                        if (is_array($data['message'])) {
+                                            $lang = getActiveLanguage();
+                                            if ($lang !== 'en' && isset($data['message']['ar'])) {
+                                                $message = $data['message']['ar'];
+                                            } else {
+                                                $message = $data['message']['en'] ?? '';
+                                            }
+                                        } else {
+                                            $message = $data['message'];
+                                        }
+                                    }
+                                    $title = '';
+                                    if (isset($data['title'])) {
+                                        if (is_array($data['title'])) {
+                                            $lang = getActiveLanguage();
+                                            if ($lang !== 'en' && isset($data['title']['ar'])) {
+                                                $title = $data['title']['ar'];
+                                            } else {
+                                                $title = $data['title']['en'] ?? '';
+                                            }
+                                        } else {
+                                            $title = $data['title'];
+                                        }
+                                    } else {
+                                        if (isset($data['changes']['title'])) {
+                                            if (is_array($data['changes']['title'])) {
+                                                $lang = getActiveLanguage();
+                                                if ($lang !== 'en' && isset($data['changes']['title']['ar'])) {
+                                                    $title = $data['changes']['title']['ar'];
+                                                } else {
+                                                    $title = $data['changes']['title']['en'] ?? '';
+                                                }
+                                            } else {
+                                                $title = $data['changes']['title'];
+                                            }
+                                        }
+                                    }
                                 @endphp
                                 <a href="#"
                                     onclick="showAlertModal({{ $data['alert_id'] ?? 0 }}, '{{ addslashes($title) }}', '{{ addslashes($message) }}'); return false;"
                                     class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
                                     <div class="flex items-center gap-3">
                                         <div>
-                                            <h6 class="fw-semibold mb-1 text-sm">{{ $title }}</h6>
+                                            <h6 class="fw-semibold mb-1 text-sm">{{ $title ?: __db('alert') }}</h6>
                                             <p class="mb-0 line-clamp-1 text-sm">
                                                 {{ $message }}
                                             </p>

@@ -11,19 +11,28 @@ use Illuminate\Http\Request;
 
 class AlertController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+        $this->middleware('permission:add_alerts', [
+            'only' => ['store']
+        ]);
+    }
     public function index(Request $request)
     {
         $alerts = Alert::with('creator')->latest()->paginate(10);
-    
+
         return view('admin.alerts.index', compact('alerts'));
     }
-    
+
     public function create()
     {
         $users = User::all();
         return view('admin.alerts.create', compact('users'));
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
@@ -35,22 +44,22 @@ class AlertController extends Controller
             'users' => 'required|array',
             'users.*' => 'required|in:all,' . implode(',', User::pluck('id')->toArray())
         ]);
-        
+
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $attachmentPath = $request->file('attachment')->store('alerts', 'public');
         }
-        
+
         $multilingualMessage = [
             'en' => $request->message,
             'ar' => $request->message_ar
         ];
-        
+
         $multilingualTitle = [
             'en' => $request->title,
             'ar' => $request->title_ar
         ];
-        
+
         $alert = Alert::create([
             'title' => $multilingualTitle,
             'message' => $multilingualMessage,
@@ -58,19 +67,19 @@ class AlertController extends Controller
             'send_to_all' => in_array('all', $request->users),
             'created_by' => auth()->id()
         ]);
-        
+
         if (in_array('all', $request->users)) {
             $recipients = User::all();
         } else {
             $recipients = User::whereIn('id', $request->users)->get();
         }
-        
+
         foreach ($recipients as $recipient) {
             AlertRecipient::create([
                 'alert_id' => $alert->id,
                 'user_id' => $recipient->id
             ]);
-            
+
             $notificationData = [
                 'delegation_id' => null,
                 'message' => $multilingualMessage,
@@ -83,25 +92,25 @@ class AlertController extends Controller
                 'created_at' => now(),
                 'alert_id' => $alert->id
             ];
-            
+
             $recipient->notify(new AlertNotification($notificationData));
         }
-        
+
         return redirect()->route('alerts.index')->with('success', 'Alert created successfully.');
     }
-    
+
     public function show(Alert $alert)
     {
         $alert->load(['alertRecipients.user']);
-        
+
         $alertRecipient = AlertRecipient::where('alert_id', $alert->id)
             ->where('user_id', auth()->id())
             ->first();
-            
+
         if ($alertRecipient && !$alertRecipient->read_at) {
             $alertRecipient->update(['read_at' => now()]);
         }
-        
+
         return view('admin.alerts.show', compact('alert'));
     }
 }
