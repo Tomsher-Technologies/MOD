@@ -67,12 +67,12 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ''),
+                            'render' => fn($driver) => e($driver->getTranslation('title') ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
                             'key' => 'name_en',
-                            'render' => fn($driver) => e($driver->name_en),
+                            'render' => fn($driver) => e($driver->getTranslation('name')),
                         ],
                         [
                             'label' => __db('phone_number'),
@@ -183,6 +183,7 @@
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
+                            'permission' => ['edit_drivers', 'driver_edit_drivers', 'assign_drivers', ],
                             'render' => function ($driver) {
                                 $editUrl = route('drivers.edit', $driver->id);
 
@@ -256,17 +257,6 @@
 
     <form action="{{ route('drivers.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-
-            <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title') }}</label>
-                <select name="title_id[]" multiple data-placeholder="{{ __db('select_titles') }}"
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getDropDown('title')->options as $option)
-                        <option value="{{ $option->id }}" @if (in_array($option->id, request('title_id', []))) selected @endif>
-                            {{ $option->value }}</option>
-                    @endforeach
-                </select>
-            </div>
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle_type') }}</label>

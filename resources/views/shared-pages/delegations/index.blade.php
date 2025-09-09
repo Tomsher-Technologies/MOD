@@ -80,7 +80,7 @@
                             'render' => function ($delegation) {
                                 $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
                                 return $teamHeads->isNotEmpty()
-                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
+                                    ? $teamHeads->map(fn($head) => e($head->getTranslation('title') . ". " . $head->getTranslation('name')))->implode('<br>')
                                     : '-';
                             },
                         ],
@@ -205,7 +205,17 @@
                 @endphp
 
                 <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :enableColumnListBtn="true"
-                    :defaultVisibleKeys="['sl_no', 'continent', 'team_head', 'invitation_from', 'escorts', 'drivers', 'invitation_status','participation_status', 'note']" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                    :defaultVisibleKeys="[
+                        'sl_no',
+                        'continent',
+                        'team_head',
+                        'invitation_from',
+                        'escorts',
+                        'drivers',
+                        'invitation_status',
+                        'participation_status',
+                        'note',
+                    ]" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
     </div>

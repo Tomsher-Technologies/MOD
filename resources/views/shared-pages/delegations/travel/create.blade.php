@@ -187,10 +187,18 @@
             <div class="xl:col-span-12 h-full">
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-                    <x-reusable-table :columns="$columns" :data="$delegates" :rowClass="function ($row) use ($existingArrivals, $existingDepartures) {
-                        $hasTravel = isset($existingArrivals[$row->id]) || isset($existingDepartures[$row->id]);
+                    <x-reusable-table :columns="$columns" :data="$delegates" :rowClass="function ($row) use (
+                        $existingArrivals,
+                        $existingDepartures,
+                        $showArrival,
+                        $showDeparture,
+                    ) {
+                        $hasTravel =
+                            (isset($existingArrivals[$row->id]) && $showArrival) ||
+                            (isset($existingDepartures[$row->id]) && $showDeparture);
                         return $hasTravel ? 'bg-green-100 border-green-300' : 'bg-yellow-100 border-yellow-300';
                     }" />
+
 
                     <div class="mt-4 flex flex-wrap gap-4 text-sm">
                         <div class="flex items-center gap-2">
