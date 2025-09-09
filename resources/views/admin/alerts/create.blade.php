@@ -98,7 +98,7 @@
                 </div>
 
                 <div class="flex justify-between items-center mt-8">
-                    <button type="submit" class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
+                    <button type="submit" class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                         {{ __db('send_alert') }}
                     </button>
                 </div>

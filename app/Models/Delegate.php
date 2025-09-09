@@ -9,7 +9,8 @@ class Delegate extends Model
     protected $fillable = [
         'delegation_id',
         'code',
-        'title_id',
+        'title_en',
+        'title_ar',
         'name_en',
         'name_ar',
         'gender_id',
@@ -32,14 +33,6 @@ class Delegate extends Model
         'accommodation' => 'boolean',
     ];
 
-    public function title()
-    {
-        return $this->belongsTo(DropdownOption::class, 'title_id')
-            ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'title');
-            });
-    }
-    
     public function gender()
     {
         return $this->belongsTo(DropdownOption::class, 'gender_id')

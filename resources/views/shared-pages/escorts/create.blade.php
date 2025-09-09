@@ -29,16 +29,19 @@
             <div class="grid grid-cols-12 gap-5">
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title') }}:</label>
-                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
-                        <option value="" disabled>{{ __db('select_title') }}</option>
-                        @foreach (getDropDown('title')->options as $option)
-                            <option value="{{ $option->id }}">
-                                {{ $option->value }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label class="form-label">{{ __db('title_en') }}:</label>
+                    <input type="text" name="title_en" value="{{ old('title_en') }}"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') . ' ' . __db('title_en') }}">
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title_ar') }}:</label>
+                    <input type="text" name="title_ar" value="{{ old('title_ar') }}"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') . ' ' . __db('title_ar') }}">
+                </div>
+
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
@@ -89,7 +92,6 @@
                     <label class="form-label">{{ __db('gender') }}:</label>
                     <select name="gender_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled {{ old('gender_id') ? '' : 'selected' }}>{{ __db('Select Gender') }}</option>
                         @foreach (getDropDown('gender')->options as $gender)
                             <option value="{{ $gender->id }}"
                                 {{ old('gender_id') == $gender->id ? 'selected' : '' }}>
@@ -104,8 +106,6 @@
                     <select name="language_id[]" id="multiSelect" multiple
                         class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm"
                         placeholder="{{ __db('Select Languages') }}">
-                        <option disabled {{ old('language_id[]') ? '' : 'selected' }}>{{ __db('Select Languages') }}
-                        </option>
                         @php
                             $oldLanguageIds = old('language_id', []);
                         @endphp
@@ -122,8 +122,6 @@
                     <label class="form-label">{{ __db('rank') }}:</label>
                     <select name="internal_ranking_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled {{ old('internal_ranking_id') ? '' : 'selected' }}>{{ __db('Select Rank') }}
-                        </option>
                         @foreach (getDropDown('internal_ranking')->options as $rank)
                             <option value="{{ $rank->id }}"
                                 {{ old('internal_ranking_id') == $rank->id ? 'selected' : '' }}>
@@ -137,8 +135,6 @@
                     <label class="form-label">{{ __db('unit') }}:</label>
                     <select name="unit"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled {{ old('unit') ? '' : 'selected' }}>{{ __db('Select Unit') }}
-                        </option>
                         @foreach (getDropDown('unit')->options ?? [] as $unit)
                             <option value="{{ $unit->id }}" {{ old('unit') == $unit->id ? 'selected' : '' }}>
                                 {{ $unit->value }}
@@ -163,7 +159,7 @@
 
             <div class="flex justify-between items-center mt-8">
                 <button type="submit" id="add-delegates"
-                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                     {{ __db('add') . ' ' . __db('escorts') }}
                 </button>
             </div>

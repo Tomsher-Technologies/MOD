@@ -131,7 +131,7 @@
                         @enderror
                     </div>
                     <button type="button" id="search-delegation-btn"
-                        class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
+                        class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                         <svg class="pe-1 text-[#FFF]" width="25" height="25" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                 d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
@@ -185,13 +185,13 @@
         <div class="flex justify-start gap-5 items-center">
 
             <button type="submit" name="submit_exit"
-                class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg py-[1px] h-12">{{ __db('submit_and_exit') }}</button>
+                class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">{{ __db('submit_and_exit') }}</button>
 
             <button type="submit" name="submit_add_new"
-                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('submit_add_new') }}</button>
+                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('submit_add_new') }}</button>
 
             <button type="submit" name="submit_add_travel"
-                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('submit_add_flight_details') }}</button>
+                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('submit_add_flight_details') }}</button>
         </div>
 
 
