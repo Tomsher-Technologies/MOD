@@ -17,7 +17,7 @@ class AlertController extends Controller
         $this->middleware('auth');
 
         $this->middleware('permission:add_alerts', [
-            'only' => ['store']
+            'only' => ['store', 'create']
         ]);
     }
     public function index(Request $request)
