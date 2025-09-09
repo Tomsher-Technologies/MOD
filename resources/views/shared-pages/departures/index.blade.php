@@ -98,7 +98,7 @@
                                 'label' => __db('delegates'),
                                 'render' => function ($row) {
                                     return collect($row['delegates'])->map(function ($delegate) {
-                                        return e($delegate->name_en);
+                                        return e($delegate->getTranslation('title') . ". " . $delegate->name_en);
                                     })->implode('<br>');
                                 },
                             ],

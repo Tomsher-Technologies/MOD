@@ -62,8 +62,8 @@
                 @endphp
 
                 <div class="grid grid-cols-2 gap-6 mt-3">
-                    <x-reusable-table :columns="$note1_columns" tableId="not1Table"  :data="$data" :noDataMessage="$noDataMessage" />
-                    <x-reusable-table :columns="$note2_columns" :data="$data" tableId="note2Table"  :noDataMessage="$noDataMessage" />
+                    <x-reusable-table :columns="$note1_columns" tableId="not1Table" :data="$data" :noDataMessage="$noDataMessage" />
+                    <x-reusable-table :columns="$note2_columns" :data="$data" tableId="note2Table" :noDataMessage="$noDataMessage" />
                 </div>
             </div>
         </div>
@@ -84,22 +84,30 @@
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
-                            'label' => __db('title'),
-                            'render' => fn($row) => $row->title?->value ?? '-',
-                        ],
-                        [
-                            'label' => __db('name'),
+                            'label' => __db('name_en'),
                             'render' => function ($row) {
                                 $badge = $row->team_head
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                                     : '';
-                                $name = $row->name_en ?? ($row->name_ar ?? '-');
-                                return $badge . '<div class="block">' . e($name) . '</div>';
+                                $name = $row->name_en;
+                                $title = $row->title_en;
+                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('name_ar'),
+                            'render' => function ($row) {
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                                    : '';
+                                $name = $row->name_ar;
+                                $title = $row->title_ar;
+                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
                             },
                         ],
                         [
                             'label' => __db('designation'),
-                            'render' => fn($row) => $row->designation_en ?? ($row->designation_ar ?? '-'),
+                            'render' => fn($row) => $row->getTranslation('designation') ?? '-',
                         ],
                         [
                             'label' => __db('internal_ranking'),
@@ -111,7 +119,7 @@
                         ],
                         [
                             'label' => __db('parent_id'),
-                            'render' => fn($row) => $row->parent->name_en ?? ($row->parent->name_ar ?? '-'),
+                            'render' => fn($row) => $row->parent?->getTranslation('name') ?? '-',
                         ],
                         [
                             'label' => __db('relationship'),
@@ -133,7 +141,7 @@
                                 if (!$row->accommodation) {
                                     return 'Not Required';
                                 }
-                                
+
                                 $room = $row->currentRoomAssignment ?? null;
 
                                 $accommodation = $row->current_room_assignment_id
@@ -164,7 +172,8 @@
                     $noDataMessage = __db('no_delegates_found');
                 @endphp
 
-                <x-reusable-table :columns="$columns"  table-id="delegatesTable" :enableColumnListBtn="true"  :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" table-id="delegatesTable" :enableColumnListBtn="true" :data="$data"
+                    :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>
@@ -205,19 +214,14 @@
                             },
                         ],
                         [
-                            'label' => __db('title'),
-                            'key' => 'title',
-                            'render' => fn($escort) => e($escort->title_value?->value ?? ''),
-                        ],
-                        [
-                            'label' => __db('name_en'),
+                            'label' => __db('name'),
                             'key' => 'name',
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
                                 return '<a href="' .
                                     $searchUrl .
                                     '" class="text-[#B68A35] hover:underline">' .
-                                    e($escort->name_en) .
+                                    e($escort->getTranslation('title') . '. ' . $escort->getTranslation('name')) .
                                     '</a>';
                             },
                         ],
@@ -303,19 +307,17 @@
                             },
                         ],
                         [
-                            'label' => __db('title'),
-                            'key' => 'title',
-                            'render' => fn($driver) => e($driver->title_value?->value),
-                        ],
-                        [
-                            'label' => __db('name_en'),
-                            'key' => 'name_en',
+                            'label' => __db('name'),
+                            'key' => 'name',
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
+                                $driverTitle = $driver?->getTranslation('title') ?? '';
+                                $driverName = $driver?->getTranslation('name') ?? '';
+
                                 return '<a href="' .
                                     $searchUrl .
                                     '" class="text-[#B68A35] hover:underline">' .
-                                    e($driver->name_en) .
+                                    e($driverTitle . '. ' . $driverName) .
                                     '</a>';
                             },
                         ],
@@ -411,12 +413,7 @@
                 'render' => function ($row) {
                     $attendees = $row->interviewMembers->where('type', 'from');
                     $names = $attendees
-                        ->map(
-                            fn($im) => e(
-                                $im->resolveMemberForInterview($row)->name_en ??
-                                    ($im->resolveMemberForInterview($row)->name_ar ?? '-'),
-                            ),
-                        )
+                        ->map(fn($im) => e($im->resolveMemberForInterview($row)?->getTranslation('name') ?? '-'))
                         ->filter()
                         ->implode('<br>');
                     return $names ?: '-';
@@ -427,7 +424,7 @@
                 'render' => function ($row) {
                     if (!empty($row->other_member_id) && $row->otherMember) {
                         $otherMemberName = $row->otherMember->name ?? '';
-                        $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
+                        $otherMemberId = $row->otherMember->getTranslation('name') ?? $row->other_member_id;
                         if ($otherMemberId) {
                             $with =
                                 '<a href="' .
@@ -519,7 +516,8 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <x-reusable-table :columns="$columns" table-id="attachmentsTable" :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" table-id="attachmentsTable" :data="$data"
+                    :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>

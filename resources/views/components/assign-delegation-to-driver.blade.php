@@ -49,7 +49,7 @@
                             </select>
                         </div>
                         <button type="button" id="searchBtn"
-                            class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12 flex items-center justify-center gap-2">
+                            class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 flex items-center justify-center gap-2">
                             <svg class="pe-1 text-[#FFF]" width="25" height="25" fill="none"
                                 viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
@@ -84,7 +84,7 @@
         </div>
         <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
             <button type="button" id="assignBtn"
-                class="btn text-md !bg-[#B68A35] text-white rounded-lg py-[1px] h-12 hidden">{{ __db('assign') }}</button>
+                class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 hidden">{{ __db('assign') }}</button>
 
         </div>
     </form>

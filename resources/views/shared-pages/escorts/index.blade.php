@@ -81,12 +81,12 @@
                         [
                             'label' => __db('title'),
                             'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ''),
+                            'render' => fn($escort) => e($escort->getTranslation('title') ?? ''),
                         ],
                         [
                             'label' => __db('name_en'),
                             'key' => 'name',
-                            'render' => fn($escort) => e($escort->name_en),
+                            'render' => fn($escort) => e($escort->getTranslation('name')),
                         ],
                         [
                             'label' => __db('phone_number'),
@@ -197,8 +197,8 @@
                     ];
                 @endphp
 
-                <x-reusable-table :columns="$columns" :data="$escorts" :enableRowLimit="true" noDataMessage="No escorts found."
-                    :rowClass="function ($row) {
+                <x-reusable-table :columns="$columns" :data="$escorts" :enableRowLimit="true"
+                    noDataMessage="No escorts found." :rowClass="function ($row) {
                         return $row->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
                     }" />
 

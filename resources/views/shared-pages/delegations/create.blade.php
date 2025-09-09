@@ -3,8 +3,8 @@
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('add_delegation') }}</h2>
         <a href="{{ route('delegations.index') }}"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                height="24" fill="none" viewBox="0 0 24 24">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M19 12H5m14 0-4 4m4-4-4-4" />
             </svg>
@@ -296,7 +296,8 @@
                         function ($d, $idx) {
                             return [
                                 'tmp_id' => $d['tmp_id'] ?? $idx + 1, // Ensure tmp_id is always set
-                                'title_id' => $d['title_id'] ?? '',
+                                'title_en' => $d['title_en'] ?? '',
+                                'title_ar' => $d['title_ar'] ?? '',
                                 'name_ar' => $d['name_ar'] ?? '',
                                 'name_en' => $d['name_en'] ?? '',
                                 'designation_en' => $d['designation_en'] ?? '',
@@ -330,18 +331,27 @@
                                 title="Remove delegate" @click="removeDelegate(index)"
                                 x-show="delegates.length > 0">&times;</button>
 
-                            <!-- Title -->
+                            <!-- Title en -->
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('title') }}</label>
-                                <select :name="`delegates[${index}][title_id]`"
+                                <input type="text" :name="`delegates[${index}][title_en]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
-                                    x-model="delegate.title_id">
-                                    <option value="">{{ __db('select_title') }}</option>
-                                    {!! $titleOptionsHtml !!}
-                                </select>
-                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.title_id`]">
+                                    x-model="delegate.title_en">
+                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.title_en`]">
                                     <span class="text-red-600"
-                                        x-text="window.delegatesFieldErrors[`delegates.${index}.title_id`][0]"></span>
+                                        x-text="window.delegatesFieldErrors[`delegates.${index}.title_en`][0]"></span>
+                                </div>
+                            </div>
+
+                            <!-- Title ar -->
+                            <div class="col-span-3">
+                                <label class="form-label">{{ __db('title') . ' ' . __db('ar') }}</label>
+                                <input type="text" :name="`delegates[${index}][title_ar]`"
+                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                    x-model="delegate.title_ar">
+                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.title_ar`]">
+                                    <span class="text-red-600"
+                                        x-text="window.delegatesFieldErrors[`delegates.${index}.title_ar`][0]"></span>
                                 </div>
                             </div>
 
@@ -488,6 +498,14 @@
                                         x-model="delegate.badge_printed" />
                                     <label :for="`badge-printed-${index}`"
                                         class="text-sm text-gray-700">{{ __db('badge_printed') }}</label>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" :id="`accommodation-${index}`"
+                                        :name="`delegates[${index}][accommodation]`" value="1"
+                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        x-model="delegate.accommodation" />
+                                    <label :for="`accommodation-${index}`"
+                                        class="text-sm text-gray-700">{{ __db('accommodation') }}</label>
                                 </div>
                             </span>
                         </div>

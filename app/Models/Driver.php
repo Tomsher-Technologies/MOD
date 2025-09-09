@@ -13,7 +13,8 @@ class Driver extends Model
     protected $fillable = [
         'code',
         'military_number',
-        'title',
+        'title_en',
+        'title_ar',
         'name_ar',
         'name_en',
         'phone_number',
@@ -32,11 +33,11 @@ class Driver extends Model
     public function getNameAttribute()
     {
         $lang = getActiveLanguage();
-        
+
         if ($lang !== 'en' && !empty($this->attributes['name_ar'])) {
             return $this->attributes['name_ar'];
         }
-        
+
         return $this->attributes['name_en'] ?? '';
     }
 
@@ -68,7 +69,7 @@ class Driver extends Model
             });
     }
 
-     public function title_value()
+    public function title_value()
     {
         return $this->belongsTo(DropdownOption::class, 'title_id')
             ->whereHas('dropdown', function ($q) {
@@ -100,5 +101,18 @@ class Driver extends Model
     public function currentRoomAssignment()
     {
         return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
+    }
+
+    public function getTranslation($field = '', $lang = false)
+    {
+        $lang = $lang == false ? getActiveLanguage() : $lang;
+
+        if ($lang !== 'en') {
+            $field =  $field . '_ar';
+        } else {
+            $field =  $field . '_en';
+        }
+
+        return $this->$field;
     }
 }

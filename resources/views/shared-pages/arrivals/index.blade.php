@@ -72,7 +72,9 @@
                     $columns = [
                         [
                             'label' => __db('sl_no'),
-                            'render' => fn($row, $key) => $key + 1 + (($paginator ?? $arrivals)->currentPage() - 1) * ($paginator ?? $arrivals)->perPage(),
+                            'render' => fn($row, $key) => $key +
+                                1 +
+                                (($paginator ?? $arrivals)->currentPage() - 1) * ($paginator ?? $arrivals)->perPage(),
                         ],
                         [
                             'label' => __db('delegation'),
@@ -103,22 +105,25 @@
                                 return $flag . ' ' . e($row['delegation']->country->name);
                             },
                         ],
-                        ['label' => __db('invitation_from'), 'render' => fn($row) => $row['delegation']->invitationFrom->value ?? '-'],
+                        [
+                            'label' => __db('invitation_from'),
+                            'render' => fn($row) => $row['delegation']->invitationFrom->value ?? '-',
+                        ],
                         [
                             'label' => __db('delegates'),
                             'render' => function ($row) {
-                                return collect($row['delegates'])->map(function ($delegate) {
-                                    return e($delegate->name_en);
-                                })->implode('<br>');
+                                return collect($row['delegates'])
+                                    ->map(function ($delegate) {
+                                        return e($delegate->getTranslation('title') . ". " . $delegate->getTranslation('name'));
+                                    })
+                                    ->implode('<br>');
                             },
                         ],
                         [
                             'label' => __db('escorts'),
                             'render' => function ($row) {
                                 return $row['delegation']->escorts->isNotEmpty()
-                                    ? $row['delegation']->escorts
-                                        ->map(fn($escort) => e($escort->code))
-                                        ->implode('<br>')
+                                    ? $row['delegation']->escorts->map(fn($escort) => e($escort->code))->implode('<br>')
                                     : '-';
                             },
                         ],
@@ -161,9 +166,9 @@
                                 if (empty($transportIds)) {
                                     return '-';
                                 }
-                                
+
                                 $firstTransport = $row['transports'][0];
-                                
+
                                 $arrivalData = [
                                     'ids' => $transportIds,
                                     'airport_id' => $firstTransport->airport_id,
@@ -191,7 +196,10 @@
                     $rowClass = function ($row) use ($bgClass) {
                         $now = \Carbon\Carbon::now();
 
-                        $statusName = is_object($row['status']) && isset($row['status']->value) ? $row['status']->value : $row['status'];
+                        $statusName =
+                            is_object($row['status']) && isset($row['status']->value)
+                                ? $row['status']->value
+                                : $row['status'];
 
                         if (!$row['date_time']) {
                             return $bgClass[$statusName] ?? 'bg-[#fff]';
@@ -276,11 +284,12 @@
                 </button>
             </div>
 
-            <form :action="`{{ url('mod-admin/travel-update') }}/${arrival.ids && arrival.ids.length > 0 ? arrival.ids[0] : arrival.id}`" method="POST" class="space-y-6"
-                data-ajax-form="true">
+            <form
+                :action="`{{ url('mod-admin/travel-update') }}/${arrival.ids && arrival.ids.length > 0 ? arrival.ids[0] : arrival.id}`"
+                method="POST" class="space-y-6" data-ajax-form="true">
                 @csrf
                 @method('POST')
-                
+
                 <template x-if="arrival.ids">
                     <div>
                         <template x-for="id in arrival.ids" :key="id">

@@ -131,7 +131,7 @@
                         @enderror
                     </div>
                     <button type="button" id="search-delegation-btn"
-                        class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">
+                        class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                         <svg class="pe-1 text-[#FFF]" width="25" height="25" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                 d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
