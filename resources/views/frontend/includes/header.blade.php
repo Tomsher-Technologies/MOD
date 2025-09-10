@@ -16,7 +16,7 @@
                 ];
             @endphp
 
-            @if(isset($buttonConfig[$currentRoute]) && auth()->user()->can($buttonConfig[$currentRoute]['permission']))
+            @if(isset($buttonConfig[$currentRoute]) && can($buttonConfig[$currentRoute]['permission']))
                 <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
                 class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
                     <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"

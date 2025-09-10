@@ -239,10 +239,7 @@
                             'label' => __db('action'),
                             'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row)  {
-                                $buttons = '';
-
-                                if (auth()->user() && auth()->user()->canany(['view_accommodation_delegations','hotel_view_accommodation_delegations'])) {
-                                    $buttons .=
+                                $buttons =
                                         '<a href="' .
                                         route('accommodation-delegation-view', base64_encode($row->delegation?->id ?? uniqid())) .
                                         '" class="">
@@ -252,7 +249,6 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </a>';
-                                }
                                 return $buttons;
                             },
                         ],
@@ -446,10 +442,7 @@
                             'key' => 'actions',
                             'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($escort) {
-                                $buttons = '';
-
-                                if (auth()->user() && auth()->user()->canany(['view_accommodation_delegations','hotel_view_accommodation_delegations'])) {
-                                    $buttons .=
+                                $buttons =
                                         '<a href="' .
                                         route('accommodation-delegation-view', base64_encode($escort->delegation?->id)) .
                                         '" class="">
@@ -459,7 +452,6 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </a>';
-                                }
                                 return $buttons;
                             },
                         ],
@@ -566,10 +558,7 @@
                             'key' => 'actions',
                             'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($driver) {
-                                $buttons = '';
-
-                                if (auth()->user() && auth()->user()->canany(['view_accommodation_delegations','hotel_view_accommodation_delegations'])) {
-                                    $buttons .=
+                                $buttons =
                                         '<a href="' .
                                         route('accommodation-delegation-view', base64_encode($driver->delegation?->id)) .
                                         '" class="">
@@ -579,7 +568,6 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </a>';
-                                }
                                 return $buttons;
                             },
                         ],
@@ -626,11 +614,7 @@
                             'key' => 'actions',
                             'permission' => ['assign_external_members','hotel_assign_external_members'],
                             'render' => function ($external) {
-                                $buttons = '';
-
-                                if (auth()->user() && auth()->user()->canany(['assign_external_members','hotel_assign_external_members'])) {
-                                    $buttons .=
-                                        '<a href="' . route('external-members.edit', $external->id) .
+                                $buttons = '<a href="' . route('external-members.edit', $external->id) .
                                         '" class="">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
                                             <path
@@ -638,7 +622,6 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </a>';
-                                }
                                 return $buttons;
                             },
                         ],
