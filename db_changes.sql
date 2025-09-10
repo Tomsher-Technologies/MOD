@@ -453,19 +453,19 @@
 -- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
-ALTER TABLE delegates CHANGE title_id title_en TEXT;
-ALTER TABLE delegates add column title_ar TEXT;
+-- ALTER TABLE delegates CHANGE title_id title_en TEXT;
+-- ALTER TABLE delegates add column title_ar TEXT;
 
 
 
-ALTER TABLE drivers DROP FOREIGN KEY fk_drivers_title_id;
-ALTER TABLE escorts DROP FOREIGN KEY fk_escorts_title_id;
+-- ALTER TABLE drivers DROP FOREIGN KEY fk_drivers_title_id;
+-- ALTER TABLE escorts DROP FOREIGN KEY fk_escorts_title_id;
 
-ALTER TABLE drivers CHANGE title_id title_en TEXT;
-ALTER TABLE drivers add column title_ar TEXT;
+-- ALTER TABLE drivers CHANGE title_id title_en TEXT;
+-- ALTER TABLE drivers add column title_ar TEXT;
 
-ALTER TABLE escorts CHANGE title_id title_en TEXT;
-ALTER TABLE escorts add column title_ar TEXT;
+-- ALTER TABLE escorts CHANGE title_id title_en TEXT;
+-- ALTER TABLE escorts add column title_ar TEXT;
 
 
 
@@ -474,7 +474,7 @@ INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 
--- Live
+Live
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', NULL, 'manage_news', 'Manage News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 131, 'add_news', 'Add News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 131, 'view_news', 'View News', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -520,6 +520,25 @@ ALTER TABLE `news_translations`
   INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '136', 'edit_committee', 'Edit Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
   INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '136', 'delete_committee', 'Delete Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+CREATE TABLE IF NOT EXISTS `committee_members` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id` bigint UNSIGNED DEFAULT NULL,
+  `name_en` varchar(255) DEFAULT NULL,
+  `name_ar` varchar(255) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `military_no` varchar(50) DEFAULT NULL,
+  `designation_id` bigint UNSIGNED DEFAULT NULL,
+  `committee_id` bigint UNSIGNED DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `committee_id` (`committee_id`),
+  KEY `designation_id` (`designation_id`),
+  KEY `event_id` (`event_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
   ALTER TABLE `committee_members` ADD FOREIGN KEY (`committee_id`) REFERENCES `dropdown_options`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT; ALTER TABLE `committee_members` ADD FOREIGN KEY (`designation_id`) REFERENCES `dropdown_options`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 
