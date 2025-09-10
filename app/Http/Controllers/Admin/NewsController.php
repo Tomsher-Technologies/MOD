@@ -131,7 +131,7 @@ class NewsController extends Controller
         $request->validate([
             'event_id' => 'required|exists:events,id',
             'news_date' => 'required|date',
-            'image' => 'required|image',
+            'image' => 'nullable|image',
             'title_en' => 'required|string|max:255',
             'description_en' => 'required',
             'title_ar' => 'required|string|max:255',
@@ -179,7 +179,7 @@ class NewsController extends Controller
         $news->translations()->where('lang', 'en')->update($translations['en']);
         $news->translations()->where('lang', 'ar')->update($translations['ar']);
 
-        session()->flash('success', 'News updated successfully.');
+        session()->flash('success', __db('news') . __db('updated_successfully'));
         return redirect()->route('news.index');
     }
 
@@ -194,7 +194,7 @@ class NewsController extends Controller
             }
         }
         $news->delete();
-        session()->flash('success', 'News deleted successfully.');
+        session()->flash('success', __db('news') . __db('deleted_successfully'));
         return redirect()->route('news.index');
     }
 

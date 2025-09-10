@@ -485,3 +485,77 @@ CREATE TABLE IF NOT EXISTS `news_translations` (
 
 ALTER TABLE `news_translations`
   ADD CONSTRAINT `news_translations_ibfk_1` FOREIGN KEY (`news_id`) REFERENCES `news` (`id`) ON DELETE CASCADE;
+
+  INSERT INTO `dropdowns` (`id`, `name`, `code`, `status`, `created_at`, `updated_at`) VALUES (NULL, 'Committee Designations', 'committee_designation', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `dropdowns` (`id`, `name`, `code`, `status`, `created_at`, `updated_at`) VALUES (NULL, 'Committee', 'committee', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', NULL, 'manage_committee', 'Manage Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '136', 'view_committee', 'View Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '136', 'add_committee', 'Add Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '136', 'edit_committee', 'Edit Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '136', 'delete_committee', 'Delete Committee', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  ALTER TABLE `committee_members` ADD FOREIGN KEY (`committee_id`) REFERENCES `dropdown_options`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT; ALTER TABLE `committee_members` ADD FOREIGN KEY (`designation_id`) REFERENCES `dropdown_options`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+  ALTER TABLE `committee_members` ADD `event_id` BIGINT UNSIGNED NULL DEFAULT NULL AFTER `id`;
+  ALTER TABLE `committee_members` ADD FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+  CREATE TABLE IF NOT EXISTS `event_pages` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_id` bigint UNSIGNED DEFAULT NULL,
+  `slug` varchar(20) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE `event_pages` ADD FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+CREATE TABLE IF NOT EXISTS `event_page_translations` (
+  `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+  `event_page_id` bigint UNSIGNED DEFAULT NULL,
+  `lang` varchar(5) DEFAULT NULL,
+  `title1` varchar(255) DEFAULT NULL,
+  `content1` text,
+  `title2` varchar(255) DEFAULT NULL,
+  `content2` text,
+  `title3` varchar(255) DEFAULT NULL,
+  `content3` text,
+  `title4` varchar(255) DEFAULT NULL,
+  `content4` text,
+  `title5` varchar(255) DEFAULT NULL,
+  `content5` text,
+  `title6` varchar(255) DEFAULT NULL,
+  `content6` text,
+  `title7` varchar(255) DEFAULT NULL,
+  `content7` text,
+  `title8` varchar(255) DEFAULT NULL,
+  `content8` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `event_page_id` (`event_page_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE `event_page_translations`
+  ADD CONSTRAINT `event_page_translations_ibfk_1` FOREIGN KEY (`event_page_id`) REFERENCES `event_pages` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+  ALTER TABLE `event_page_translations` ADD `image` VARCHAR(255) NULL DEFAULT NULL AFTER `content8`;
+
+  ALTER TABLE `event_page_translations` ADD `link` VARCHAR(255) NULL DEFAULT NULL AFTER `image`;
+  
+  ALTER TABLE `event_page_translations` ADD `btn_link_1` VARCHAR(255) NULL DEFAULT NULL AFTER `link`, ADD `btn_link_2` VARCHAR(255) NULL DEFAULT NULL AFTER `btn_link_1`, ADD `btn_link_3` VARCHAR(255) NULL DEFAULT NULL AFTER `btn_link_2`, ADD `btn_link_4` VARCHAR(255) NULL DEFAULT NULL AFTER `btn_link_3`;
+
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', NULL, 'manage_pages', 'Manage Pages', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '141', 'view_pages', 'View Pages', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '141', 'edit_pages', 'Edit Pages', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  ALTER TABLE `event_page_translations` ADD `title9` VARCHAR(255) NULL DEFAULT NULL AFTER `content8`;

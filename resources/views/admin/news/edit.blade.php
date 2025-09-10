@@ -22,8 +22,8 @@
                 <div class="grid grid-cols-12 gap-5">
 
                     <div class="col-span-4">
-                        <label class="form-label">{{ __db('event') }} :</label>
-                        <select name="event_id" id="event_id" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" required>
+                        <label class="form-label">{{ __db('event') }} <span class="text-red-500">*</span> :</label>
+                        <select name="event_id" id="event_id" class="select2 w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" >
                             <option value="">{{ __db('select') . ' ' . __db('event') }}</option>
                             @foreach ($events as $event)
                                 <option value="{{ $event->id }}" {{ old('event_id', $news->event_id) == $event->id ? 'selected' : '' }}>{{ $event->getTranslation('name') }}</option>
@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="col-span-4">
-                        <label class="form-label">{{ __db('news_date') }} :</label>
+                        <label class="form-label">{{ __db('news_date') }} <span class="text-red-500">*</span> :</label>
                         <input type="date" name="news_date" value="{{ old('news_date', $news->news_date) }}" class=" rounded-lg h-11  w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         @error('news_date')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="col-span-4">
-                        <label class="form-label">{{ __db('image') }} :</label>
+                        <label class="form-label">{{ __db('image') }} <span class="text-red-500">*</span> :</label>
                         <input type="file" name="image"
                             class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <img id="imagePreview" src="{{ asset(getUploadedImage($news->image)) }}" alt="Image Preview"
@@ -53,40 +53,40 @@
                         @enderror
                     </div>
                     <div class="col-span-12">
-                        <label class="form-label">{{ __db('title') }} ({{ __db('english') }}):</label>
-                        <input type="text" name="title_en"
+                        <label class="form-label">{{ __db('title') }} ({{ __db('english') }}) <span class="text-red-500">*</span> :</label>
+                        <input type="text" name="title_en" dir="ltr"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                            value="{{ old('title_en', $news->getTranslation('title', 'en')) }}" required>
+                            value="{{ old('title_en', $news->getTranslation('title', 'en')) }}" >
                         @error('title_en')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-span-12">
-                        <label class="form-label">{{ __db('title') }} ({{ __db('arabic') }}):</label>
+                        <label class="form-label">{{ __db('title') }} ({{ __db('arabic') }}) <span class="text-red-500">*</span> :</label>
                         <input type="text" name="title_ar"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                            value="{{ old('title_ar',  $news->getTranslation('title', 'ar')) }}" required>
+                            value="{{ old('title_ar',  $news->getTranslation('title', 'ar')) }}" >
                         @error('title_ar')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-span-12">
-                        <label class="form-label">{{ __db('description') }} ({{ __db('english') }}):</label>
-                        <textarea name="description_en" rows="5"
+                        <label class="form-label">{{ __db('description') }} ({{ __db('english') }}) <span class="text-xs text-neutral-500">({{ __db('optional') }})</span> <span class="text-red-500">*</span> :</label>
+                        <textarea name="description_en" rows="5" dir="ltr"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                            required>{{ old('description_en',  $news->getTranslation('description', 'en')) }}</textarea>
+                            >{{ old('description_en',  $news->getTranslation('description', 'en')) }}</textarea>
                         @error('description_en')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-span-12">
-                        <label class="form-label">{{ __db('description') }} ({{ __db('arabic') }}):</label>
+                        <label class="form-label">{{ __db('description') }} ({{ __db('arabic') }}) <span class="text-red-500">*</span> :</label>
                         <textarea name="description_ar" rows="5"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                            required>{{ old('description_ar', $news->getTranslation('description', 'ar')) }}</textarea>
+                            >{{ old('description_ar', $news->getTranslation('description', 'ar')) }}</textarea>
                         @error('description_ar')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                         @enderror

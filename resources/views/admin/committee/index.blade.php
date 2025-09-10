@@ -1,16 +1,16 @@
-@extends('layouts.admin_account', ['title' => __db('all') . ' ' . __db('news')])
+@extends('layouts.admin_account', ['title' => __db('all') . ' ' . __db('committee_members')])
 
 @section('content')
     <div class="">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="font-semibold mb-0 !text-[22px]">{{__db('all') . ' ' . __db('news') }}</h2>
+            <h2 class="font-semibold mb-0 !text-[22px]">{{__db('all') . ' ' . __db('committee_members') }}</h2>
             
         </div>
         <!-- DAdd Delegation -->
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
             <div class=" mb-4 flex items-center justify-between gap-3">
-                <form class="w-[50%] me-4" action="{{ route('news.index') }}" method="GET">
+                <form class="w-[50%] me-4" action="{{ route('committees.index') }}" method="GET">
                     <div class="relative">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -21,10 +21,10 @@
                         </div>
                         <input type="search" id="default-search" name="search" value="{{ request('search') }}"
                             class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                            placeholder="{{ __db('search_by_title') }}" />
+                            placeholder="{{ __db('search_by_name_or_email_or_phone_or_military_number') }}" />
 
                         <div class="flex">
-                            <a href="{{ route('news.index') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                            <a href="{{ route('committees.index') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                     {{ __db('reset') }}</a>
 
                             <button type="submit"
@@ -55,18 +55,29 @@
                             {{ __db('sl_no') }}
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                            {{ __db('title') }}
+                            {{ __db('name') }} ({{ __db('english') }})
+                        </th>
+                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('name') }} ({{ __db('arabic') }})
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                            {{ __db('image') }}
+                            {{ __db('email') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                            {{ __db('phone') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                            {{ __db('military_number') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                            {{ __db('designation') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                            {{ __db('committee') }}
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('event') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
-                            {{ __db('date') }}
-                        </th>
-
                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('status') }}</th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                             {{ __db('actions') }}
@@ -74,27 +85,42 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($news as $key => $new)
+                    @forelse ($committee_members as $key => $com)
                         <tr class="text-[12px] align-[middle]">
-                            <td class="px-4 py-2 border text-center border-gray-200">{{ $news->firstItem() + $key }}</td>
+                            <td class="px-4 py-2 border text-center border-gray-200">{{ $committee_members->firstItem() + $key }}</td>
                             <td class="px-4 py-3 border border-gray-200">
-                                {{ $new->getTranslation('title') ?? '' }}
+                                {{ $com->name_en ?? '' }}
+                            </td>
+
+                            <td class="px-4 py-3 border border-gray-200">
+                                {{ $com->name_ar ?? '' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200">
-                                <img src="{{ asset(getUploadedImage($new->image)) }}" class="h-20 w-20">
+                                {{ $com->email ?? '' }}
                             </td>
                             <td class="px-4 border text-center border-gray-200 py-3">
-                                {{ $new->event?->name_en ?? '' }}
+                                {{ $com->phone ?? '' }}
                             </td>
                             <td class="px-4 border text-center border-gray-200 py-3">
-                                {{ $new->news_date ? \Carbon\Carbon::parse($new->news_date)->format('d M Y') : '-' }}
+                                {{ $com->military_no ?? '' }}
+                            </td>
+                            <td class="px-4 border text-center border-gray-200 py-3">
+                                {{ $com->designation->value ?? '' }}
+                            </td>
+                            
+
+                            <td class="px-4 border text-center border-gray-200 py-3">
+                                {{ $com->committee->value ?? '' }}
+                            </td>
+                            <td class="px-4 border text-center border-gray-200 py-3">
+                                {{ $com->event?->getTranslation('name') ?? '' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200 text-center">
-                                @can('edit_news')
+                                @can('edit_committee')
                                     <div class=" items-center">
                                         <label for="switch-{{ $key }}" class="relative inline-block w-11 h-6">
-                                            <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $new->id }}"
-                                                class="sr-only peer" {{ $new->status == 1 ? 'checked' : '' }} />
+                                            <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $com->id }}"
+                                                class="sr-only peer" {{ $com->status == 1 ? 'checked' : '' }} />
 
                                             <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
@@ -105,8 +131,8 @@
                             
                             <td class="px-4 py-3 border text-center border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @canany(['edit_news'])
-                                        <a href="{{ route('news.edit', $new->id) }}">
+                                    @canany(['edit_committee'])
+                                        <a href="{{ route('committees.edit', $com->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
                                                 <path
@@ -116,12 +142,12 @@
                                         </a>
                                     @endcanany
 
-                                    @canany(['delete_news'])
-                                        <form action="{{ route('news.destroy', $new->id) }}"
-                                            method="POST" class="delete-news-form">
+                                    @canany(['delete_committee'])
+                                        <form action="{{ route('committees.destroy', $com->id) }}"
+                                            method="POST" class="delete-committee-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="delete-news text-red-600 hover:text-red-800">
+                                            <button class="delete-committee text-red-600 hover:text-red-800">
                                                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                     fill="none" viewBox="0 0 24 24">
                                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -145,13 +171,11 @@
                 </tbody>
             </table>
             <div class="mt-4">
-                {{ $news->appends(request()->input())->links() }}
+                {{ $committee_members->appends(request()->input())->links() }}
             </div>
         </div>
 
-       <div id="filter-drawer"
-            class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
-            tabindex="-1" aria-labelledby="drawer-label">
+        <div id="filter-drawer" class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80" tabindex="-1" aria-labelledby="drawer-label">
             <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
                 {{ __db('filter') }}</h5>
             <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
@@ -164,8 +188,9 @@
                 <span class="sr-only">{{ __db('close_menu') }}</span>
             </button>
 
-            <form action="{{ route('news.index') }}" method="GET">
+            <form action="{{ route('committees.index') }}" method="GET">
                 <div class="flex flex-col gap-2 mt-2">
+
                     <div class="flex flex-col">
                         <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('event') }}</label>
                         <select name="event_id" id="event_id" class="select2 w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" data-placeholder="{{ __db('select') . ' ' . __db('event') }}">
@@ -177,14 +202,27 @@
                     </div>
 
                     <div class="flex flex-col">
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('news_date') }}</label>
-                        <input type="text" class="form-control date-range" id="date_range" name="date_range"
-                    placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
-                    data-separator=" to " autocomplete="off"  value="{{ request('date_range') ?? '' }}">
+                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('designation') }}</label>
+                        <select name="designation_id" id="designation_id" class="select2 w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" data-placeholder="{{ __db('select') . ' ' . __db('designation') }}">
+                            <option value="">{{ __db('select') . ' ' . __db('designation') }}</option>
+                            @foreach ($designations as $des)
+                                <option value="{{ $des->id }}" {{ request('designation_id') == $des->id ? 'selected' : '' }}>{{ $des->value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                   <div class="flex flex-col">
+                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('committee') }}</label>
+                        <select name="committee_id" id="committee_id" class="select2 w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" data-placeholder="{{ __db('select') . ' ' . __db('committee') }}">
+                            <option value="">{{ __db('select') . ' ' . __db('committee') }}</option>
+                            @foreach ($committees as $com)
+                                <option value="{{ $com->id }}" {{ request('committee_id') == $com->id ? 'selected' : '' }}>{{ $com->value }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-6">
-                    <a href="{{ route('news.index') }}"
+                    <a href="{{ route('committees.index') }}"
                         class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
                     <button type="submit"
                         class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
@@ -202,7 +240,7 @@
         } else {
             var status = 0;
         }
-        $.post('{{ route('news.status') }}', {
+        $.post('{{ route('committees.status') }}', {
             _token: '{{ csrf_token() }}',
             id: el.value,
             status: status
@@ -223,7 +261,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".delete-news").forEach(button => {
+        document.querySelectorAll(".delete-committee").forEach(button => {
             button.addEventListener("click", function (e) {
                 e.preventDefault();
 

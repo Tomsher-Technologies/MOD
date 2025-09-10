@@ -79,6 +79,11 @@
                         'link' => route('news.create'),
                         'permission' => ['add_news'],
                     ],
+                    'committees.index' => [
+                        'text' => __db('add_committee_member'),
+                        'link' => route('committees.create'),
+                        'permission' => ['add_committee'],
+                    ],
                 ];
                 $config = $buttonConfig[$currentRoute] ?? null;
             @endphp
