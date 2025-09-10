@@ -7,7 +7,7 @@
         </div>
 
         <div>
-            @can('add_dropdown_options')
+            @directCan('add_dropdown_options')
                 <button data-modal-target="add-country" data-modal-toggle="add-country"
                     class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg ">
                     <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -17,7 +17,7 @@
                     </svg>
                     <span>{{ __db('add_country') }}</span>
                 </button>
-            @endcan
+            @enddirectCan
         </div>
 
     </div>

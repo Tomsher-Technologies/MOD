@@ -116,7 +116,7 @@
                                 {{ $com->event?->getTranslation('name') ?? '' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200 text-center">
-                                @can('edit_committee')
+                                @directCan('edit_committee')
                                     <div class=" items-center">
                                         <label for="switch-{{ $key }}" class="relative inline-block w-11 h-6">
                                             <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $com->id }}"
@@ -126,12 +126,12 @@
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                         </label>
                                     </div>
-                                @endcan
+                                @enddirectCan
                             </td>
                             
                             <td class="px-4 py-3 border text-center border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @canany(['edit_committee'])
+                                    @directCanany(['edit_committee'])
                                         <a href="{{ route('committees.edit', $com->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
@@ -140,9 +140,9 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </a>
-                                    @endcanany
+                                    @enddirectCanany
 
-                                    @canany(['delete_committee'])
+                                    @directCanany(['delete_committee'])
                                         <form action="{{ route('committees.destroy', $com->id) }}"
                                             method="POST" class="delete-committee-form">
                                             @csrf
@@ -156,7 +156,7 @@
                                                 </svg>
                                             </button>
                                         </form>
-                                    @endcanany
+                                    @enddirectCanany
                                 </div>
                             </td>
                         </tr>

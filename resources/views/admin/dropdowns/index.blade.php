@@ -5,7 +5,7 @@
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('dynamic_contents') }}</h2>
 
         <div class="flex items-center">
-            @can('add_dropdown_options')
+            @directCan('add_dropdown_options')
                 <a href="{{ route('countries.index') }}"
                     class="btn me-4 text-sm mb-[-10px] border !border-[#a57d30] text-[#a57d30] rounded-lg ">
                     <span class="mr-2">{{ __db('countries') }}</span>
@@ -21,7 +21,7 @@
 
                     <span class="mr-2">{{ __db('bulk_import_options') }}</span>
                 </a>
-            @endcan
+            @enddirectCan
         </div>
     </div>
 
@@ -65,13 +65,13 @@
                                 </td>
                                 <td class="border border-gray-200 px-4 py-3">
                                     <div class=" text-center gap-5">
-                                        @can('edit_role')
+                                        @directCan('edit_role')
                                             <a href="{{ route('dropdowns.options.show', $dropdown) }}"
                                                 class="btn me-8 text-xs px-4 py-2 !bg-[#B68A35] text-white rounded-lg">
 
                                                 <span>{{ __db('view_options') }}</span>
                                             </a>
-                                        @endcan
+                                        @enddirectCan
                                     </div>
                                 </td>
                             </tr>

@@ -521,21 +521,21 @@
 
                 <div class="flex gap-4">
 
-                    @canany(['add_delegations', 'delegate_add_delegations'])
+                    @directCanany(['add_delegations', 'delegate_add_delegations'])
                         <button type="submit" name="submit_exit" value="1"
                             class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit') }}</button>
-                    @endcanany
+                    @enddirectCanany
 
-                    @canany(['add_travels', 'delegate_add_delegates'])
+                    @directCanany(['add_travels', 'delegate_add_delegates'])
                         <button type="submit" name="submit_add_travel" value="2"
                             class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_flight') }}</button>
-                    @endcanany
+                    @enddirectCanany
 
 
-                    @canany(['add_interviews', 'delegate_add_delegates'])
+                    @directCanany(['add_interviews', 'delegate_add_delegates'])
                         <button type="submit" name="submit_add_interview" value="3"
                             class="btn text-md !bg-[#D7BC6D] text-white rounded-lg h-12 px-8 submit-btn">{{ __db('submit_add_interview') }}</button>
-                    @endcanany
+                    @enddirectCanany
 
                 </div>
             </div>

@@ -159,7 +159,8 @@ function getUnreadNotificationCount()
 
 function getAdminEventLogo()
 {
-    $defaultEventLogo = Event::where('is_default', 1)->value('logo');
+    $eventId = session('current_event_id', getDefaultEventId() ?? null);
+    $defaultEventLogo = Event::where('id', $eventId)->value('logo');
 
     if ($defaultEventLogo) {
         $relativePath = str_replace('/storage/', '', $defaultEventLogo);
@@ -588,7 +589,10 @@ if (!function_exists('can')) {
         $permissions = is_array($permissions) ? $permissions : [$permissions];
 
         foreach ($permissions as $permission) {
-            if ($user->can($permission)) {
+            // if ($user->can($permission)) {
+            //     return true;
+            // }
+             if ($user->getDirectPermissions()->pluck('name')->contains($permission)) {
                 return true;
             }
         }

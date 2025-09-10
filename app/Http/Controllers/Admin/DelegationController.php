@@ -11,6 +11,7 @@ use App\Models\DelegationAttachment;
 use App\Models\Dropdown;
 use App\Models\Interview;
 use App\Models\InterviewMember;
+use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
 use App\Exports\BadgePrintedDelegatesExport;
 use App\Exports\NonBadgePrintedDelegatesExport;
@@ -320,7 +321,15 @@ class DelegationController extends Controller
             ->where('delegation_id', $id)
             ->get();
 
-        return view('admin.delegations.show', compact('delegation'));
+        $hotels = Accommodation::where('status', 1)
+                    ->whereHas('rooms', function ($q) {
+                        $q->where('available_rooms', '>', 0);
+                    })
+                    ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
+                    ->orderBy('hotel_name', 'asc')
+                    ->get();
+
+        return view('admin.delegations.show', compact('delegation','hotels'));
     }
 
     public function arrivalsIndex(Request $request)

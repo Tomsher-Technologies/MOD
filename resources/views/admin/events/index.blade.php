@@ -99,7 +99,7 @@
                             </td>
 
                             <td class="px-4 py-3 text-center " dir="ltr">
-                                @can('edit_event')
+                                @directCan('edit_event')
                                     <a href="{{ route('events.edit',  ['id' => base64_encode($event->id)]) }}" title="{{ __db('edit') }}" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
                                             <path
@@ -107,16 +107,16 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </a>
-                                @endcan
+                                @enddirectCan
 
-                                @can('view_event')
+                                @directCan('view_event')
                                     <a href="{{ route('events.show',  ['id' => base64_encode($event->id)]) }}" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 12" fill="none">
                                             <path d="M6.73242 5.98193C6.73242 6.37976 6.89046 6.76129 7.17176 7.04259C7.45307 7.3239 7.8346 7.48193 8.23242 7.48193C8.63025 7.48193 9.01178 7.3239 9.29308 7.04259C9.57439 6.76129 9.73242 6.37976 9.73242 5.98193C9.73242 5.58411 9.57439 5.20258 9.29308 4.92127C9.01178 4.63997 8.63025 4.48193 8.23242 4.48193C7.8346 4.48193 7.45307 4.63997 7.17176 4.92127C6.89046 5.20258 6.73242 5.58411 6.73242 5.98193Z" stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                             <path d="M14.9824 5.98193C13.1824 8.98193 10.9324 10.4819 8.23242 10.4819C5.53242 10.4819 3.28242 8.98193 1.48242 5.98193C3.28242 2.98193 5.53242 1.48193 8.23242 1.48193C10.9324 1.48193 13.1824 2.98193 14.9824 5.98193Z" stroke="#7C5E24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
                                     </a>
-                                @endcan
+                                @enddirectCan
                             </td>
                         </tr>
                     @empty
