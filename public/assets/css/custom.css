@@ -6051,6 +6051,7 @@ h6, .h6 {
 /* === sidebar css start === */
 .sidebar{
   position: fixed;
+  overflow-y: scroll;
   inset-inline-start: -105%;
   top: 0px;
   z-index: 30;

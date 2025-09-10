@@ -215,6 +215,56 @@
                 </li>
             @endcanany
 
+            @canany(['manage_news'])
+                <li>
+                    <a href="{{ route('news.index') }}"
+                        class="{{ areActiveRoutes(['news.index', 'news.edit', 'news.create']) }}">
+                        <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                    d="M7 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2z" />
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                    d="M8 8h8M8 12h5" />
+                        </svg>
+
+                        <span class="text-md">{{ __db('news') }}</span>
+                    </a>
+                </li>
+            @endcanany
+
+            @canany(['manage_committee'])
+                <li>
+                    <a href="{{ route('committees.index') }}"
+                        class="{{ areActiveRoutes(['committees.index', 'committees.edit', 'committees.create']) }}">
+                        <!-- user + envelope badge (square canvas) -->
+                        <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0v.75H4.5v-.75z" />
+                            <circle cx="17" cy="17" r="3.6" fill="currentColor" />
+                            <rect x="14" y="15" width="6" height="4" rx="0.6" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 15l3 2 3-2" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <span class="text-md">{{ __db('committees') }}</span>
+                    </a>
+                </li>
+            @endcanany
+
+            @canany(['manage_pages'])
+                <li>
+                    <a href="{{ route('event_pages.index') }}"
+                        class="{{ areActiveRoutes(['event_pages.index', 'event_pages.edit']) }}">
+                        <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0v.75H4.5v-.75z" />
+                            <circle cx="17" cy="17" r="3.6" fill="currentColor" />
+                            <rect x="14" y="15" width="6" height="4" rx="0.6" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 15l3 2 3-2" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        </svg>
+                        <span class="text-md">{{ __db('pages') }}</span>
+                    </a>
+                </li>
+            @endcanany
+
+
             @canany(['manage_staff'])
                 <li>
                     <a href="{{ route('staffs.index') }}"

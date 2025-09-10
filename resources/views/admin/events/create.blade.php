@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('event')])
 
 @section('content')
-<div class="dashboard-main-body ">
+<div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('create_new_event') }}</h2>
         <a href="{{ route('events.index') }}" id="add-attachment-btn" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
