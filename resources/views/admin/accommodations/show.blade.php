@@ -66,7 +66,7 @@
                         @endphp
                         @if($hotel->rooms)
                             @foreach ($hotel->rooms as $room)
-                                <div class="mb-2">{{ $room->roomType->value ?? "-" }} - {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
+                                <div class="mb-2">{{ $room->roomType?->value ?? "-" }} - {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
                                 @php
                                     $total_rooms += $room->total_rooms;
                                     $assigned_rooms += $room->assigned_rooms;
@@ -154,7 +154,7 @@
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
                                     : '';
                                 $name = $row->assignable?->name_en ?: '';
-                                return $teamHeadBadge . '<div class="block">' . $row->assignable?->title->value .' '.e($name) . '</div>';
+                                return $teamHeadBadge . '<div class="block">' . $row->assignable?->title?->value .' '.e($name) . '</div>';
                             },
                         ],
                         [
@@ -177,11 +177,11 @@
                         ],
                         [
                             'label' => __db('internal_ranking'),
-                            'render' => fn($row) => $row->assignable?->internalRanking->value ?? '-',
+                            'render' => fn($row) => $row->assignable?->internalRanking?->value ?? '-',
                         ],
                         [
                             'label' => __db('gender'),
-                            'render' => fn($row) => $row->assignable?->gender->value ?? '-',
+                            'render' => fn($row) => $row->assignable?->gender?->value ?? '-',
                         ],
                         [
                             'label' => __db('parent_id'),
@@ -193,7 +193,7 @@
                         ],
                         [
                             'label' => __db('relationship'),
-                            'render' => fn($row) => $row->assignable?->relationship->value ?? '-',
+                            'render' => fn($row) => $row->assignable?->relationship?->value ?? '-',
                         ],
                         [
                             'label' => __db('badge_printed'),
@@ -295,7 +295,7 @@
                                         @if ($arrival)
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                                                <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
+                                                <p class="text-base">{{ $arrival->airport?->value ?? '-' }}</p>
                                             </div>
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
@@ -322,7 +322,7 @@
                                         @if ($departure)
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                                                <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
+                                                <p class="text-base">{{ $departure->airport?->value ?? '-' }}</p>
                                             </div>
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>

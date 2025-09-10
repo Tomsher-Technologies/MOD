@@ -79,15 +79,13 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <table class="table-auto mb-0 border-collapse border border-gray-300 w-full">
+                {{-- <table class="table-auto mb-0 border-collapse border border-gray-300 w-full">
                     <thead>
                         <tr class="text-[13px]">
                             @canany(['assign_accommodations', 'hotel_assign_accommodations'])
                                 <th scope="col"
                                     class="p-2 w-[30px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                    {{-- <input type="checkbox"
-                                    class="w-4 h-4 accent-[#B68A35] border border-white bg-transparent rounded focus:ring-white" />
-                                --}}
+                                    
                                 </th>
                             @endcanany
                             <th scope="col"
@@ -129,10 +127,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- @php
-                        echo '
-                        <pre>'; print_r($delegation->delegates);die;
-                        @endphp --}}
+                        
                         @forelse ($delegation->delegates as $key => $row)
                             @php
                                 $id = $row->id ?? uniqid();
@@ -146,6 +141,7 @@
 
                             <tr data-id="{{ $row->id }}"
                                 class="delegate-row text-[12px] align-[middle] @if ($row->accommodation == 0) bg-[#e5e5e5] @elseif($room) bg-[#acf3bc] @endif">
+
                                 @canany(['assign_accommodations', 'hotel_assign_accommodations'])
                                     <td class="px-1 py-2 border border-gray-200">
                                         @if ($row->accommodation == 1)
@@ -155,6 +151,7 @@
                                         @endif
                                     </td>
                                 @endcanany
+
                                 <td class="px-1 py-2 border border-gray-200">{{ $key + 1 }}</td>
                                 <td class="px-1 border border-gray-200 py-3">
 
@@ -247,7 +244,179 @@
 
 
                     </tbody>
-                </table>
+                </table> --}}
+
+                @php
+                    $columns = [
+                        [
+                            'label' => '',
+                            'permission' =>['assign_accommodations', 'hotel_assign_accommodations'],
+                            'render' => function ($row) {
+
+                                if ($row->accommodation == 1){
+                                    return '<input type="checkbox" class="assign-hotel-checkbox"
+                                        data-delegate-id="' . e($row->id) . '" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">';
+                                }
+                                 
+                            },
+                        ],
+                        [
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('name_en'),
+                            'render' => function ($row) {
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                                    : '';
+                                $name = $row->name_en;
+                                $title = $row->title_en;
+                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('name_ar'),
+                            'render' => function ($row) {
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                                    : '';
+                                $name = $row->name_ar;
+                                $title = $row->title_ar;
+                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
+                            },
+                        ],
+                        [
+                            'label' => __db('designation'),
+                            'render' => fn($row) => $row->getTranslation('designation') ?? '-',
+                        ],
+                        [
+                            'label' => __db('internal_ranking'),
+                            'render' => fn($row) => $row->internalRanking?->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('gender'),
+                            'render' => fn($row) => $row->gender?->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('parent_id'),
+                            'render' => fn($row) => $row->parent?->getTranslation('name') ?? '-',
+                        ],
+                        [
+                            'label' => __db('relationship'),
+                            'render' => fn($row) => $row->relationship?->value ?? '-',
+                        ],
+                        [
+                            'label' => __db('badge_printed'),
+                            'render' => fn($row) => $row->badge_printed ? 'Yes' : 'No',
+                        ],
+                        [
+                            'label' => __db('participation_status'),
+                            'render' => function ($row) {
+                                return $row->participation_status ?? '-';
+                            },
+                        ],
+                       
+                        [
+                            'label' => __db('arrival_status'),
+                            'render' => function ($row) {
+                                $id = $row->id ?? uniqid();
+                                return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
+                                    $id .
+                                    '" data-modal-toggle="delegate-transport-modal-' .
+                                    $id .
+                                    '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
+                            },
+                        ],
+
+                        [
+                            'label' => __db('hotel'),
+                            'render' => function ($row) {
+                                $room = $row->currentRoomAssignment ?? null;
+                                return '<span class="hotel_name">'.$room?->hotel?->hotel_name.'</span>
+                                    <input type="hidden" name="hotel_id" id="hotel_id'. $row->id.'"
+                                        class="hotel-id-input" data-delegate-id="'. $row->id.'"
+                                        value="'.$room?->hotel_id.'">';
+                            },
+                        ],
+
+                        [
+                            'label' => __db('room_type'),
+                            'render' => function ($row) {
+                                $room = $row->currentRoomAssignment ?? null;
+                                if ($row->accommodation == 1){
+                                    $options = '';
+                                    if ($room) {
+                                        $hotelid = $room->hotel_id;
+                                        $roomTypes = App\Models\AccommodationRoom::with('roomType')
+                                            ->where('accommodation_id', $hotelid)
+                                            ->get();
+                                        foreach ($roomTypes as $roomType) {
+                                            $options .=
+                                                '<option value="' .
+                                                $roomType->id .
+                                                '" ' .
+                                                ($roomType->id == $room->room_type_id ? 'selected' : '') .
+                                                '>' .
+                                                $roomType->roomType?->value .
+                                                '</option>';
+                                        }
+                                    }
+
+                                    return '<select name="room_type" id="room_type'. $row->id.'"
+                                        class="room-type-dropdown p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                        <option value="">' . __db('select') . '</option>
+                                        ' . $options . '
+                                    </select>';
+                                }
+                            },
+                        ],
+
+                        [
+                            'label' => __db('room_number'),
+                            'render' => function ($row) {
+                                
+                                if ($row->accommodation == 1){
+                                    $room = $row->currentRoomAssignment ?? null;
+                                    return '<input type="text" name="room_number" id="room_number'. $row->id.'"
+                                        class="room-number-input w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                        value="'.$room?->room_number.'">';
+                                }                            },
+                        ],
+                        [
+                            'label' => __db('action'),
+                            'permission' =>['assign_accommodations', 'hotel_assign_accommodations'],
+                            'render' => function ($row) {
+
+                                if ($row->accommodation == 1){
+                                    return '<div class="flex items-center gap-5">
+                                                <a href="#" id="add-attachment-btn"
+                                                    class="save-room-assignment text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                                    <span>'.__db('save').' </span>
+                                                </a>
+                                            </div>';
+                                }
+                                 
+                            },
+                        ],
+                    ];
+                    $data = $delegation->delegates;
+                    
+                    $noDataMessage = __db('no_delegates_found');
+                @endphp
+
+                <x-reusable-table :columns="$columns" table-id="delegatesTable" :enableColumnListBtn="true" :data="$data"
+                    :noDataMessage="$noDataMessage" :rowClass="function ($row)  {
+                        $room = $row->currentRoomAssignment ?? null;
+
+                        if ($row->accommodation == 0){
+                            return 'bg-[#e5e5e5]';
+                        }elseif($room){
+                            return 'bg-[#acf3bc]';
+                        } 
+                    }" />
+
+
                 <hr class="my-5">
                 <div class="flex items-center justify-start gap-6">
 
@@ -645,7 +814,213 @@
         </div>
     </div>
 
+
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }} ({{ $delegation->interviews->count() }})</h2>
+
+    @php
+        $columns = [
+            [
+                'label' => __db('sl_no'),
+                'render' => fn($row, $key) => $key + 1,
+            ],
+            [
+                'label' => 'Date & Time',
+                'render' => fn($row) => $row->date_time
+                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                    : '-',
+            ],
+            [
+                'label' => 'Attended By',
+                'render' => function ($row) {
+                    $attendees = $row->interviewMembers->where('type', 'from');
+                    $names = $attendees
+                        ->map(fn($im) => e($im->resolveMemberForInterview($row)?->getTranslation('name') ?? '-'))
+                        ->filter()
+                        ->implode('<br>');
+                    return $names ?: '-';
+                },
+            ],
+            [
+                'label' => __db('interview_with'),
+                'render' => function ($row) {
+                    if (!empty($row->other_member_id) && $row->otherMember) {
+                        $otherMemberName = $row->otherMember->name ?? '';
+                        $otherMemberId = $row->otherMember->getTranslation('name') ?? $row->other_member_id;
+                        if ($otherMemberId) {
+                            $with =
+                                '<a href="' .
+                                route('other-interview-members.show', [
+                                    'other_interview_member' => base64_encode($otherMemberId),
+                                ]) .
+                                '" class="!text-[#B68A35]">
+                                    <span class="block">Other Member: ' .
+                                e($otherMemberId) .
+                                '</span>
+                                </a>';
+                        }
+                    } else {
+                        $with =
+                            '<a href="' .
+                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                            '" class="!text-[#B68A35]">' .
+                            'Delegation ID : ' .
+                            e($row->interviewWithDelegation->code ?? '') .
+                            '</a>';
+                    }
+
+                    $names = $row->interviewMembers
+                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                        ->implode('');
+
+                    return $with . $names;
+                },
+            ],
+            ['label' => 'Status', 'render' => fn($row) => e(ucfirst($row->status?->value))],
+        ];
+        $data = $delegation->interviews ?? collect();
+        $noDataMessage = __db('no_data_found');
+    @endphp
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <x-reusable-table :columns="$columns" table-id="interviewsTable" :data="$data" :noDataMessage="$noDataMessage" />
+            </div>
+        </div>
+    </div>
+
+
+    <hr class="mx-6 border-neutral-200 h-10">
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('attachments') }} ({{ $delegation->attachments->count() }})
+    </h2>
+
+    @php
+        $columns = [
+            [
+                'label' => __db('sl_no'),
+                'render' => fn($row, $key) => $key + 1,
+            ],
+            [
+                'label' => __db('title'),
+                'render' => fn($row) => $row->title?->value ?? '-',
+            ],
+            // [
+            //     'label' => __db('file_name'),
+            //     'render' => fn($row) => $row->file_name ?? '-',
+            // ],
+            [
+                'label' => __db('uploaded_file'),
+                'render' => function ($row) {
+                    $fileUrl = $row->file_path ? asset('storage/' . $row->file_path) : '#';
+                    $fileName = e($row->file_name);
+                    return '<a href="' .
+                        $fileUrl .
+                        '" target="_blank" class="font-medium !text-[#B68A35]">' .
+                        $fileName .
+                        '</a>';
+                },
+            ],
+            [
+                'label' => __db('uploaded_date'),
+                'render' => fn($row) => $row->created_at ? $row->created_at->format('d-m-Y') : '-',
+            ],
+            [
+                'label' => __db('document_date'),
+                'render' => fn($row) => $row->document_date ?? '-',
+            ],
+        ];
+
+        $data = $delegation->attachments;
+        $noDataMessage = __db('no_attachments_found');
+    @endphp
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+        <div class="xl:col-span-12 h-full">
+            <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                <x-reusable-table :columns="$columns" table-id="attachmentsTable" :data="$data"
+                    :noDataMessage="$noDataMessage" />
+            </div>
+        </div>
+    </div>
 </div>
+
+ @foreach ($delegation->delegates as $delegate)
+        <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
+            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative w-full max-w-2xl mx-auto">
+                <div class="bg-white rounded-lg shadow ">
+                    <div class="flex items-start justify-between p-4 border-b rounded-t">
+                        <h3 class="text-xl font-semibold text-gray-900">{{ __db('transport_information_for') }}
+                            {{ $delegate->name_en ?? '-' }}</h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
+                            data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-6">
+                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
+                        @php
+                            $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                        @endphp
+                        <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
+                            @if ($arrival)
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                                    <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
+                                </div>
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                    <p class="text-base">{{ $arrival->flight_no ?? '-' }}</p>
+                                </div>
+                                <div class="py-4 border-b md:border-b-0">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                    <p class="text-base">{{ $arrival->flight_name ?? '-' }}</p>
+                                </div>
+                                <div class="py-4 !pb-0">
+                                    <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                    <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
+                                </div>
+                            @else
+                                <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
+                            @endif
+                        </div>
+
+                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
+                        @php
+                            $departure = $delegate->delegateTransports->where('type', 'departure')->first();
+                        @endphp
+                        <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
+                            @if ($departure)
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                    <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
+                                </div>
+                                <div class="border-b py-4">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                    <p class="text-base">{{ $departure->flight_no ?? '-' }}</p>
+                                </div>
+                                <div class="py-4 border-b md:border-b-0">
+                                    <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                    <p class="text-base">{{ $departure->flight_name ?? '-' }}</p>
+                                </div>
+                                <div class="py-4 !pb-0">
+                                    <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                    <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
+                                </div>
+                            @else
+                                <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
 @section('script')
     <script>

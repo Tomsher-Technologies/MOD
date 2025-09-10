@@ -46,10 +46,24 @@
             @endcanany
 
             @canany(['manage_delegations', 'delegate_manage_delegations', 'escort_manage_delegations',
-                'driver_manage_delegations', 'hotel_manage_delegations'])
+                'driver_manage_delegations'])
                 <li>
                     <a href="{{ route('delegations.index') }}"
                         class="{{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit','delegations.show']) }}">
+                        <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36"
+                            height="30" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                d="M15 17h3a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3m4-9h2m-2 3h2m-6 0h.01M12 17v.01" />
+                        </svg>
+                        <span class="text-md">{{ __db('delegations') }}</span>
+                    </a>
+                </li>
+            @endcanany
+
+            @canany(['hotel_manage_delegations'])
+                <li>
+                    <a href="{{ route('accommodation-delegations') }}"
+                        class="{{ areActiveRoutes(['accommodation-delegations', 'accommodation-delegation-view']) }}">
                         <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36"
                             height="30" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
