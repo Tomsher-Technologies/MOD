@@ -1033,72 +1033,75 @@
                 let url = "{{ route('accommodation.rooms', ':id') }}";
                 url = url.replace(':id', hotelId);
 
-                $.get(url, function(data) {
-                    let html = '';
-                    let hotelName = '';
-                    if (data.length > 0) {
-                        data.forEach(r => {
-                            hotelName = r.accommodation?.hotel_name ?? '';
-                            let available = r.total_rooms - r.assigned_rooms;
-                            html += `
-                            <tr class="text-[12px]">
-                                <td class="p-2 border">${r.room_type?.value ?? '-'}</td>
-                                <td class="p-2 border text-center">${r.total_rooms}</td>
-                                <td class="p-2 border text-center">${r.assigned_rooms}</td>
-                                <td class="p-2 border text-center font-semibold">${available}</td>
-                            </tr>
-                        `;
-                        });
-                    } else {
-                        html =
-                            `<tr><td colspan="4" class="p-2 border text-center">{{ __db('no_rooms_found') }}</td></tr>`;
-                    }
+                if(hotelId){
+                    $.get(url, function(data) {
+                        let html = '';
+                        let hotelName = '';
+                        if (data.length > 0) {
+                            data.forEach(r => {
+                                hotelName = r.accommodation?.hotel_name ?? '';
+                                let available = r.total_rooms - r.assigned_rooms;
+                                html += `
+                                <tr class="text-[12px]">
+                                    <td class="p-2 border">${r.room_type?.value ?? '-'}</td>
+                                    <td class="p-2 border text-center">${r.total_rooms}</td>
+                                    <td class="p-2 border text-center">${r.assigned_rooms}</td>
+                                    <td class="p-2 border text-center font-semibold">${available}</td>
+                                </tr>
+                            `;
+                            });
+                        } else {
+                            html =
+                                `<tr><td colspan="4" class="p-2 border text-center">{{ __db('no_rooms_found') }}</td></tr>`;
+                        }
 
-                    if (section == 'Delegate') {
-                        $('#hotelNameDelegate').html(hotelName);
-                        $('#roomDetails').html(html);
-                        $('#HotelInfo').show();
+                        if (section == 'Delegate') {
+                            $('#hotelNameDelegate').html(hotelName);
+                            $('#roomDetails').html(html);
+                            $('#HotelInfo').show();
 
-                        $('#hotelNameEscort').html('');
-                        $('#roomDetailsEscort').html('');
-                        $('#HotelInfoEscort').hide();
-                        $('#hotelEscort').val('').trigger('change');;
+                            $('#hotelNameEscort').html('');
+                            $('#roomDetailsEscort').html('');
+                            $('#HotelInfoEscort').hide();
+                            $('#hotelEscort').val('').trigger('change');
 
-                        $('#hotelNameDriver').html('');
-                        $('#roomDetailsDriver').html('');
-                        $('#HotelInfoDriver').hide();
-                        $('#hotelDriver').val('').trigger('change');;
-                    }else if (section == 'Escort') {
-                        $('#hotelNameEscort').html(hotelName);
-                        $('#roomDetailsEscort').html(html);
-                        $('#HotelInfoEscort').show();
+                            $('#hotelNameDriver').html('');
+                            $('#roomDetailsDriver').html('');
+                            $('#HotelInfoDriver').hide();
+                            $('#hotelDriver').val('').trigger('change');
+                        }else if (section == 'Escort') {
+                            $('#hotelNameEscort').html(hotelName);
+                            $('#roomDetailsEscort').html(html);
+                            $('#HotelInfoEscort').show();
 
-                        $('#hotelNameDelegate').html('');
-                        $('#roomDetails').html('');
-                        $('#HotelInfo').hide();
-                        $('#hotelDelegate').val('').trigger('change');;
+                            $('#hotelNameDelegate').html('');
+                            $('#roomDetails').html('');
+                            $('#HotelInfo').hide();
+                            $('#hotelDelegate').val('').trigger('change');
 
-                        $('#hotelNameDriver').html('');
-                        $('#roomDetailsDriver').html('');
-                        $('#HotelInfoDriver').hide();
-                        $('#hotelDriver').val('').trigger('change');;
-                    }else if (section == 'Driver') {
-                        $('#hotelNameDriver').html(hotelName);
-                        $('#roomDetailsDriver').html(html);
-                        $('#HotelInfoDriver').show();
+                            $('#hotelNameDriver').html('');
+                            $('#roomDetailsDriver').html('');
+                            $('#HotelInfoDriver').hide();
+                            $('#hotelDriver').val('').trigger('change');
+                        }else if (section == 'Driver') {
+                            $('#hotelNameDriver').html(hotelName);
+                            $('#roomDetailsDriver').html(html);
+                            $('#HotelInfoDriver').show();
 
-                        $('#hotelNameDelegate').html('');
-                        $('#roomDetails').html('');
-                        $('#HotelInfo').hide();
-                        $('#hotelDelegate').val('').trigger('change');;
+                            $('#hotelNameDelegate').html('');
+                            $('#roomDetails').html('');
+                            $('#HotelInfo').hide();
+                            $('#hotelDelegate').val('').trigger('change');
 
-                        $('#hotelNameEscort').html('');
-                        $('#roomDetailsEscort').html('');
-                        $('#HotelInfoEscort').hide();
-                        $('#hotelEscort').val('').trigger('change');;
-                    }
-                    
-                });
+                            $('#hotelNameEscort').html('');
+                            $('#roomDetailsEscort').html('');
+                            $('#HotelInfoEscort').hide();
+                            $('#hotelEscort').val('').trigger('change');
+                        }
+                        
+                    });
+                }
+                
             }
             $(document).on('change', '#hotelDelegate', function() {
                 let hotelId = this.value;
