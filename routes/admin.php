@@ -16,6 +16,9 @@ use App\Http\Controllers\Admin\AccommodationController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\AlertController;
+use App\Http\Controllers\Admin\NewsController;
+use App\Http\Controllers\Admin\CommitteeController;
+use App\Http\Controllers\Admin\EventPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -174,6 +177,18 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/export-badge-printed-delegates', [DelegationController::class, 'exportBadgePrintedDelegates'])->name('delegates.exportBadgePrintedDelegates');
     Route::get('/export-non-badge-printed-delegates', [DelegationController::class, 'exportNonBadgePrintedDelegates'])->name('delegates.exportNonBadgePrintedDelegates');
 
+    //Manage news
+    Route::resource('news', NewsController::class);
+    Route::post('/news/status', [NewsController::class, 'updateStatus'])->name('news.status');
+
+    //Manage Committee
+    Route::resource('committees', CommitteeController::class);
+    Route::post('/committees/status', [CommitteeController::class, 'updateStatus'])->name('committees.status');
+
+    //Manage Page Contents
+    Route::get('event-pages', [EventPageController::class,'index'])->name('event_pages.index');
+    Route::get('event-pages/edit/{id}', [EventPageController::class,'edit'])->name('event_pages.edit');
+    Route::post('event-pages/{id}/update', [EventPageController::class,'update'])->name('event_pages.update');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

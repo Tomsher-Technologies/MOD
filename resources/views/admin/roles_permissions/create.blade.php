@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('create_new_role')])
 
 @section('content')
-<div class="dashboard-main-body ">
+<div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('create_new_role') }}</h2>
         <a href="{{ route('roles.index') }}" id="add-attachment-btn"

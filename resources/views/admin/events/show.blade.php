@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('event_details')])
 
 @section('content')
-<div class="dashboard-main-body ">
+<div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('event_details') }}</h2>
         <a href="{{ Session::has('events_last_url') ? Session::get('events_last_url') : route('events.index') }}"
