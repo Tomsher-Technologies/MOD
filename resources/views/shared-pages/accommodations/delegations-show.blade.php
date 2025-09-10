@@ -157,7 +157,7 @@
 
                                     {!! $badge !!}
                                     <div class="block">{{ $row->name_en ?? ($row->name_ar ?? '-') }}
-                                        {{ $row->title_value?->value }} </div>
+                                        {{ $row->title_en }} </div>
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     {{ $row->designation_en ?? ($row->designation_ar ?? '-') }}
@@ -537,7 +537,7 @@
                                 <td class="px-1 py-2 border border-gray-200">{{ $keyEscort + 1 }}</td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     <div class="block">{{ $rowEscort->name_en ?? ($rowEscort->name_ar ?? '-') }}
-                                        {{ $rowEscort->title_value?->value }} </div>
+                                        {{ $rowEscort->title_en }} </div>
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     {{ $rowEscort->military_number ?? '-' }}
@@ -727,7 +727,7 @@
                                 <td class="px-1 py-2 border border-gray-200">{{ $keyDriver + 1 }}</td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     <div class="block">{{ $rowDriver->name_en ?? ($rowDriver->name_ar ?? '-') }}
-                                        {{ $rowDriver->title_value?->value }} </div>
+                                        {{ $rowDriver->title_en }} </div>
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     {{ $rowDriver->military_number ?? '-' }}
