@@ -154,7 +154,7 @@
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
                                     : '';
                                 $name = $row->assignable?->name_en ?: '';
-                                return $teamHeadBadge . '<div class="block">' . $row->assignable?->title->value .' '.e($name) . '</div>';
+                                return $teamHeadBadge . '<div class="block">' . $row->assignable?->title_en .' '.e($name) . '</div>';
                             },
                         ],
                         [
@@ -401,7 +401,7 @@
                                 $searchUrl = route('escorts.index', ['search' => $escort->assignable?->name_en]);
                                 return '<a href="' .
                                     $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .e($escort->assignable?->title_value?->value ?? '') .
+                                    '" class="text-[#B68A35] hover:underline">' .e($escort->assignable?->title_en ?? '') .
                                     e($escort->assignable?->name_en) .
                                     '</a>';
                             },
@@ -487,7 +487,6 @@
                         ],
                         [
                             'label' => __db('delegation'),
-                            'key' => 'title',
                             'render' => fn($driver) => e($driver->delegation?->code ?? ''),
                         ],
                         [
@@ -521,7 +520,7 @@
                                 $searchUrl = route('drivers.index', ['search' => $driver->assignable?->name_en]);
                                 return '<a href="' .
                                     $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' . e($driver->assignable?->title_value?->value ?? '') .
+                                    '" class="text-[#B68A35] hover:underline">' . e($driver->assignable?->title_en ?? '') .
                                     e($driver->assignable?->name_en) .
                                     '</a>';
                             },
