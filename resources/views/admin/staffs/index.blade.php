@@ -113,7 +113,7 @@
                                 <td class="px-4 py-3 text-center text-black" dir="ltr">
                                     {{ $staff->roles->pluck('name')->join(', ') }}</td>
                                 <td class="px-4 py-3 text-center text-black" dir="ltr">
-                                    @can('edit_staff')
+                                    @directCan('edit_staff')
                                         <div class=" items-center">
                                             <label for="switch-{{ $key }}" class="relative inline-block w-11 h-6">
                                                 <input type="checkbox" id="switch-{{ $key }}"
@@ -128,11 +128,11 @@
                                                 </div>
                                             </label>
                                         </div>
-                                    @endcan
+                                    @enddirectCan
                                 </td>
 
                                 <td class="px-4 py-3 text-center " dir="ltr">
-                                    @can('edit_staff')
+                                    @directCan('edit_staff')
                                         <a href="{{ route('staffs.edit', ['id' => base64_encode($staff->id)]) }}"
                                             title="{{ __db('edit') }}"
                                             class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
@@ -143,7 +143,7 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </a>
-                                    @endcan
+                                    @enddirectCan
                                 </td>
                             </tr>
                         @empty

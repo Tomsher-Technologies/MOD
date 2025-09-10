@@ -589,7 +589,10 @@ if (!function_exists('can')) {
         $permissions = is_array($permissions) ? $permissions : [$permissions];
 
         foreach ($permissions as $permission) {
-            if ($user->can($permission)) {
+            // if ($user->can($permission)) {
+            //     return true;
+            // }
+             if ($user->getDirectPermissions()->pluck('name')->contains($permission)) {
                 return true;
             }
         }

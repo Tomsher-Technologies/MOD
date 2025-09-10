@@ -35,6 +35,8 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
 
             $user = Auth::user();
+            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $user->givePermissionTo($rolePermissions);
             $redirectTo = match ($user->user_type) {
                 // 'admin' => route('admin.dashboard'),
                 // 'staff' => route('admin.dashboard'),

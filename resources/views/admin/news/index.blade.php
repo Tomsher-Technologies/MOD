@@ -90,7 +90,7 @@
                                 {{ $new->news_date ? \Carbon\Carbon::parse($new->news_date)->format('d M Y') : '-' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200 text-center">
-                                @can('edit_news')
+                                @directCan('edit_news')
                                     <div class=" items-center">
                                         <label for="switch-{{ $key }}" class="relative inline-block w-11 h-6">
                                             <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $new->id }}"
@@ -100,12 +100,12 @@
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                         </label>
                                     </div>
-                                @endcan
+                                @enddirectCan
                             </td>
                             
                             <td class="px-4 py-3 border text-center border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @canany(['edit_news'])
+                                    @directCanany(['edit_news'])
                                         <a href="{{ route('news.edit', $new->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
@@ -114,9 +114,9 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </a>
-                                    @endcanany
+                                    @enddirectCanany
 
-                                    @canany(['delete_news'])
+                                    @directCanany(['delete_news'])
                                         <form action="{{ route('news.destroy', $new->id) }}"
                                             method="POST" class="delete-news-form">
                                             @csrf
@@ -130,7 +130,7 @@
                                                 </svg>
                                             </button>
                                         </form>
-                                    @endcanany
+                                    @enddirectCanany
                                 </div>
                             </td>
                         </tr>

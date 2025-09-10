@@ -71,7 +71,7 @@
                             
                             <td class="px-4 py-3 text-center " dir="ltr">
 
-                                @can('edit_labels')
+                                @directCan('edit_labels')
                                     <button class=" edit-btn w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center" data-modal-target="editTranslationModal" title="{{ __db('edit') }}"
                                     data-modal-toggle="editTranslationModal" data-id="{{ $translation->id }}"
                                     data-key="{{ $translation->label_key }}" 
@@ -82,7 +82,7 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </button>
-                                @endcan
+                                @enddirectCan
                                 
                             </td>
                         </tr>

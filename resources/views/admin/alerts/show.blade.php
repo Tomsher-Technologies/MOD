@@ -38,7 +38,7 @@
                     <span>{{ __db('created_by') }}: {{ $alert->creator->name }}</span>
                     <span>{{ $alert->created_at->format('M d, Y H:i') }}</span>
 
-                    @canany(['add_alerts'])
+                    @directCanany(['add_alerts'])
                         <span>
                             @if ($alert->send_to_all)
                                 {{ __db('sent_to_all_users') }}
@@ -46,12 +46,12 @@
                                 {{ __db('sent_to') }} {{ $alert->alertRecipients()->count() }} {{ __db('users') }}
                             @endif
                         </span>
-                    @endcanany
+                    @enddirectCanany
                 </div>
             </div>
         </div>
 
-        @canany(['add_alerts'])
+        @directCanany(['add_alerts'])
             <div class="bg-white h-full w-full rounded-lg border-0 p-6">
                 <h3 class="text-lg font-semibold mb-4">{{ __db('recipients') }}</h3>
 
@@ -112,7 +112,7 @@
                     </table>
                 </div>
             </div>
-        @endcanany
+        @enddirectCanany
 
     </div>
 @endsection

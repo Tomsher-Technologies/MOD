@@ -37,11 +37,11 @@
                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                         {{ __db('total_capacity') }}
                     </th>
-                    @canany(['edit_accommodations', 'hotel_edit_accommodations'])
+                    @directCanany(['edit_accommodations', 'hotel_edit_accommodations'])
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                             {{ __db('action') }}
                         </th>
-                    @endcanany
+                    @enddirectCanany
                 </tr>
             </thead>
             <tbody>
@@ -75,7 +75,7 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 border border-gray-200">{{ $assigned_rooms }}/{{ $total_rooms }}</td>
-                    @canany(['edit_accommodations', 'hotel_edit_accommodations'])
+                    @directCanany(['edit_accommodations', 'hotel_edit_accommodations'])
                         <td class="px-4 py-2 border border-gray-200">
                             <div class="flex align-center gap-4">
 
@@ -90,7 +90,7 @@
 
                             </div>
                         </td>
-                    @endcanany
+                    @enddirectCanany
                 </tr>
             </tbody>
         </table>
@@ -237,6 +237,7 @@
                         ],
                         [
                             'label' => __db('action'),
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row)  {
                                 $buttons = '';
 
@@ -443,7 +444,7 @@
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
-                            'permission' => ['view_accommodation_delegations','hotel_view_accommodation_delegations'],
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($escort) {
                                 $buttons = '';
 
@@ -563,7 +564,7 @@
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
-                            'permission' => ['view_accommodation_delegations','hotel_view_accommodation_delegations'],
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($driver) {
                                 $buttons = '';
 

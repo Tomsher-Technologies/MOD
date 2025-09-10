@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex items-center">
-        @can('add_dropdown_options')
+        @directCan('add_dropdown_options')
             <button data-modal-target="add-option" data-modal-toggle="add-option" class="ml-2 btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                 <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                     height="24" fill="none" viewBox="0 0 24 24">
@@ -17,7 +17,7 @@
                 </svg>
                 <span>{{ __db('add_option') }}</span>
             </button>
-        @endcan
+        @enddirectCan
 
         <a href="{{ route('dropdowns.index') }}" class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"  stroke="currentColor" stroke-width="2">
@@ -87,7 +87,7 @@
                             <td class="px-4 py-3 text-black text-center">{{ $option->value }}</td>
                             <td class="px-4 py-3 text-black text-center">{{ $option->sort_order }}</td>
                             <td class="px-4 py-3 text-center">
-                                @can('edit_dropdown_options')
+                                @directCan('edit_dropdown_options')
                                     <div class=" items-center">
                                         <label for="switch-{{ $key }}" class="relative inline-block w-11 h-6">
                                             <input type="checkbox" id="switch-{{ $key }}" onchange="update_status(this)" value="{{ $option->id }}"
@@ -97,11 +97,11 @@
                                             <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                         </label>
                                     </div>
-                                @endcan
+                                @enddirectCan
                             </td>
 
                             <td class="text-center">
-                                @can('edit_dropdown_options')
+                                @directCan('edit_dropdown_options')
                                     <button data-modal-target="edit-option-{{ $option->id }}" data-modal-toggle="edit-option-{{ $option->id }}" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
                                             <path
@@ -109,7 +109,7 @@
                                                 fill="#B68A35"></path>
                                         </svg>
                                     </button>
-                                @endcan
+                                @enddirectCan
                             </td>
 
                             <div id="edit-option-{{ $option->id }}" tabindex="-1" aria-hidden="true"

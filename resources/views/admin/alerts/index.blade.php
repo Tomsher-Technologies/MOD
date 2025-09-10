@@ -5,7 +5,7 @@
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('alerts') }}</h2>
 
-            @canany(['add_alerts'])
+            @directCanany(['add_alerts'])
                 <a href="{{ route('alerts.create') }}"
                     class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                     <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -15,7 +15,7 @@
                     </svg>
                     <span>{{ __db('create_alert') }}</span>
                 </a>
-            @endcanany
+            @enddirectCanany
 
         </div>
 
@@ -58,7 +58,7 @@
                     {{ $alerts->links() }}
                 </div>
             @else
-                @canany(['add_alerts'])
+                @directCanany(['add_alerts'])
                     <div class="text-center py-12">
                         <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -79,7 +79,7 @@
                             </a>
                         </div>
                     </div>
-                @endcanany
+                @enddirectCanany
                 <div class="text-center py-12">
                     <h3 class="mt-2 text-sm font-medium text-neutral-900">{{ __db('no_alerts') }}</h3>
                 </div>
