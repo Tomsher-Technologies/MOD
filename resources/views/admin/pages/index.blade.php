@@ -34,7 +34,7 @@
 
                             <td class="px-4 py-3 border text-center border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @canany(['edit_pages'])
+                                    @directCanany(['edit_pages'])
                                         <a href="{{ route('event_pages.edit', ['id' => base64_encode($page->id)]) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
@@ -43,7 +43,7 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </a>
-                                    @endcanany
+                                    @enddirectCanany
                                 </div>
                             </td>
                         </tr>

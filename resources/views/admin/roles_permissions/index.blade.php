@@ -66,7 +66,7 @@
                             <td class="px-4 py-3 text-black  text-center">{{ ucwords($role->module)}}</td>
                             <td class="px-4 py-3">
                                 <div class=" text-center gap-5">
-                                    @can('edit_role')
+                                    @directCan('edit_role')
                                         <a href="{{route('roles.edit', ['id'=>$role->id] )}}" class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
@@ -75,7 +75,7 @@
                                                     fill="#B68A35"></path>
                                             </svg>
                                         </a>
-                                    @endcan
+                                    @enddirectCan
                                 </div>
                             </td>
                         </tr>

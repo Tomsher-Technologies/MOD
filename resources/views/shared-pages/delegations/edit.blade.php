@@ -129,7 +129,7 @@
 
                 </div>
 
-                @canany(['edit_delegations', 'delegate_edit_delegations'])
+                @directCanany(['edit_delegations', 'delegate_edit_delegations'])
                     <div class="col-span-12 mt-6">
                         <button type="submit"
                             class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition"
@@ -137,7 +137,7 @@
                             {{ __db('update_delegation') }}
                         </button>
                     </div>
-                @endcanany
+                @enddirectCanany
             </div>
         </form>
 
@@ -294,22 +294,22 @@
                                     x-text="window.attachmentsFieldErrors?.[`attachments.${index}.file`]?.[0] ?? ''"></span>
                             </template>
 
-                            @canany(['edit_delegations', 'delegate_edit_delegations'])
+                            @directCanany(['edit_delegations', 'delegate_edit_delegations'])
                                 <button type="button" class="btn !bg-[#B68A35] text-white rounded-lg px-4 py-2 mt-3"
                                     @click="addAttachment()">
                                     + {{ __db('add_attachments') }}
                                 </button>
-                            @endcanany
+                            @enddirectCanany
 
 
-                            @canany(['edit_delegations', 'delegate_edit_delegations'])
+                            @directCanany(['edit_delegations', 'delegate_edit_delegations'])
                                 <div class="mt-6">
                                     <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-6 py-2"
                                         x-show="attachments.length > 0" @click="window.hasUnsavedAttachments = false">
                                         {{ __db('save_attachments') }}
                                     </button>
                                 </div>
-                            @endcanany
+                            @enddirectCanany
                         </div>
                     </form>
                 </div>
@@ -322,28 +322,28 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('delegates') }} ({{ $delegation->delegates->count() }})
         </h2>
         <div class="flex items-center gap-3">
-            @canany(['add_delegates', 'delegate_add_delegates'])
+            @directCanany(['add_delegates', 'delegate_add_delegates'])
                 <a href="{{ route('delegations.addDelegate', $delegation->id) }}" id="add-attachment-btn"
                     class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-3 px-5">
                     <span>{{ __db('add_delegate') }}</span>
                 </a>
-            @endcanany
+            @enddirectCanany
 
-            @canany(['add_travels', 'delegate_edit_delegations'])
+            @directCanany(['add_travels', 'delegate_edit_delegations'])
                 <a href="{{ route('delegations.addTravel', ['id' => $delegation->id, 'showArrival' => 1]) }}"
                     id="add-attachment-btn"
                     class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
                     <span>{{ __db('add_group_arrival') }}</span>
                 </a>
-            @endcanany
+            @enddirectCanany
 
-            @canany(['add_travels', 'delegate_edit_delegations'])
+            @directCanany(['add_travels', 'delegate_edit_delegations'])
                 <a href="{{ route('delegations.addTravel', ['id' => $delegation->id, 'showDeparture' => 1]) }}"
                     id="add-attachment-btn"
                     class="btn text-sm border !border-[#B68A35] !text-[#B68A35] flex items-center rounded-lg py-3 px-5">
                     <span>{{ __db('add_group_departure') }}</span>
                 </a>
-            @endcanany
+            @enddirectCanany
 
         </div>
     </div>
@@ -596,10 +596,10 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
         <div class="flex items-center gap-3">
-            @canany(['add_escorts', 'escort_add_escorts'])
+            @directCanany(['add_escorts', 'escort_add_escorts'])
                 <a href={{ route('escorts.index') }}
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
-            @endcanany
+            @enddirectCanany
         </div>
     </div>
 
@@ -764,10 +764,10 @@
 
 
         <div class="flex items-center gap-3">
-            @canany(['add_drivers', 'driver_add_drivers'])
+            @directCanany(['add_drivers', 'driver_add_drivers'])
                 <a href={{ route('drivers.index') }}
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-            @endcanany
+            @enddirectCanany
         </div>
     </div>
 
@@ -952,10 +952,10 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
         <div class="flex items-center gap-3">
-            @canany(['add_interviews', 'delegate_edit_delegations'])
+            @directCanany(['add_interviews', 'delegate_edit_delegations'])
                 <a href="{{ route('delegations.addInterview', $delegation) }}"
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
-            @endcanany
+            @enddirectCanany
         </div>
     </div>
 

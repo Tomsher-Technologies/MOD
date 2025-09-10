@@ -37,11 +37,11 @@
                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                         {{ __db('total_capacity') }}
                     </th>
-                    @canany(['edit_accommodations', 'hotel_edit_accommodations'])
+                    @directCanany(['edit_accommodations', 'hotel_edit_accommodations'])
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                             {{ __db('action') }}
                         </th>
-                    @endcanany
+                    @enddirectCanany
                 </tr>
             </thead>
             <tbody>
@@ -66,7 +66,7 @@
                         @endphp
                         @if($hotel->rooms)
                             @foreach ($hotel->rooms as $room)
-                                <div class="mb-2">{{ $room->roomType->value ?? "-" }} - {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
+                                <div class="mb-2">{{ $room->roomType?->value ?? "-" }} - {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
                                 @php
                                     $total_rooms += $room->total_rooms;
                                     $assigned_rooms += $room->assigned_rooms;
@@ -75,7 +75,7 @@
                         @endif
                     </td>
                     <td class="px-4 py-3 border border-gray-200">{{ $assigned_rooms }}/{{ $total_rooms }}</td>
-                    @canany(['edit_accommodations', 'hotel_edit_accommodations'])
+                    @directCanany(['edit_accommodations', 'hotel_edit_accommodations'])
                         <td class="px-4 py-2 border border-gray-200">
                             <div class="flex align-center gap-4">
 
@@ -90,7 +90,7 @@
 
                             </div>
                         </td>
-                    @endcanany
+                    @enddirectCanany
                 </tr>
             </tbody>
         </table>
@@ -177,11 +177,11 @@
                         ],
                         [
                             'label' => __db('internal_ranking'),
-                            'render' => fn($row) => $row->assignable?->internalRanking->value ?? '-',
+                            'render' => fn($row) => $row->assignable?->internalRanking?->value ?? '-',
                         ],
                         [
                             'label' => __db('gender'),
-                            'render' => fn($row) => $row->assignable?->gender->value ?? '-',
+                            'render' => fn($row) => $row->assignable?->gender?->value ?? '-',
                         ],
                         [
                             'label' => __db('parent_id'),
@@ -193,7 +193,7 @@
                         ],
                         [
                             'label' => __db('relationship'),
-                            'render' => fn($row) => $row->assignable?->relationship->value ?? '-',
+                            'render' => fn($row) => $row->assignable?->relationship?->value ?? '-',
                         ],
                         [
                             'label' => __db('badge_printed'),
@@ -237,6 +237,7 @@
                         ],
                         [
                             'label' => __db('action'),
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row)  {
                                 $buttons = '';
 
@@ -295,7 +296,7 @@
                                         @if ($arrival)
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                                                <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
+                                                <p class="text-base">{{ $arrival->airport?->value ?? '-' }}</p>
                                             </div>
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
@@ -322,7 +323,7 @@
                                         @if ($departure)
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                                                <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
+                                                <p class="text-base">{{ $departure->airport?->value ?? '-' }}</p>
                                             </div>
                                             <div class="border-b py-4">
                                                 <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
@@ -443,7 +444,7 @@
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
-                            'permission' => ['view_accommodation_delegations','hotel_view_accommodation_delegations'],
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($escort) {
                                 $buttons = '';
 
@@ -563,7 +564,7 @@
                         [
                             'label' => __db('actions'),
                             'key' => 'actions',
-                            'permission' => ['view_accommodation_delegations','hotel_view_accommodation_delegations'],
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($driver) {
                                 $buttons = '';
 
