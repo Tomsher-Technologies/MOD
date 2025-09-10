@@ -159,7 +159,8 @@ function getUnreadNotificationCount()
 
 function getAdminEventLogo()
 {
-    $defaultEventLogo = Event::where('is_default', 1)->value('logo');
+    $eventId = session('current_event_id', getDefaultEventId() ?? null);
+    $defaultEventLogo = Event::where('id', $eventId)->value('logo');
 
     if ($defaultEventLogo) {
         $relativePath = str_replace('/storage/', '', $defaultEventLogo);

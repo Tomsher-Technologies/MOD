@@ -47,6 +47,24 @@ class AuthController extends Controller
                 Auth::logout();
                 return back()->withErrors(['password' => __db('event_not_assigned')]);
             }
+            $role = $roleAssignment->role?->name;
+            $user->syncRoles($role);
+
+            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+
+            $user->syncPermissions([]);
+
+            $event = $roleAssignment->event;
+
+            if ($event?->status == 1) {
+                $filtered = collect($rolePermissions)->filter(function ($perm) {
+                    return str_contains($perm, '_view_') || str_contains($perm, '_manage_');
+                })->toArray();
+
+                $user->givePermissionTo($filtered);
+            } else {
+                $user->givePermissionTo($rolePermissions);
+            }
 
             session(['current_event_id' => $eventId]);
             session(['current_module' => $roleAssignment->module]);

@@ -4,7 +4,8 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('accommodations') }}</h2>
 
         <div>
-            @canany(['add_accommodations', 'hotel_add_accommodations', 'import_accommodations', 'hotel_import_accommodations'])
+ 
+            @directCanany(['add_accommodations', 'hotel_add_accommodations', 'import_accommodations', 'hotel_import_accommodations'])
                 <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
                     class="btn !text-[#B68A35] !bg-[#E6D7A2]  text-md rounded-lg px-6 py-3 text-center inline-flex items-center"
                     type="button">
@@ -30,7 +31,7 @@
                         @endcan
                     </ul>
                 </div>
-            @endcanany
+            @enddirectCanany
 
             @canany(['view_external_members', 'assign_external_members','hotel_view_external_members', 'hotel_assign_external_members'])
                 <a href="{{ route('admin.view-external-members') }}"

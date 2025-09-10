@@ -201,7 +201,7 @@
                 'driver_manage_accommodations', 'hotel_manage_accommodations'])
                 <li>
                     <a href="{{ route('accommodations.index') }}"
-                        class="{{ areActiveRoutes(['accommodations.index', 'accommodations.show', 'accommodations.import', 'accommodations.create', 'accommodations.edit', 'admin.view-external-members', 'external-members.edit', 'accommodation-delegations', 'accommodation-delegation-view']) }}">
+                        class="{{ areActiveRoutes(['accommodations.index', 'accommodations.show', 'accommodations.import', 'accommodations.create', 'accommodations.edit', 'admin.view-external-members', 'external-members.edit']) }}">
                         <svg class="pe-2" width="30" height="30" xmlns="http://www.w3.org/2000/svg"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
