@@ -361,37 +361,28 @@
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
-                            'label' => __db('title'),
-                            'render' => fn($row) => $row->title?->value ?? '-',
-                        ],
-                        [
                             'label' => __db('name_en'),
                             'render' => function ($row) {
-                                $teamHeadBadge = $row->team_head
-                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                                     : '';
-                                $name = $row->name_en ?: '';
-                                return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
+                                $name = $row->name_en;
+                                $title = $row->title_en;
+                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
                             },
                         ],
                         [
                             'label' => __db('name_ar'),
                             'render' => function ($row) {
-                                $teamHeadBadge = $row->team_head
-                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                                     : '';
-                                $name = $row->name_ar ?: '';
-                                return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
+                                $name = $row->name_ar;
+                                $title = $row->title_ar;
+                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
                             },
                         ],
-                        [
-                            'label' => __db('designation_en'),
-                            'render' => fn($row) => $row->designation_en ?: $row->designation_ar ?: '-',
-                        ],
-                        [
-                            'label' => __db('designation_ar'),
-                            'render' => fn($row) => $row->designation_ar ?: '-',
-                        ],
+
                         [
                             'label' => __db('internal_ranking'),
                             'render' => fn($row) => $row->internalRanking->value ?? '-',
@@ -402,11 +393,7 @@
                         ],
                         [
                             'label' => __db('parent_id'),
-                            'render' => fn($row) => $row->parent
-                                ? ($row->parent->name_en ?:
-                                $row->parent->name_ar ?:
-                                '-')
-                                : '-',
+                            'render' => fn($row) => $row->parent?->getTranslation('name') ?? '-',
                         ],
                         [
                             'label' => __db('relationship'),
@@ -504,8 +491,20 @@
                     $noDataMessage = __db('no_data_found');
                 @endphp
 
-                <x-reusable-table :data="$delegation->delegates" :defaultVisibleKeys="['sl_no', 'title', 'name_ar', 'designation_ar', 'internal_ranking', 'gender', 
-                    'parent_id', 'relationship', 'badge_printed', 'participation_status', 'accommodation', 'arrival_status', 'action']" table-id="delegatesTableEdit" :enableColumnListBtn="true"
+                <x-reusable-table :data="$delegation->delegates" :defaultVisibleKeys="[
+                    'sl_no',
+                    'name_ar',
+                    'designation',
+                    'internal_ranking',
+                    'gender',
+                    'parent_id',
+                    'relationship',
+                    'badge_printed',
+                    'participation_status',
+                    'accommodation',
+                    'arrival_status',
+                    'action',
+                ]" table-id="delegatesTableEdit" :enableColumnListBtn="true"
                     :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 @foreach ($delegation->delegates as $delegate)
@@ -637,19 +636,14 @@
                             },
                         ],
                         [
-                            'label' => __db('title'),
-                            'key' => 'title',
-                            'render' => fn($escort) => e($escort->title->value ?? ''),
-                        ],
-                        [
-                            'label' => __db('name_en'),
+                            'label' => __db('name'),
                             'key' => 'name',
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
                                 return '<a href="' .
                                     $searchUrl .
                                     '" class="text-[#B68A35] hover:underline">' .
-                                    e($escort->name_en) .
+                                    e($escort->getTranslation('title') . '. ' . $escort->getTranslation('name')) .
                                     '</a>';
                             },
                         ],
@@ -698,15 +692,15 @@
                             'render' => function ($escort) {
                                 return '<div class="flex items-center">
                                     <label for="switch-' .
-                                                        $escort->id .
-                                                        '" class="relative inline-block w-11 h-6">
+                                    $escort->id .
+                                    '" class="relative inline-block w-11 h-6">
                                         <input type="checkbox" id="switch-' .
-                                                        $escort->id .
-                                                        '" onchange="update_escort_status(this)" value="' .
-                                                        $escort->id .
-                                                        '" class="sr-only peer" ' .
-                                                        ($escort->status == 1 ? 'checked' : '') .
-                                                        ' />
+                                    $escort->id .
+                                    '" onchange="update_escort_status(this)" value="' .
+                                    $escort->id .
+                                    '" class="sr-only peer" ' .
+                                    ($escort->status == 1 ? 'checked' : '') .
+                                    ' />
                                         <div class="block bg-gray-300 peer-checked:bg-[#009448] w-11 h-6 rounded-full transition"></div>
                                         <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition peer-checked:translate-x-5"></div>
                                     </label>
@@ -811,19 +805,17 @@
                             },
                         ],
                         [
-                            'label' => __db('title'),
-                            'key' => 'title',
-                            'render' => fn($driver) => e($driver->title->value ?? ''),
-                        ],
-                        [
-                            'label' => __db('name_en'),
-                            'key' => 'name_en',
+                            'label' => __db('name'),
+                            'key' => 'name',
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
+                                $driverTitle = $driver?->getTranslation('title') ?? '';
+                                $driverName = $driver?->getTranslation('name') ?? '';
+
                                 return '<a href="' .
                                     $searchUrl .
                                     '" class="text-[#B68A35] hover:underline">' .
-                                    e($driver->name_en) .
+                                    e($driverTitle . '. ' . $driverName) .
                                     '</a>';
                             },
                         ],
@@ -976,42 +968,29 @@
                     });
 
                     $columns = [
-                        ['label' => __db('sl_no'), 'render' => fn($row, $key) => $key + 1],
                         [
-                            'label' => __db('date_time'),
-                            'render' => fn($row) => $row->date_time
-                                ? \Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
-                                : '',
+                            'label' => __db('sl_no'),
+                            'render' => fn($row, $key) => $key + 1,
                         ],
                         [
-                            'label' => __db('attended_by'),
-                            'render' => function ($row) use ($delegatesCollection, $delegation) {
-                                if ($row->interviewMembers && count($row->interviewMembers)) {
-                                    $attendedBy = collect($row->interviewMembers)->filter(
-                                        fn($m) => $m->type === 'from',
-                                    );
-                                    if ($attendedBy->isEmpty()) {
-                                        return '-';
-                                    }
-
-                                    return $attendedBy
-                                        ->map(function ($member) use ($delegatesCollection, $delegation) {
-                                            $memberId = (int) $member->member_id;
-                                            $delegate = $delegatesCollection->get($memberId);
-                                            $delegateName = $delegate
-                                                ? ($delegate->name_en ?:
-                                                $delegate->name_ar ?:
-                                                'N/A')
-                                                : 'Unknown';
-                                            return '<span class="block">Member ID: ' .
-                                                e($memberId) .
-                                                ' - Delegate Name: ' .
-                                                e($delegateName) .
-                                                '</span>';
-                                        })
-                                        ->implode('');
-                                }
-                                return '-';
+                            'label' => 'Date & Time',
+                            'render' => fn($row) => $row->date_time
+                                ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                                : '-',
+                        ],
+                        [
+                            'label' => 'Attended By',
+                            'render' => function ($row) {
+                                $attendees = $row->interviewMembers->where('type', 'from');
+                                $names = $attendees
+                                    ->map(
+                                        fn($im) => e(
+                                            $im->resolveMemberForInterview($row)?->getTranslation('name') ?? '-',
+                                        ),
+                                    )
+                                    ->filter()
+                                    ->implode('<br>');
+                                return $names ?: '-';
                             },
                         ],
                         [
@@ -1019,7 +998,7 @@
                             'render' => function ($row) {
                                 if (!empty($row->other_member_id) && $row->otherMember) {
                                     $otherMemberName = $row->otherMember->name ?? '';
-                                    $otherMemberId = $row->otherMember->name_en ?? $row->other_member_id;
+                                    $otherMemberId = $row->otherMember->getTranslation('name') ?? $row->other_member_id;
                                     if ($otherMemberId) {
                                         $with =
                                             '<a href="' .
@@ -1099,7 +1078,6 @@
                             },
                         ],
                     ];
-
                 @endphp
                 <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>

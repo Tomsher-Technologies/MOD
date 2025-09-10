@@ -30,7 +30,8 @@ class NonBadgePrintedDelegatesExport implements FromCollection, WithHeadings, Wi
                 'Country' => $delegate->delegation->country->name ?? '',
                 'Continent' => $delegate->delegation->continent->value ?? '',
                 'Invitation From' => $delegate->delegation->invitationFrom->value ?? '',
-                'Title' => $delegate->title->value ?? '',
+                'Title En' => $delegate->title_en ?? '',
+                'Title Ar' => $delegate->title_ar ?? '',
                 'Designation' => $delegate->designation_en,
             ];
         });
@@ -45,7 +46,8 @@ class NonBadgePrintedDelegatesExport implements FromCollection, WithHeadings, Wi
             'Country',
             'Continent',
             'Invitation From',
-            'Title',
+            'Title En',
+            'Title Ar',
             'Designation',
         ];
     }
@@ -75,7 +77,8 @@ class NonBadgePrintedDelegatesExport implements FromCollection, WithHeadings, Wi
                 $sheet->getColumnDimension('E')->setWidth(15);
                 $sheet->getColumnDimension('F')->setWidth(20);
                 $sheet->getColumnDimension('G')->setWidth(15);
-                $sheet->getColumnDimension('H')->setWidth(25);
+                $sheet->getColumnDimension('H')->setWidth(15);
+                $sheet->getColumnDimension('I')->setWidth(25);
             },
         ];
     }

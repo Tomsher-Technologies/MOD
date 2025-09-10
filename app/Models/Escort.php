@@ -22,7 +22,8 @@ class Escort extends Model
         'spoken_languages',
         'internal_ranking_id',
         'status',
-        'title',
+        'title_en',
+        'title_ar',
         'unit_id',
         'rank',
         'phone_number',
@@ -39,11 +40,11 @@ class Escort extends Model
     public function getNameAttribute()
     {
         $lang = getActiveLanguage();
-        
+
         if ($lang !== 'en' && !empty($this->attributes['name_ar'])) {
             return $this->attributes['name_ar'];
         }
-        
+
         return $this->attributes['name_en'] ?? '';
     }
 
@@ -66,22 +67,6 @@ class Escort extends Model
         });
     }
 
-    public function title()
-    {
-        return $this->belongsTo(DropdownOption::class, 'title_id')
-            ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'title');
-            });
-    }
-
-      public function title_value()
-    {
-        return $this->belongsTo(DropdownOption::class, 'title_id')
-            ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'title');
-            });
-    }
-
     public function getSpokenLanguagesLabelsAttribute()
     {
         if (empty($this->spoken_languages)) {
@@ -89,12 +74,6 @@ class Escort extends Model
         }
         return DropdownOption::whereIn('id', $this->spoken_languages)->pluck('value')->implode(', ');
     }
-
-    // public function languages()
-    // {
-    //     return $this->belongsToMany(DropdownOption::class, 'escort_language', 'escort_id', 'language_id');
-    // }
-
 
     public function event()
     {
@@ -149,5 +128,18 @@ class Escort extends Model
     public function currentRoomAssignment()
     {
         return $this->belongsTo(RoomAssignment::class, 'current_room_assignment_id');
+    }
+
+    public function getTranslation($field = '', $lang = false)
+    {
+        $lang = $lang == false ? getActiveLanguage() : $lang;
+
+        if ($lang !== 'en') {
+            $field =  $field . '_ar';
+        } else {
+            $field =  $field . '_en';
+        }
+
+        return $this->$field;
     }
 }

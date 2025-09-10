@@ -28,17 +28,23 @@
         <form action="{{ route('drivers.store') }}" method="POST">
             @csrf
             <div class="grid grid-cols-12 gap-5">
+
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title') }}:</label>
-                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
-                        <option value="" disabled>{{ __db('select_title') }}</option>
-                        @foreach (getDropDown('title')->options as $option)
-                            <option value="{{ $option->id }}">
-                                {{ $option->value }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label class="form-label">{{ __db('title_en') }}:</label>
+                    <input type="text" name="title_en" value="{{ old('title_en') }}"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}">
+
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title_ar') }}:</label>
+                    <input type="text" name="title_ar" value="{{ old('title_ar') }}"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}">
+
+                </div>
+
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
@@ -143,7 +149,7 @@
             <div class="flex justify-between items-center mt-8">
                 <!-- Add Delegate Button -->
                 <button type="submit" id="add-delegates"
-                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('add') . ' ' . __db('driver') }}</button>
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('add') . ' ' . __db('driver') }}</button>
 
             </div>
         </form>

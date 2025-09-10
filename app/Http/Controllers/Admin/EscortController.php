@@ -129,6 +129,8 @@ class EscortController extends Controller
     {
 
         $request->validate([
+            'title_en' => 'string|max:255',
+            'title_ar' => 'string|max:255',
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
@@ -170,8 +172,6 @@ class EscortController extends Controller
             $escortData['spoken_languages'] = null;
         }
 
-        $escortData['title'] = $escortData['title_id'] ?? null;
-        unset($escortData['title_id']);
         $escort = Escort::create($escortData);
 
         $this->logActivity(
@@ -210,7 +210,8 @@ class EscortController extends Controller
     {
         $validated = $request->validate([
             'name_en' => 'required|string|max:255',
-            'title_id' => 'nullable|string|exists:dropdown_options,id',
+            'title_en' => 'string|max:255',
+            'title_ar' => 'string|max:255',
             'military_number' => 'nullable|string|max:255',
             'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
@@ -245,13 +246,8 @@ class EscortController extends Controller
         $escort = Escort::findOrFail($id);
 
         $relationsToCompare = [
-            'title_id' => [
-                'display_with' => [
-                    'model' => \App\Models\DropdownOption::class,
-                    'key' => 'id',
-                    'label' => 'value',
-                ],
-            ],
+            'title_en' => [],
+            'title_ar' => [],
             'gender_id' => [
                 'display_with' => [
                     'model' => \App\Models\DropdownOption::class,

@@ -444,10 +444,31 @@
 
 --  alter table countries add column name_ar text;
 
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_accommodations', 'Assign Accommodations', 'web', '1', current_timestamp(), current_timestamp());
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_import_accommodations', 'Import Accommodations', 'web', '1', current_timestamp(), current_timestamp());
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_accommodations', 'Assign Accommodations', 'web', '1', current_timestamp(), current_timestamp());
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_import_accommodations', 'Import Accommodations', 'web', '1', current_timestamp(), current_timestamp());
 
-INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_accommodation_delegations', 'View Accommodation Delegations', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_accommodation_delegations', 'View Accommodation Delegations', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+ALTER TABLE delegates CHANGE title_id title_en TEXT;
+ALTER TABLE delegates add column title_ar TEXT;
+
+
+
+ALTER TABLE drivers DROP FOREIGN KEY fk_drivers_title_id;
+ALTER TABLE escorts DROP FOREIGN KEY fk_escorts_title_id;
+
+ALTER TABLE drivers CHANGE title_id title_en TEXT;
+ALTER TABLE drivers add column title_ar TEXT;
+
+ALTER TABLE escorts CHANGE title_id title_en TEXT;
+ALTER TABLE escorts add column title_ar TEXT;
+
+
+
 
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_view_external_members', 'View External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '102', 'hotel_assign_external_members', 'Assign External Members', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

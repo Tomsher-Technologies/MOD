@@ -30,16 +30,19 @@
             <div class="grid grid-cols-12 gap-5">
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title') }}:</label>
-                    <select name="title_id" class="select2 p-3 rounded-lg w-full text-sm border border-neutral-300">
-                        <option value="" disabled>{{ __db('select_title') }}</option>
-                        @foreach (getDropDown('title')->options as $option)
-                            <option value="{{ $option->id }}" @if (old('title_id', $driver->title_id) == $option->id) selected @endif>
-                                {{ $option->value }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <label class="form-label">{{ __db('title_en') }}:</label>
+                    <input type="text" name="title_en"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        value="{{ old('title_en', $driver->title_en) }}">
                 </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title_ar') }}:</label>
+                    <input type="text" name="title_ar"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        value="{{ old('title_ar', $driver->title_ar) }}">
+                </div>
+
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
@@ -69,12 +72,12 @@
                         value="{{ old('phone_number', $driver->phone_number) }}">
                 </div>
 
-                <div class="col-span-4">
+                {{-- <div class="col-span-4">
                     <label class="form-label">{{ __db('driver') . ' ' . __db('id') }}:</label>
                     <input type="text" name="driver_id"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('driver_id', $driver->driver_id) }}">
-                </div>
+                </div> --}}
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('vehicle_type') }}:</label>
                     <input type="text" name="car_type"
@@ -133,7 +136,7 @@
 
             <div class="flex justify-between items-center mt-8">
                 <button type="submit"
-                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg py-[1px] h-12">{{ __db('save') }}</button>
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('save') }}</button>
             </div>
         </form>
     </div>

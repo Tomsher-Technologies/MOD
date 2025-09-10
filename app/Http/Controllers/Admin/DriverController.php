@@ -132,7 +132,8 @@ class DriverController extends Controller
     {
         $request->validate([
             'military_number' => 'nullable|string|max:255',
-            'title_id' => 'nullable|string|exists:dropdown_options,id',
+            'title_ar' => 'nullable|string',
+            'title_en' => 'nullable|string',
             'name_ar' => 'required|string|max:255',
             'military_number' => 'nullable|string|max:255',
             'name_en' => 'required|string|max:255',
@@ -201,7 +202,8 @@ class DriverController extends Controller
     {
         $validated = $request->validate([
             'military_number' => 'nullable|string|max:255',
-            'title_id' => 'nullable|string|exists:dropdown_options,id',
+            'title_ar' => 'nullable|string',
+            'title_en' => 'nullable|string',
             'name_ar' => 'required|string|max:255',
             'name_en' => 'required|string|max:255',
             'phone_number' => 'nullable|string|max:255',
@@ -232,13 +234,8 @@ class DriverController extends Controller
         $driver = Driver::findOrFail($id);
 
         $relationsToCompare = [
-            'title' => [
-                'display_with' => [
-                    'model' => \App\Models\DropdownOption::class,
-                    'key' => 'id',
-                    'label' => 'value',
-                ],
-            ],
+            'title_en' => [],
+            'title_ar' => [],
             'delegation_id' => [
                 'display_with' => [
                     'model' => \App\Models\Delegation::class,

@@ -58,7 +58,7 @@
                             <button type="submit"
                                 class="!text-[#5D471D] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
                         </div>
-                        
+
                         @canany(['badge_print_export'])
                             @if (request('badge_printed') == '0')
                                 <div class="flex items-center">
@@ -131,7 +131,10 @@
                         ],
                         [
                             'label' => __db('delegate_name'),
-                            'render' => fn($row) => $row->name_en ?? '-',
+                            'render' => fn($row) => $row->getTranslation('title') .
+                                '. ' .
+                                $row->getTranslation('name') ??
+                                '-',
                         ],
 
                         [
@@ -163,12 +166,8 @@
                             'render' => fn($row) => $row->delegation->invitationFrom->value ?? '-',
                         ],
                         [
-                            'label' => __db('title'),
-                            'render' => fn($row) => $row->title->value ?? '-',
-                        ],
-                        [
                             'label' => __db('designation'),
-                            'render' => fn($row) => $row->designation_en ?? '-',
+                            'render' => fn($row) => $row->getTranslation('designation') ?? '-',
                         ],
                         [
                             'label' => __db('badge_printed'),
@@ -226,51 +225,54 @@
                     <input type="hidden" name="badge_printed" value="{{ request('badge_printed') }}">
                 @endif
 
-                <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('continent') }}</label>
-                    <select name="continent_id" class="w-full p-2 border border-gray-300 rounded-lg">
-                        <option value="">{{ __db('select_continent') }}</option>
-                        @foreach (getDropdown('continents')->options as $option)
-                            <option value="{{ $option->id }}"
-                                {{ request('continent_id') == $option->id ? 'selected' : '' }}>
-                                {{ $option->value }}
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                    <select multiple name="continent_id[]" id="continent-select"
+                        data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('continents')->options as $continent)
+                            <option value="{{ $continent->id }}"
+                                {{ is_array(request('continent_id')) && in_array($continent->id, request('continent_id')) ? 'selected' : '' }}>
+                                {{ $continent->value }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('country') }}</label>
-                    <select name="country_id" class="w-full p-2 border border-gray-300 rounded-lg">
-                        <option value="">{{ __db('select_country') }}</option>
-                        @foreach (getDropdown('country')->options as $option)
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                    <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}"
-                                {{ request('country_id') == $option->id ? 'selected' : '' }}>
-                                {{ $option->value }}
+                                {{ is_array(request('country_id')) && in_array($option->id, request('country_id')) ? 'selected' : '' }}>
+                                {{ $option->name }}
                             </option>
                         @endforeach
                     </select>
                 </div>
 
-                <div>
-                    <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('invitation_from') }}</label>
-                    <select name="invitation_from" class="w-full p-2 border border-gray-300 rounded-lg">
-                        <option value="">{{ __db('select_invitation_from') }}</option>
-                        @foreach (getDropdown('departments')->options as $option)
-                            <option value="{{ $option->id }}"
-                                {{ request('invitation_from') == $option->id ? 'selected' : '' }}>
-                                {{ $option->value }}
-                            </option>
+                <div class="flex flex-col">
+                    <label
+                        class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                    <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @foreach (getDropDown('departments')->options as $option)
+                            <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
+                                {{ $option->value }}</option>
                         @endforeach
                     </select>
                 </div>
 
-                <div class="flex justify-end">
-                    <button type="submit"
-                        class="text-white bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                        {{ __db('apply_filters') }}
-                    </button>
-                </div>
+                  <div class="grid grid-cols-2 gap-4 mt-6">
+                <a href="{{ route('delegates.badgePrintedIndex') }}"
+                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
+                <button type="submit"
+                    class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
+            </div>
             </form>
         </div>
     </div>
@@ -431,5 +433,48 @@
                 window.location.reload();
             }, 2000);
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $('.select2').select2({
+                placeholder: "Select an option",
+                allowClear: true
+            });
+
+            let initiallySelectedCountries = $('#country-select').val() || [];
+
+            $('#continent-select').on('change', function() {
+                const continentId = $(this).val();
+                const countrySelect = $('#country-select');
+
+                countrySelect.find('option[value!=""]').remove();
+
+                if (continentId) {
+                    $.get('{{ route('countries.by-continent') }}', {
+                        continent_ids: continentId
+                    }, function(data) {
+                        $.each(data, function(index, country) {
+                            const isSelected = initiallySelectedCountries.includes(country
+                                .id.toString());
+
+                            countrySelect.append(new Option(country.name, country.id, false,
+                                isSelected));
+                        });
+
+                        countrySelect.trigger('change');
+                    }).fail(function() {
+                        console.log('Failed to load countries');
+                    });
+                } else {
+                    countrySelect.val(null).trigger('change');
+                }
+            });
+
+            const selectedContinent = $('#continent-select').val();
+            if (selectedContinent && selectedContinent.length > 0) {
+                $('#continent-select').trigger('change');
+            }
+        });
     </script>
 @endsection
