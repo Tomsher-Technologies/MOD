@@ -109,35 +109,41 @@
         $("#accommodationForm").validate({
             rules: {
                 hotel_name: {
-                    required: true
+                    require_from_group: [1, ".hotel-name-group"]
+                },
+                hotel_name_ar: {
+                    require_from_group: [1, ".hotel-name-group"]
                 },
                 address: {
-                    required: true
+                    required: false
                 },
                 contact_number: {
-                    required: true,
+                    required: false,
                     phonePattern: true
                 },
                 // Validate first room row
                 "rooms[0][room_type]": {
-                    required: true
+                    required: false
                 },
                 "rooms[0][total_rooms]": {
-                    required: true,
+                    required: false,
                     digits: true
                 },
                 // Validate first contact person row
                 "contacts[0][name]": {
-                    required: true
+                    required: false
                 },
                 "contacts[0][phone]": {
-                    required: true,
+                    required: false,
                     phonePattern: true
                 }
             },
             messages: {
                 hotel_name: {
-                    required: "{{ __db('this_field_is_required') }}",
+                    require_from_group: "{{ __db('fill_either_english_or_arabic_field') }}",
+                },
+                hotel_name_ar: {
+                    require_from_group: "{{ __db('fill_either_english_or_arabic_field') }}",
                 },
                 address: {
                     required: "{{ __db('this_field_is_required') }}",

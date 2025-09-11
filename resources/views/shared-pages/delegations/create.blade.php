@@ -322,15 +322,11 @@
 
             <div id="delegate-container">
                 <template x-for="(delegate, index) in delegates" :key="`delegate-${delegate.tmp_id}`">
-                    <div>
+                    <div class="mt-4">
                         <input type="hidden" :name="`delegates[${index}][tmp_id]`" :value="delegate.tmp_id" />
 
                         <div class="delegate-row border rounded p-4 grid grid-cols-12 gap-4 relative">
-                            <button type="button"
-                                class="delete-row absolute top-2 end-2 text-red-600 hover:text-red-800"
-                                title="Remove delegate" @click="removeDelegate(index)"
-                                x-show="delegates.length > 0">&times;</button>
-
+                            
                             <!-- Title en -->
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('title') }}</label>
@@ -503,10 +499,15 @@
                                     <input type="checkbox" :id="`accommodation-${index}`"
                                         :name="`delegates[${index}][accommodation]`" value="1"
                                         class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                        x-model="delegate.accommodation" />
+                                        x-model="delegate.accommodation" checked/>
                                     <label :for="`accommodation-${index}`"
                                         class="text-sm text-gray-700">{{ __db('accommodation') }}</label>
                                 </div>
+                                <div class=" items-center ms-auto">
+                                    <button type="button" class="delete-row top-2 text-sm end-2 text-white hover:text-white-800 font-medium rounded-lg px-4 py-2 bg-red-600"  title="Remove delegate" @click="removeDelegate(index)" x-show="delegates.length > 0">{{ __db('delete') }}</button>
+
+                                </div>
+                                
                             </span>
                         </div>
                     </div>

@@ -50,17 +50,22 @@ class AccommodationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'hotel_name' => 'required',
+            'hotel_name'     => 'required_without:hotel_name_ar',
+            'hotel_name_ar'  => 'required_without:hotel_name',
             'address' => 'nullable',
-            'contact_number' => 'required',
-            'rooms.*.room_type' => 'required',
-            'rooms.*.total_rooms' => 'required',
-            'contacts.*.name' => 'required',
-            'contacts.*.phone' => 'required',
+            'contact_number' => 'nullable',
+            'rooms.*.room_type' => 'nullable',
+            'rooms.*.total_rooms' => 'nullable',
+            'contacts.*.name' => 'nullable',
+            'contacts.*.phone' => 'nullable',
+        ], [
+            'hotel_name.required_without' => __db('fill_either_english_or_arabic_field'),
+            'hotel_name_ar.required_without' => __db('fill_either_english_or_arabic_field'),
         ]);
 
         $accommodation = Accommodation::create([
             'hotel_name' => trim($request->hotel_name) ?? null,
+            'hotel_name_ar' => trim($request->hotel_name_ar) ?? null,
             'address' => $request->address,
             'contact_number' => $request->contact_number
         ]);
@@ -98,16 +103,20 @@ class AccommodationController extends Controller
     public function update(Request $request, Accommodation $accommodation)
     {
         $request->validate([
-            'hotel_name' => 'required',
+            'hotel_name'     => 'required_without:hotel_name_ar',
+            'hotel_name_ar'  => 'required_without:hotel_name',
             'address' => 'nullable',
-            'contact_number' => 'required',
-            'rooms.*.room_type' => 'required',
-            'rooms.*.total_rooms' => 'required',
-            'contacts.*.name' => 'required',
-            'contacts.*.phone' => 'required',
+            'contact_number' => 'nullable',
+            'rooms.*.room_type' => 'nullable',
+            'rooms.*.total_rooms' => 'nullable',
+            'contacts.*.name' => 'nullable',
+            'contacts.*.phone' => 'nullable',
+        ], [
+            'hotel_name.required_without' => __db('fill_either_english_or_arabic_field'),
+            'hotel_name_ar.required_without' => __db('fill_either_english_or_arabic_field'),
         ]);
 
-        $accommodation->update($request->only('hotel_name', 'address', 'contact_number'));
+        $accommodation->update($request->only('hotel_name','hotel_name_ar', 'address', 'contact_number'));
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $roomData) {
@@ -483,6 +492,7 @@ class AccommodationController extends Controller
 
         $roomTypes = AccommodationRoom::with('roomType')
             ->where('accommodation_id', $hotel->id)
+            ->where('available_rooms', '>', 0)
             ->get();
         return view('admin.accommodations.add-external-members', compact('hotel', 'roomTypes'));
     }
@@ -604,6 +614,7 @@ class AccommodationController extends Controller
         $hotel = Accommodation::findOrFail($externalMember->hotel_id);
         $roomTypes = AccommodationRoom::with('roomType')
             ->where('accommodation_id', $hotel->id)
+            ->where('available_rooms', '>', 0)
             ->get();
         return view('admin.accommodations.edit-external-members', compact('externalMember', 'hotel', 'roomTypes'));
     }

@@ -8,6 +8,7 @@ window.jQuery.moment = moment;
 import "daterangepicker/daterangepicker.css";
 
 import "jquery-validation";
+import "jquery-validation/dist/additional-methods.js";
 
 import select2 from "select2";
 import "select2/dist/css/select2.min.css";

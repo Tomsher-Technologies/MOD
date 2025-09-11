@@ -44,7 +44,7 @@
                                 <td class="px-4 py-3 text-end" dir="ltr">
                                     {{ $key + 1 }}
                                 </td>
-                                <td class="border border-gray-200 px-4 py-3 text-black">{{ $dropdown->name }}</td>
+                                <td class="border border-gray-200 px-4 py-3 text-black">{{ __db($dropdown->code) }}</td>
                                 <td class=" px-4 py-4 text-black text-center flex items-center">
                                     <div class="relative inline-block">
                                         <svg class="copy-icon w-6 h-6 text-black cursor-pointer"

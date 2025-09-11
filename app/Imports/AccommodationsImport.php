@@ -19,14 +19,17 @@ class AccommodationsImport implements ToCollection, WithHeadingRow
                             })->pluck('id')->toArray();
 
         foreach ($rows as $row) {
-            $existingHotel = Accommodation::where('hotel_name', trim($row['hotel_name']))->first();
+            $existingHotel = Accommodation::where('hotel_name', trim($row['hotel_name_en']))
+                                        ->orWhere('hotel_name_ar', trim($row['hotel_name_ar']))
+                                        ->first();
 
             if ($existingHotel) {
                 continue;
             }
 
             $accommodation = Accommodation::create([
-                'hotel_name'     => trim($row['hotel_name']) ?? null,
+                'hotel_name'     => trim($row['hotel_name_en']) ?? null,
+                'hotel_name_ar'  => trim($row['hotel_name_ar']) ?? null,
                 'contact_number' => $row['contact_number'] ?? null,
                 'address'        => $row['address'] ?? null,
             ]);

@@ -52,7 +52,11 @@
                             </th>
                             <th scope="col"
                                 class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
-                                {{ __db('hotel_name') }}
+                                {{ __db('hotel_name') }} ({{ __db('english') }})
+                            </th>
+                            <th scope="col"
+                                class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                {{ __db('hotel_name') }} ({{ __db('arabic') }})
                             </th>
                             <th scope="col"
                                 class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
@@ -88,11 +92,26 @@
                                             
                                     @enddirectCanany
 
-                                    {{ $hotel->hotel_name ?? '-' }}
+                                    {{ $hotel->getRawOriginal('hotel_name') ?? '-' }}
+
                                     @directCanany(['view_accommodations', 'delegate_view_accommodations', 'escort_view_accommodations','driver_view_accommodations','hotel_view_accommodations'])
                                         </a>
                                     @enddirectCanany
                                 </td>
+
+                                <td class="px-3 py-3 border border-gray-200">
+                                    @directCanany(['view_accommodations', 'delegate_view_accommodations', 'escort_view_accommodations','driver_view_accommodations','hotel_view_accommodations'])
+                                        <a href="{{ route('accommodations.show', base64_encode($hotel->id)) }}" class="text-[#B68A35] hover:underline">
+                                            
+                                    @enddirectCanany
+
+                                    {{ $hotel->getRawOriginal('hotel_name_ar') ?? '-' }}
+                                    
+                                    @directCanany(['view_accommodations', 'delegate_view_accommodations', 'escort_view_accommodations','driver_view_accommodations','hotel_view_accommodations'])
+                                        </a>
+                                    @enddirectCanany
+                                </td>
+
                                 <td class="px-3 py-3 border border-gray-200">
                                     {{ $hotel->address ?? '-' }}
                                 </td>
@@ -102,8 +121,8 @@
                                 <td class="px-3 py-3 border border-gray-200">
                                     @if ($hotel->contacts)
                                         @foreach ($hotel->contacts as $contact_person)
-                                            <div class="mb-2">{{ $contact_person->name ?? '-' }} -
-                                                {{ $contact_person->phone ?? '-' }}</div>
+                                            <div class="mb-2">{{ $contact_person->name }} -
+                                                {{ $contact_person->phone  }}</div>
                                         @endforeach
                                     @endif
                                 </td>
@@ -115,8 +134,8 @@
                                     @endphp
                                     @if ($hotel->rooms)
                                         @foreach ($hotel->rooms as $room)
-                                            <div class="mb-2">{{ $room->roomType->value ?? '-' }} -
-                                                {{ $room->assigned_rooms }}/{{ $room->total_rooms }}</div>
+                                            <div class="mb-2">{{ $room->roomType?->value ?? "N/A" }} -
+                                                {{ $room->assigned_rooms ?? 0 }}/{{ $room->total_rooms ?? 0 }}</div>
                                             @php
                                                 $total_rooms += $room->total_rooms;
                                                 $assigned_rooms += $room->assigned_rooms;

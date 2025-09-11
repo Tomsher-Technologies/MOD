@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Accommodation extends Model
 {
-    protected $fillable = ['hotel_name', 'address', 'contact_number','status', 'event_id', 'ref_code','created_by', 'updated_by'];
+    protected $fillable = ['hotel_name', 'hotel_name_ar', 'address', 'contact_number','status', 'event_id', 'ref_code','created_by', 'updated_by'];
 
     public function event()
     {
@@ -68,5 +68,16 @@ class Accommodation extends Model
                 $accommodation->updated_by = auth()->user()->id;
             }
         });
+    }
+
+    public function getHotelNameAttribute($value)
+    {
+        $lang = app()->getLocale() ?? 'en';
+
+        if ($lang !== 'en' && !empty($this->attributes['hotel_name_ar'])) {
+            return $this->attributes['hotel_name_ar'];
+        }
+
+        return $value;
     }
 }
