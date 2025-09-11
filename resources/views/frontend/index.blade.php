@@ -20,7 +20,7 @@
                 <p class="text-white text-[28px] mb-6">
                     {{ $page->getTranslation('title2', $lang) }}
                 </p>
-                <a href="about-us.html"
+                <a href="{{ route('about-us') }}"
                     class="inline-block bg-[#b68a35] text-white px-8 py-3 rounded-lg hover:bg-[#9e7526] transition">
                     {{ $page->getTranslation('btn_link_1', $lang) }}
                 </a>
@@ -41,7 +41,7 @@
                 <div class="col-span-6 text-[#797E86]">
                     {!! $page->getTranslation('content1', $lang) !!}
                     <br>
-                    <a href="about-us.html"
+                    <a href="{{ route('about-us') }}"
                         class="inline-block bg-[#b68a35] mt-4 text-white px-8 py-3 rounded-lg hover:bg-[#9e7526] transition">
                         {!! $page->getTranslation('btn_link_2', $lang) !!}
                     </a>
@@ -120,12 +120,12 @@
             </div>
         </div>
     </section>
-    <section class="py-[160px] bg-[url('..{{ $page->getTranslation('image', $lang) }}')] bg-cover bg-center relative">
+    <section class="py-[160px]  bg-cover bg-center relative" style="background-image: url('{{ asset($page->getTranslation('image', $lang)) }}');">
         <div class="container mx-auto relative z-10">
             <h2 class="text-[40px] text-[#744e2e] mb-2">{!! $page->getTranslation('content3', $lang) !!}</h2>
             <p class="text-[#797E86]">{!! $page->getTranslation('content4', $lang) !!}
             </p>
-            <a href="committees.html"
+            <a href="{{ route('committees') }}"
                 class="mt-3 inline-block bg-[#b68a35] text-white px-8 py-3 rounded-lg hover:bg-[#9e7526] text-end me-auto">
                 {!! $page->getTranslation('btn_link_3', $lang) !!}
             </a>
@@ -135,36 +135,20 @@
         <div class="container mx-auto">
             <h2 class="text-[40px] text-[#744e2e] mb-6">{!! $page->getTranslation('title9', $lang) !!}</h2>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
-                <!-- News Item 1 -->
-                <div class="p-4 rounded-lg  border border-gray-200">
-                    <a href="news-events-details.html">
-                        <img src="src/images/news-1.jpg" alt="Event 1" class="w-full h-70 object-cover rounded mb-3">
-                        <h3 class="text-sm text-[#b68a35]">Aug 15, 2025</h3>
-                        <p class="text-[20px] leading-[25px] font-medium mt-1 text-[#797E86]">Dubai Airshow 2025 launches
-                            future-facing conference programme. </p>
-                    </a>
-                </div>
-                <!-- News Item 2 -->
-                <div class="p-4 rounded-lg  border border-gray-200">
-                    <a href="news-events-details.html">
-                        <img src="src/images/news-2.jpg" alt="Event 1" class="w-full h-70 object-cover rounded mb-3">
-                        <h3 class="text-sm text-[#b68a35]">Aug 16, 2025 </h3>
-                        <p class="text-[20px] leading-[25px] font-medium mt-1 text-[#797E86]">Dubai Airshow 2025 Space
-                            Steering Committee charts path</p>
-                    </a>
-                </div>
-                <!-- News Item 3 -->
-                <div class="p-4 rounded-lg  border border-gray-200">
-                    <a href="news-events-details.html">
-                        <img src="src/images/news-3.jpg" alt="Event 1" class="w-full h-70 object-cover rounded mb-3">
-                        <h3 class="text-sm text-[#b68a35]">Aug 17, 2025 </h3>
-                        <p class="text-[20px] leading-[25px] font-medium mt-1 text-[#797E86]">The future is here:
-                            Record-breaking Dubai Airshow returns this November</p>
-                    </a>
-                </div>
+                @foreach ($news as $new)
+                    <div class="p-4 rounded-lg  border border-gray-200">
+                        <a href="{{ route('news-details', base64_encode($new->id)) }}">
+                            <img src="{{ asset(getUploadedImage($new->image)) }}" alt="{{ $new->getTranslation('title', $lang) }}" class="w-full h-70 object-cover rounded mb-3">
+                            <h3 class="text-sm text-[#b68a35]">{{ date('M d, Y', strtotime($new->news_date)) }}</h3>
+                            <p class="text-[20px] leading-[25px] font-medium mt-1 text-[#797E86]">
+                                {{ $new->getTranslation('title', $lang) }}
+                            </p>
+                        </a>
+                    </div>
+                @endforeach
             </div>
             <div class="mt-6 text-center">
-                <a href="news-events.html"
+                <a href="{{ route('news') }}"
                     class="mt-3 inline-block bg-[#b68a35] text-white px-8 py-3 rounded-lg hover:bg-[#9e7526] text-end me-auto">
                     {!! $page->getTranslation('btn_link_4', $lang) !!}
                 </a>
