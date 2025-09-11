@@ -27,6 +27,27 @@ import Swal from "sweetalert2";
 import { Fancybox } from "@fancyapps/ui";
 import "flowbite";
 import "./bootstrap";
+import tinymce from 'tinymce/tinymce';
+// Default UI/theme
+import 'tinymce/icons/default';
+import 'tinymce/themes/silver';
+import 'tinymce/models/dom';
+
+// Plugins
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/autolink';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/code';
+import 'tinymce/plugins/table';
+import 'tinymce/plugins/preview';
+import 'tinymce/plugins/fullscreen';
+import 'tinymce/plugins/media';
+import 'tinymce/plugins/wordcount';
+// import 'tinymce/skins/ui/oxide/skin.min.css';
+// import 'tinymce/skins/ui/oxide/content.min.css';
+// import 'tinymce/skins/content/default/content.min.css';
 
 import Highcharts from "highcharts";
 window.Highcharts = Highcharts;
@@ -72,6 +93,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         $this.on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
+        });
+    });
+
+    document.querySelectorAll('.texteditor').forEach(function(el) {
+        tinymce.init({
+            target: el,
+            directionality: el.getAttribute('dir') === 'rtl' ? 'rtl' : 'ltr',
+            height: 400,
+            license_key: 'gpl',
+            skin: true,
+            content_css: true,
+            plugins: 'advlist autolink lists link image table preview code fullscreen media wordcount',
+            toolbar: 'undo redo | styles | bold italic underline | ' +
+                    'alignleft aligncenter alignright alignjustify | ' +
+                    'bullist numlist outdent indent | link image table | code preview fullscreen',   
+            menubar: 'file edit view insert format tools table',
+            skin_url: '/tinymce/skins/ui/oxide',   
+            content_css: '/tinymce/skins/content/default/content.min.css',
         });
     });
 });

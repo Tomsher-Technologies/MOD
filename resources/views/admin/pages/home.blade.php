@@ -99,9 +99,9 @@
                     <div>
                         <label class="form-label">{{ __db('content') }} ({{ $lang['name'] }}) <span class="text-red-600">*</span></label>
                         <textarea name="translations[{{ $lang['code'] }}][content1]"
-                                  @if($lang['code']=='en') dir="ltr" @endif
+                                  @if($lang['code']=='en') dir="ltr" @else dir="rtl" @endif
                                   rows="5"
-                                  class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">{{ old('translations.' . $lang['code'] . '.content1', $trans->content1 ?? '') }}</textarea>
+                                  class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">{!! old('translations.' . $lang['code'] . '.content1', $trans->content1 ?? '') !!}</textarea>
                     </div>
 
                     <div>
@@ -127,9 +127,9 @@
                     <div>
                         <label class="form-label">{{ __db('content') }} ({{ $lang['name'] }}) <span class="text-red-600">*</span></label>
                         <textarea name="translations[{{ $lang['code'] }}][content2]"
-                                  @if($lang['code']=='en') dir="ltr" @endif
+                                  @if($lang['code']=='en') dir="ltr" @else dir="rtl" @endif
                                   rows="5"
-                                  class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">{{ old('translations.' . $lang['code'] . '.content2', $trans->content2 ?? '') }}</textarea>
+                                  class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">{!! old('translations.' . $lang['code'] . '.content2', $trans->content2 ?? '') !!}</textarea>
                     </div>
 
                     <div>
@@ -234,10 +234,7 @@
 
                     <div>
                         <label class="form-label">{{ __db('content') }} ({{ $lang['name'] }}) <span class="text-red-600">*</span></label>
-                        <input type="text" name="translations[{{ $lang['code'] }}][content4]" value="{{ $trans->content4 ?? '' }}"
-                               @if($lang['code']=='en') dir="ltr" @endif
-                               class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                        <textarea name="translations[{{ $lang['code'] }}][content4]" @if($lang['code']=='en') dir="ltr" @else dir="rtl" @endif class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"  @if($lang['code']=='en') required @endif>{!! $trans->content4 ?? '' !!}</textarea>
                     </div>
 
                     <div class="grid grid-cols-12 gap-5">
