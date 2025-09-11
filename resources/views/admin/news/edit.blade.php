@@ -75,7 +75,7 @@
                     <div class="col-span-12">
                         <label class="form-label">{{ __db('description') }} ({{ __db('english') }}) <span class="text-xs text-neutral-500">({{ __db('optional') }})</span> <span class="text-red-500">*</span> :</label>
                         <textarea name="description_en" rows="5" dir="ltr"
-                            class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                            class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                             >{{ old('description_en',  $news->getTranslation('description', 'en')) }}</textarea>
                         @error('description_en')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
@@ -84,8 +84,8 @@
 
                     <div class="col-span-12">
                         <label class="form-label">{{ __db('description') }} ({{ __db('arabic') }}) <span class="text-red-500">*</span> :</label>
-                        <textarea name="description_ar" rows="5"
-                            class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        <textarea name="description_ar" rows="5" dir="rtl"
+                            class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                             >{{ old('description_ar', $news->getTranslation('description', 'ar')) }}</textarea>
                         @error('description_ar')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
