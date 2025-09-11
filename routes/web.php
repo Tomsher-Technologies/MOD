@@ -6,10 +6,16 @@ use App\Http\Controllers\Escort\HomeController as EscortHomeController;
 use App\Http\Controllers\Driver\HomeController as DriverHomeController;
 use App\Http\Controllers\Hotel\HomeController as HotelHomeController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FrontController;
 
 require __DIR__.'/admin.php';
 
-Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/', [FrontController::class, 'home'])->name('home');
+Route::get('/about-us', [FrontController::class, 'aboutUs'])->name('about-us');
+Route::get('/committees', [FrontController::class, 'committees'])->name('committees');
+Route::get('/news', [FrontController::class, 'committees'])->name('news');
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('web.login');
 Route::get('logout', [AuthController::class, 'logout'])->name('web.logout');
 

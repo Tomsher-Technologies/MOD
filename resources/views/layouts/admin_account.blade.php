@@ -18,6 +18,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @yield('style')
+    <style>
+        .tox-promotion {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body class="bg-[#f2f2f2]" dir="rtl">
