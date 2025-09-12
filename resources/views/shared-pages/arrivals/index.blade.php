@@ -246,7 +246,7 @@
                     </div>
 
                 </div>
-
+{{-- 
                 @if (isset($paginator))
                     <div class="mt-4">
                         {{ $paginator->links() }}
@@ -255,7 +255,7 @@
                     <div class="mt-4">
                         {{ $arrivals->links() }}
                     </div>
-                @endif
+                @endif --}}
 
             </div>
         </div>

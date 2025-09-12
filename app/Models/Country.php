@@ -27,11 +27,22 @@ class Country extends Model
     public function getNameAttribute($value)
     {
         $lang = getActiveLanguage();
-        
+
         if ($lang !== 'en' && !empty($this->attributes['name_ar'])) {
             return $this->attributes['name_ar'];
         }
-        
+
         return $value;
+    }
+
+    public function getNameEn()
+    {
+        return $this->attributes['name'];
+    }
+
+
+    public function getNameAr()
+    {
+        return $this->attributes['name_ar'];
     }
 }

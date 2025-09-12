@@ -39,7 +39,6 @@
                 @php
                     $departmentOptions = getDropDown('departments');
                     $continentOptions = getDropDown('continents');
-                    $countryOptions = getDropDown('country');
                     $invitationStatusOptions = getDropDown('invitation_status');
                     $participationStatusOptions = getDropDown('participation_status');
                 @endphp

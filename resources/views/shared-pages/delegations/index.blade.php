@@ -80,7 +80,25 @@
                             'render' => function ($delegation) {
                                 $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
                                 return $teamHeads->isNotEmpty()
-                                    ? $teamHeads->map(fn($head) => e($head->getTranslation('title') . ". " . $head->getTranslation('name')))->implode('<br>')
+                                    ? $teamHeads
+                                        ->map(
+                                            fn($head) => e(
+                                                $head->getTranslation('title') . '. ' . $head->getTranslation('name'),
+                                            ),
+                                        )
+                                        ->implode('<br>')
+                                    : '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('designation'),
+                            'key' => 'team_head_designation',
+                            'render' => function ($delegation) {
+                                $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
+                                return $teamHeads->isNotEmpty()
+                                    ? $teamHeads
+                                        ->map(fn($head) => e($head->getTranslation('designation')))
+                                        ->implode('<br>')
                                     : '-';
                             },
                         ],
@@ -146,29 +164,38 @@
                             'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
                         ],
 
-                        [
-                            'key' => 'note',
-                            'label' => __db('note'),
-                            'render' => function ($d) {
-                                if (empty($d->note1) && empty($d->note2)) {
-                                    return '-';
-                                }
-                                return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
-                                    data-modal-target="note-modal" data-modal-toggle="note-modal"
-                                    data-note1="' .
-                                    e($d->note1) .
-                                    '"
-                                    data-note2="' .
-                                    e($d->note2) .
-                                    '"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
-                                </svg>';
-                            },
-                        ],
+                        // [
+                        //     'key' => 'note',
+                        //     'label' => __db('note'),
+                        //     'render' => function ($d) {
+                        //         if (empty($d->note1) && empty($d->note2)) {
+                        //             return '-';
+                        //         }
+                        //         return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
+    //             data-modal-target="note-modal" data-modal-toggle="note-modal"
+    //             data-note1="' .
+                        //             e($d->note1) .
+                        //             '"
+    //             data-note2="' .
+                        //             e($d->note2) .
+                        //             '"
+    //             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+    //             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
+    //         </svg>';
+                        //     },
+                        // ],
                         [
                             'label' => __db(__db('actions')),
                             'key' => __db('actions'),
+                            'permission' => [
+                                'edit_delegations',
+                                'delegate_edit_delegations',
+                                'view_delegations',
+                                'delegate_view_delegations',
+                                'escort_view_delegations',
+                                'driver_view_delegations',
+                                'hotel_view_delegations',
+                            ],
                             'render' => function ($delegation) {
                                 $buttons = '';
                                 if (can(['edit_delegations', 'delegate_edit_delegations'])) {
