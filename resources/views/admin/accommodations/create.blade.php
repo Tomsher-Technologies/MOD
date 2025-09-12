@@ -36,12 +36,12 @@
         });
 
         $(`select[name="rooms[${roomIndex}][room_type]"]`).rules("add", {
-            required: true,
+            required: false,
             messages: { required: "{{ __db('this_field_is_required') }}" }
         });
 
         $(`input[name="rooms[${roomIndex}][total_rooms]"]`).rules("add", {
-            required: true,
+            required: false,
             digits: true,
             min: 1,
             messages: {
@@ -79,12 +79,12 @@
         container.insertAdjacentHTML('beforeend', row);
 
         $(`input[name="contacts[${contactIndex}][name]"]`).rules("add", {
-            required: true,
+            required: false,
             messages: { required: "{{ __db('this_field_is_required') }}" }
         });
 
         $(`input[name="contacts[${contactIndex}][phone]"]`).rules("add", {
-            required: true,
+            required: false,
             phonePattern: true,
             messages: { 
                 required: "{{ __db('this_field_is_required') }}"

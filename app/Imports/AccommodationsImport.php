@@ -53,7 +53,7 @@ class AccommodationsImport implements ToCollection, WithHeadingRow
                 if (str_starts_with($column, 'contact_name_')) {
                     $index = str_replace('contact_name_', '', $column);
                     $phoneCol = 'contact_phone_' . $index;
-                    if (!empty($value) && !empty($row[$phoneCol])) {
+                    if (!empty($value) || !empty($row[$phoneCol])) {
                         $accommodation->contacts()->create([
                             'name'  => $value,
                             'phone' => $row[$phoneCol],
