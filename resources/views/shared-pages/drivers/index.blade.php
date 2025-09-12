@@ -1,7 +1,33 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
+        @directCanany(['add_drivers', 'driver_add_drivers', 'import_drivers', 'driver_import_drivers'])
+            <button id="driverDropdownButton" data-dropdown-toggle="driverDropdown"
+                class="btn !text-[#B68A35] !bg-[#E6D7A2]  text-md rounded-lg px-6 py-3 text-center inline-flex items-center"
+                type="button">
+                {{ __db('add') . ' ' . __db('driver') }}
+                <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 4 4 4-4" />
+                </svg>
+            </button>
 
+            <div id="driverDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
+                <ul class="py-2 text-sm text-gray-700" aria-labelledby="driverDropdownButton">
+                    <li>
+                        <a href="{{ route('drivers.create') }}"
+                            class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('driver') . ' ' . __db('manually') }}</a>
+                    </li>
+                    {{-- @directCanany(['import_drivers', 'driver_import_drivers']) --}}
+                        <li>
+                            <a href="{{ route('drivers.import.form') }}"
+                                class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('driver') . ' ' . __db('bulk') }}</a>
+                        </li>
+                    {{-- @enddirectCanany --}}
+                </ul>
+            </div>
+        @enddirectCanany
     </div>
     <!-- Drivers -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">

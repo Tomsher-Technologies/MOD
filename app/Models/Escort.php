@@ -53,19 +53,17 @@ class Escort extends Model
         if (!$this->phone_number) {
             return '';
         }
-        
+
         $cleanNumber = preg_replace('/[^0-9]/', '', $this->phone_number);
-        
-        // If it starts with 971 and is 12 digits, remove the country code
+
         if (strlen($cleanNumber) === 12 && substr($cleanNumber, 0, 3) === '971') {
             return substr($cleanNumber, 3);
         }
-        
-        // If it's already 9 digits, return as is
+
         if (strlen($cleanNumber) === 9) {
             return $cleanNumber;
         }
-        
+
         return $cleanNumber;
     }
 
@@ -74,7 +72,12 @@ class Escort extends Model
         static::creating(function ($escort) {
             $latestEscort = self::latest('id')->first();
             $newId = $latestEscort ? $latestEscort->id + 1 : 1;
-            $escort->code = 'EC' . str_pad($newId, 3, '0', STR_PAD_LEFT);
+
+            $minLength = 3;
+            $newIdLength = strlen((string)$newId);
+            $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
+
+            $escort->code = 'EC' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
 
             if (!$escort->event_id) {
                 $sessionEventId = Session::get('current_event_id');

@@ -7,7 +7,9 @@ use App\Http\Traits\HandlesUpdateConfirmation;
 use App\Models\Delegation;
 use App\Models\Dropdown;
 use App\Models\Driver;
+use App\Imports\DriverImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DriverController extends Controller
 {
@@ -24,6 +26,10 @@ class DriverController extends Controller
         $this->middleware('permission:add_drivers|driver_add_drivers', [
             'only' => ['create', 'store']
         ]);
+
+        // $this->middleware('permission:import_drivers|driver_import_drivers', [
+        //     'only' => ['showImportForm', 'import']
+        // ]);
 
         $this->middleware('permission:assign_drivers|driver_edit_drivers', [
             'only' => ['assign']
@@ -473,6 +479,24 @@ class DriverController extends Controller
         }
 
         return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
+    }
+
+    public function showImportForm()
+    {
+        return view('admin.drivers.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+
+        $excel = Excel::import(new DriverImport, $request->file('file'));
+
+        return redirect()->route('drivers.index')
+            ->with('success',  __db('driver') . __db('created_successfully'));
     }
 
     protected function loadDropdownOptions()

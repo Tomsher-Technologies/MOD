@@ -7,7 +7,9 @@ use App\Http\Traits\HandlesUpdateConfirmation;
 use App\Models\Delegation;
 use App\Models\Dropdown;
 use App\Models\Escort;
+use App\Imports\EscortImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EscortController extends Controller
 {
@@ -23,6 +25,10 @@ class EscortController extends Controller
 
         $this->middleware('permission:add_escorts|escort_add_escorts', [
             'only' => ['create', 'store']
+        ]);
+
+        $this->middleware('permission:import_escorts|escort_import_escorts', [
+            'only' => ['showImportForm', 'import']
         ]);
 
         $this->middleware('permission:assign_escorts|escort_edit_escorts', [
@@ -457,6 +463,23 @@ class EscortController extends Controller
         }
 
         return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
+    }
+
+    public function showImportForm()
+    {
+        return view('admin.escorts.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        Excel::import(new EscortImport, $request->file('file'));
+
+        return redirect()->route('escorts.index')
+            ->with('success',  __db('escort') . __db('created_successfully'));
     }
 
     protected function loadDropdownOptions()
