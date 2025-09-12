@@ -13,7 +13,6 @@
 
     @if ($errors->any())
         <div class="p-4 my-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-            <span class="font-medium">Please fix the errors below:</span>
             <ul class="mt-1.5 list-disc list-inside">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -40,25 +39,25 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('title_en') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}" required
+                    <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}" 
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('title_ar') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="title_ar" value="{{ old('title_ar', $delegate->title_ar) }}" required
+                    <input type="text" name="title_ar" value="{{ old('title_ar', $delegate->title_ar) }}" 
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('name_en') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="name_en" value="{{ old('name_en', $delegate->name_en) }}" required
+                    <input type="text" name="name_en" value="{{ old('name_en', $delegate->name_en) }}" 
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('name_ar') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="name_ar" value="{{ old('name_ar', $delegate->name_ar) }}" required
+                    <input type="text" name="name_ar" value="{{ old('name_ar', $delegate->name_ar) }}" 
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 

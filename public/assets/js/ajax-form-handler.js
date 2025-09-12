@@ -1,23 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-    /**
-     * Attaches a single event listener to the body to handle all form submissions
-     * that have the 'data-ajax-form' attribute. This is more efficient than attaching many listeners.
-     */
     document.body.addEventListener("submit", function (e) {
         const form = e.target.closest('form[data-ajax-form="true"]');
         if (!form) {
-            return; // If the submitted element is not our target form, do nothing.
+            return;
         }
 
-        e.preventDefault(); // Stop the default browser submission
+        e.preventDefault();
         handleFormSubmit(form);
     });
 });
 
-/**
- * Handles the entire asynchronous form submission process.
- * @param {HTMLFormElement} form The form element being submitted.
- */
 async function handleFormSubmit(form) {
     const submitButton = form.querySelector('button[type="submit"]');
     const originalButtonText = submitButton.innerHTML;
@@ -40,7 +32,6 @@ async function handleFormSubmit(form) {
 
         if (!response.ok) {
             if (response.status === 422 && result.errors) {
-                // Handle validation errors
                 let errorHtml = '<ul class="mt-1.5 list-disc list-inside text-left">';
                 for (const key in result.errors) {
                     result.errors[key].forEach((error) => {
@@ -53,12 +44,10 @@ async function handleFormSubmit(form) {
                 throw new Error(result.message || "An unknown server error occurred.");
             }
         } else {
-            // Server responded successfully
             if (result.status === "confirmation_required") {
                 promptForConfirmation(form, result.changed_fields);
             } else if (result.status === "success") {
                 await Swal.fire("Success!", result.message, "success");
-                // Dispatch a custom event with the success result
                 window.dispatchEvent(new CustomEvent('ajaxFormSuccess', { detail: result }));
                 if (result.redirect_url) {
                     window.location.href = result.redirect_url;
@@ -71,22 +60,16 @@ async function handleFormSubmit(form) {
         console.error("Submission Error:", error);
         Swal.fire("Request Failed!", error.message, "error");
     } finally {
-        // Re-enable the submit button
         submitButton.innerHTML = originalButtonText;
         submitButton.disabled = false;
     }
 }
 
-/**
- * Displays a confirmation modal with details of the changed fields.
- * @param {HTMLFormElement} form The form element.
- * @param {object} changedFields An object containing details of the changed fields.
- */
 function promptForConfirmation(form, changedFields) {
     let changedFieldsHtml = '<div class="text-left">';
 
     for (const key in changedFields) {
-        const change = changedFields[key]; // Access the object with {label, old, new}
+        const change = changedFields[key];
 
         changedFieldsHtml += `
             <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0">
@@ -95,9 +78,10 @@ function promptForConfirmation(form, changedFields) {
                     <span class="ml-3 text-gray-800 font-medium">${change.label}</span>
                 </label>
                 <div class="flex items-center text-xs sm:text-sm ml-4 flex-shrink-0">
-                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-md font-mono">${change.old}</span>
-                    <span class="mx-2 font-bold text-gray-400">→</span>
                     <span class="px-2 py-1 bg-green-100 text-green-800 rounded-md font-mono">${change.new}</span>
+                    <span class="mx-2 font-bold text-gray-400">→</span>
+                    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-md font-mono">${change.old}</span>
+
                 </div>
             </div>`;
     }
@@ -117,24 +101,21 @@ function promptForConfirmation(form, changedFields) {
         confirmButtonText: "Confirm & Save",
         cancelButtonText: "Cancel",
         customClass: {
-            popup: 'w-full max-w-2xl' // Make modal wider to fit content
+            popup: 'w-full max-w-2xl'
         },
     }).then((dialogResult) => {
         if (dialogResult.isConfirmed) {
-            // Remove any old confirmation flags before adding new ones
             form.querySelector('input[name="_is_confirmed"]')?.remove();
             form.querySelectorAll('input[name="_notify_fields[]"]')?.forEach(
                 (el) => el.remove()
             );
 
-            // Add a hidden input to the form to signify confirmation
             const confirmationInput = document.createElement("input");
             confirmationInput.type = "hidden";
             confirmationInput.name = "_is_confirmed";
             confirmationInput.value = "true";
             form.appendChild(confirmationInput);
 
-            // Add hidden inputs for the selected notification fields
             const notifyCheckboxes = Swal.getPopup().querySelectorAll(
                 'input[name="_notify_fields[]"]:checked'
             );
@@ -152,7 +133,6 @@ function promptForConfirmation(form, changedFields) {
             changedFieldsInput.value = JSON.stringify(changedFields);
             form.appendChild(changedFieldsInput);
 
-            // Re-submit the form, which will now include the confirmation flags
             handleFormSubmit(form);
         }
     });

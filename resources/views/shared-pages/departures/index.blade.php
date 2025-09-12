@@ -299,7 +299,7 @@
                     </div>
 
                     <div>
-                        <label class="form-label">{{ __db('date_time') }}:</label>
+                        <label class="form-label">{{ __db('date_time') }}:<span class="text-red-600">*</span></label>
                         <input type="datetime-local" name="date_time" x-model="departure.date_time"
                             class="p-3 rounded-lg w-full border text-sm">
                     </div>

@@ -55,7 +55,7 @@
 
         <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-                <label class="form-label block mb-1 text-sm">{{ __db('date_time') }}:</label>
+                <label class="form-label block mb-1 text-sm">{{ __db('date_time') }}:<span class="text-red-600">*</span></label>
                 <input name="{{ $type }}[date_time]" type="datetime-local"
                     value="{{ old($type . '.date_time', $dateTime) }}"
                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm" />

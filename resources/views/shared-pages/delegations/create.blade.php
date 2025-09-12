@@ -44,7 +44,7 @@
                 @endphp
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_from') }}:</label>
+                    <label class="form-label">{{ __db('invitation_from') }}: <span class="text-red-600">*</span></label>
 
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
@@ -66,7 +66,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('continent') }}:</label>
+                    <label class="form-label">{{ __db('continent') }}: <span class="text-red-600">*</span></label>
                     <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_continent') }}</option>
@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('country') }}:</label>
+                    <label class="form-label">{{ __db('country') }}: <span class="text-red-600">*</span></label>
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_country') }}</option>
@@ -105,7 +105,8 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_status') }}:</label>
+                    <label class="form-label">{{ __db('invitation_status') }}: <span
+                            class="text-red-600">*</span></label>
                     <select name="invitation_status_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_invitation_status') }}</option>
@@ -125,7 +126,8 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('participation_status') }}:</label>
+                    <label class="form-label">{{ __db('participation_status') }}: <span
+                            class="text-red-600">*</span></label>
                     <select name="participation_status_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_participation_status') }}</option>
@@ -656,6 +658,7 @@
                         relationship: '',
                         internal_ranking_id: '',
                         note: '',
+                        accommodation: true,
                         team_head: false,
                         badge_printed: false
                     });

@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_from') }}:</label>
+                    <label class="form-label">{{ __db('invitation_from') }}: <span class="text-red-600">*</span></label>
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __db('select_invitation_from') }}</option>
@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('continent') }}:</label>
+                    <label class="form-label">{{ __db('continent') }}: <span class="text-red-600">*</span></label>
                     <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __('Select Continent') }}</option>
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('country') }}:</label>
+                    <label class="form-label">{{ __db('country') }}: <span class="text-red-600">*</span></label>
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __('Select Country') }}</option>
@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_status') }}:</label>
+                    <label class="form-label">{{ __db('invitation_status') }}: <span class="text-red-600">*</span></label>
                     <select name="invitation_status_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Invitation Status') }}</option>
@@ -88,7 +88,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('participation_status') }}:</label>
+                    <label class="form-label">{{ __db('participation_status') }}: <span class="text-red-600">*</span></label>
                     <select name="participation_status_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Participation Status') }}</option>
@@ -252,8 +252,8 @@
                                         x-model="attachment.deleted" />
 
                                     <div class="col-span-3">
-                                        <label class="form-label">{{ __db('title') }}</label>
-                                        <select :name="`attachments[${index}][title_id]`"
+                                        <label class="form-label">{{ __db('title') }}<span class="text-red-600">*</span></label>
+                                        <select :name="`attachments[${index}][title_id]`" required
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
                                             x-model.number="attachment.title_id" :disabled="attachment.deleted"
                                             @change="window.hasUnsavedAttachments = true">

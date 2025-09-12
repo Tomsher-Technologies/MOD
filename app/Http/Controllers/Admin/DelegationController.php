@@ -322,14 +322,14 @@ class DelegationController extends Controller
             ->get();
 
         $hotels = Accommodation::where('status', 1)
-                    ->whereHas('rooms', function ($q) {
-                        $q->where('available_rooms', '>', 0);
-                    })
-                    ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
-                    ->orderBy('hotel_name', 'asc')
-                    ->get();
+            ->whereHas('rooms', function ($q) {
+                $q->where('available_rooms', '>', 0);
+            })
+            ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
+            ->orderBy('hotel_name', 'asc')
+            ->get();
 
-        return view('admin.delegations.show', compact('delegation','hotels'));
+        return view('admin.delegations.show', compact('delegation', 'hotels'));
     }
 
     public function arrivalsIndex(Request $request)
@@ -786,8 +786,8 @@ class DelegationController extends Controller
             'delegates.*.tmp_id' => 'required_with:delegates',
             'delegates.*.title_en' => 'nullable|string',
             'delegates.*.title_ar' => 'nullable|string',
-            'delegates.*.name_ar' => 'nullable|string',
-            'delegates.*.name_en' => 'required_with:delegates|string',
+            'delegates.*.name_en' => 'nullable|string|required_without:delegates.*.name_ar',
+            'delegates.*.name_ar' => 'nullable|string|required_without:delegates.*.name_en',
             'delegates.*.designation_en' => 'nullable|string',
             'delegates.*.designation_ar' => 'nullable|string',
             'delegates.*.gender_id' => 'required_with:delegates|exists:dropdown_options,id',
@@ -814,7 +814,8 @@ class DelegationController extends Controller
             'participation_status_id.required' => __db('participation_status_id_required'),
             'participation_status_id.exists' => __db('participation_status_id_exists'),
             'delegates.*.tmp_id.required_with' => __db('delegates_tmp_id_required_with'),
-            'delegates.*.name_en.required_with' => __db('delegates_name_en_required_with'),
+            'delegates.*.name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'delegates.*.name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'delegates.*.gender_id.required_with' => __db('delegates_gender_id_required_with'),
             'delegates.*.gender_id.exists' => __db('delegates_gender_id_exists'),
             'delegates.*.parent_id.exists' => __db('delegates_parent_id_exists'),
@@ -1023,7 +1024,7 @@ class DelegationController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Delegation updated successfully.',
-                'redirect_url' => route('delegations.show', $delegation->id),
+                'redirect_url' => route('delegations.edit', $delegation->id),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -1505,8 +1506,8 @@ class DelegationController extends Controller
         $validator = Validator::make($request->all(), [
             'title_en' => 'nullable|string',
             'title_ar' => 'nullable|string',
-            'name_ar' => 'required|string',
-            'name_en' => 'required|string',
+            'name_en' => 'nullable|string|required_without:name_ar',
+            'name_ar' => 'nullable|string|required_without:name_en',
             'designation_en' => 'nullable|string',
             'designation_ar' => 'nullable|string',
             'gender_id' => 'required|exists:dropdown_options,id',
@@ -1532,8 +1533,8 @@ class DelegationController extends Controller
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
-            'name_ar.required' => __db('name_ar_required'),
-            'name_en.required' => __db('name_en_required'),
+            'name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'gender_id.required' => __db('gender_id_required'),
             'gender_id.exists' => __db('delegates_gender_id_exists'),
             'parent_id.exists' => __db('delegates_parent_id_exists'),

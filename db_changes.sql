@@ -599,3 +599,9 @@ ALTER TABLE `event_page_translations`
   INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '141', 'edit_pages', 'Edit Pages', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
   ALTER TABLE `event_page_translations` ADD `title9` VARCHAR(255) NULL DEFAULT NULL AFTER `content8`;
+
+
+
+
+  
+  ALTER TABLE `delegates` CHANGE `name_en` `name_en` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL; -- DONE IN LIVE
