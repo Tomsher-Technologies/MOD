@@ -75,7 +75,7 @@ function promptForConfirmation(form, changedFields) {
             <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0">
                 <label class="flex items-center flex-grow cursor-pointer">
                     <input type="checkbox" name="_notify_fields[]" value="${key}" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                    <span class="ml-3 text-gray-800 font-medium">${change.label}</span>
+                    <span class="ml-3 mr-2 text-gray-800 font-medium">${change.label}</span>
                 </label>
                 <div class="flex items-center text-xs sm:text-sm ml-4 flex-shrink-0">
                     <span class="px-2 py-1 bg-green-100 text-green-800 rounded-md font-mono">${change.new}</span>
@@ -101,7 +101,9 @@ function promptForConfirmation(form, changedFields) {
         confirmButtonText: "Confirm & Save",
         cancelButtonText: "Cancel",
         customClass: {
-            popup: 'w-full max-w-2xl'
+            popup: 'w-full max-w-2xl',
+            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+            cancelButton: 'px-4 rounded-lg'
         },
     }).then((dialogResult) => {
         if (dialogResult.isConfirmed) {

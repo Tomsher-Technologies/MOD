@@ -49,7 +49,7 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
-            <div class="bg-white h-full w-full rounded-lg border-0 p-10">
+            <div class="bg-white h-full w-full rounded-lg border-0 p-7">
                 <x-reusable-table :columns="$columns" tableId="delegationDetails" :data="$data" :noDataMessage="$noDataMessage" />
 
                 <hr class="my-5">

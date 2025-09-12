@@ -1,19 +1,14 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }}</h2>
-
     </div>
     <!-- Escorts -->
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
-
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-
                 <div class=" mb-4 flex items-center justify-between gap-3">
-
                     <form class="w-[50%] me-4" action="{{ route('escorts.index') }}" method="GET">
                         <div class="relative">
-
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 20 20">
@@ -27,21 +22,8 @@
                                 value="{{ request('search') }}" />
                             <button type="submit"
                                 class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
-
                         </div>
                     </form>
-
-                    {{-- <button data-modal-target="column-visibility-modal" data-modal-toggle="column-visibility-modal"
-                        type="button"
-                        class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg me-auto">
-                        <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="1.5"
-                                d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
-                        </svg>
-                        <span>{{ __db('column_list') }}</span>
-                    </button> --}}
 
                     <div class="text-center">
                         <button
@@ -72,7 +54,6 @@
                             'key' => 'escort_id',
                             'render' => fn($escort) => e($escort->code),
                         ],
-
                         [
                             'label' => __db('military_number'),
                             'key' => 'military_number',
@@ -84,7 +65,7 @@
                             'render' => fn($escort) => e($escort->getTranslation('title') ?? ''),
                         ],
                         [
-                            'label' => __db('name_en'),
+                            'label' => __db('name'),
                             'key' => 'name',
                             'render' => fn($escort) => e($escort->getTranslation('name')),
                         ],
@@ -117,7 +98,6 @@
                                         $delegationUrl = $delegation->id
                                             ? route('delegations.show', $delegation->id)
                                             : '';
-
                                         return '<a class="font-medium !text-[#B68A35] hover:underline" href="' .
                                             $delegationUrl .
                                             '?id=' .
@@ -171,11 +151,11 @@
                                                 $output .=
                                                     '<form action="' .
                                                     $unassignUrl .
-                                                    '" method="POST" style="display:inline;">' .
+                                                    '" method="POST" class="unassign-form" style="display:inline;">' .
                                                     csrf_field() .
                                                     '<input type="hidden" name="delegation_id" value="' .
                                                     $delegation->id .
-                                                    '" /><button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
+                                                    '" /><button type="submit" class="unassign-btn !bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
                                                     e($delegation->code) .
                                                     '</span></button></form>';
                                             }
@@ -227,10 +207,8 @@
 
     <form action="{{ route('escorts.index') }}" method="GET">
         <div class="flex flex-col gap-4 mt-4">
-
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title') }}</label>
-
                 <select name="title_id[]" multiple data-placeholder="{{ __db('select_titles') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getDropDown('title')->options as $option)
@@ -239,8 +217,6 @@
                     @endforeach
                 </select>
             </div>
-
-
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('gender') }}</label>
                 <select name="gender_id[]" multiple data-placeholder="{{ __db('select_genders') }}"
@@ -252,9 +228,6 @@
                     @endforeach
                 </select>
             </div>
-
-
-
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('language') }}</label>
                 <select name="language_id[]" multiple data-placeholder="{{ __db('select_languages') }}"
@@ -265,10 +238,6 @@
                     @endforeach
                 </select>
             </div>
-
-
-
-
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation') }}</label>
                 <select name="delegation_id[]" multiple data-placeholder="{{ __db('select_delegations') }}"
@@ -279,10 +248,6 @@
                     @endforeach
                 </select>
             </div>
-
-
-
-
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('escorts.index') }}"
@@ -324,6 +289,7 @@
 </div>
 
 @push('scripts')
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function update_status(el) {
             if (el.checked) {
@@ -341,7 +307,6 @@
                     setTimeout(function() {
                         window.location.reload();
                     }, 1000);
-
                 } else {
                     toastr.error("{{ __db('something_went_wrong') }}");
                     setTimeout(function() {
@@ -400,12 +365,31 @@
                 });
             }
 
-
             loadPreferences();
             applyVisibility();
 
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', applyVisibility);
+            });
+
+            document.querySelectorAll('.unassign-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '{{ __db('are_you_sure') }}',
+                        text: '{{ __db('unassign_confirm_text') }}',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#B68A35',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: '{{ __db('yes_unassign') }}',
+                        cancelButtonText: '{{ __db('cancel') }}'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
             });
         });
     </script>

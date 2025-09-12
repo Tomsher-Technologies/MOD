@@ -1026,6 +1026,7 @@ class DelegationController extends Controller
                 'message' => 'Delegation updated successfully.',
                 'redirect_url' => route('delegations.edit', $delegation->id),
             ]);
+            
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Delegation update failed: ' . $e->getMessage(), [

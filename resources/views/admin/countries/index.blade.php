@@ -164,7 +164,7 @@
                             @csrf
 
                             <div class="mb-4">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name_en') }}</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name_en') }}<span class="text-red-600">*</span></label>
                                 <input type="text" name="name" value="{{ old('name') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
@@ -176,14 +176,14 @@
                             </div>
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}<span class="text-red-600">*</span></label>
                                 <input type="text" name="short_code" value="{{ old('short_code') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
 
 
                             <div class="mb-4">
-                                <label class="form-label">{{ __db('continent') }}*:</label>
+                                <label class="form-label">{{ __db('continent') }}:<span class="text-red-600">*</span></label>
                                 <select name="continent_id" required
                                     class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                     <option value="">{{ __db('select_continent') }}</option>
@@ -261,7 +261,7 @@
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name') }}</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name') }}<span class="text-red-600">*</span></label>
                             <input type="text" name="name" value="{{ old('name', $country->getNameEn()) }}"
                                 required class="w-full border border-gray-300 rounded p-2">
                         </div>
@@ -273,7 +273,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('short_code') }}</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('short_code') }}<span class="text-red-600">*</span></label>
                             <input type="text" name="short_code"
                                 value="{{ old('short_code', $country->short_code) }}" required
                                 class="w-full border border-gray-300 rounded p-2">
@@ -281,7 +281,7 @@
 
 
                         <div class="mb-4">
-                            <label class="form-label">{{ __db('continent') }}:</label>
+                            <label class="form-label">{{ __db('continent') }}:<span class="text-red-600">*</span></label>
                             <select name="continent_id" required
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                 <option value="" disabled selected>{{ __('Select Continent') }}</option>
@@ -299,7 +299,7 @@
 
 
                         <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('sort_order') }}</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('sort_order') }}<span class="text-red-600">*</span></label>
                             <input type="number" name="sort_order" required
                                 value="{{ old('sort_order', $country->sort_order ?? 0) }}"
                                 class="w-full border border-gray-300 rounded p-2">

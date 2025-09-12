@@ -70,8 +70,8 @@
                             'render' => fn($driver) => e($driver->getTranslation('title') ?? ''),
                         ],
                         [
-                            'label' => __db('name_en'),
-                            'key' => 'name_en',
+                            'label' => __db('name'),
+                            'key' => 'name',
                             'render' => fn($driver) => e($driver->getTranslation('name')),
                         ],
                         [

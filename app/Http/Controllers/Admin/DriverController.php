@@ -134,9 +134,9 @@ class DriverController extends Controller
             'military_number' => 'nullable|string|max:255',
             'title_ar' => 'nullable|string',
             'title_en' => 'nullable|string',
-            'name_ar' => 'required|string|max:255',
+            'name_en' => 'nullable|string|required_without:name_ar',
+            'name_ar' => 'nullable|string|required_without:name_en',
             'military_number' => 'nullable|string|max:255',
-            'name_en' => 'required|string|max:255',
             'phone_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
@@ -146,10 +146,8 @@ class DriverController extends Controller
             'note1' => 'nullable|string',
             'delegation_id' => 'nullable|exists:delegations,id',
         ], [
-            'name_ar.required' => __db('driver_name_ar_required'),
-            'name_en.required' => __db('driver_name_en_required'),
-            'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
-            'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
+            'name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
             'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
             'unit_id.exists' => __db('unit_id_exists'),
@@ -204,8 +202,8 @@ class DriverController extends Controller
             'military_number' => 'nullable|string|max:255',
             'title_ar' => 'nullable|string',
             'title_en' => 'nullable|string',
-            'name_ar' => 'required|string|max:255',
-            'name_en' => 'required|string|max:255',
+            'name_en' => 'nullable|string|required_without:name_ar',
+            'name_ar' => 'nullable|string|required_without:name_en',
             'phone_number' => 'nullable|string|max:255',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
@@ -216,8 +214,8 @@ class DriverController extends Controller
             'status' => 'nullable|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
         ], [
-            'name_ar.required' => __db('driver_name_ar_required'),
-            'name_en.required' => __db('driver_name_en_required'),
+            'name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
@@ -394,7 +392,7 @@ class DriverController extends Controller
             ]
         );
 
-        return redirect()->route('drivers.index')->with('success', __db('Driver assigned successfully.'));
+        return redirect()->route('delegations.show', $delegationId)->with('success', __db('Driver assigned successfully.'));
     }
 
 

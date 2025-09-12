@@ -309,6 +309,7 @@
                                 'internal_ranking_id' => $d['internal_ranking_id'] ?? '',
                                 'note' => $d['note'] ?? '',
                                 'team_head' => !empty($d['team_head']),
+                                'accommodation' => !empty($d['accommodation']),
                                 'badge_printed' => !empty($d['badge_printed']),
                             ];
                         },
@@ -358,7 +359,8 @@
 
                             <!-- Name (Arabic) -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('name_ar') }}</label>
+                                <label class="form-label">{{ __db('name_ar') }}<span
+                                        class="text-red-600">*</span></label>
                                 <input type="text" :name="`delegates[${index}][name_ar]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.name_ar">
@@ -370,7 +372,8 @@
 
                             <!-- Name (English) -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('name_en') }}</label>
+                                <label class="form-label">{{ __db('name_en') }}<span
+                                        class="text-red-600">*</span></label>
                                 <input type="text" :name="`delegates[${index}][name_en]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.name_en">
@@ -406,7 +409,8 @@
 
                             <!-- Gender -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('gender') }}</label>
+                                <label class="form-label">{{ __db('gender') }}<span
+                                        class="text-red-600">*</span></label>
                                 <select :name="`delegates[${index}][gender_id]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.gender_id">
@@ -545,7 +549,6 @@
     </form>
 </div>
 
-
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -556,6 +559,9 @@
                 placeholder: "Select an option",
                 allowClear: true
             });
+
+            const selectedContinent = $('#continent-select').val();
+            const selectedCountry = "{{ old('country_id') }}";
 
             $('#continent-select').on('change', function() {
                 const continentId = $(this).val();
@@ -568,18 +574,18 @@
                         continent_ids: continentId
                     }, function(data) {
                         $.each(data, function(index, country) {
+                            const isSelected = country.id == selectedCountry;
                             countrySelect.append(new Option(country.name, country.id, false,
-                                false));
+                                isSelected));
                         });
 
-                        countrySelect.trigger('change');
+                        countrySelect.trigger('change'); 
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });
                 }
             });
 
-            const selectedContinent = $('#continent-select').val();
             if (selectedContinent) {
                 $('#continent-select').trigger('change');
             }
@@ -642,7 +648,6 @@
                     return !anyOtherTeamHead || delegate.team_head;
                 },
 
-
                 addDelegate() {
                     const maxTmpId = Math.max(...this.delegates.map(d => d.tmp_id || 0), 0);
                     const newTmpId = maxTmpId + 1;
@@ -663,6 +668,7 @@
                         badge_printed: false
                     });
                 },
+
                 removeDelegate(idx) {
                     this.delegates.splice(idx, 1);
                 }

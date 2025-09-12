@@ -129,10 +129,10 @@ class EscortController extends Controller
     {
 
         $request->validate([
-            'title_en' => 'string|max:255',
-            'title_ar' => 'string|max:255',
-            'name_en' => 'required|string|max:255',
-            'name_ar' => 'required|string|max:255',
+            'title_en' => 'nullable|string|max:255',
+            'title_ar' => 'nullable|string|max:255',
+            'name_en' => 'nullable|string|required_without:name_ar',
+            'name_ar' => 'nullable|string|required_without:name_en',
             'delegation_id' => 'nullable|exists:delegations,id',
             'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
             'military_number' => 'nullable|string|max:255',
@@ -145,8 +145,8 @@ class EscortController extends Controller
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
         ], [
-            'name_en.required' => __db('escort_name_en_required'),
-            'name_ar.required' => __db('escort_name_ar_required'),
+            'name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
             'delegation_id.exists' => __db('delegation_id_exists'),
@@ -209,11 +209,11 @@ class EscortController extends Controller
     public function update(Request $request, string $id)
     {
         $validated = $request->validate([
-            'name_en' => 'required|string|max:255',
-            'title_en' => 'string|max:255',
-            'title_ar' => 'string|max:255',
+            'name_en' => 'nullable|string|required_without:name_ar',
+            'name_ar' => 'nullable|string|required_without:name_en',
+            'title_en' => 'nullable|string|max:255',
+            'title_ar' => 'nullable|string|max:255',
             'military_number' => 'nullable|string|max:255',
-            'name_ar' => 'required|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
             'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
             'phone_number' => 'nullable|string|max:255',
@@ -225,10 +225,8 @@ class EscortController extends Controller
             'status' => 'nullable|string|max:255',
             'language_id' => 'nullable|array',
         ], [
-            'name_en.required' => __db('escort_name_en_required'),
-            'name_ar.required' => __db('escort_name_ar_required'),
-            'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
-            'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
+            'name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'delegation_id.exists' => __db('delegation_id_exists'),
             'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
             'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
@@ -392,7 +390,7 @@ class EscortController extends Controller
             ]
         );
 
-        return redirect()->route('escorts.index')->with('success', __db('Escort assigned successfully.'));
+        return redirect()->route('delegations.show', $delegationId)->with('success', __db('Escort assigned successfully.'));
     }
 
 
