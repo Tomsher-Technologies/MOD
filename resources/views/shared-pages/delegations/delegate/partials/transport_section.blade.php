@@ -55,7 +55,8 @@
 
         <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-                <label class="form-label block mb-1 text-sm">{{ __db('date_time') }}:<span class="text-red-600">*</span></label>
+                <label class="form-label block mb-1 text-sm">{{ __db('date_time') }}:<span
+                        class="text-red-600">*</span></label>
                 <input name="{{ $type }}[date_time]" type="datetime-local"
                     value="{{ old($type . '.date_time', $dateTime) }}"
                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm" />
@@ -101,3 +102,12 @@
             class="block p-2.5 w-full text-sm rounded-lg border border-neutral-300">{{ old($type . '.comment', $transport->comment ?? '') }}</textarea>
     </div>
 </div>
+
+{{-- @push('scripts')
+$('#datetime').datetimepicker({
+      format: 'Y-m-d H:i',  // YYYY-MM-DD HH:mm
+      step: 5,             // minutes interval
+      inline: false,        // false = popup, true = inline
+      todayButton: true,    // show "today" button
+});
+@endpush --}}

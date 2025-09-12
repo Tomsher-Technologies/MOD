@@ -47,18 +47,28 @@ class Driver extends Model
             $latestDriver = self::latest('id')->first();
             $newId = $latestDriver ? $latestDriver->id + 1 : 1;
             $driver->code = 'DR' . str_pad($newId, 3, '0', STR_PAD_LEFT);
-
-
-            if (!$driver->event_id) {
-                $sessionEventId = Session::get('current_event_id');
-                if ($sessionEventId) {
-                    $driver->event_id = $sessionEventId;
-                } else {
-                    $defaultEventId = getDefaultEventId();
-                    $driver->event_id = $defaultEventId ? $defaultEventId : null;
-                }
-            }
         });
+    }
+
+    public function getPhoneNumberWithoutCountryCodeAttribute()
+    {
+        if (!$this->phone_number) {
+            return '';
+        }
+        
+        $cleanNumber = preg_replace('/[^0-9]/', '', $this->phone_number);
+        
+        // If it starts with 971 and is 12 digits, remove the country code
+        if (strlen($cleanNumber) === 12 && substr($cleanNumber, 0, 3) === '971') {
+            return substr($cleanNumber, 3);
+        }
+        
+        // If it's already 9 digits, return as is
+        if (strlen($cleanNumber) === 9) {
+            return $cleanNumber;
+        }
+        
+        return $cleanNumber;
     }
 
     public function title()

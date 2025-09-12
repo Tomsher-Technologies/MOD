@@ -137,7 +137,7 @@ class DriverController extends Controller
             'name_en' => 'nullable|string|required_without:name_ar',
             'name_ar' => 'nullable|string|required_without:name_en',
             'military_number' => 'nullable|string|max:255',
-            'phone_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:9|min:9',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
             'car_number' => 'nullable|string|max:255',
@@ -149,7 +149,8 @@ class DriverController extends Controller
             'name_en.required_without' => __db('either_english_name_or_arabic_name'),
             'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 9]),
+            'phone_number.min' => __db('driver_phone_number_min', ['min' => 9]),
             'unit_id.exists' => __db('unit_id_exists'),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
@@ -159,6 +160,14 @@ class DriverController extends Controller
         ]);
 
         $driverData = $request->all();
+
+        // Prepend country code to phone number if it exists
+        if (isset($driverData['phone_number']) && !empty($driverData['phone_number'])) {
+            $phoneNumber = preg_replace('/[^0-9]/', '', $driverData['phone_number']);
+            if (strlen($phoneNumber) === 9) {
+                $driverData['phone_number'] = '971' . $phoneNumber;
+            }
+        }
 
         $driverData['title'] = $driverData['title_id'] ?? null;
         unset($driverData['title_id']);
@@ -204,7 +213,7 @@ class DriverController extends Controller
             'title_en' => 'nullable|string',
             'name_en' => 'nullable|string|required_without:name_ar',
             'name_ar' => 'nullable|string|required_without:name_en',
-            'phone_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:9|min:9',
             'driver_id' => 'nullable|string|max:255',
             'car_type' => 'nullable|string|max:255',
             'car_number' => 'nullable|string|max:255',
@@ -219,7 +228,8 @@ class DriverController extends Controller
             'name_en.max' => __db('driver_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('driver_name_ar_max', ['max' => 255]),
             'military_number.max' => __db('driver_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('driver_phone_number_max', ['max' => 14]),
+            'phone_number.max' => __db('driver_phone_number_max', ['max' => 12]),
+            'phone_number.min' => __db('driver_phone_number_min', ['min' => 12]),
             'driver_id.max' => __db('driver_id_max', ['max' => 255]),
             'car_type.max' => __db('driver_car_type_max', ['max' => 255]),
             'unit_id.exists' => __db('unit_id_exists'),
@@ -261,6 +271,13 @@ class DriverController extends Controller
             'status' => [],
         ];
 
+        if (isset($dataToSave['phone_number']) && !empty($dataToSave['phone_number'])) {
+            $phoneNumber = preg_replace('/[^0-9]/', '', $dataToSave['phone_number']);
+            if (strlen($phoneNumber) === 9) {
+                $dataToSave['phone_number'] = '971' . $phoneNumber;
+            }
+        }
+
         $confirmationResult = $this->processUpdate($request, $driver, $validated, $relationsToCompare);
 
         if ($confirmationResult instanceof \Illuminate\Http\JsonResponse) {
@@ -269,6 +286,8 @@ class DriverController extends Controller
 
         $dataToSave = $confirmationResult['data'];
         $fieldsToNotify = $confirmationResult['notify'] ?? [];
+
+
 
         $dataToSave['title'] = $dataToSave['title_id'] ?? null;
         unset($dataToSave['title_id']);

@@ -136,7 +136,7 @@ class EscortController extends Controller
             'delegation_id' => 'nullable|exists:delegations,id',
             'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
             'military_number' => 'nullable|string|max:255',
-            'phone_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:9|min:9',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'unit_id' => 'nullable|exists:dropdown_options,id',
@@ -152,7 +152,6 @@ class EscortController extends Controller
             'delegation_id.exists' => __db('delegation_id_exists'),
             'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
             'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('escort_phone_number_max', ['max' => 14]),
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
@@ -164,6 +163,14 @@ class EscortController extends Controller
         ]);
 
         $escortData = $request->all();
+
+        // Prepend country code to phone number if it exists
+        if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
+            $phoneNumber = preg_replace('/[^0-9]/', '', $escortData['phone_number']);
+            if (strlen($phoneNumber) === 9) {
+                $escortData['phone_number'] = '971' . $phoneNumber;
+            }
+        }
 
         if (isset($escortData['language_id'])) {
             $escortData['spoken_languages'] = implode(',', $escortData['language_id']);
@@ -216,7 +223,7 @@ class EscortController extends Controller
             'military_number' => 'nullable|string|max:255',
             'delegation_id' => 'nullable|exists:delegations,id',
             'internal_ranking_id' => 'nullable|exists:dropdown_options,id',
-            'phone_number' => 'nullable|string|max:255',
+            'phone_number' => 'nullable|string|max:9|min:9',
             'email' => 'nullable|email|max:255',
             'gender_id' => 'nullable|exists:dropdown_options,id',
             'nationality_id' => 'nullable|exists:dropdown_options,id',
@@ -230,7 +237,8 @@ class EscortController extends Controller
             'delegation_id.exists' => __db('delegation_id_exists'),
             'internal_ranking_id.exists' => __db('internal_ranking_id_exists'),
             'military_number.max' => __db('escort_military_number_max', ['max' => 255]),
-            'phone_number.max' => __db('escort_phone_number_max', ['max' => 14]),
+            'phone_number.max' => __db('escort_phone_number_max', ['max' => 9]),
+            'phone_number.min' => __db('escort_phone_number_min', ['min' => 9]),
             'email.max' => __db('escort_email_max', ['max' => 255]),
             'email.email' => __db('escort_email_email'),
             'gender_id.exists' => __db('gender_id_exists'),
@@ -280,6 +288,13 @@ class EscortController extends Controller
             'status' => [],
         ];
 
+        if (isset($validated['phone_number']) && !empty($validated['phone_number'])) {
+            $phoneNumber = preg_replace('/[^0-9]/', '', $validated['phone_number']);
+            if (strlen($phoneNumber) === 9) {
+                $validated['phone_number'] = '971' . $phoneNumber;
+            }
+        }
+
         $originalSpokenLanguages = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
         $newSpokenLanguages = $validated['language_id'] ?? [];
 
@@ -314,6 +329,8 @@ class EscortController extends Controller
         } else {
             $validated['spoken_languages'] = null;
         }
+
+
 
         $escort->update($validated);
 

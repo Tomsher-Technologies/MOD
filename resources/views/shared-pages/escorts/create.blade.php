@@ -81,11 +81,14 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('phone_number') }}:</label>
-                    <input type="text" name="phone_number"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('enter') }}" inputmode="numeric" pattern="[0-9]*"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
-
+                    <div class="flex">
+                        <input type="text" name="phone_number" value="{{ old('phone_number') }}"
+                            class="p-3 w-full border text-sm border-neutral-300 border-l-0 text-neutral-600 focus:border-primary-600 focus:ring-0 ltr"
+                            placeholder="501234567" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" minlength="9"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" dir="ltr" />
+                        <span
+                            class="inline-flex items-center px-3  border-neutral-300 bg-gray-50 border   border-r-0 border-l-1 text-gray-500 text-sm">+971</span>
+                    </div>
                 </div>
 
                 <div class="col-span-4">
