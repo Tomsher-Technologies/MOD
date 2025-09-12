@@ -14,9 +14,7 @@
                 <span>{{ __db('back') }}</span>
             </a>
         </div>
-
-
-
+       
         <!-- DAdd Delegation -->
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
@@ -35,10 +33,37 @@
                             placeholder="{{ __db('search_by_name') }}" />
                         <button type="submit"
                             class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+
+                         <a href="{{ route('admin.view-external-members') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                                        {{ __db('reset') }}</a>
                     </div>
                 </form>
 
-                <div class="text-center">
+                <div class="text-center flex">
+
+                    <form method="GET" class="ml-4 mt-2">
+                        @foreach (request()->except('limit', 'page') as $key => $value)
+                            @if (is_array($value))
+                                @foreach ($value as $subKey => $subValue)
+                                    <input type="hidden" name="{{ $key }}[{{ $subKey }}]"
+                                        value="{{ $subValue }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endif
+                        @endforeach
+
+                        <select id="limit" name="limit" onchange="this.form.submit()"
+                            class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
+                            @foreach ([10, 25, 50, 100] as $size)
+                                <option value="{{ $size }}" {{ request('limit', 10) == $size ? 'selected' : '' }}>
+                                    {{ $size }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="mr-2 text-sm">{{ __db('rows') }}</span>
+                    </form>
+
                     <button
                         class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
                         type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
@@ -63,6 +88,9 @@
                             {{ __db('name') }}
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            {{ __db('coming_from') }}
+                        </th>
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                             {{ __db('hotel') }}
                         </th>
                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
@@ -82,6 +110,9 @@
                             <td class="px-4 py-2 border border-gray-200">{{ $externalMembers->firstItem() + $key }}</td>
                             <td class="px-4 py-3 border border-gray-200">
                                 {{ $member->name ?? '' }}
+                            </td>
+                            <td class="px-4 py-3 border border-gray-200">
+                                {{ $member->coming_from ?? '' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200">
                                 {{ $member->hotel?->hotel_name ?? '' }}
@@ -122,6 +153,11 @@
                             </td>
                         </tr>
                     @empty
+                        <tr class=" text-sm align-[middle]">
+                            <td class="px-4 py-3 text-center " colspan="10" dir="ltr">
+                                {{ __db('no_data_found') }}
+                            </td>
+                        </tr>
                     @endforelse
 
                 </tbody>
@@ -147,7 +183,7 @@
                 <div class="flex flex-col gap-2 mt-2">
                     <div class="flex flex-col">
                         <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('hotel') }}</label>
-                        <select name="hotel_id" data-placeholder="{{ __db('select') }}"
+                        <select name="hotel_id" id="hotel_id" data-placeholder="{{ __db('select') }}"
                             class="select2 w-full rounded-lg border border-gray-300 text-sm">
                             <option value="">{{ __db('select') }}</option>
                             @foreach ($hotels as $hotel)
@@ -160,15 +196,22 @@
 
                     <div class="flex flex-col">
                         <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('room_type') }}</label>
-                        <select name="room_type_id" data-placeholder="{{ __db('select') }}"
+                        <select name="room_type_id" id="room_type_id" data-placeholder="{{ __db('select') }}"
                             class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                            <option value="">{{ __db('select') }}</option>
+                            <option value=" ">{{ __db('all') }}</option>
                             @foreach ($roomTypes as $roomType)
                                 <option value="{{ $roomType->id }}" @if (request('room_type_id') == $roomType->id) selected @endif>
-                                    {{ $roomType->roomType->value }}
+                                    {{ $roomType->roomType?->value }}
                                 </option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('room_number') }}</label>
+                        <input type="text" name="room_number" id="room_number" autocomplete="off"
+                            class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg"
+                            placeholder="{{ __db('search') }}" value="{{ request('room_number') }}">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-6">
@@ -207,6 +250,20 @@
             $('.select2').select2({
                 placeholder: "{{ __db('select') }}",
                 allowClear: true
+            });
+
+            $('#hotel_id').on('change', function() {
+                let hotelId = $(this).val();
+                let dropdown = $('#room_type_id');
+                let url = "{{ route('accommodation.rooms', ':id') }}";
+                url = url.replace(':id', hotelId);
+
+                $.get(url, function(data) {
+                    dropdown.empty().append('<option value="">{{ __db('select') }}</option>');
+                    data.forEach(function(room) {
+                        dropdown.append('<option value="' + room.id + '">' + room.room_type?.value + '</option>');
+                    });
+                });
             });
         });
     </script>

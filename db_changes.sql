@@ -601,3 +601,5 @@
 --   ALTER TABLE `event_page_translations` ADD `title9` VARCHAR(255) NULL DEFAULT NULL AFTER `content8`;
 
 ALTER TABLE `news` ADD FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE `accommodations` ADD `hotel_name_ar` VARCHAR(255) NULL DEFAULT NULL AFTER `hotel_name`;
+ALTER TABLE `external_member_assignments` ADD `coming_from` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
