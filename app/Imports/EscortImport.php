@@ -32,69 +32,69 @@ class EscortImport implements ToCollection, WithHeadingRow
                 'status' => $row['status'] ?? 1,
             ];
 
-            if (!empty($row['gender'])) {
+            if (!empty($row['gender_id'])) {
                 $gender = DropdownOption::whereHas('dropdown', function($q) {
                     $q->where('code', 'gender');
-                })->where('value', trim($row['gender']))->first();
+                })->where('id', trim($row['gender_id']))->first();
                 
                 if ($gender) {
                     $escortData['gender_id'] = $gender->id;
                 }
             }
 
-            if (!empty($row['nationality'])) {
+            if (!empty($row['nationality_id'])) {
                 $nationality = DropdownOption::whereHas('dropdown', function($q) {
                     $q->where('code', 'nationality');
-                })->where('value', trim($row['nationality']))->first();
+                })->where('id', trim($row['nationality_id']))->first();
                 
                 if ($nationality) {
                     $escortData['nationality_id'] = $nationality->id;
                 }
             }
 
-            if (!empty($row['internal_ranking'])) {
+            if (!empty($row['internal_ranking_id'])) {
                 $ranking = DropdownOption::whereHas('dropdown', function($q) {
                     $q->where('code', 'internal_ranking');
-                })->where('value', trim($row['internal_ranking']))->first();
+                })->where('id', trim($row['internal_ranking_id']))->first();
                 
                 if ($ranking) {
                     $escortData['internal_ranking_id'] = $ranking->id;
                 }
             }
 
-            if (!empty($row['unit'])) {
+            if (!empty($row['unit_id'])) {
                 $unit = DropdownOption::whereHas('dropdown', function($q) {
                     $q->where('code', 'unit');
-                })->where('value', trim($row['unit']))->first();
+                })->where('id', trim($row['unit_id']))->first();
                 
                 if ($unit) {
                     $escortData['unit_id'] = $unit->id;
                 }
             }
 
-            // if (!empty($row['delegation_code'])) {
-            //     $delegation = Delegation::where('code', trim($row['delegation_code']))->first();
+            // if (!empty($row['delegation_id'])) {
+            //     $delegation = Delegation::where('id', trim($row['delegation_id']))->first();
             //     if ($delegation) {
             //         $escortData['delegation_id'] = $delegation->id;
             //     }
             // }
 
-            if (!empty($row['spoken_languages'])) {
-                $languages = explode(',', trim($row['spoken_languages']));
-                $languageIds = [];
+            if (!empty($row['spoken_languages_ids'])) {
+                $languageIds = explode(',', trim($row['spoken_languages_ids']));
+                $validLanguageIds = [];
                 
-                foreach ($languages as $language) {
+                foreach ($languageIds as $languageId) {
                     $lang = DropdownOption::whereHas('dropdown', function($q) {
                         $q->where('code', 'language');
-                    })->where('value', trim($language))->first();
+                    })->where('id', trim($languageId))->first();
                     
                     if ($lang) {
-                        $languageIds[] = $lang->id;
+                        $validLanguageIds[] = $lang->id;
                     }
                 }
                 
-                if (!empty($languageIds)) {
-                    $escortData['spoken_languages'] = implode(',', $languageIds);
+                if (!empty($validLanguageIds)) {
+                    $escortData['spoken_languages'] = implode(',', $validLanguageIds);
                 }
             }
 

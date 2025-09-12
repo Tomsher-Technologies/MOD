@@ -224,5 +224,9 @@
     "not_badge_printed" : "Not Badge Printed",
     "export_to_excel" : "Export to Excel",
     "badge_printed_status_updated_successfully" : "Badge printed status updated successfully",
-    "badge_printed_status_update_failed" : "Failed to update badge printed status"
+    "badge_printed_status_update_failed" : "Failed to update badge printed status",
+    "download_sample_delegations_excel" : "Download Delegations Sample Excel",
+    "download_sample_delegations_excel_description" : "Download the sample Excel file for importing delegations with the correct format.",
+    "delegation_import_failed" : "Delegation import failed",
+    "import_delegations" : "Import Delegations"
 }

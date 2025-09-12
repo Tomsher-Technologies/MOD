@@ -35,18 +35,18 @@ class DriverImport implements ToCollection, WithHeadingRow
                 'status' => $row['status'] ?? 1,
             ];
 
-            if (!empty($row['unit'])) {
+            if (!empty($row['unit_id'])) {
                 $unit = DropdownOption::whereHas('dropdown', function($q) {
                     $q->where('code', 'unit');
-                })->where('value', trim($row['unit']))->first();
+                })->where('id', trim($row['unit_id']))->first();
                 
                 if ($unit) {
                     $driverData['unit_id'] = $unit->id;
                 }
             }
 
-            // if (!empty($row['delegation_code'])) {
-            //     $delegation = Delegation::where('code', trim($row['delegation_code']))->first();
+            // if (!empty($row['delegation_id'])) {
+            //     $delegation = Delegation::where('id', trim($row['delegation_id']))->first();
             //     if ($delegation) {
             //         $driverData['delegation_id'] = $delegation->id;
             //     }

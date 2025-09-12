@@ -180,5 +180,9 @@
     "not_badge_printed" : "الشارة غير مطبوعة",
     "export_to_excel" : "تصدير إلى إكسل",
     "badge_printed_status_updated_successfully" : "تم تحديث حالة طباعة الشارة بنجاح",
-    "badge_printed_status_update_failed" : "فشل تحديث حالة طباعة الشارة"
+    "badge_printed_status_update_failed" : "فشل تحديث حالة طباعة الشارة",
+    "download_sample_delegations_excel" : "تنزيل نموذج إكسل للوفود",
+    "download_sample_delegations_excel_description" : "قم بتنزيل ملف إكسل نموذجي لاستيراد الوفود بالتنسيق الصحيح.",
+    "delegation_import_failed" : "فشل استيراد الوفود",
+    "import_delegations" : "استيراد الوفود"
 }

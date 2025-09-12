@@ -15,6 +15,7 @@ use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
 use App\Exports\BadgePrintedDelegatesExport;
 use App\Exports\NonBadgePrintedDelegatesExport;
+use App\Imports\DelegationImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -39,7 +40,7 @@ class DelegationController extends Controller
         ]);
 
         $this->middleware('permission:add_delegations|delegate_add_delegations', [
-            'only' => ['create', 'store', 'syncTransportInfo']
+            'only' => ['create', 'store', 'syncTransportInfo', 'showImportForm', 'import']
         ]);
 
         $this->middleware('permission:edit_delegations|delegate_edit_delegations', [
@@ -2178,5 +2179,30 @@ class DelegationController extends Controller
         }
 
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
+    }
+
+    public function showImportForm()
+    {
+        return view('admin.delegations.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new DelegationImport, $request->file('file'));
+            
+            return redirect()->route('delegations.index')
+                ->with('success', __db('delegation') . ' ' . __db('created_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Delegation Import Error: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage())
+                ->withInput();
+        }
     }
 }

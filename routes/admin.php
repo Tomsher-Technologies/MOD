@@ -86,10 +86,16 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/delegations/members/{delegation}', [DelegationController::class, 'members'])->name('delegations.members');
 
     // Delegations
+
+    // Delegation Import
+    Route::get('/delegations/import', [DelegationController::class, 'showImportForm'])->name('delegations.import.form');
+    Route::post('/delegations/import', [DelegationController::class, 'import'])->name('delegations.import');
+
     Route::resource('delegations', DelegationController::class);
     Route::get('/delegations-get', [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+
 
     // Delegate
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');

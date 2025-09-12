@@ -53,9 +53,16 @@
                         'permission' => ['add_other_interview_members'],
                     ],
                     'delegations.index' => [
-                        'text' => __db('add_new_delegation'),
-                        'link' => route('delegations.create'),
-                        'permission' => ['add_delegations', 'delegate_add_delegations'],
+                        [
+                            'text' => __db('add_new_delegation'),
+                            'link' => route('delegations.create'),
+                            'permission' => ['add_delegations', 'delegate_add_delegations'],
+                        ],
+                        [
+                            'text' => __db('import_delegations'),
+                            'link' => route('delegations.import.form'),
+                            'permission' => ['add_delegations', 'delegate_add_delegations'],
+                        ],
                     ],
                     'escorts.index' => [
                         'text' => __db('add_escort'),
@@ -88,16 +95,36 @@
                 $config = $buttonConfig[$currentRoute] ?? null;
             @endphp
 
-            @if ($config && can($config['permission']))
-                <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
-                    class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
-                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        width="24" height="24" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 12h14m-7 7V5" />
-                    </svg>
-                    <span>{{ $buttonConfig[$currentRoute]['text'] }}</span>
-                </a>
+            @if ($config)
+                @if (is_array($config) && isset($config[0]) && is_array($config[0]))
+                    {{-- Multiple buttons for the same route --}}
+                    @foreach ($config as $button)
+                        @if (can($button['permission']))
+                            <a href="{{ $button['link'] }}"
+                                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                                <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 12h14m-7 7V5" />
+                                </svg>
+                                <span>{{ $button['text'] }}</span>
+                            </a>
+                        @endif
+                    @endforeach
+                @elseif (is_array($config) && isset($config['text']))
+                    {{-- Single button --}}
+                    @if (can($config['permission']))
+                        <a href="{{ $config['link'] }}"
+                            class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                            <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 12h14m-7 7V5" />
+                            </svg>
+                            <span>{{ $config['text'] }}</span>
+                        </a>
+                    @endif
+                @endif
             @endif
         </div>
         <div class="col-auto ml-4 mr-2">
