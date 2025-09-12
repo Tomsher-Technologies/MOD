@@ -27,15 +27,31 @@ class AccommodationController extends Controller
 
     public function index(Request $request)
     {
+        $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
         $request->session()->put('accommodations_last_url', url()->full());
-        $accommodations = Accommodation::with(['rooms', 'contacts'])->where('event_id', session('current_event_id', getDefaultEventId() ?? null));
+        $accommodations = Accommodation::with(['rooms', 'contacts'])->where('event_id',$currentEventId);
 
         if (request()->has('search')) {
-            $accommodations = $accommodations->where('hotel_name', 'like', '%' . request('search') . '%');
+            $accommodations->where(function ($query) {
+                $query->where('hotel_name', 'like', '%' . request()->input('search') . '%')
+                    ->orWhere('hotel_name_ar', 'like', '%' . request()->input('search') . '%')
+                    ->orWhere('address', 'like', '%' . request()->input('search') . '%')
+                    ->orWhere('contact_number', 'like', '%' . request()->input('search') . '%');
+            });
         }
 
-        $accommodations = $accommodations->latest()->paginate(15);
-        return view('admin.accommodations.index', compact('accommodations'));
+        if ($roomTypeId = $request->input('room_type_id')) {
+            $accommodations->whereHas('rooms', function ($roomQuery) use ($roomTypeId) {
+                $roomQuery->where('room_type', $roomTypeId);
+            });
+        }
+        $limit = $request->input('limit') ?? 10;
+        $accommodations = $accommodations->latest()->paginate($limit);
+               
+        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+        $roomTypes = $roomTypes ? $roomTypes->options : collect();
+        
+        return view('admin.accommodations.index', compact('accommodations','roomTypes'));
     }
 
     public function create()
@@ -50,27 +66,48 @@ class AccommodationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'hotel_name' => 'required',
+            'hotel_name'     => 'required_without:hotel_name_ar',
+            'hotel_name_ar'  => 'required_without:hotel_name',
             'address' => 'nullable',
-            'contact_number' => 'required',
-            'rooms.*.room_type' => 'required',
-            'rooms.*.total_rooms' => 'required',
-            'contacts.*.name' => 'required',
-            'contacts.*.phone' => 'required',
+            'contact_number' => 'nullable',
+            'rooms.*.room_type' => 'nullable',
+            'rooms.*.total_rooms' => 'nullable',
+            'contacts.*.name' => 'nullable',
+            'contacts.*.phone' => 'nullable',
+        ], [
+            'hotel_name.required_without' => __db('fill_either_english_or_arabic_field'),
+            'hotel_name_ar.required_without' => __db('fill_either_english_or_arabic_field'),
         ]);
 
         $accommodation = Accommodation::create([
             'hotel_name' => trim($request->hotel_name) ?? null,
+            'hotel_name_ar' => trim($request->hotel_name_ar) ?? null,
             'address' => $request->address,
             'contact_number' => $request->contact_number
         ]);
 
         if ($request->has('rooms')) {
-            $accommodation->rooms()->createMany($request->rooms);
+            $rooms = collect($request->rooms)
+                ->filter(function ($room) {
+                    return !empty($room['room_type']) || !empty($room['total_rooms']);
+                })
+                ->toArray();
+
+            if (!empty($rooms)) {
+                $accommodation->rooms()->createMany($rooms);
+            }
         }
 
         if ($request->has('contacts')) {
-            $accommodation->contacts()->createMany($request->contacts);
+            $contacts = collect($request->contacts)
+                ->filter(function ($contact) {
+                    return !empty($contact['name']) || !empty($contact['phone']);
+                })
+                ->toArray();
+
+            if (!empty($contacts)) {
+                $accommodation->contacts()->createMany($contacts);
+            }
         }
 
         $this->logActivity(
@@ -98,16 +135,20 @@ class AccommodationController extends Controller
     public function update(Request $request, Accommodation $accommodation)
     {
         $request->validate([
-            'hotel_name' => 'required',
+            'hotel_name'     => 'required_without:hotel_name_ar',
+            'hotel_name_ar'  => 'required_without:hotel_name',
             'address' => 'nullable',
-            'contact_number' => 'required',
-            'rooms.*.room_type' => 'required',
-            'rooms.*.total_rooms' => 'required',
-            'contacts.*.name' => 'required',
-            'contacts.*.phone' => 'required',
+            'contact_number' => 'nullable',
+            'rooms.*.room_type' => 'nullable',
+            'rooms.*.total_rooms' => 'nullable',
+            'contacts.*.name' => 'nullable',
+            'contacts.*.phone' => 'nullable',
+        ], [
+            'hotel_name.required_without' => __db('fill_either_english_or_arabic_field'),
+            'hotel_name_ar.required_without' => __db('fill_either_english_or_arabic_field'),
         ]);
 
-        $accommodation->update($request->only('hotel_name', 'address', 'contact_number'));
+        $accommodation->update($request->only('hotel_name','hotel_name_ar', 'address', 'contact_number'));
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $roomData) {
@@ -117,17 +158,27 @@ class AccommodationController extends Controller
                         'total_rooms' => $roomData['total_rooms'],
                     ]);
                 } else {
-                    $accommodation->rooms()->create([
-                        'room_type'   => $roomData['room_type'],
-                        'total_rooms' => $roomData['total_rooms'],
-                    ]);
+                    if (!empty($roomData['room_type']) && !empty($roomData['total_rooms'])) {
+                        $accommodation->rooms()->create([
+                            'room_type'   => $roomData['room_type'],
+                            'total_rooms' => $roomData['total_rooms'],
+                        ]);
+                    }
                 }
             }
         }
 
         $accommodation->contacts()->delete();
         if ($request->has('contacts')) {
-            $accommodation->contacts()->createMany($request->contacts);
+            $contacts = collect($request->contacts)
+                ->filter(function ($contact) {
+                    return !empty($contact['name']) || !empty($contact['phone']);
+                })
+                ->toArray();
+
+            if (!empty($contacts)) {
+                $accommodation->contacts()->createMany($contacts);
+            }
         }
 
         return redirect()->route('accommodations.index')->with('success',  __db('accommodation') . __db('updated_successfully'));
@@ -407,9 +458,17 @@ class AccommodationController extends Controller
                 if ($oldAssignment) {
                     $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                        $oldRoom->save();
+                        $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                            ->where('room_type_id', $oldAssignment->room_type_id)
+                                            ->where('room_number', $oldAssignment->room_number)
+                                            ->where('active_status', 1)
+                                            ->count();
+                        if($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number)) ){
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
                     }
+                    
                 }
             }
 
@@ -477,14 +536,30 @@ class AccommodationController extends Controller
         return response()->json($rooms);
     }
 
-    public function addExternalMembers($id)
+    public function addExternalMembers(Request $request, $id)
     {
+        $request->session()->put('external_members_last_url', url()->full());
         $hotel = Accommodation::findOrFail(base64_decode($id) ?? $id);
 
         $roomTypes = AccommodationRoom::with('roomType')
-            ->where('accommodation_id', $hotel->id)
-            ->get();
-        return view('admin.accommodations.add-external-members', compact('hotel', 'roomTypes'));
+                                        ->where('accommodation_id', $hotel->id)
+                                        ->where('available_rooms', '>', 0)
+                                        ->get();
+
+        $externalMembersQuery = ExternalMemberAssignment::with(['hotel', 'roomType.roomType'])
+                                            ->where('hotel_id', $hotel->id)
+                                            ->where('active_status', 1);
+            
+        if ($search = $request->input('search')) {
+            $externalMembersQuery->where('name', 'like', '%' . $search . '%')->orWhere('coming_from', 'like', '%' . $search . '%');
+        }
+        
+        if ($roomTypeId = $request->input('room_type_id')) {
+            $externalMembersQuery->where('room_type_id', $roomTypeId);
+        }
+        
+        $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->get();
+        return view('admin.accommodations.add-external-members', compact('hotel', 'roomTypes','externalMembers'));
     }
 
     public function storeExternalMembers(Request $request)
@@ -531,6 +606,7 @@ class AccommodationController extends Controller
 
         $user = ExternalMemberAssignment::create([
             'name' => $request->name,
+            'coming_from' => $request->coming_from,
             'room_type_id' => $request->room_type,
             'room_number' => $request->room_number,
             'hotel_id' => $request->hotel_id,
@@ -568,9 +644,12 @@ class AccommodationController extends Controller
             ->where('active_status', 1);
             
         if ($search = $request->input('search')) {
-            $externalMembersQuery->where('name', 'like', '%' . $search . '%');
+            $externalMembersQuery->where('name', 'like', '%' . $search . '%')->orWhere('coming_from', 'like', '%' . $search . '%');
         }
         
+        if($request->has('room_number')){
+            $externalMembersQuery->where('room_number', 'like', '%' . $request->input('room_number'). '%');
+        }
         if ($hotelId = $request->input('hotel_id')) {
             $externalMembersQuery->where('hotel_id', $hotelId);
         }
@@ -578,24 +657,22 @@ class AccommodationController extends Controller
         if ($roomTypeId = $request->input('room_type_id')) {
             $externalMembersQuery->where('room_type_id', $roomTypeId);
         }
-        
-        $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->paginate(10);
+        $limit = $request->input('limit') ?? 10;
+        $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->paginate($limit);
         
         $hotels = Accommodation::where('event_id', $currentEventId)
                     ->where('status', 1)
                     ->orderBy('hotel_name', 'asc')
                     ->get();
-                    
-        $roomTypes = AccommodationRoom::with('roomType')
-                        ->whereHas('accommodation', function ($query) use ($currentEventId) {
-                            $query->where('event_id', $currentEventId);
-                        })
-                        ->orderBy('id', 'asc')
-                        ->get()
-                        ->unique('room_type_id')
-                        ->values();
+               
+        $roomTypes = [];
+        if($request->input('hotel_id')) {
+            $roomTypes = AccommodationRoom::with('roomType','accommodation')
+                                            ->where('accommodation_id', $request->input('hotel_id'))
+                                            ->get();
+        }
         
-        return view('admin.accommodations.view-external-members', compact('externalMembers', 'hotels', 'roomTypes'));
+        return view('admin.accommodations.view-external-members', compact('externalMembers', 'hotels','roomTypes'));
     }
 
     public function editExternalMembers($id)
@@ -604,6 +681,7 @@ class AccommodationController extends Controller
         $hotel = Accommodation::findOrFail($externalMember->hotel_id);
         $roomTypes = AccommodationRoom::with('roomType')
             ->where('accommodation_id', $hotel->id)
+            ->where('available_rooms', '>', 0)
             ->get();
         return view('admin.accommodations.edit-external-members', compact('externalMember', 'hotel', 'roomTypes'));
     }
@@ -632,10 +710,11 @@ class AccommodationController extends Controller
                 ->exists();
 
             $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type)
-                ->where('room_number', $request->room_number)
-                ->where('active_status', 1)
-                ->exists();
+                            ->where('room_type_id', $request->room_type)
+                            ->where('room_number', $request->room_number)
+                            ->where('active_status', 1)
+                            ->exists();
+
 
             $roomType = AccommodationRoom::find($request->room_type);
             $availableRooms = $roomType->available_rooms;
@@ -653,20 +732,29 @@ class AccommodationController extends Controller
                     $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
                     $newRoom->save();
                 }
+            }else{
+                if ($externalMember) {
+                    $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
+                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                                            ->where('room_type_id', $externalMember->room_type_id)
+                                            ->where('room_number', $externalMember->room_number)
+                                            ->where('active_status', 1)
+                                            ->count();
+                        if($alreadyAssignedCount <= 1 && (strtolower($externalMember->room_number) != strtolower($request->room_number)) ){
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
+                    }
+                }
             }
 
-            if ($externalMember) {
-                $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
-                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                    $oldRoom->save();
-                }
-                $externalMember->active_status = 0;
-                $externalMember->save();
-            }
+            $externalMember->active_status = 0;
+            $externalMember->save();
 
             $user = ExternalMemberAssignment::create([
                 'name' => $request->name,
+                'coming_from' => $request->coming_from,
                 'room_type_id' => $request->room_type,
                 'room_number' => $request->room_number,
                 'hotel_id' => $request->hotel_id,
@@ -674,6 +762,7 @@ class AccommodationController extends Controller
                 'active_status' => 1,
             ]);
 
+            $externalMemberId = $user->id;
             $hotel = Accommodation::findOrFail($request->hotel_id);
 
             $changes = [
@@ -691,12 +780,14 @@ class AccommodationController extends Controller
         } else {
             $externalMember->update([
                 'name' => $request->name,
+                'coming_from' => $request->coming_from,
                 'assigned_by'  => auth()->user()->id,
                 'active_status' => 1,
             ]);
+            $externalMemberId = $externalMember->id;
         }
 
-        return redirect()->back()->with('success', __db('external_member_updated'));
+        return redirect()->route('external-members.edit', $externalMemberId)->with('success', __db('external_member_updated'));
     }
 
     public function destroyExternalMembers($id)
@@ -708,14 +799,52 @@ class AccommodationController extends Controller
 
         if ($externalMember) {
             $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
+
+            $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                                            ->where('room_type_id', $externalMember->room_type_id)
+                                            ->where('room_number', $externalMember->room_number)
+                                            ->where('active_status', 1)
+                                            ->count();
+                        
             if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                $oldRoom->save();
+                if($alreadyAssignedCount <= 1){
+                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    $oldRoom->save();
+                }
             }
             $externalMember->active_status = 0;
             $externalMember->save();
         }
 
         return redirect()->back()->with('success', __db('external_member_deleted'));
+    }
+
+    public function unassignAccommodation($id)
+    {
+        $assignment = RoomAssignment::findOrFail($id);
+
+        $hotel_id = $assignment->hotel_id;
+        $room_number = $assignment->room_number;
+
+        if ($assignment) {
+            $oldRoom = AccommodationRoom::find($assignment->room_type_id);
+
+            $alreadyAssignedCount = RoomAssignment::where('hotel_id', $assignment->hotel_id)
+                                            ->where('room_type_id', $assignment->room_type_id)
+                                            ->where('room_number', $assignment->room_number)
+                                            ->where('active_status', 1)
+                                            ->count();
+                        
+            if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                if($alreadyAssignedCount <= 1){
+                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    $oldRoom->save();
+                }
+            }
+            $assignment->active_status = 0;
+            $assignment->save();
+        }
+
+        return redirect()->back()->with('success', __db('room_unassigned_successfully'));
     }
 }

@@ -60,7 +60,7 @@
                         </option>
                     @endforeach
                 </select>
-                <span class="mr-2 text-sm">rows</span>
+                <span class="mr-2 text-sm">{{ __db('rows') }}</span>
             </form>
         @endif
     </div>

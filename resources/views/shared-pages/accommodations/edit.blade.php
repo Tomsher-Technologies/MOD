@@ -18,12 +18,23 @@
 
             <div class="grid grid-cols-12 gap-5">
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('hotel_name') }}:</label>
+                    <label class="form-label">{{ __db('hotel_name') }} ({{ __db('english') }}) <span class="text-red-600">*</span>:</label>
                     <input type="text" name="hotel_name" id="hotel_name"
                         value="{{ old('hotel_name', $accommodation->hotel_name) }}"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        class="hotel-name-group p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') }}">
                     @error('hotel_name')
+                        <div class="text-red-600">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('hotel_name') }} ({{ __db('arabic') }}) <span class="text-red-600">*</span>:</label>
+                    <input type="text" name="hotel_name_ar" id="hotel_name_ar"
+                        value="{{ old('hotel_name_ar', $accommodation->hotel_name_ar) }}"
+                        class="hotel-name-group p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}">
+                    @error('hotel_name_ar')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
                 </div>

@@ -198,6 +198,7 @@
     "either_english_name_or_arabic_name" : "Either Arabic or English name must be provided.",
     "confirm_changes_notification" : "Confirm Changes & Select Notifications",
     "following_fields_have_changed" : "The following fields have been changed. Please select which changes you would like to send notifications for",
+     "fill_either_english_or_arabic_field" : "Please fill either English or Arabic field",
     "" : "",
     "" : "",
     "" : "",

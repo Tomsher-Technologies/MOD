@@ -4,7 +4,7 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{__db('edit') . ' ' . __db('external_accommodations') }}</h2>
-        <a href="{{ session()->get('external_members_last_url') ? session()->get('external_members_last_url') : route('external_members.index') }}"
+        <a href="{{ session()->get('external_members_last_url') ? session()->get('external_members_last_url') : route('admin.view-external-members') }}"
             class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
             <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                 fill="none" viewBox="0 0 24 24">
@@ -93,6 +93,15 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-3">
+                    <label class="block text-sm text-gray-700 mb-1">{{ __db('coming_from') }}</label>
+                    <input type="text" placeholder="{{ __db('enter') }}"  name="coming_from"  value="{{ old('coming_from', $externalMember->coming_from ?? '') }}"
+                        class="w-full text-secondary-light p-3 text-sm !border-[#d1d5db] rounded-lg" />
+                     @error('coming_from')
+                        <div class="text-red-600 text-sm mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-span-12 md:col-span-3">
                     <label class="block text-sm text-gray-700 mb-1">{{ __db('room_type') }}</label>
                     <select name="room_type" id="room_type" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select') }}</option>
@@ -137,6 +146,10 @@
 
 @section('script')
 <script>
-    
+    document.addEventListener("DOMContentLoaded", () => {
+        $(document).on("change", "#room_type", function () {
+            $("#room_number").val(""); 
+        });
+    });
 </script>
 @endsection
