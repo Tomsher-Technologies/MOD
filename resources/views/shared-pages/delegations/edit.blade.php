@@ -1,5 +1,5 @@
 <div x-data="{ isAttachmentEditModalOpen: false }">
-    <x-back-btn title="" back-url="{{ route('delegations.index') }}" />
+    <x-back-btn title="" back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 

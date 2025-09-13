@@ -187,6 +187,7 @@ class DelegationController extends Controller
 
         $delegations = $query->paginate($limit);
 
+        $request->session()->put('delegations_last_url', url()->full());
 
         return view('admin.delegations.index', compact('delegations'));
     }
@@ -1030,7 +1031,6 @@ class DelegationController extends Controller
                 'message' => 'Delegation updated successfully.',
                 'redirect_url' => route('delegations.edit', $delegation->id),
             ]);
-            
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Delegation update failed: ' . $e->getMessage(), [
@@ -2250,12 +2250,12 @@ class DelegationController extends Controller
 
         try {
             Excel::import(new DelegationOnlyImport, $request->file('file'));
-            
+
             return redirect()->route('delegations.index')
                 ->with('success', __db('delegations_only_imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-            
+
             return redirect()->back()
                 ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage())
                 ->withInput();
@@ -2270,12 +2270,12 @@ class DelegationController extends Controller
 
         try {
             Excel::import(new DelegateImport, $request->file('file'));
-            
+
             return redirect()->route('delegations.index')
                 ->with('success', __db('delegate') . ' ' . __db('created_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-            
+
             return redirect()->back()
                 ->with('error', __db('delegate_import_failed') . ': ' . $e->getMessage())
                 ->withInput();

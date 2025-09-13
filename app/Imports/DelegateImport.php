@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Http\Traits\HandlesUpdateConfirmation;
 use App\Models\Delegation;
 use App\Models\Delegate;
 use App\Models\DelegateTransport;
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Log;
 
 class DelegateImport implements ToCollection, WithHeadingRow
 {
+
+    use HandlesUpdateConfirmation;
+
     public function collection(Collection $rows)
     {
         DB::beginTransaction();
@@ -32,27 +36,35 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
                 $delegation = Delegation::where('code', $delegationCode)->first();
 
-
                 if (!$delegation) {
                     continue;
                 }
 
                 $delegateData = $this->processDelegateData($row, $delegation->id);
 
-                $delegateCode = trim($row['delegate_code'] ?? '');
+                // $delegateCode = trim($row['delegate_code'] ?? '');
                 $existingDelegate = null;
 
-                if (!empty($delegateCode)) {
-                    $existingDelegate = Delegate::where('delegation_id', $delegation->id)
-                        ->where('code', $delegateCode)
-                        ->first();
-                }
+                // if (!empty($delegateCode)) {
+                //     $existingDelegate = Delegate::where('delegation_id', $delegation->id)
+                //         ->where('code', $delegateCode)
+                //         ->first();
+                // }
 
                 if ($existingDelegate) {
                     $existingDelegate->update($delegateData);
                     $delegate = $existingDelegate;
                 } else {
                     $delegate = Delegate::create($delegateData);
+
+                    $this->logActivity(
+                        module: 'Delegation',
+                        submodule: 'delegate',
+                        action: 'create-excel',
+                        model: $delegate,
+                        submoduleId: $delegate->id,
+                        delegationId: $delegation->id
+                    );
                 }
 
                 if (!empty($row['arrival_date_time'])) {
