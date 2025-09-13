@@ -89,7 +89,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     // Delegation Import
     Route::get('/delegations/import', [DelegationController::class, 'showImportForm'])->name('delegations.import.form');
-    Route::post('/delegations/import', [DelegationController::class, 'import'])->name('delegations.import');
+    Route::post('/delegations/import/delegations', [DelegationController::class, 'importDelegations'])->name('delegations.import.delegations');
+    Route::post('/delegations/import/delegates', [DelegationController::class, 'importDelegatesWithTravels'])->name('delegations.import.delegates');
 
     Route::resource('delegations', DelegationController::class);
     Route::get('/delegations-get', [DelegationController::class, 'index']);
@@ -191,6 +192,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/export-non-badge-printed', [DelegationController::class, 'exportNonBadgePrinted'])->name('delegates.exportNonBadgePrinted');
     Route::get('/export-badge-printed-delegates', [DelegationController::class, 'exportBadgePrintedDelegates'])->name('delegates.exportBadgePrintedDelegates');
     Route::get('/export-non-badge-printed-delegates', [DelegationController::class, 'exportNonBadgePrintedDelegates'])->name('delegates.exportNonBadgePrintedDelegates');
+    Route::get('/export-delegations', [DelegationController::class, 'exportDelegations'])->name('delegates.exportDelegations');
+    Route::get('/export-delegates', [DelegationController::class, 'exportDelegates'])->name('delegates.exportDelegates');
 
     //Manage news
     Route::resource('news', NewsController::class);

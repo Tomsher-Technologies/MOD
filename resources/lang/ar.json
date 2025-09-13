@@ -183,6 +183,12 @@
     "badge_printed_status_update_failed" : "فشل تحديث حالة طباعة الشارة",
     "download_sample_delegations_excel" : "تنزيل نموذج إكسل للوفود",
     "download_sample_delegations_excel_description" : "قم بتنزيل ملف إكسل نموذجي لاستيراد الوفود بالتنسيق الصحيح.",
+    "download_sample_delegates_excel" : "تنزيل نموذج إكسل للمندوبين",
+    "download_sample_delegates_excel_description" : "قم بتنزيل ملف إكسل نموذجي لاستيراد المندوبين بالتنسيق الصحيح.",
     "delegation_import_failed" : "فشل استيراد الوفود",
-    "import_delegations" : "استيراد الوفود"
+    "import_delegations" : "استيراد الوفود",
+    "import_delegations_only" : "استيراد الوفود فقط",
+    "import_delegations_with_delegates" : "استيراد الوفود مع المندوبين",
+    "delegations_only_imported_successfully" : "تم استيراد الوفود بنجاح",
+    "upload_excel" : "تحميل إكسل"
 }

@@ -227,6 +227,12 @@
     "badge_printed_status_update_failed" : "Failed to update badge printed status",
     "download_sample_delegations_excel" : "Download Delegations Sample Excel",
     "download_sample_delegations_excel_description" : "Download the sample Excel file for importing delegations with the correct format.",
+    "download_sample_delegates_excel" : "Download Delegates Sample Excel",
+    "download_sample_delegates_excel_description" : "Download the sample Excel file for importing delegates with the correct format.",
     "delegation_import_failed" : "Delegation import failed",
-    "import_delegations" : "Import Delegations"
+    "import_delegations" : "Import Delegations",
+    "import_delegations_only" : "Import Delegations Only",
+    "import_delegations_with_delegates" : "Import Delegations with Delegates",
+    "delegations_only_imported_successfully" : "Delegations imported successfully",
+    "upload_excel" : "Upload Excel"
 }

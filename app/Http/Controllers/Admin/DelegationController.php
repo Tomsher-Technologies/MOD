@@ -15,7 +15,10 @@ use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
 use App\Exports\BadgePrintedDelegatesExport;
 use App\Exports\NonBadgePrintedDelegatesExport;
-use App\Imports\DelegationImport;
+use App\Exports\DelegationExport;
+use App\Exports\DelegateExport;
+use App\Imports\DelegateImport;
+use App\Imports\DelegationOnlyImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -2155,6 +2158,49 @@ class DelegationController extends Controller
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
     }
 
+    public function exportBadgePrintedDelegates(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+        ])
+            ->where('badge_printed', true)
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
+
+        $badgePrintedFilter = $request->input('badge_printed');
+        if ($badgePrintedFilter !== null) {
+            if ($badgePrintedFilter == '1') {
+                $query->where('badge_printed', true);
+            } elseif ($badgePrintedFilter == '0') {
+                $query->where('badge_printed', false);
+            }
+        }
+
+        $delegates = $query->get();
+
+        $selectedDelegateIds = $request->input('delegate_ids');
+        if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
+            $delegates = $delegates->whereIn('id', $selectedDelegateIds);
+
+            // Only update badge printed status if we're exporting non-badge printed
+            if ($badgePrintedFilter == '0') {
+                Delegate::whereIn('id', $selectedDelegateIds)->update(['badge_printed' => true]);
+            }
+        }
+
+        // Use the appropriate export class based on badge printed status
+        if ($badgePrintedFilter == '0' || ($badgePrintedFilter === null && $delegates->first() && !$delegates->first()->badge_printed)) {
+            return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
+        } else {
+            return Excel::download(new \App\Exports\BadgePrintedDelegatesExport($delegates), 'badge-printed-delegates.xlsx');
+        }
+    }
+
     public function exportNonBadgePrintedDelegates(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
@@ -2181,27 +2227,57 @@ class DelegationController extends Controller
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
     }
 
+    public function exportDelegations(Request $request)
+    {
+        return Excel::download(new DelegationExport, 'delegations.xlsx');
+    }
+
+    public function exportDelegates(Request $request)
+    {
+        return Excel::download(new DelegateExport, 'delegates.xlsx');
+    }
+
     public function showImportForm()
     {
         return view('admin.delegations.import');
     }
 
-    public function import(Request $request)
+    public function importDelegations(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,csv',
         ]);
 
         try {
-            Excel::import(new DelegationImport, $request->file('file'));
+            Excel::import(new DelegationOnlyImport, $request->file('file'));
             
             return redirect()->route('delegations.index')
-                ->with('success', __db('delegation') . ' ' . __db('created_successfully'));
+                ->with('success', __db('delegations_only_imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
             
             return redirect()->back()
                 ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function importDelegatesWithTravels(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new DelegateImport, $request->file('file'));
+            
+            return redirect()->route('delegations.index')
+                ->with('success', __db('delegate') . ' ' . __db('created_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Delegation Import Error: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->with('error', __db('delegate_import_failed') . ': ' . $e->getMessage())
                 ->withInput();
         }
     }
