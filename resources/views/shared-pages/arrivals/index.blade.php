@@ -145,7 +145,7 @@
                         [
                             'label' => __db('date_time'),
                             'render' => fn($row) => $row['date_time']
-                                ? \Carbon\Carbon::parse($row['date_time'])->format('Y-m-d h:i A')
+                                ? \Carbon\Carbon::parse($row['date_time'])->format('Y-m-d H:i')
                                 : '-',
                         ],
                         [
@@ -179,7 +179,7 @@
                                     'flight_no' => $firstTransport->flight_no,
                                     'flight_name' => $firstTransport->flight_name,
                                     'date_time' => $firstTransport->date_time
-                                        ? \Carbon\Carbon::parse($firstTransport->date_time)->format('Y-m-d\TH:i')
+                                        ? \Carbon\Carbon::parse($firstTransport->date_time)->format('Y-m-d H:i')
                                         : '',
                                     'status' => $firstTransport->status,
                                 ];
@@ -329,8 +329,8 @@
 
                     <div>
                         <label class="form-label">{{ __db('date_time') }}: <span class="text-red-600">*</span></label>
-                        <input type="datetime-local" name="date_time" x-model="arrival.date_time"
-                            class="p-3 rounded-lg w-full border text-sm">
+                        <input type="text" name="date_time" x-model="arrival.date_time" id="arrival_datetime"
+                            class="p-3 rounded-lg w-full border text-sm datetimepicker-input">
                     </div>
                     <div>
 
@@ -534,6 +534,18 @@
                     }));
                 });
             });
+
+            const arrivalDateTimeInput = document.getElementById('arrival_datetime');
+            if (arrivalDateTimeInput) {
+                $(arrivalDateTimeInput).datetimepicker({
+                    format: 'Y-m-d H:i',
+                    step: 5,
+                    inline: false,
+                    todayButton: true,
+                    hours24: true,
+                    mask: true,
+                });
+            }
 
             const continentSelect = $("#continent");
             const countrySelect = $("#country");
