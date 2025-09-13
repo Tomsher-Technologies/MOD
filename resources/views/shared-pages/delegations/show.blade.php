@@ -387,6 +387,7 @@
                     $rowClass = function ($driver) {
                         return $driver->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
                     };
+
                 @endphp
 
 
@@ -408,7 +409,7 @@
             [
                 'label' => 'Date & Time',
                 'render' => fn($row) => $row->date_time
-                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                     : '-',
             ],
             [

@@ -1502,12 +1502,6 @@ class DelegationController extends Controller
     {
         $isEditMode = $delegate && $delegate->exists;
 
-        // return response()->json([
-        //     'isEditMode' => $isEditMode,
-        //     'delegate' => $delegate,
-        //     'delegation' => $delegation
-        // ]);
-
         $validator = Validator::make($request->all(), [
             'title_en' => 'nullable|string',
             'title_ar' => 'nullable|string',

@@ -595,7 +595,7 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
-        <div class="flex items-center gap-3">
+           <div class="flex items-center gap-3">
             @directCanany(['add_escorts', 'escort_add_escorts'])
                 <a href={{ route('escorts.index') }}
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
@@ -749,7 +749,7 @@
                     ];
                 @endphp
 
-                <x-reusable-table :data="$delegation->escorts" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->escorts" table-id="escortsTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
 
         </div>
@@ -763,7 +763,7 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
 
 
-        <div class="flex items-center gap-3">
+       <div class="flex items-center gap-3">
             @directCanany(['add_drivers', 'driver_add_drivers'])
                 <a href={{ route('drivers.index') }}
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
@@ -935,7 +935,7 @@
                 @endphp
 
 
-                <x-reusable-table :data="$delegation->drivers" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->drivers" table-id="driversTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
 
         </div>
@@ -975,7 +975,7 @@
                         [
                             'label' => 'Date & Time',
                             'render' => fn($row) => $row->date_time
-                                ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                                ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                                 : '-',
                         ],
                         [
@@ -1079,7 +1079,7 @@
                         ],
                     ];
                 @endphp
-                <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->interviews" table-id="interviewsTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
     </div>

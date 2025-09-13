@@ -130,6 +130,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     // Escorts
     Route::get('/escorts/import', [EscortController::class, 'showImportForm'])->name('escorts.import.form');
     Route::post('/escorts/import', [EscortController::class, 'import'])->name('escorts.import');
+    Route::get('/escorts/search', [EscortController::class, 'search'])->name('escorts.search');
 
     Route::resource('escorts', EscortController::class);
     Route::post('/escorts/status', [EscortController::class, 'updateStatus'])->name('escorts.status');
@@ -143,6 +144,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     Route::get('/drivers/import', [DriverController::class, 'showImportForm'])->name('drivers.import.form');
     Route::post('/drivers/import', [DriverController::class, 'import'])->name('drivers.import');
+    Route::get('/drivers/search', [DriverController::class, 'search'])->name('drivers.search');
 
     Route::resource('drivers', DriverController::class);
     Route::post('/drivers/status', [DriverController::class, 'updateStatus'])->name('drivers.status');
