@@ -359,7 +359,7 @@ class EscortController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => __db('Escort updated successfully.'),
-            'redirect_url' => route('escorts.index'),
+            'redirect_url' => route('escorts.edit', $escort->id),
         ]);
     }
 
