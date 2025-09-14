@@ -603,3 +603,10 @@
 ALTER TABLE `news` ADD FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE `accommodations` ADD `hotel_name_ar` VARCHAR(255) NULL DEFAULT NULL AFTER `hotel_name`;
 ALTER TABLE `external_member_assignments` ADD `coming_from` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
+
+ALTER TABLE `users` CHANGE `military_number` `username` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;
+
+ALTER TABLE `users` ADD UNIQUE(`username`);
+
+ALTER TABLE `users` ADD `force_password` TINYINT(1) NULL DEFAULT '0' AFTER `password`;
+ALTER TABLE `users` CHANGE `force_password` `force_password` TINYINT(1) NULL DEFAULT '0' COMMENT '1- force password change on first login';

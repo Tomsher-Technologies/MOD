@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AlertController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\EventPageController;
+use App\Http\Controllers\Admin\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -190,6 +191,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('event-pages', [EventPageController::class,'index'])->name('event_pages.index');
     Route::get('event-pages/edit/{id}', [EventPageController::class,'edit'])->name('event_pages.edit');
     Route::post('event-pages/{id}/update', [EventPageController::class,'update'])->name('event_pages.update');
+
+    // Report Section
+    Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
+    Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
 });
 
 Route::get('/lang/{lang}', function ($lang) {
