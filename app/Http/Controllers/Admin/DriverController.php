@@ -323,7 +323,7 @@ class DriverController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => __db('Driver updated successfully.'),
-            'redirect_url' => getRouteForPage('drivers.index'),
+            'redirect_url' => getRouteForPage('drivers.edit', $driver->id),
         ]);
     }
 
