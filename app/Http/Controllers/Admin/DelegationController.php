@@ -43,7 +43,11 @@ class DelegationController extends Controller
         ]);
 
         $this->middleware('permission:add_delegations|delegate_add_delegations', [
-            'only' => ['create', 'store', 'syncTransportInfo', 'showImportForm', 'import']
+            'only' => ['create', 'store', 'syncTransportInfo']
+        ]);
+
+        $this->middleware('permission:import_delegations|delegate_add_delegations', [
+            'only' => ['showImportForm', 'import']
         ]);
 
         $this->middleware('permission:edit_delegations|delegate_edit_delegations', [
@@ -1382,7 +1386,7 @@ class DelegationController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => __db('interview_created_successfully'),
-                    'redirect_url' => route('delegations.edit', $delegation->id)  
+                    'redirect_url' => route('delegations.edit', $delegation->id)
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
