@@ -222,6 +222,9 @@
                     confirmButtonText: '{{ __db('reassign') }}',
                     denyButtonText: '{{ __db('replace') }}',
                     cancelButtonText: '{{ __db('cancel') }}',
+                    customClass: {
+                        confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-center text-white bg-[#B68A35] hover:bg-[#A87C27]',
+                    },
                 }).then((result) => {
                     if (result.isConfirmed) {
                         Swal.fire({
@@ -231,11 +234,14 @@
                             inputPlaceholder: '{{ __db('select_date') }}',
                             inputValidator: (value) => {
                                 if (!value)
-                                return '{{ __db('start_date_required') }}';
+                                    return '{{ __db('start_date_required') }}';
                             },
                             showCancelButton: true,
                             confirmButtonText: '{{ __db('submit') }}',
                             cancelButtonText: '{{ __db('cancel') }}',
+                            customClass: {
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-center text-white bg-[#B68A35] hover:bg-[#A87C27]',
+                            },
                         }).then((dateResult) => {
                             if (dateResult.isConfirmed) {
                                 actionInput.value = 'reassign';

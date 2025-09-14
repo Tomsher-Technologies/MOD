@@ -1,7 +1,8 @@
 @php
     $mode = old($type . '.mode', $transport->mode ?? 'flight');
     $dateTime =
-        $transport && $transport->date_time ? \Carbon\Carbon::parse($transport->date_time)->format('Y-m-d\TH:i') : '';
+        $transport && $transport->date_time ? \Carbon\Carbon::parse($transport->date_time)->format('Y-m-d H:i') : '';
+
 @endphp
 
 <h2 class="font-semibold text-2xl mb-4">{{ $title }}</h2>
@@ -52,13 +53,14 @@
             </div>
         </div>
 
-
         <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-                <label class="form-label block mb-1 text-sm">{{ __db('date_time') }}:</label>
-                <input name="{{ $type }}[date_time]" type="datetime-local"
+                <label class="form-label block mb-1 text-sm">{{ __db('date_time') }}:<span
+                        class="text-red-600">*</span></label>
+                <input name="{{ $type }}[date_time]" id="{{ $type }}_datetime" type="text"
                     value="{{ old($type . '.date_time', $dateTime) }}"
-                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm" />
+                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm datetimepicker-input"
+                    placeholder="{{ __db('select_date_time') }}" />
             </div>
 
             @php
@@ -101,3 +103,21 @@
             class="block p-2.5 w-full text-sm rounded-lg border border-neutral-300">{{ old($type . '.comment', $transport->comment ?? '') }}</textarea>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateTimeInput = document.getElementById('{{ $type }}_datetime');
+    if (dateTimeInput) {
+        $(dateTimeInput).datetimepicker({
+            format: 'Y-m-d H:i',  
+            step: 5,             
+            inline: false,       
+            todayButton: true,   
+            hours24: true,       
+            mask: true,    
+        });
+    }
+});
+</script>
+@endpush

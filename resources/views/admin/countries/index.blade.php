@@ -76,10 +76,13 @@
                                 return $countries->firstItem() + $key;
                             },
                         ],
-                        ['label' => __db('name'), 'render' => fn($country) => e($country->name)],
-                        ['label' => 'Name (Arabic)', 'render' => fn($country) => e($country->name_ar ?? '')],
-                        ['label' => __db('short_code'), 'render' => fn($country) => e($country->short_code)],
-                        ['label' => __db('continent'), 'render' => fn($country) => e($country->continent->value ?? '')],
+                        ['label' => __db('name'), 'render' => fn($country) => e($country?->getNameEn())],
+                        ['label' => 'Name (Arabic)', 'render' => fn($country) => e($country?->getNameAr() ?? '')],
+                        ['label' => __db('short_code'), 'render' => fn($country) => e($country?->short_code)],
+                        [
+                            'label' => __db('continent'),
+                            'render' => fn($country) => e($country?->continent->value ?? ''),
+                        ],
                         [
                             'label' => __db('flag'),
                             'render' => function ($country) {
@@ -161,26 +164,26 @@
                             @csrf
 
                             <div class="mb-4">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name') }}</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name_en') }}<span class="text-red-600">*</span></label>
                                 <input type="text" name="name" value="{{ old('name') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
 
                             <div class="mb-4">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 ">Name (Arabic)</label>
+                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name_ar') }}</label>
                                 <input type="text" name="name_ar" value="{{ old('name_ar') }}"
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
                             <div class="mb-4">
                                 <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}</label>
+                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}<span class="text-red-600">*</span></label>
                                 <input type="text" name="short_code" value="{{ old('short_code') }}" required
                                     class="w-full border border-gray-300 rounded p-2">
                             </div>
 
 
                             <div class="mb-4">
-                                <label class="form-label">{{ __db('continent') }}*:</label>
+                                <label class="form-label">{{ __db('continent') }}:<span class="text-red-600">*</span></label>
                                 <select name="continent_id" required
                                     class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                     <option value="">{{ __db('select_continent') }}</option>
@@ -206,7 +209,10 @@
                             </div>
 
                             <div class="col-span-3 mb-4">
-                                <label class="form-label">{{ __db('flag') }}</label>
+                                  <label class="form-label flex flex-row items-center gap-1">{{ __db('flag') }} <span
+                                    class="text-xs text-gray-500 block mt-1">({{ __db('recommended') . ' ' . __db('resolution') }}:
+                                    {{ __db('100x100') }}
+                                    px)</span></label>
                                 <input type="file" name="flag" id="image"
                                     class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                 @error('flag')
@@ -219,7 +225,7 @@
                                 <select name="status" class="w-full border border-gray-300 rounded p-2">
                                     <option value="1" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('active') }}
                                     </option>
-                                    <option value="0" {{ !old('status', 1) ? 'selected' : '' }}>
+                                    <option value="0" {{ old('status', 1) ? 'selected' : '' }}>
                                         {{ __db('inactive') }}</option>
                                 </select>
                             </div>
@@ -255,19 +261,19 @@
                         @method('PUT')
 
                         <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name') }}</label>
-                            <input type="text" name="name" value="{{ old('name', $country->pluck('name')) }}"
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name') }}<span class="text-red-600">*</span></label>
+                            <input type="text" name="name" value="{{ old('name', $country->getNameEn()) }}"
                                 required class="w-full border border-gray-300 rounded p-2">
                         </div>
 
                         <div class="mb-4">
                             <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('name_ar') }}</label>
-                            <input type="text" name="name_ar" value="{{ old('name_ar', $country->name_ar) }}"
+                            <input type="text" name="name_ar" value="{{ old('name_ar', $country->getNameAr()) }}"
                                 class="w-full border border-gray-300 rounded p-2">
                         </div>
 
                         <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('short_code') }}</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('short_code') }}<span class="text-red-600">*</span></label>
                             <input type="text" name="short_code"
                                 value="{{ old('short_code', $country->short_code) }}" required
                                 class="w-full border border-gray-300 rounded p-2">
@@ -275,7 +281,7 @@
 
 
                         <div class="mb-4">
-                            <label class="form-label">{{ __db('continent') }}:</label>
+                            <label class="form-label">{{ __db('continent') }}:<span class="text-red-600">*</span></label>
                             <select name="continent_id" required
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                 <option value="" disabled selected>{{ __('Select Continent') }}</option>
@@ -293,16 +299,19 @@
 
 
                         <div class="mb-4">
-                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('sort_order') }}</label>
+                            <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('sort_order') }}<span class="text-red-600">*</span></label>
                             <input type="number" name="sort_order" required
                                 value="{{ old('sort_order', $country->sort_order ?? 0) }}"
                                 class="w-full border border-gray-300 rounded p-2">
                         </div>
 
                         <div class="col-span-3">
-                            <label class="form-label">{{ __db('flag') }}</label>
+                            <label class="form-label flex flex-row items-center gap-1">{{ __db('flag') }} <span
+                                    class="text-xs text-gray-500 block mt-1">({{ __db('recommended') . ' ' . __db('resolution') }}:
+                                    {{ __db('100x100') }}
+                                    px)</span></label>
                             <input type="file" name="flag" id="flag"
-                                class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                class="rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                             @error('flag')
                                 <div class="text-red-600">{{ $message }}</div>
                             @enderror
@@ -310,9 +319,8 @@
                                 <img src="{{ getUploadedImage($country->flag) }}" alt="Image" width="100"
                                     height="100" class="mb-2 mt-4"><br>
                             @endif
+
                         </div>
-
-
 
                         <div class="mb-4">
                             <label class="block mb-2 text-sm font-medium text-gray-900">{{ __db('Status') }}</label>
@@ -342,7 +350,6 @@
 
 @section('script')
     <script>
-        // Show modals
         document.querySelectorAll('[data-modal-toggle]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const modalId = btn.getAttribute('data-modal-toggle');
@@ -354,7 +361,6 @@
             });
         });
 
-        // Close modals with close buttons
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', () => {
                 const modal = btn.closest('[id^="edit-country-"], #add-country');
@@ -365,7 +371,6 @@
             });
         });
 
-        // Close modals when clicking outside
         document.querySelectorAll('[id^="edit-country-"], #add-country').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {

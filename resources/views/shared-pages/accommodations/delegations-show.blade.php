@@ -862,7 +862,7 @@
             [
                 'label' => 'Date & Time',
                 'render' => fn($row) => $row->date_time
-                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                     : '-',
             ],
             [

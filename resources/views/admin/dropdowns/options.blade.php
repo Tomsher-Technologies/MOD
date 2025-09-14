@@ -183,7 +183,7 @@
                         @csrf
                         <input type="hidden" name="dropdown_id" value="{{ $dropdown->id }}">
 
-                        <label class="block mb-2 font-medium">{{ __db('value') }} ({{ __db('english') }})</label>
+                        <label class="block mb-2 font-medium">{{ __db('value') }} ({{ __db('english') }})<span class="text-red-600">*</span></label>
                         <input type="text" name="value" required class="w-full border p-2 rounded mb-4">
 
                         <label class="block mb-2 font-medium">{{ __db('value') }} ({{ __db('arabic') }})</label>
@@ -193,7 +193,7 @@
                         <input type="number" name="sort_order" class="w-full border p-2 rounded mb-4" value="0">
 
                         <div class="text-right">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                            <button type="submit" class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">
                                 {{ __db('save') }}
                             </button>
                         </div>
