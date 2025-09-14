@@ -13,6 +13,7 @@ class ExternalMemberAssignment extends Model
 
     protected $fillable = [
         'name',
+        'coming_from',
         'hotel_id',
         'room_type_id',
         'room_number',

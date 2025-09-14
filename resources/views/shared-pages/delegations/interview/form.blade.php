@@ -90,10 +90,11 @@
             <div class="bg-white grid grid-cols-4 gap-5 mt-6 mb-4">
 
                 <div>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
-                    <input type="datetime-local" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm"
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:<span class="text-red-600">*</span></label>
+                    <input type="text" id="interview_datetime" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm datetimepicker-input"
                         name="date_time"
-                        value="{{ old('date_time', $isEditMode ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d\TH:i') : '') }}">
+                        value="{{ old('date_time', $isEditMode ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d H:i') : '') }}"
+                        placeholder="{{ __db('select_date_time') }}">
                     @error('date_time')
                         <div class="text-red-600 mt-1">{{ $message }}</div>
                     @enderror
@@ -267,6 +268,22 @@
             const checked = e.target.checked;
             document.querySelectorAll('.delegate-checkbox').forEach(cb => cb.checked = checked);
         });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateTimeInput = document.getElementById('interview_datetime');
+        if (dateTimeInput) {
+            $(dateTimeInput).datetimepicker({
+                format: 'Y-m-d H:i',  
+                step: 5,             
+                inline: false,       
+                todayButton: true,   
+                hours24: true,       
+                mask: true,    
+            });
+        }
+    });
     </script>
 
     <script>

@@ -5,10 +5,9 @@
 
     <div id="update-confirmation-dialog" class="hidden">
         <div class="text-left p-4">
-            <h3 class="text-lg font-semibold mb-4">Confirm Changes & Select Notifications</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ __db('confirm_changes_notification') }}</h3>
             <p class="text-sm text-gray-600 mb-4">
-                The following fields have been changed. Please select which changes you would like to send notifications
-                for.
+                {{__db('following_fields_have_changed')}}.
             </p>
             <div id="changed-fields-checkboxes" class="space-y-2 max-h-48 overflow-y-auto border p-3 rounded-md">
                 @foreach ($changedFields as $key => $label)

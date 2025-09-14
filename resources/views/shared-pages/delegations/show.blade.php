@@ -8,7 +8,10 @@
                     {{ __db('edit') }}
                 </a>
             @enddirectCanany
-            <x-back-btn class="" back-url="{{ route('delegations.index') }}" />
+            
+            <x-back-btn title="" class=""
+                back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
+
         </div>
     </div>
 
@@ -49,7 +52,7 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
-            <div class="bg-white h-full w-full rounded-lg border-0 p-10">
+            <div class="bg-white h-full w-full rounded-lg border-0 p-7">
                 <x-reusable-table :columns="$columns" tableId="delegationDetails" :data="$data" :noDataMessage="$noDataMessage" />
 
                 <hr class="my-5">
@@ -384,6 +387,7 @@
                     $rowClass = function ($driver) {
                         return $driver->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
                     };
+
                 @endphp
 
 
@@ -405,7 +409,7 @@
             [
                 'label' => 'Date & Time',
                 'render' => fn($row) => $row->date_time
-                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                     : '-',
             ],
             [

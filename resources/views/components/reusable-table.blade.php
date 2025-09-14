@@ -60,13 +60,13 @@
                         </option>
                     @endforeach
                 </select>
-                <span class="mr-2 text-sm">rows</span>
+                <span class="mr-2 text-sm">{{ __db('rows') }}</span>
             </form>
         @endif
     </div>
 @endif
 
-<table class="table-auto mb-0 !border-[#F9F7ED] w-full" id="{{ $tableId }}">
+<table class="table-auto mb-0 !border-[#F9F7ED] w-full hidden" id="{{ $tableId }}">
     <thead>
         <tr class="text-[13px]">
             @foreach ($columns as $column)
@@ -130,7 +130,18 @@
             @endforeach
         @endif
     </tbody>
+
+
+
 </table>
+
+@if (
+    $data instanceof \Illuminate\Contracts\Pagination\Paginator ||
+        $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
+    <div class="mt-2">
+        {{ $data->appends(request()->except('page'))->links() }}
+    </div>
+@endif
 
 <div id="{{ $modalId }}" tabindex="-1" aria-hidden="true"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -150,7 +161,10 @@
             <div class="p-6 space-y-6">
                 <div class="space-y-3 grid grid-cols-3" id="{{ $tableId }}-column-toggles">
                     @foreach ($columns as $column)
-                        @if ($column['key'] !== 'action' && $column['key'] !== 'actions')
+                        @php
+                            $isActionColumn = in_array($column['key'], ['action', 'actions']);
+                        @endphp
+                        @if (!$isActionColumn)
                             <label class="flex items-center space-x-2">
                                 <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox me-2"
                                     value="{{ $column['key'] }}" checked>
@@ -182,12 +196,6 @@
                     let preferences = {};
                     checkboxes.forEach(checkbox => {
                         const columnKey = checkbox.value;
-
-                        if (columnKey === 'action' || columnKey === 'actions') {
-                            preferences[columnKey] = true;
-                            return;
-                        }
-
                         const isVisible = checkbox.checked;
                         preferences[columnKey] = isVisible;
 
@@ -197,6 +205,15 @@
                             el.style.display = isVisible ? '' : 'none';
                         });
                     });
+
+                    // Always show action columns
+                    document.querySelectorAll(
+                        `#${tableId} th[data-column-key='action'], #${tableId} td[data-column-key='action'],` +
+                        `#${tableId} th[data-column-key='actions'], #${tableId} td[data-column-key='actions']`
+                    ).forEach(el => {
+                        el.style.display = '';
+                    });
+
                     localStorage.setItem(storageKey, JSON.stringify(preferences));
                 };
 
@@ -221,10 +238,23 @@
                             });
                         }
                     }
+
+                    // Always show action columns
+                    document.querySelectorAll(
+                        `#${tableId} th[data-column-key='action'], #${tableId} td[data-column-key='action'],` +
+                        `#${tableId} th[data-column-key='actions'], #${tableId} td[data-column-key='actions']`
+                    ).forEach(el => {
+                        el.style.display = '';
+                    });
                 };
 
                 loadPreferences();
                 applyVisibility();
+
+                const table = document.getElementById(tableId);
+                if (table) {
+                    table.classList.remove('hidden');
+                }
 
                 checkboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', applyVisibility);

@@ -157,8 +157,8 @@ trait HandlesUpdateConfirmation
                             $newDisplay = $value;
 
                             try {
-                                if ($originalValue) $oldDisplay = Carbon::parse($originalValue)->format('Y-m-d h:i A');
-                                if ($value) $newDisplay = Carbon::parse($value)->format('Y-m-d h:i A');
+                                if ($originalValue) $oldDisplay = Carbon::parse($originalValue)->format('Y-m-d H:i');
+                                if ($value) $newDisplay = Carbon::parse($value)->format('Y-m-d H:i');
                             } catch (\Exception $e) {
                             }
 
@@ -207,8 +207,8 @@ trait HandlesUpdateConfirmation
                             if (!$originalValue || !Carbon::parse($originalValue)->eq(Carbon::parse($value))) {
                                 $changedFields["{$requestKey}.{$field}"] = [
                                     'label' => Str::headline($requestKey . ' Date Time'),
-                                    'old' => $originalValue ? Carbon::parse($originalValue)->format('Y-m-d h:i A') : 'N/A',
-                                    'new' => $value ? Carbon::parse($value)->format('Y-m-d h:i A') : 'N/A',
+                                    'old' => $originalValue ? Carbon::parse($originalValue)->format('Y-m-d H:i') : 'N/A',
+                                    'new' => $value ? Carbon::parse($value)->format('Y-m-d H:i') : 'N/A',
                                 ];
                             }
                         } elseif ($originalValue != $value) {

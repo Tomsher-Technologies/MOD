@@ -8,9 +8,14 @@ window.jQuery.moment = moment;
 import "daterangepicker/daterangepicker.css";
 
 import "jquery-validation";
+import "jquery-validation/dist/additional-methods.js";
 
 import select2 from "select2";
 import "select2/dist/css/select2.min.css";
+
+import 'jquery-datetimepicker/jquery.datetimepicker.css';
+import 'jquery-datetimepicker/build/jquery.datetimepicker.full.min.js';
+
 
 import Alpine from "alpinejs";
 window.Alpine = Alpine;
@@ -21,6 +26,9 @@ select2(window.$);
 import "toastr/build/toastr.min.css";
 import "sweetalert2/dist/sweetalert2.min.css";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
+
+import 'jquery-datetimepicker/jquery.datetimepicker.css';
+import 'jquery-datetimepicker/build/jquery.datetimepicker.full.min.js';
 
 import toastr from "toastr";
 import Swal from "sweetalert2";

@@ -862,7 +862,7 @@
             [
                 'label' => 'Date & Time',
                 'render' => fn($row) => $row->date_time
-                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                    ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                     : '-',
             ],
             [
@@ -1061,6 +1061,16 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
+            $(document).on("change", ".room-type-dropdown-escort", function () {
+                $(this).closest("tr").find(".room-number-input-escort").val(""); 
+            });
+
+            $(document).on("change", ".room-type-dropdown", function () {
+                $(this).closest("tr").find(".room-number-input").val(""); 
+            });
+             $(document).on("change", ".room-type-dropdown-driver", function () {
+                $(this).closest("tr").find(".room-number-input-driver").val(""); 
+            });
             function hotelData(hotelId, section) {
                 $('.assign-hotel-checkbox').prop('checked', false);
                 $('.assign-hotel-checkbox-escort').prop('checked', false);

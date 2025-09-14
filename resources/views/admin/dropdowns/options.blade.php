@@ -4,7 +4,7 @@
 
 <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
     <div class="justify-between">
-        <h2 class="font-semibold mb-0 !text-[22px]">Options for: {{ $dropdown->name }}</h2>
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('options') }}: {{ $dropdown->name }}</h2>
     </div>
 
     <div class="flex items-center">
@@ -117,38 +117,38 @@
                                 <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
                                  
 
-                                    <h2 class="text-xl font-semibold mb-4">Edit Option</h2>
+                                    <h2 class="text-xl font-semibold mb-4">{{ __db('edit') . ' ' . __db('option') }}</h2>
 
                                     <form class="" method="POST" action="{{ route('dropdowns.options.update', $option) }}">
                                         @csrf
                                         @method('PUT')
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Value</label>
-                                            <input type="text" name="value" value="{{ $option->value }}" required
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }} ({{ __db('english') }})</label>
+                                            <input type="text" name="value" value="{{ $option->getRawOriginal('value') }}" required
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Value (Arabic)</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }} ({{ __db('arabic') }})</label>
                                             <input type="text" name="value_ar" value="{{ $option->value_ar }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Sort Order</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
                                             <input type="number" name="sort_order" value="{{ $option->sort_order ?? 0 }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Status</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
                                             <select name="status" class="w-full border border-gray-300 rounded p-2">
-                                                <option value="1" {{ $option->status ? 'selected' : '' }}>Active</option>
-                                                <option value="0" {{ !$option->status ? 'selected' : '' }}>Inactive</option>
+                                                <option value="1" {{ $option->status ? 'selected' : '' }}>{{ __db('active') }}</option>
+                                                <option value="0" {{ !$option->status ? 'selected' : '' }}>{{ __db('inactive') }}</option>
                                             </select>
                                         </div>
 
                                         <div class="flex justify-start space-x-2 pt-4">
                                             <button type="submit"
                                                 class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12 ml-2">
-                                                Update
+                                                {{ __db('update') }}
                                             </button>
                                             <button type="button" data-modal-hide="edit-option-{{ $option->id }}" class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">{{ __db('cancel') }}</button>
                                         </div>
@@ -177,24 +177,24 @@
                     <button type="button" data-modal-hide="add-option"
                         class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
-                    <h2 class="text-xl font-semibold mb-4">Add New Option</h2>
+                    <h2 class="text-xl font-semibold mb-4">{{ __db('add_new_option') }}</h2>
 
                     <form method="POST" action="{{ route('dropdowns.options.store') }}">
                         @csrf
                         <input type="hidden" name="dropdown_id" value="{{ $dropdown->id }}">
 
-                        <label class="block mb-2 font-medium">Value</label>
+                        <label class="block mb-2 font-medium">{{ __db('value') }} ({{ __db('english') }})<span class="text-red-600">*</span></label>
                         <input type="text" name="value" required class="w-full border p-2 rounded mb-4">
 
-                        <label class="block mb-2 font-medium">Value (Arabic)</label>
+                        <label class="block mb-2 font-medium">{{ __db('value') }} ({{ __db('arabic') }})</label>
                         <input type="text" name="value_ar" class="w-full border p-2 rounded mb-4">
 
-                        <label class="block mb-2 font-medium">Sort Order</label>
+                        <label class="block mb-2 font-medium">{{ __db('sort_order') }}</label>
                         <input type="number" name="sort_order" class="w-full border p-2 rounded mb-4" value="0">
 
                         <div class="text-right">
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                Add Option
+                            <button type="submit" class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-8 submit-btn">
+                                {{ __db('save') }}
                             </button>
                         </div>
                     </form>
