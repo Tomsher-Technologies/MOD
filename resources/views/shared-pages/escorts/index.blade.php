@@ -1,32 +1,11 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }}</h2>
-        @directCanany(['add_escorts', 'escort_add_escorts', 'import_escorts', 'escort_import_escorts'])
-            <button id="escortDropdownButton" data-dropdown-toggle="escortDropdown"
-                class="btn !text-[#B68A35] !bg-[#E6D7A2]  text-md rounded-lg px-6 py-3 text-center inline-flex items-center"
-                type="button">
-                {{ __db('add') . ' ' . __db('escort') }}
-                <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 10 6">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="m1 1 4 4 4-4" />
-                </svg>
-            </button>
-
-            <div id="escortDropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44">
-                <ul class="py-2 text-sm text-gray-700" aria-labelledby="escortDropdownButton">
-                    <li>
-                        <a href="{{ route('escorts.create') }}"
-                            class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('escort') . ' ' . __db('manually') }}</a>
-                    </li>
-                    @directCanany(['import_escorts', 'escort_import_escorts'])
-                        <li>
-                            <a href="{{ route('escorts.import.form') }}"
-                                class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('escort') . ' ' . __db('bulk') }}</a>
-                        </li>
-                    @enddirectCanany
-                </ul>
-            </div>
+        @directCanany(['import_escorts', 'escort_add_escorts'])
+            <a href="{{ route('escorts.import.form') }}"
+                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
+                {{ __db('import') . ' ' . __db('escorts') }}
+            </a>
         @enddirectCanany
     </div>
     <!-- Escorts -->

@@ -17,8 +17,8 @@ class EscortImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            $existingEscort = Escort::where('code', trim($row['code']))
-                                ->first();
+            // $existingEscort = Escort::where('code', trim($row['code']))
+            //                     ->first();
 
             $escortData = [
                 'name_en' => trim($row['name_en']) ?? null,
@@ -28,45 +28,44 @@ class EscortImport implements ToCollection, WithHeadingRow
                 'email' => trim($row['email']) ?? null,
                 'title_en' => trim($row['title_en']) ?? null,
                 'title_ar' => trim($row['title_ar']) ?? null,
-                'date_of_birth' => !empty($row['date_of_birth']) ? \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['date_of_birth'])->format('Y-m-d') : null,
                 'status' => $row['status'] ?? 1,
             ];
 
             if (!empty($row['gender_id'])) {
-                $gender = DropdownOption::whereHas('dropdown', function($q) {
+                $gender = DropdownOption::whereHas('dropdown', function ($q) {
                     $q->where('code', 'gender');
                 })->where('id', trim($row['gender_id']))->first();
-                
+
                 if ($gender) {
                     $escortData['gender_id'] = $gender->id;
                 }
             }
 
             if (!empty($row['nationality_id'])) {
-                $nationality = DropdownOption::whereHas('dropdown', function($q) {
+                $nationality = DropdownOption::whereHas('dropdown', function ($q) {
                     $q->where('code', 'nationality');
                 })->where('id', trim($row['nationality_id']))->first();
-                
+
                 if ($nationality) {
                     $escortData['nationality_id'] = $nationality->id;
                 }
             }
 
             if (!empty($row['internal_ranking_id'])) {
-                $ranking = DropdownOption::whereHas('dropdown', function($q) {
+                $ranking = DropdownOption::whereHas('dropdown', function ($q) {
                     $q->where('code', 'internal_ranking');
                 })->where('id', trim($row['internal_ranking_id']))->first();
-                
+
                 if ($ranking) {
                     $escortData['internal_ranking_id'] = $ranking->id;
                 }
             }
 
             if (!empty($row['unit_id'])) {
-                $unit = DropdownOption::whereHas('dropdown', function($q) {
+                $unit = DropdownOption::whereHas('dropdown', function ($q) {
                     $q->where('code', 'unit');
                 })->where('id', trim($row['unit_id']))->first();
-                
+
                 if ($unit) {
                     $escortData['unit_id'] = $unit->id;
                 }
@@ -82,17 +81,17 @@ class EscortImport implements ToCollection, WithHeadingRow
             if (!empty($row['spoken_languages_ids'])) {
                 $languageIds = explode(',', trim($row['spoken_languages_ids']));
                 $validLanguageIds = [];
-                
+
                 foreach ($languageIds as $languageId) {
-                    $lang = DropdownOption::whereHas('dropdown', function($q) {
+                    $lang = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'language');
                     })->where('id', trim($languageId))->first();
-                    
+
                     if ($lang) {
                         $validLanguageIds[] = $lang->id;
                     }
                 }
-                
+
                 if (!empty($validLanguageIds)) {
                     $escortData['spoken_languages'] = implode(',', $validLanguageIds);
                 }
@@ -105,27 +104,27 @@ class EscortImport implements ToCollection, WithHeadingRow
                 }
             }
 
-            if ($existingEscort) {
-                $existingEscort->update($escortData);
-                
-                $this->logActivity(
-                    module: 'Escorts',
-                    action: 'update-excel',
-                    model: $existingEscort,
-                    submodule: 'managing_members',
-                    submoduleId: $existingEscort->id
-                );
-            } else {
-                $escort = Escort::create($escortData);
-                
-                $this->logActivity(
-                    module: 'Escorts',
-                    action: 'create-excel',
-                    model: $escort,
-                    submodule: 'managing_members',
-                    submoduleId: $escort->id
-                );
-            }
+            // if ($existingEscort) {
+            //     $existingEscort->update($escortData);
+
+            //     $this->logActivity(
+            //         module: 'Escorts',
+            //         action: 'update-excel',
+            //         model: $existingEscort,
+            //         submodule: 'managing_members',
+            //         submoduleId: $existingEscort->id
+            //     );
+            // } else {
+            $escort = Escort::create($escortData);
+
+            $this->logActivity(
+                module: 'Escorts',
+                action: 'create-excel',
+                model: $escort,
+                submodule: 'managing_members',
+                submoduleId: $escort->id
+            );
+            // }
         }
     }
 }

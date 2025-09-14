@@ -27,9 +27,9 @@ class DriverController extends Controller
             'only' => ['create', 'store']
         ]);
 
-        // $this->middleware('permission:import_drivers|driver_import_drivers', [
-        //     'only' => ['showImportForm', 'import']
-        // ]);
+        $this->middleware('permission:import_drivers|driver_add_drivers', [
+            'only' => ['showImportForm', 'import']
+        ]);
 
         $this->middleware('permission:assign_drivers|driver_edit_drivers', [
             'only' => ['assign']

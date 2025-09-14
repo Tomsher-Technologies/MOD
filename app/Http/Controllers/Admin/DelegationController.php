@@ -1361,7 +1361,6 @@ class DelegationController extends Controller
                     ]);
                 }
 
-                // Attach new "to" member if present
                 if ($validated['interview_type'] === 'delegation' && !empty($validated['to_delegate_id'])) {
                     $newInterview->interviewMembers()->create([
                         'member_id' => $validated['to_delegate_id'],
@@ -1383,7 +1382,7 @@ class DelegationController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => __db('interview_created_successfully'),
-                    'redirect_url' => route('delegations.show', $delegation->id)  // Adjust as needed
+                    'redirect_url' => route('delegations.edit', $delegation->id)  
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
