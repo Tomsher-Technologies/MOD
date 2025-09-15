@@ -18,7 +18,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $user = \App\Models\User::where('username', $request->username)->first();
+        $user = \App\Models\User::where('username', $request->username)->orWhere('email', $request->username)->first();
 
         $rules = [
             'username' => 'required',
