@@ -227,7 +227,7 @@
                     ];
 
                     $rowClass = function ($driver) {
-                        return $driver->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
+                        return $driver->delegations->where('pivot.status', 1)->count() > 0 ? 'bg-green-100' : '';
                     };
                 @endphp
 
@@ -236,8 +236,8 @@
                     no-data-message="No drivers found." />
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
-                    <div class="h-5 w-5 bg-[#f2eccf] rounded"></div>
-                    <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('drivers') }}</span>
+                    <div class="h-5 w-5 bg-green-100 rounded"></div>
+                    <span class="text-gray-800 text-sm">{{ __db('assigned') . ' ' . __db('drivers') }}</span>
                 </div>
             </div>
         </div>

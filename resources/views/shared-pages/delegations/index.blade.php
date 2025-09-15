@@ -47,6 +47,41 @@
                 </div>
 
                 @php
+                    $rowClass = function ($delegation) {
+                        if (isEscort()) {
+                            $hasEscortAssignments = $delegation->escorts->where('pivot.status', 1)->isNotEmpty();
+
+                            if ($hasEscortAssignments) {
+                                return 'bg-green-100';
+                            } else {
+                                return ''; 
+                            }
+                        }
+                        elseif (isDriver()) {
+                            $hasDriverAssignments = $delegation->drivers->where('pivot.status', 1)->isNotEmpty();
+
+                            if ($hasDriverAssignments) {
+                                return 'bg-green-100';
+                            } else {
+                                return ''; 
+                            }
+                        }
+                        elseif (isHotel()) {
+                            $hasRoomAssignments =
+                                $delegation->delegates->where('accommodation', 1)->isNotEmpty() ||
+                                $delegation->escorts->where('pivot.status', 1)->isNotEmpty() ||
+                                $delegation->drivers->where('pivot.status', 1)->isNotEmpty();
+
+                            if ($hasRoomAssignments) {
+                                return 'bg-green-100'; 
+                            } else {
+                                return ''; 
+                            }
+                        }
+
+                        return '';
+                    };
+
                     $columns = [
                         [
                             'label' => __db('sl_no'),
@@ -252,7 +287,37 @@
                         'invitation_status',
                         'participation_status',
                         'note',
-                    ]" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                    ]" :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
+
+                @if (isEscort() || isDriver() || isHotel())
+                    <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-green-100 rounded"></div>
+                            <span class="text-gray-800 text-sm">
+                                @if (isEscort())
+                                    {{ __db('has_escort_assignments') }}
+                                @elseif (isDriver())
+                                    {{ __db('has_driver_assignments') }}
+                                @elseif (isHotel())
+                                    {{ __db('has_room_assignments') }}
+                                @endif
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-white border rounded"></div>
+                            <span class="text-gray-800 text-sm">
+                                @if (isEscort())
+                                    {{ __db('no_escort_assignments') }}
+                                @elseif (isDriver())
+                                    {{ __db('no_driver_assignments') }}
+                                @elseif (isHotel())
+                                    {{ __db('no_room_assignments') }}
+                                @endif
+                            </span>
+                        </div>
+                    </div>
+                @endif
+
             </div>
         </div>
     </div>
@@ -276,7 +341,8 @@
             <div class="flex flex-col gap-2 mt-2">
 
                 <div class="flex flex-col">
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                    <label
+                        class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>

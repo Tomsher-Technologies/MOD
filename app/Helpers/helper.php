@@ -601,6 +601,24 @@ if (!function_exists('can')) {
     }
 }
 
+function isEscort()
+{
+    $user = auth()->user();
+    return $user && $user->user_type === 'escort';
+}
+
+function isDriver()
+{
+    $user = auth()->user();
+    return $user && $user->user_type === 'driver';
+}
+
+function isHotel()
+{
+    $user = auth()->user();
+    return $user && $user->user_type === 'hotel';
+}
+
 function getRoomAssignmentStatus($delegationId)
 {
     $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)

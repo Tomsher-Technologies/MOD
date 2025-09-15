@@ -185,12 +185,12 @@
 
                 <x-reusable-table :columns="$columns" :data="$escorts" :enableRowLimit="true"
                     noDataMessage="No escorts found." :rowClass="function ($row) {
-                        return $row->delegations->where('pivot.status', 1)->count() > 0 ? '' : 'bg-[#f2eccf]';
+                        return $row->delegations->where('pivot.status', 1)->count() > 0 ? 'bg-green-100' : '';
                     }" />
 
                 <div class="mt-3 flex items-center justify-start gap-3 ">
-                    <div class="h-5 w-5 bg-[#e6d7a2] rounded"></div>
-                    <span class="text-gray-800 text-sm">{{ __db('unassigned') . ' ' . __db('escorts') }}</span>
+                    <div class="h-5 w-5 bg-green-100 rounded"></div>
+                    <span class="text-gray-800 text-sm">{{ __db('assigned') . ' ' . __db('escorts') }}</span>
                 </div>
             </div>
         </div>
