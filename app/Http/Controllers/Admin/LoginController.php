@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\EventUserRole;
 
 class LoginController extends Controller
 {
@@ -64,5 +66,39 @@ class LoginController extends Controller
         
         return redirect()->route('admin.login');
     }
+
+    public function checkUsername(Request $request)
+    {
+        $user = User::where('username', $request->username)->first();
+
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => __db('user_not_found')]);
+        }
+
+        if (in_array($user->user_type, ['admin','staff'])) {
+            return response()->json([
+                'status' => true,
+                'type'   => 'admin',
+            ]);
+        }
+
+        // non-admin → load user events
+        $events = EventUserRole::with('event')
+                    ->where('user_id', $user->id)
+                    ->get()
+                    ->map(function ($eur) {
+                        return [
+                            'id'   => $eur->event->id,
+                            'name' => $eur->event->name_en,
+                        ];
+                    });
+
+        return response()->json([
+            'status' => true,
+            'type'   => 'other',
+            'events' => $events,
+        ]);
+    }
+
 
 }

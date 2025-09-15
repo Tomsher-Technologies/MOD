@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/check-username', [LoginController::class, 'checkUsername'])->name('check.username');
     Route::post('login', [LoginController::class, 'login'])->name('post.login');
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
