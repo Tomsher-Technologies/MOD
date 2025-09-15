@@ -86,6 +86,26 @@
     </form>
 </div>
 
+<div id="delegationDetailsModal"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg shadow-lg w-full !max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">{{ __db('delegation_details') }}</h2>
+                <button id="closeDelegationModal" class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="delegationDetailsContent">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchBtn = document.getElementById('searchBtn');
@@ -97,6 +117,134 @@
             delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
             delegationSearch: "{{ route('delegations.search') }}",
         };
+
+        const delegationModal = document.getElementById('delegationDetailsModal');
+        const closeDelegationModal = document.getElementById('closeDelegationModal');
+        const delegationDetailsContent = document.getElementById('delegationDetailsContent');
+
+        closeDelegationModal.addEventListener('click', function() {
+            delegationModal.classList.add('hidden');
+        });
+
+        delegationModal.addEventListener('click', function(e) {
+            if (e.target === delegationModal) {
+                delegationModal.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delegation-details-link') || e.target.closest(
+                    '.delegation-details-link')) {
+                const link = e.target.classList.contains('delegation-details-link') ? e.target : e
+                    .target.closest('.delegation-details-link');
+                const delegationId = link.getAttribute('data-delegation-id');
+                const delegationCode = link.getAttribute('data-delegation-code');
+
+                delegationDetailsContent.innerHTML =
+                    '<div class="text-center py-4">{{ __db('loading') }}...</div>';
+                delegationModal.classList.remove('hidden');
+
+                fetch(`/mod-admin/delegations/${delegationId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .getAttribute('content')
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            let detailsHtml = `
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold mb-3">{{ __db('delegation_information') }}</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="font-medium">{{ __db('delegation') }} ID:</p>
+                                        <p>${data.delegation.code}</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">{{ __db('country') }}:</p>
+                                        <p>${data.delegation.country?.name || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">{{ __db('continent') }}:</p>
+                                        <p>${data.delegation.continent?.value || '-'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">{{ __db('invitation_from') }}:</p>
+                                        <p>${data.delegation.invitationFrom?.value || '-'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-semibold mb-3">{{ __db('delegates') }}</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
+                                        <thead>
+                                            <tr class="bg-gray-100">
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('name_en') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('name_ar') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('internal_ranking') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('gender') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('parent') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('relationship') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('badge_printed') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('participation_status') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('designation') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('team_head') }}</th>
+                                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('accommodation') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                        `;
+
+                            if (data.delegation.delegates && data.delegation.delegates.length > 0) {
+                                data.delegation.delegates.forEach(delegate => {
+                                    detailsHtml += `
+                                    <tr>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.name_en || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_ar || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internalRanking?.value || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.gender?.value || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.badge_printed || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.participation_status || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.designation_en || delegate?.designation_ar || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.team_head ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.accommodation ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
+                                    </tr>
+                                `;
+                                });
+                            } else {
+                                detailsHtml += `
+                                <tr>
+                                    <td colspan="4" class="border border-gray-300 px-4 py-2 text-center">{{ __db('no_delegates_found') }}</td>
+                                </tr>
+                            `;
+                            }
+
+                            detailsHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+
+                            delegationDetailsContent.innerHTML = detailsHtml;
+                        } else {
+                            delegationDetailsContent.innerHTML =
+                                '<div class="text-center py-4 text-red-500">{{ __db('failed_to_load_delegation_details') }}</div>';
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        delegationDetailsContent.innerHTML =
+                            '<div class="text-center py-4 text-red-500">{{ __db('error_loading_delegation_details') }}</div>';
+                    });
+            }
+        });
 
         searchBtn.addEventListener('click', function() {
             const delegationCode = delegationCodeInput.value.trim();
@@ -137,7 +285,13 @@
                                             <input type="radio" name="delegation_id" value="${delegation.id}"
                                                 class="w-4 h-4 !accent-[#B68A35]"  />
                                         </td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.code}</td>
+                                        <td class="px-4 py-2 border border-gray-200">
+                                            <a href="javascript:void(0)" class="text-[#B68A35] hover:underline delegation-details-link" 
+                                               data-delegation-id="${delegation.id}"
+                                               data-delegation-code="${delegation.code}">
+                                                ${delegation.code}
+                                            </a>
+                                        </td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value || ''}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.country?.name || ''}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
@@ -147,7 +301,7 @@
                             });
                         } else {
                             delegationTableBody.innerHTML =
-                                '<tr><td colspan="5" class="text-center py-4">{{ __db('no') . " " . __db('delegations') . " " . __db('found') }}</td></tr>';
+                                '<tr><td colspan="5" class="text-center py-4">{{ __db('no') . ' ' . __db('delegations') . ' ' . __db('found') }}</td></tr>';
                         }
                     } else {
                         delegationTableBody.innerHTML =
