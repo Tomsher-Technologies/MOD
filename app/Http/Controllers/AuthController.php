@@ -18,7 +18,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $user = \App\Models\User::where('username', $request->username)->first();
+        $user = \App\Models\User::where('username', $request->username)->orWhere('email', $request->username)->first();
 
         $rules = [
             'username' => 'required',
@@ -42,7 +42,13 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
         $eventId = $request->input('event_id');
 
-        if (Auth::attempt($credentials)) {
+        $login = $request->input('username'); 
+        $password = $request->input('password');
+        $eventId = $request->input('event_id');
+
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$field => $login, 'password' => $password])) {
             $user = Auth::user();
 
             if($user->user_type == 'admin' || $user->user_type == 'staff') {
