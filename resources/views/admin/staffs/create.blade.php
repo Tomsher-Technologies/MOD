@@ -24,12 +24,15 @@
                         <div class="grid grid-cols-12 gap-5">
 
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('military_number') }} <span class="text-red-600">*</span></label>
-                                <input type="text" id="military_number" name="military_number" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('military_number') }}">
-                                @error('military_number')
+                                <label class="form-label">{{ __db('username') }} <span class="text-red-600">*</span></label>
+                                <input type="text" id="username" name="username" 
+                                    class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
+                                    value="{{ old('username') }}">
+                                @error('username')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                             </div>
+
 
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('name') }} <span class="text-red-600">*</span></label>
@@ -40,7 +43,7 @@
                             </div>
 
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('email') }} <span class="text-red-600">*</span></label>
+                                <label class="form-label">{{ __db('email') }}</label>
                                 <input type="text" id="email" name="email" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('email') }}">
                                 @error('email')
                                     <div class="text-red-600">{{ $message }}</div>
@@ -80,14 +83,14 @@
                                 @enderror
                             </div>
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('password') }} <span class="text-red-600">*</span></label>
+                                <label class="form-label">{{ __db('password') }} </label>
                                 <input type="password" id="password" name="password" autocomplete="new-password" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('password') }}">
                                 @error('password')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('confirm_password') }} <span class="text-red-600">*</span></label>
+                                <label class="form-label">{{ __db('confirm_password') }} </label>
                                 <input type="text" id="password_confirmation" name="password_confirmation" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('password_confirmation') }}">
                                 @error('password_confirmation')
                                     <div class="text-red-600">{{ $message }}</div>
