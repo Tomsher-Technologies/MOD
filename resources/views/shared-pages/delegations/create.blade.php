@@ -39,13 +39,12 @@
                 @php
                     $departmentOptions = getDropDown('departments');
                     $continentOptions = getDropDown('continents');
-                    $countryOptions = getDropDown('country');
                     $invitationStatusOptions = getDropDown('invitation_status');
                     $participationStatusOptions = getDropDown('participation_status');
                 @endphp
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_from') }}:</label>
+                    <label class="form-label">{{ __db('invitation_from') }}: <span class="text-red-600">*</span></label>
 
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
@@ -67,7 +66,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('continent') }}:</label>
+                    <label class="form-label">{{ __db('continent') }}: <span class="text-red-600">*</span></label>
                     <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_continent') }}</option>
@@ -88,7 +87,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('country') }}:</label>
+                    <label class="form-label">{{ __db('country') }}: <span class="text-red-600">*</span></label>
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_country') }}</option>
@@ -106,7 +105,8 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_status') }}:</label>
+                    <label class="form-label">{{ __db('invitation_status') }}: <span
+                            class="text-red-600">*</span></label>
                     <select name="invitation_status_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_invitation_status') }}</option>
@@ -126,7 +126,8 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('participation_status') }}:</label>
+                    <label class="form-label">{{ __db('participation_status') }}: <span
+                            class="text-red-600">*</span></label>
                     <select name="participation_status_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_participation_status') }}</option>
@@ -308,6 +309,7 @@
                                 'internal_ranking_id' => $d['internal_ranking_id'] ?? '',
                                 'note' => $d['note'] ?? '',
                                 'team_head' => !empty($d['team_head']),
+                                'accommodation' => !empty($d['accommodation']),
                                 'badge_printed' => !empty($d['badge_printed']),
                             ];
                         },
@@ -353,7 +355,8 @@
 
                             <!-- Name (Arabic) -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('name_ar') }}</label>
+                                <label class="form-label">{{ __db('name_ar') }}<span
+                                        class="text-red-600">*</span></label>
                                 <input type="text" :name="`delegates[${index}][name_ar]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.name_ar">
@@ -365,7 +368,8 @@
 
                             <!-- Name (English) -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('name_en') }}</label>
+                                <label class="form-label">{{ __db('name_en') }}<span
+                                        class="text-red-600">*</span></label>
                                 <input type="text" :name="`delegates[${index}][name_en]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.name_en">
@@ -401,7 +405,8 @@
 
                             <!-- Gender -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('gender') }}</label>
+                                <label class="form-label">{{ __db('gender') }}<span
+                                        class="text-red-600">*</span></label>
                                 <select :name="`delegates[${index}][gender_id]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.gender_id">
@@ -545,7 +550,6 @@
     </form>
 </div>
 
-
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -556,6 +560,9 @@
                 placeholder: "Select an option",
                 allowClear: true
             });
+
+            const selectedContinent = $('#continent-select').val();
+            const selectedCountry = "{{ old('country_id') }}";
 
             $('#continent-select').on('change', function() {
                 const continentId = $(this).val();
@@ -568,18 +575,18 @@
                         continent_ids: continentId
                     }, function(data) {
                         $.each(data, function(index, country) {
+                            const isSelected = country.id == selectedCountry;
                             countrySelect.append(new Option(country.name, country.id, false,
-                                false));
+                                isSelected));
                         });
 
-                        countrySelect.trigger('change');
+                        countrySelect.trigger('change'); 
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });
                 }
             });
 
-            const selectedContinent = $('#continent-select').val();
             if (selectedContinent) {
                 $('#continent-select').trigger('change');
             }
@@ -642,7 +649,6 @@
                     return !anyOtherTeamHead || delegate.team_head;
                 },
 
-
                 addDelegate() {
                     const maxTmpId = Math.max(...this.delegates.map(d => d.tmp_id || 0), 0);
                     const newTmpId = maxTmpId + 1;
@@ -658,10 +664,12 @@
                         relationship: '',
                         internal_ranking_id: '',
                         note: '',
+                        accommodation: true,
                         team_head: false,
                         badge_printed: false
                     });
                 },
+
                 removeDelegate(idx) {
                     this.delegates.splice(idx, 1);
                 }

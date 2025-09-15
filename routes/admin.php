@@ -88,10 +88,17 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/delegations/members/{delegation}', [DelegationController::class, 'members'])->name('delegations.members');
 
     // Delegations
+
+    // Delegation Import
+    Route::get('/delegations/import', [DelegationController::class, 'showImportForm'])->name('delegations.import.form');
+    Route::post('/delegations/import/delegations', [DelegationController::class, 'importDelegations'])->name('delegations.import.delegations');
+    Route::post('/delegations/import/delegates', [DelegationController::class, 'importDelegatesWithTravels'])->name('delegations.import.delegates');
+
     Route::resource('delegations', DelegationController::class);
     Route::get('/delegations-get', [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+
 
     // Delegate
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
@@ -123,14 +130,24 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::post('/travel-update/{transport}', [DelegationController::class, 'updateTravel'])->name('delegations.updateTravel');
 
     // Escorts
+    Route::get('/escorts/import', [EscortController::class, 'showImportForm'])->name('escorts.import.form');
+    Route::post('/escorts/import', [EscortController::class, 'import'])->name('escorts.import');
+    Route::get('/escorts/search', [EscortController::class, 'search'])->name('escorts.search');
+
     Route::resource('escorts', EscortController::class);
     Route::post('/escorts/status', [EscortController::class, 'updateStatus'])->name('escorts.status');
     Route::get('/escorts/assign/{escort}', [EscortController::class, 'assignIndex'])->name('escorts.assignIndex');
+
 
     Route::post('escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
     Route::post('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
 
     // Drivers
+
+    Route::get('/drivers/import', [DriverController::class, 'showImportForm'])->name('drivers.import.form');
+    Route::post('/drivers/import', [DriverController::class, 'import'])->name('drivers.import');
+    Route::get('/drivers/search', [DriverController::class, 'search'])->name('drivers.search');
+
     Route::resource('drivers', DriverController::class);
     Route::post('/drivers/status', [DriverController::class, 'updateStatus'])->name('drivers.status');
     Route::get('/drivers/assign/{driver}', [DriverController::class, 'assignIndex'])->name('drivers.assignIndex');
@@ -154,7 +171,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::post('/accommodation/room-assign', [AccommodationController::class, 'assignRoom'])->name('accommodation.assign-rooms');
     Route::get('/accommodation/hotel/{hotel}/occupancy', [AccommodationController::class, 'hotelOccupancy'])->name('accommodation.occupancy');
     Route::post('/accommodation/room-unassign', [AccommodationController::class, 'unassignAccommodation'])->name('accommodation.unassign-rooms');
-   
+
     Route::get('/add-external-accommodation/{id}', [AccommodationController::class, 'addExternalMembers'])->name('external_accommodations.add');
     Route::post('/add-external-accommodation', [AccommodationController::class, 'storeExternalMembers'])->name('admin.external-members.store');
     Route::get('/external-accommodations', [AccommodationController::class, 'getExternalMembers'])->name('admin.view-external-members');
@@ -179,6 +196,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/export-non-badge-printed', [DelegationController::class, 'exportNonBadgePrinted'])->name('delegates.exportNonBadgePrinted');
     Route::get('/export-badge-printed-delegates', [DelegationController::class, 'exportBadgePrintedDelegates'])->name('delegates.exportBadgePrintedDelegates');
     Route::get('/export-non-badge-printed-delegates', [DelegationController::class, 'exportNonBadgePrintedDelegates'])->name('delegates.exportNonBadgePrintedDelegates');
+    Route::get('/export-delegations', [DelegationController::class, 'exportDelegations'])->name('delegates.exportDelegations');
+    Route::get('/export-delegates', [DelegationController::class, 'exportDelegates'])->name('delegates.exportDelegates');
 
     //Manage news
     Route::resource('news', NewsController::class);

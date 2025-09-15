@@ -15,6 +15,10 @@ use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
 use App\Exports\BadgePrintedDelegatesExport;
 use App\Exports\NonBadgePrintedDelegatesExport;
+use App\Exports\DelegationExport;
+use App\Exports\DelegateExport;
+use App\Imports\DelegateImport;
+use App\Imports\DelegationOnlyImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -40,6 +44,10 @@ class DelegationController extends Controller
 
         $this->middleware('permission:add_delegations|delegate_add_delegations', [
             'only' => ['create', 'store', 'syncTransportInfo']
+        ]);
+
+        $this->middleware('permission:import_delegations|delegate_add_delegations', [
+            'only' => ['showImportForm', 'import']
         ]);
 
         $this->middleware('permission:edit_delegations|delegate_edit_delegations', [
@@ -183,6 +191,7 @@ class DelegationController extends Controller
 
         $delegations = $query->paginate($limit);
 
+        $request->session()->put('delegations_last_url', url()->full());
 
         return view('admin.delegations.index', compact('delegations'));
     }
@@ -322,14 +331,14 @@ class DelegationController extends Controller
             ->get();
 
         $hotels = Accommodation::where('status', 1)
-                    ->whereHas('rooms', function ($q) {
-                        $q->where('available_rooms', '>', 0);
-                    })
-                    ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
-                    ->orderBy('hotel_name', 'asc')
-                    ->get();
+            ->whereHas('rooms', function ($q) {
+                $q->where('available_rooms', '>', 0);
+            })
+            ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
+            ->orderBy('hotel_name', 'asc')
+            ->get();
 
-        return view('admin.delegations.show', compact('delegation','hotels'));
+        return view('admin.delegations.show', compact('delegation', 'hotels'));
     }
 
     public function arrivalsIndex(Request $request)
@@ -786,8 +795,8 @@ class DelegationController extends Controller
             'delegates.*.tmp_id' => 'required_with:delegates',
             'delegates.*.title_en' => 'nullable|string',
             'delegates.*.title_ar' => 'nullable|string',
-            'delegates.*.name_ar' => 'nullable|string',
-            'delegates.*.name_en' => 'required_with:delegates|string',
+            'delegates.*.name_en' => 'nullable|string|required_without:delegates.*.name_ar',
+            'delegates.*.name_ar' => 'nullable|string|required_without:delegates.*.name_en',
             'delegates.*.designation_en' => 'nullable|string',
             'delegates.*.designation_ar' => 'nullable|string',
             'delegates.*.gender_id' => 'required_with:delegates|exists:dropdown_options,id',
@@ -814,7 +823,8 @@ class DelegationController extends Controller
             'participation_status_id.required' => __db('participation_status_id_required'),
             'participation_status_id.exists' => __db('participation_status_id_exists'),
             'delegates.*.tmp_id.required_with' => __db('delegates_tmp_id_required_with'),
-            'delegates.*.name_en.required_with' => __db('delegates_name_en_required_with'),
+            'delegates.*.name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'delegates.*.name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'delegates.*.gender_id.required_with' => __db('delegates_gender_id_required_with'),
             'delegates.*.gender_id.exists' => __db('delegates_gender_id_exists'),
             'delegates.*.parent_id.exists' => __db('delegates_parent_id_exists'),
@@ -1023,7 +1033,7 @@ class DelegationController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Delegation updated successfully.',
-                'redirect_url' => route('delegations.show', $delegation->id),
+                'redirect_url' => route('delegations.edit', $delegation->id),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -1355,7 +1365,6 @@ class DelegationController extends Controller
                     ]);
                 }
 
-                // Attach new "to" member if present
                 if ($validated['interview_type'] === 'delegation' && !empty($validated['to_delegate_id'])) {
                     $newInterview->interviewMembers()->create([
                         'member_id' => $validated['to_delegate_id'],
@@ -1377,7 +1386,7 @@ class DelegationController extends Controller
                 return response()->json([
                     'status' => 'success',
                     'message' => __db('interview_created_successfully'),
-                    'redirect_url' => route('delegations.show', $delegation->id)  // Adjust as needed
+                    'redirect_url' => route('delegations.edit', $delegation->id)
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -1496,17 +1505,11 @@ class DelegationController extends Controller
     {
         $isEditMode = $delegate && $delegate->exists;
 
-        // return response()->json([
-        //     'isEditMode' => $isEditMode,
-        //     'delegate' => $delegate,
-        //     'delegation' => $delegation
-        // ]);
-
         $validator = Validator::make($request->all(), [
             'title_en' => 'nullable|string',
             'title_ar' => 'nullable|string',
-            'name_ar' => 'required|string',
-            'name_en' => 'required|string',
+            'name_en' => 'nullable|string|required_without:name_ar',
+            'name_ar' => 'nullable|string|required_without:name_en',
             'designation_en' => 'nullable|string',
             'designation_ar' => 'nullable|string',
             'gender_id' => 'required|exists:dropdown_options,id',
@@ -1532,8 +1535,8 @@ class DelegationController extends Controller
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
-            'name_ar.required' => __db('name_ar_required'),
-            'name_en.required' => __db('name_en_required'),
+            'name_en.required_without' => __db('either_english_name_or_arabic_name'),
+            'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'gender_id.required' => __db('gender_id_required'),
             'gender_id.exists' => __db('delegates_gender_id_exists'),
             'parent_id.exists' => __db('delegates_parent_id_exists'),
@@ -2152,6 +2155,49 @@ class DelegationController extends Controller
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
     }
 
+    public function exportBadgePrintedDelegates(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $query = Delegate::with([
+            'delegation.country',
+            'delegation.continent',
+            'delegation.invitationFrom',
+        ])
+            ->where('badge_printed', true)
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            });
+
+        $badgePrintedFilter = $request->input('badge_printed');
+        if ($badgePrintedFilter !== null) {
+            if ($badgePrintedFilter == '1') {
+                $query->where('badge_printed', true);
+            } elseif ($badgePrintedFilter == '0') {
+                $query->where('badge_printed', false);
+            }
+        }
+
+        $delegates = $query->get();
+
+        $selectedDelegateIds = $request->input('delegate_ids');
+        if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
+            $delegates = $delegates->whereIn('id', $selectedDelegateIds);
+
+            // Only update badge printed status if we're exporting non-badge printed
+            if ($badgePrintedFilter == '0') {
+                Delegate::whereIn('id', $selectedDelegateIds)->update(['badge_printed' => true]);
+            }
+        }
+
+        // Use the appropriate export class based on badge printed status
+        if ($badgePrintedFilter == '0' || ($badgePrintedFilter === null && $delegates->first() && !$delegates->first()->badge_printed)) {
+            return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
+        } else {
+            return Excel::download(new \App\Exports\BadgePrintedDelegatesExport($delegates), 'badge-printed-delegates.xlsx');
+        }
+    }
+
     public function exportNonBadgePrintedDelegates(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
@@ -2176,5 +2222,60 @@ class DelegationController extends Controller
         }
 
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
+    }
+
+    public function exportDelegations(Request $request)
+    {
+        return Excel::download(new DelegationExport, 'delegations.xlsx');
+    }
+
+    public function exportDelegates(Request $request)
+    {
+        return Excel::download(new DelegateExport, 'delegates.xlsx');
+    }
+
+    public function showImportForm()
+    {
+        return view('admin.delegations.import');
+    }
+
+    public function importDelegations(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new DelegationOnlyImport, $request->file('file'));
+
+            return redirect()->route('delegations.index')
+                ->with('success', __db('delegations_only_imported_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Delegation Import Error: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function importDelegatesWithTravels(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new DelegateImport, $request->file('file'));
+
+            return redirect()->route('delegations.index')
+                ->with('success', __db('delegate') . ' ' . __db('created_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Delegation Import Error: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', __db('delegate_import_failed') . ': ' . $e->getMessage())
+                ->withInput();
+        }
     }
 }

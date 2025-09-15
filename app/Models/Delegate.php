@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
 
 class Delegate extends Model
 {
@@ -32,6 +33,20 @@ class Delegate extends Model
         'badge_printed' => 'boolean',
         'accommodation' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($delegate) {
+            $latestDelegate = self::latest('id')->first();
+            $newId = $latestDelegate ? $latestDelegate->id + 1 : 1;
+
+            $minLength = 3;
+            $newIdLength = strlen((string)$newId);
+            $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
+
+            $delegate->code = 'DL' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
+        });
+    }
 
     public function gender()
     {

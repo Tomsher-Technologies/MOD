@@ -10,12 +10,16 @@
                 $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
             @endphp
 
-            @if(Auth::user()->user_type == 'admin' || Auth::user()->user_type == 'super_admin' || Auth::user()->user_type == 'staff')
-                <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm" class="me-3 inline-block">
+            @if (Auth::user()->user_type == 'admin' ||
+                    Auth::user()->user_type == 'super_admin' ||
+                    Auth::user()->user_type == 'staff')
+                <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm"
+                    class="me-3 inline-block">
                     @csrf
                     <select name="event_id" id="current-event-select"
                         class="p-2 !pe-10 text-sm rounded border border-neutral-300 text-neutral-700 cursor-pointer"
-                        onchange="document.getElementById('currentEventForm').submit();" title="{{ __db('select_event') }}">
+                        onchange="document.getElementById('currentEventForm').submit();"
+                        title="{{ __db('select_event') }}">
                         @foreach ($events as $event)
                             <option value="{{ $event->id }}" {{ $currentEventId == $event->id ? 'selected' : '' }}>
                                 {{ $event->code }} - {{ $event->name_en }}
@@ -27,7 +31,7 @@
                     </select>
                 </form>
             @endif
-            
+
             @php
                 $currentRoute = Route::currentRouteName();
 
@@ -53,9 +57,11 @@
                         'permission' => ['add_other_interview_members'],
                     ],
                     'delegations.index' => [
-                        'text' => __db('add_new_delegation'),
-                        'link' => route('delegations.create'),
-                        'permission' => ['add_delegations', 'delegate_add_delegations'],
+                        [
+                            'text' => __db('add_new_delegation'),
+                            'link' => route('delegations.create'),
+                            'permission' => ['add_delegations', 'delegate_add_delegations'],
+                        ],
                     ],
                     'escorts.index' => [
                         'text' => __db('add_escort'),
@@ -88,16 +94,37 @@
                 $config = $buttonConfig[$currentRoute] ?? null;
             @endphp
 
-            @if ($config && can($config['permission']))
-                <a href="{{ $buttonConfig[$currentRoute]['link'] }}"
-                    class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
-                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                        width="24" height="24" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 12h14m-7 7V5" />
-                    </svg>
-                    <span>{{ $buttonConfig[$currentRoute]['text'] }}</span>
-                </a>
+            @if ($config)
+                @if (is_array($config) && isset($config[0]) && is_array($config[0]))
+                    {{-- Multiple buttons for the same route --}}
+                    @foreach ($config as $button)
+                        @if (can($button['permission']))
+                            <a href="{{ $button['link'] }}"
+                                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                                <svg class="w-6 h-6 text-white me-2" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2" d="M5 12h14m-7 7V5" />
+                                </svg>
+                                <span>{{ $button['text'] }}</span>
+                            </a>
+                        @endif
+                    @endforeach
+                @elseif (is_array($config) && isset($config['text']))
+                    {{-- Single button --}}
+                    @if (can($config['permission']))
+                        <a href="{{ $config['link'] }}"
+                            class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                            <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="M5 12h14m-7 7V5" />
+                            </svg>
+                            <span>{{ $config['text'] }}</span>
+                        </a>
+                    @endif
+                @endif
             @endif
         </div>
         <div class="col-auto ml-4 mr-2">
@@ -247,11 +274,17 @@
                         <span
                             class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 ">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
                     </div>
-                   
+
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
                             @php
-                                $unreadAlerts = auth()->user()->unreadNotifications()->whereNotNull('alert_id')->latest()->take(5)->get();
+                                $unreadAlerts = auth()
+                                    ->user()
+                                    ->unreadNotifications()
+                                    ->whereNotNull('alert_id')
+                                    ->latest()
+                                    ->take(5)
+                                    ->get();
                             @endphp
                             @forelse($unreadAlerts as $notification)
                                 @php
@@ -333,8 +366,7 @@
                     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div class="relative p-4 w-full max-w-2xl max-h-full">
                         <div class="relative bg-white rounded-lg shadow ">
-                            <div
-                                class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
+                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
                                 <h3 class="text-xl font-semibold text-gray-900 " id="alertModalTitle">
                                     {{ __db('alert') }}
                                 </h3>
@@ -355,8 +387,7 @@
                                     {{ __db('alert_message') }}
                                 </p>
                             </div>
-                            <div
-                                class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
+                            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
                                 <button onclick="closeAlertModal()" type="button"
                                     class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400  dark:hover:text-white dark:hover:bg-gray-700">
                                     {{ __db('close') }}
@@ -395,52 +426,53 @@
     <script>
         function showLatestAlertModal() {
             fetch('/mod-admin/alerts/latest', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.alert) {
-                    document.getElementById('alertModalTitle').textContent = data.alert.title;
-                    document.getElementById('alertModalMessage').textContent = data.alert.message;
-                    
-                    document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
-                    
-                    document.getElementById('alertModal').classList.remove('hidden');
-                    document.getElementById('alertModal').classList.add('flex');
-                    
-                    if (data.alert.id > 0) {
-                        fetch('/mod-admin/alerts/' + data.alert.id + '/mark-as-read', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            const alertCountElement = document.querySelector('#dropdownAlert .badge');
-                            if (alertCountElement) {
-                                let count = parseInt(alertCountElement.textContent) || 0;
-                                if (count > 0) {
-                                    alertCountElement.textContent = count - 1;
-                                }
-                            }
-                        });
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
-                } else {
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.alert) {
+                        document.getElementById('alertModalTitle').textContent = data.alert.title;
+                        document.getElementById('alertModalMessage').textContent = data.alert.message;
+
+                        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
+
+                        document.getElementById('alertModal').classList.remove('hidden');
+                        document.getElementById('alertModal').classList.add('flex');
+
+                        if (data.alert.id > 0) {
+                            fetch('/mod-admin/alerts/' + data.alert.id + '/mark-as-read', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                            .getAttribute('content')
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    const alertCountElement = document.querySelector('#dropdownAlert .badge');
+                                    if (alertCountElement) {
+                                        let count = parseInt(alertCountElement.textContent) || 0;
+                                        if (count > 0) {
+                                            alertCountElement.textContent = count - 1;
+                                        }
+                                    }
+                                });
+                        }
+                    } else {
+                        document.getElementById('dropdownAlert').classList.toggle('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching latest alert:', error);
                     document.getElementById('dropdownAlert').classList.toggle('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching latest alert:', error);
-                document.getElementById('dropdownAlert').classList.toggle('hidden');
-            });
+                });
         }
-        
+
         function showAlertModal(alertId, title, message) {
             document.getElementById('alertModalTitle').textContent = title;
             document.getElementById('alertModalMessage').textContent = message;

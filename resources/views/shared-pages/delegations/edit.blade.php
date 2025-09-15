@@ -1,5 +1,5 @@
 <div x-data="{ isAttachmentEditModalOpen: false }">
-    <x-back-btn title="" back-url="{{ route('delegations.index') }}" />
+    <x-back-btn title="" back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 
@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_from') }}:</label>
+                    <label class="form-label">{{ __db('invitation_from') }}: <span class="text-red-600">*</span></label>
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __db('select_invitation_from') }}</option>
@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('continent') }}:</label>
+                    <label class="form-label">{{ __db('continent') }}: <span class="text-red-600">*</span></label>
                     <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __('Select Continent') }}</option>
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('country') }}:</label>
+                    <label class="form-label">{{ __db('country') }}: <span class="text-red-600">*</span></label>
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __('Select Country') }}</option>
@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_status') }}:</label>
+                    <label class="form-label">{{ __db('invitation_status') }}: <span class="text-red-600">*</span></label>
                     <select name="invitation_status_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Invitation Status') }}</option>
@@ -88,7 +88,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('participation_status') }}:</label>
+                    <label class="form-label">{{ __db('participation_status') }}: <span class="text-red-600">*</span></label>
                     <select name="participation_status_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Participation Status') }}</option>
@@ -252,8 +252,8 @@
                                         x-model="attachment.deleted" />
 
                                     <div class="col-span-3">
-                                        <label class="form-label">{{ __db('title') }}</label>
-                                        <select :name="`attachments[${index}][title_id]`"
+                                        <label class="form-label">{{ __db('title') }}<span class="text-red-600">*</span></label>
+                                        <select :name="`attachments[${index}][title_id]`" required
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
                                             x-model.number="attachment.title_id" :disabled="attachment.deleted"
                                             @change="window.hasUnsavedAttachments = true">
@@ -595,7 +595,7 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
-        <div class="flex items-center gap-3">
+           <div class="flex items-center gap-3">
             @directCanany(['add_escorts', 'escort_add_escorts'])
                 <a href={{ route('escorts.index') }}
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
@@ -749,7 +749,7 @@
                     ];
                 @endphp
 
-                <x-reusable-table :data="$delegation->escorts" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->escorts" table-id="escortsTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
 
         </div>
@@ -763,7 +763,7 @@
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
 
 
-        <div class="flex items-center gap-3">
+       <div class="flex items-center gap-3">
             @directCanany(['add_drivers', 'driver_add_drivers'])
                 <a href={{ route('drivers.index') }}
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
@@ -935,7 +935,7 @@
                 @endphp
 
 
-                <x-reusable-table :data="$delegation->drivers" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->drivers" table-id="driversTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
 
         </div>
@@ -975,7 +975,7 @@
                         [
                             'label' => 'Date & Time',
                             'render' => fn($row) => $row->date_time
-                                ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d h:i A')
+                                ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                                 : '-',
                         ],
                         [
@@ -1079,7 +1079,7 @@
                         ],
                     ];
                 @endphp
-                <x-reusable-table :data="$delegation->interviews" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->interviews" table-id="interviewsTable" :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
     </div>

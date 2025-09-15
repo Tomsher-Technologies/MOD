@@ -142,7 +142,7 @@
                                     @directCan('edit_staff')
                                         <a href="{{ route('staffs.edit', ['id' => base64_encode($staff->id)]) }}"
                                             title="{{ __db('edit') }}"
-                                            class="w-8 h-8 bg-[#FBF3D6] text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
+                                            class="w-8 h-8 text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
                                                 <path
