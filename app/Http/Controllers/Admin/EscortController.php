@@ -59,6 +59,15 @@ class EscortController extends Controller
             ->where('event_id', $currentEventId)
             ->latest();
 
+        $delegationId = $request->input('delegation_id');
+        $assignmentMode = $request->input('assignment_mode');
+
+        if ($delegationId && $assignmentMode === 'escort') {
+            $query->whereDoesntHave('delegations', function ($q) {
+                $q->where('delegation_escorts.status', 1);
+            });
+        }
+
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name_en', 'like', "%{$search}%")
@@ -99,13 +108,12 @@ class EscortController extends Controller
             });
         }
 
-
         $limit = $request->limit ? $request->limit : 20;
 
         $escorts = $query->paginate($limit);
         $delegations = Delegation::where('event_id', $currentEventId)->get();
 
-        return view('admin.escorts.index', compact('escorts', 'delegations'));
+        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode'));
     }
 
     public function updateStatus(Request $request)
@@ -114,11 +122,6 @@ class EscortController extends Controller
         $escort->status = $request->status;
         $escort->save();
 
-        // if ($request->status == 0) {
-        //     $escort->delegations()->updateExistingPivot($escort->delegations->pluck('id'), [
-        //         'status' => 0,
-        //     ]);
-        // }
 
         return response()->json(['status' => 'success']);
     }
@@ -170,7 +173,6 @@ class EscortController extends Controller
 
         $escortData = $request->all();
 
-        // Prepend country code to phone number if it exists
         if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $escortData['phone_number']);
             if (strlen($phoneNumber) === 9) {
@@ -412,6 +414,10 @@ class EscortController extends Controller
                 'delegation_code' => $delegation->code
             ]
         );
+
+        if ($request->has('assignment_mode') && $request->assignment_mode === 'escort') {
+            return redirect()->route('delegations.show', $delegationId)->with('success', __db('Escort assigned successfully.'));
+        }
 
         return redirect()->route('delegations.show', $delegationId)->with('success', __db('Escort assigned successfully.'));
     }

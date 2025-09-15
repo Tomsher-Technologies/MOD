@@ -190,5 +190,15 @@
     "import_delegations_only" : "استيراد الوفود فقط",
     "import_delegations_with_delegates" : "استيراد الوفود مع المندوبين",
     "delegations_only_imported_successfully" : "تم استيراد الوفود بنجاح",
-    "upload_excel" : "تحميل إكسل"
+    "upload_excel" : "تحميل إكسل",
+    "add_escort": "إضافة مرافق",
+    "add_driver": "إضافة سائق",
+    "assigning_escort_to_delegation": "تعيين المرافق للوفد",
+    "only_unassigned_escorts_shown": "يتم عرض المرافقين غير المعينين فقط للتعيين",
+    "assigning_driver_to_delegation": "تعيين السائق للوفد",
+    "all_drivers_shown_for_assignment": "يتم عرض جميع السائقين للتعيين",
+    "assign_confirm_text": "هل أنت متأكد أنك تريد تعيين هذا العضو؟",
+    "yes_assign": "نعم، قم بالتعيين",
+    "unassign_confirm_text": "هل أنت متأكد أنك تريد إلغاء تعيين هذا العضو؟",
+    "yes_unassign": "نعم، قم بإلغاء التعيين"
 }

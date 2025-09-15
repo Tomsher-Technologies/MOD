@@ -58,6 +58,10 @@ class DriverController extends Controller
             ->where('event_id', $currentEventId)
             ->latest();
 
+        $delegationId = $request->input('delegation_id');
+        $assignmentMode = $request->input('assignment_mode');
+
+
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name_en', 'like', "%{$search}%")
@@ -107,7 +111,7 @@ class DriverController extends Controller
 
         $delegations = Delegation::where('event_id', $currentEventId)->get();
 
-        return view('admin.drivers.index', compact('drivers', 'delegations'));
+        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode'));
     }
 
 
@@ -117,11 +121,6 @@ class DriverController extends Controller
         $driver->status = $request->status;
         $driver->save();
 
-        // if ($request->status == 0) {
-        //     $driver->delegations()->updateExistingPivot($driver->delegations->pluck('id'), [
-        //         'status' => 0,
-        //     ]);
-        // }
 
         return response()->json(['status' => 'success']);
     }
@@ -167,7 +166,6 @@ class DriverController extends Controller
 
         $driverData = $request->all();
 
-        // Prepend country code to phone number if it exists
         if (isset($driverData['phone_number']) && !empty($driverData['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $driverData['phone_number']);
             if (strlen($phoneNumber) === 9) {
@@ -446,7 +444,6 @@ class DriverController extends Controller
             ]);
         }
 
-        // Log activity
         $this->logActivity(
             module: 'Drivers',
             submodule: 'assignment',

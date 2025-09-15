@@ -12,9 +12,19 @@
 
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver')
+                    <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
+                        <h3 class="font-semibold text-lg">{{ __db('assigning_driver_to_delegation') }}</h3>
+                        <p>{{ __db('all_drivers_shown_for_assignment') }}</p>
+                    </div>
+                @endif
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
                     <form class="w-[50%] me-4" action="{{ route('drivers.index') }}" method="GET">
+                        @if(isset($delegationId) && isset($assignmentMode))
+                            <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
+                            <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
+                        @endif
                         <div class="relative">
 
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -188,7 +198,7 @@
                             'label' => __db('actions'),
                             'key' => 'actions',
                             'permission' => ['edit_drivers', 'driver_edit_drivers', 'assign_drivers'],
-                            'render' => function ($driver) {
+                            'render' => function ($driver) use ($delegationId, $assignmentMode) {
                                 $editUrl = route('drivers.edit', $driver->id);
 
                                 $output = '<div class="flex items-start gap-2">'; // flex column with gap
@@ -206,18 +216,37 @@
                                 </a>';
                                 }
 
-                                if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
-                                    $assignUrl = route('drivers.assignIndex', $driver->id);
-                                    $output .=
-                                        '
+                                if (isset($delegationId) && isset($assignmentMode) && $assignmentMode == 'driver') {
+                                    if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
+                                        $assignUrl = route('drivers.assign', $driver->id);
+                                        $output .=
+                                            '
+                                <form action="' . $assignUrl . '" method="POST" class="assign-form" style="display:inline;">
+                                    ' . csrf_field() . '
+                                    <input type="hidden" name="delegation_id" value="' . $delegationId . '" />
+                                    <input type="hidden" name="action" value="reassign" />
+                                    <button type="submit" class="lex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
+                                       <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                    </svg>
+                                        <span>' . __db('assign') . '</span>
+                                    </button>
+                                </form>';
+                                    }
+                                } else {
+                                    if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
+                                        $assignUrl = route('drivers.assignIndex', $driver->id);
+                                        $output .=
+                                            '
                                 <a href="' .
-                                        $assignUrl .
-                                        '" class="flex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
+                                            $assignUrl .
+                                            '" class="flex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                     </svg>
                                     <span>Assign</span>
                                 </a>';
+                                    }
                                 }
 
                                 $output .= '</div>';
@@ -266,7 +295,7 @@
                 <select name="car_type[]" multiple data-placeholder="{{ __db('select_vehicle_types') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getAllDrivers() as $driver)
-                        <option value="{{ $driver->car_type }}" @if (in_array($driver->car_type, request('car_type', []))) selected @endif>
+                        <option value="{{ $driver->car_type }}" @if (is_array(request('car_type', [])) && in_array($driver->car_type, request('car_type', []))) selected @endif>
                             {{ $driver->car_type }}</option>
                     @endforeach
                 </select>
@@ -278,7 +307,7 @@
                 <select name="car_number[]" multiple data-placeholder="{{ __db('select_plate_numbers') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getAllDrivers() as $driver)
-                        <option value="{{ $driver->car_number }}" @if (in_array($driver->car_number, request('car_number', []))) selected @endif>
+                        <option value="{{ $driver->car_number }}" @if (is_array(request('car_number', [])) && in_array($driver->car_number, request('car_number', []))) selected @endif>
                             {{ $driver->car_number }}</option>
                     @endforeach
                 </select>
@@ -289,7 +318,7 @@
                 <select name="capacity[]" multiple data-placeholder="{{ __db('select_capacities') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getAllDrivers() as $driver)
-                        <option value="{{ $driver->capacity }}" @if (in_array($driver->capacity, request('capacity', []))) selected @endif>
+                        <option value="{{ $driver->capacity }}" @if (is_array(request('capacity', [])) && in_array($driver->capacity, request('capacity', []))) selected @endif>
                             {{ $driver->capacity }}
                         </option>
                     @endforeach
@@ -302,7 +331,7 @@
                     class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_delegations') }}</option>
                     @foreach ($delegations as $delegation)
-                        <option value="{{ $delegation->id }}" @if (in_array($delegation->id, request('delegation_id', []))) selected @endif>
+                        <option value="{{ $delegation->id }}" @if (is_array(request('delegation_id', [])) && in_array($delegation->id, request('delegation_id', []))) selected @endif>
                             {{ $delegation->code }}
                         </option>
                     @endforeach
@@ -442,7 +471,7 @@
 
             unassignForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
-                    e.preventDefault(); // prevent default submission
+                    e.preventDefault(); 
                     Swal.fire({
                         title: 'Are you sure?',
                         text: "You are about to unassign this delegation!",
@@ -452,6 +481,26 @@
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'Yes, unassign it!',
                         cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.assign-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    Swal.fire({
+                        title: '{{ __db('are_you_sure') }}',
+                        text: '{{ __db('assign_confirm_text') }}',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4CAF50',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: '{{ __db('yes_assign') }}',
+                        cancelButtonText: '{{ __db('cancel') }}'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();
