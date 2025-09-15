@@ -81,12 +81,11 @@
                     <thead class="bg-gray-100">
                         <tr class="text-[13px]">
                             <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
-                            <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('military_number') }}</th>
+                            <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('username') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('email') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('phone') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('module') }}</th>
-                            <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('role') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('status') }}</th>
                             <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('action') }}</th>
                         </tr>
@@ -97,21 +96,28 @@
                                 <td class="px-4 py-3 text-center" dir="ltr">
                                     {{ $key + 1 + ($users->currentPage() - 1) * $users->perPage() }}
                                 </td>
-                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->military_number }}
+                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->username }}
                                 </td>
-                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->name }}</td>
-                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->email }}</td>
+                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->name ?? '-' }}</td>
+                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->email ?? '-' }}</td>
 
-                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->phone }}</td>
+                                <td class="px-4 py-3 text-center text-black" dir="ltr">{{ $staff->phone ?? '-' }}</td>
                                 <td class="px-4 py-3 text-center text-black" dir="ltr">
-                                    @if ($staff->user_type === 'staff')
-                                        {{ __db('admin') }}
-                                    @else
-                                        {{ __db($staff->user_type) }}
-                                    @endif
+                                    @forelse($staff->eventUserRoles as $eur)
+                                        <div class="mb-1">
+                                            <span class="font-semibold">{{ $eur->event->getTranslation('name') ?? 'N/A' }}</span> &nbsp;
+                                            (<span class="text-blue-600">{{ ucfirst($eur->module) }}</span> –
+                                            <span class="text-green-600">{{ $eur->role->name ?? 'N/A' }}</span>)
+                                        </div>
+                                    @empty
+                                        @if ($staff->user_type === 'staff')
+                                            {{ __db('admin') }}
+                                        @else
+                                            {{ __db($staff->user_type) }}
+                                        @endif
+                                         ({{ $staff->roles->pluck('name')->join(', ') }})
+                                    @endforelse
                                 </td>
-                                <td class="px-4 py-3 text-center text-black" dir="ltr">
-                                    {{ $staff->roles->pluck('name')->join(', ') }}</td>
                                 <td class="px-4 py-3 text-center text-black" dir="ltr">
                                     @directCan('edit_staff')
                                         <div class=" items-center">
@@ -131,6 +137,7 @@
                                     @enddirectCan
                                 </td>
 
+                                
                                 <td class="px-4 py-3 text-center " dir="ltr">
                                     @directCan('edit_staff')
                                         <a href="{{ route('staffs.edit', ['id' => base64_encode($staff->id)]) }}"

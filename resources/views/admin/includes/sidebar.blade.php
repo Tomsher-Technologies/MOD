@@ -342,7 +342,18 @@
                     </a>
                 </li>
             @enddirectCanany
-
+            <hr>
+                <li>
+                    <a href="{{ route('reports-delegations') }}"
+                        class="{{ areActiveRoutes(['reports-delegations']) }}">
+                        <svg class="pe-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36"
+                            height="30" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
+                                d="M15 17h3a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3m4-9h2m-2 3h2m-6 0h.01M12 17v.01" />
+                        </svg>
+                        <span class="text-md">{{ __db('delegations') }} {{ __db('reports') }}</span>
+                    </a>
+                </li>
             <hr>
             <li>
                 <a href="#">
