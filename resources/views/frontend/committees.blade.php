@@ -14,7 +14,7 @@
                 <input id="searchInput" type="text" placeholder="{{ __db('search') }}" name="search"
                     class="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/2 focus:outline-none focus:ring-2 focus:ring-[#b68a35]" value="{{ request('search') }}"/>
                 <select id="designationFilter" name="designation_id" class="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-[#b68a35]">
-                    <option value="">{{ __db('select') }}</option>
+                    <option value="">{{ __db('select_designation') }}</option>
                     @foreach($availableDesignations as $designation)
                         <option value="{{ $designation->id }}" @selected(request('designation_id') == $designation->id)>
                             {{ $designation?->value }}
@@ -23,7 +23,7 @@
                 </select>
                 <select id="committeeFilter" name="committee_id"
                     class="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-[#b68a35]">
-                    <option value="">{{ __db('select') }}</option>
+                    <option value="">{{ __db('select_committee') }}</option>
                     @foreach($availableCommittees as $committee)
                         <option value="{{ $committee->id }}" @selected(request('committee_id') == $committee->id)>
                             {{ $committee?->value }}
