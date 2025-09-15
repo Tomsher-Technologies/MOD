@@ -60,16 +60,16 @@ class LoginController extends Controller
         // if ($request->is('mod-admin/*') || $request->is('mod-admin')) {
         //     return redirect()->route('admin.login');
         // }
-        if(in_array($user->user_type, ['delegate', 'hotel', 'escort', 'driver'])){
-            return redirect()->route('login');
-        }
+        // if(in_array($user->user_type, ['delegate', 'hotel', 'escort', 'driver'])){
+        //     return redirect()->route('login');
+        // }
         
-        return redirect()->route('admin.login');
+        return redirect()->route('login');
     }
 
     public function checkUsername(Request $request)
     {
-        $user = User::where('username', $request->username)->first();
+        $user = User::where('username', $request->username)->orWhere('email', $request->username)->first();
 
         if (!$user) {
             return response()->json(['status' => false, 'message' => __db('user_not_found')]);
