@@ -29,7 +29,7 @@ class StaffController extends Controller
         $request->session()->put('staffs_last_url', url()->full());
         $sort_search = $request->has('search') ? $request->search : '';
         $role_id = $request->has('role_id') ? $request->role_id : '';
-        $users = User::orderBy('id','desc');
+        $users = User::with(['eventUserRoles.event', 'eventUserRoles.role'])->orderBy('id','desc');
         
         if($sort_search){
             $users = $users->where(function ($query) use ($sort_search){
@@ -91,58 +91,56 @@ class StaffController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email',
             'mobile' => 'nullable|string|max:20',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'nullable|min:6|confirmed',
             'role' => 'required',
             'module' => 'required',
-            'military_number' => 'required|unique:users,military_number',
+            'username' => 'required|alpha_num|unique:users,username|max:50',
         ], [
             'name.required' => __db('name_required'),
-            'email.required' => __db('email_required'),
             'email.email' => __db('valid_email'),
-            'email.unique' => __db('email_already_exist'),
             'mobile.max' => __db('mobile_max', ['max' => 20]), 
-            'password.required' => __db('password_required'),
             'password.min' => __db('password_length', ['min' => 6]),
             'password.confirmed' => __db('new_password_confirmed'),
             'role.required' => __db('role_required'),
             'module.required' => __db('module_required'),
-            'military_number.required' => __db('military_number_required'),
-            'military_number.unique' => __db('military_number_already_exist'),
+            'username.required' => __db('username_required'),
+            'username.alpha_num' => __db('username_alpha_num'), 
+            'username.unique' => __db('username_already_exist'),
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+        $password = ($request->password) ? $request->password : '123456';
 
-        if(User::where('email', $request->email)->first() == null){
-            $user = new User;
-            $user->military_number = $request->military_number;
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->phone = $request->mobile;
-            $user->user_type = ($request->module === 'admin') ? 'staff' : $request->module;
-            $user->password = Hash::make($request->password);
-            if($user->save()){
-                $user->assignRole($request->role);
-                if($request->module != 'admin'){
-                    $role = Role::where('name', $request->role)->where('module', $request->module)->first();
+        $user = new User;
+        $user->username = $request->username;
+        $user->name = $request->name;
+        $user->email = $request->email ?? NULL;
+        $user->phone = $request->mobile ?? NULL;
+        $user->user_type = ($request->module === 'admin') ? 'staff' : $request->module;
+        $user->force_password = $request->password ? 0 : 1;
+        $user->password = Hash::make($password);
+        if($user->save()){
+            $user->assignRole($request->role);
+            if($request->module != 'admin'){
+                $role = Role::where('name', $request->role)->where('module', $request->module)->first();
 
-                    if ($role) {
-                        EventUserRole::create([
-                            'event_id'  => getDefaultEventId(), 
-                            'user_id'   => $user->id,
-                            'module'    => $request->module,
-                            'role_id'   => $role->id,
-                        ]);
-                    }
+                if ($role) {
+                    EventUserRole::create([
+                        'event_id'  => getDefaultEventId(), 
+                        'user_id'   => $user->id,
+                        'module'    => $request->module,
+                        'role_id'   => $role->id,
+                    ]);
                 }
-                session()->flash('success', __db('staff').__db('created_successfully'));
-                return redirect()->route('staffs.index');
             }
+            session()->flash('success', __db('staff').__db('created_successfully'));
+            return redirect()->route('staffs.index');
         }
 
-        session()->flash('error', __db('email_already_exist'));
+        session()->flash('error', __db('something_went_wrong'));
         return back();
     }
 
@@ -177,15 +175,14 @@ class StaffController extends Controller
       
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
+            'email' => 'nullable|email',
             'mobile' => 'nullable|string|max:20',
             'password' => 'nullable|min:6|confirmed',
             'role' => 'required',
             'module' => 'required',
-            'military_number' => 'required|unique:users,military_number,'.$user->id,
+            'username' => 'required|alpha_num|max:50|unique:users,username,'.$user->id,
         ], [
             'name.required' => __db('name_required'),
-            'email.required' => __db('email_required'),
             'email.email' => __db('valid_email'),
             'email.unique' => __db('email_already_exist'),
             'mobile.max' => __db('mobile_max', ['max' => 20]), 
@@ -193,17 +190,18 @@ class StaffController extends Controller
             'password.confirmed' => __db('new_password_confirmed'),
             'role.required' => __db('role_required'),
             'module.required' => __db('module_required'),
-            'military_number.required' => __db('military_number_required'),
-            'military_number.unique' => __db('military_number_already_exist'),
+            'username.required' => __db('username_required'),
+            'username.alpha_num' => __db('username_alpha_num'),
+            'username.unique' => __db('username_already_exist'),
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $user->military_number = $request->military_number;
+        $user->username = $request->username;
         $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->mobile;
+        $user->email = $request->email ?? NULL;
+        $user->phone = $request->mobile ?? NULL;
         if(strlen($request->password) > 0){
             $user->password = Hash::make($request->password);
         }
