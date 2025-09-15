@@ -34,6 +34,7 @@ class AuthController extends Controller
             'password.required' => __db('password_required'),
             'event_id.required' => __db('event_required'),
         ]);
+        echo "<pre>";print_r($validator->errors());exit;
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
