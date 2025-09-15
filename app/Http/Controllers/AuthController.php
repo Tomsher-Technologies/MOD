@@ -42,7 +42,13 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
         $eventId = $request->input('event_id');
 
-        if (Auth::attempt($credentials)) {
+        $login = $request->input('username'); 
+        $password = $request->input('password');
+        $eventId = $request->input('event_id');
+
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$field => $login, 'password' => $password])) {
             $user = Auth::user();
 
             if($user->user_type == 'admin' || $user->user_type == 'staff') {
