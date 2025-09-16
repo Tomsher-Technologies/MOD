@@ -110,10 +110,18 @@ class DelegationController extends Controller
             'delegates',
             'escorts',
             'drivers'
-        ])->orderBy('id', 'desc');
+        ]);
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
+
+        $query->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->leftJoin('dropdown_options as participation_status_sort', 'delegations.participation_status_id', '=', 'participation_status_sort.id')
+            ->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('participation_status_sort.sort_order', 'asc')
+            ->select('delegations.*');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -144,8 +152,6 @@ class DelegationController extends Controller
                     });
             });
         }
-
-
 
         if ($invitationFrom = $request->input('invitation_from')) {
             if (is_array($invitationFrom)) {

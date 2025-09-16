@@ -32,26 +32,26 @@ class AlertController extends Controller
     public function create()
     {
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
-        
+
         if (!$currentEventId) {
             return redirect()->back()->with('error', 'No current event selected.');
         }
-        
+
         $event = Event::findOrFail($currentEventId);
-        
+
         $assignedUsers = EventUserRole::with('user')
             ->where('event_id', $event->id)
             ->get()
             ->pluck('user')
             ->unique('id');
-            
+
         $modules = [
             'delegate' => 'Delegate Module',
             'escort' => 'Escort Module',
             'driver' => 'Driver Module',
             'hotel' => 'Hotel Module'
         ];
-        
+
         return view('admin.alerts.create', compact('assignedUsers', 'modules', 'event'));
     }
 
@@ -64,17 +64,17 @@ class AlertController extends Controller
             'message_ar' => 'required|string',
             'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
             'recipient_type' => 'required|in:all,module,users',
-            'module' => 'required_if:recipient_type,module|in:delegate,escort,driver,hotel',
-            'users' => 'required_if:recipient_type,users|array',
-            'users.*' => 'required_if:recipient_type,users|exists:users,id'
+            'module' => 'exclude_unless:recipient_type,module|required|in:delegate,escort,driver,hotel',
+            'users' => 'exclude_unless:recipient_type,users|required|array',
+            'users.*' => 'exclude_unless:recipient_type,users|required|exists:users,id'
         ]);
 
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
-        
+
         if (!$currentEventId) {
             return redirect()->back()->with('error', 'No current event selected.');
         }
-        
+
         $event = Event::findOrFail($currentEventId);
 
         $attachmentPath = null;
@@ -116,9 +116,9 @@ class AlertController extends Controller
         } else {
             $eventUserIds = EventUserRole::where('event_id', $event->id)
                 ->pluck('user_id');
-                
+
             $selectedUserIds = array_intersect($request->users, $eventUserIds->toArray());
-            
+
             $recipients = User::whereIn('id', $selectedUserIds)->get();
         }
 

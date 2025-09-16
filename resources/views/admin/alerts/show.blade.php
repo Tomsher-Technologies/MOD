@@ -56,60 +56,53 @@
                 <h3 class="text-lg font-semibold mb-4">{{ __db('recipients') }}</h3>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __db('user') }}
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __db('email') }}
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __db('status') }}
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    {{ __db('read_at') }}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($alert->alertRecipients as $recipient)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">{{ $recipient->user->name }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm text-gray-500">{{ $recipient->user->email }}</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if ($recipient->read_at)
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {{ __db('read') }}
-                                            </span>
-                                        @else
-                                            <span
-                                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                                {{ __db('unread') }}
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        @if ($recipient->read_at)
-                                            {{ $recipient->read_at->format('M d, Y H:i') }}
-                                        @else
-                                            {{ __db('not_read_yet') }}
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    @php
+                        $columns = [
+                            [
+                                'label' => __db('user'),
+                                'render' => fn($row) => e($row->user->name ?? '-'),
+                                'key' => 'user',
+                                'class' =>
+                                    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                            ],
+                            [
+                                'label' => __db('email'),
+                                'render' => fn($row) => e($row->user->email ?? '-'),
+                                'key' => 'email',
+                                'class' =>
+                                    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                            ],
+                            [
+                                'label' => __db('status'),
+                                'render' => function ($row) {
+                                    if ($row->read_at) {
+                                        return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">' .
+                                            __db('read') .
+                                            '</span>';
+                                    }
+                                    return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">' .
+                                        __db('unread') .
+                                        '</span>';
+                                },
+                                'key' => 'status',
+                                'class' =>
+                                    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                            ],
+                            [
+                                'label' => __db('read_at'),
+                                'render' => function ($row) {
+                                    return $row->read_at
+                                        ? e($row->read_at->format('M d, Y H:i'))
+                                        : __db('not_read_yet');
+                                },
+                                'key' => 'read_at',
+                                'class' =>
+                                    'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                            ],
+                        ];
+                    @endphp
+                    <x-reusable-table :columns="$columns" :data="$alert->alertRecipients" :noDataMessage="__db('no_recipients_found')" />
+
                 </div>
             </div>
         @enddirectCanany
