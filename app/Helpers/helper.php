@@ -7,6 +7,7 @@ use App\Models\Escort;
 use App\Models\Driver;
 use App\Models\Event;
 use App\Models\Language;
+use App\Models\Accommodation;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Request;
@@ -172,6 +173,32 @@ function getAdminEventLogo()
     return asset('assets/img/md-logo.svg');
 }
 
+function getAdminEventPDFLogo()
+{
+    $eventId = session('current_event_id', getDefaultEventId() ?? null);
+    $defaultEventLogo = Event::where('id', $eventId)->value('logo');
+
+    if ($defaultEventLogo) {
+        $relativePath = str_replace('/storage/', '', $defaultEventLogo);
+        if (Storage::disk('public')->exists($relativePath)) {
+            return $defaultEventLogo;
+        }
+    }
+
+    return 'assets/img/md-logo.svg';
+}
+
+function getCurrentEventName()
+{
+    $eventId = session('current_event_id', getDefaultEventId() ?? null);
+    $event = Event::where('id', $eventId)->first();
+
+    if ($event) {
+        return $event->getTranslation('name');
+    }
+    return '';
+}
+
 function getModuleEventLogo()
 {
     $defaultEventLogo = Event::where('is_default', 1)->value('logo');
@@ -199,6 +226,12 @@ function getModuleAccountEventLogo()
         }
     }
     return asset('assets/img/md-logo.svg');
+}
+
+function getAccommodationDetails($hotels)
+{
+    $details = Accommodation::with(['contacts'])->whereIn('id', $hotels)->get();
+    return $details;
 }
 
 function getloginImage()

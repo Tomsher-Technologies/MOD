@@ -212,9 +212,14 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('event-pages/edit/{id}', [EventPageController::class,'edit'])->name('event_pages.edit');
     Route::post('event-pages/{id}/update', [EventPageController::class,'update'])->name('event_pages.update');
 
+    // Account
+    Route::get('/profile',[AdminDashboardController::class, 'account'])->name('account');
+
     // Report Section
     Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
     Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
+    Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

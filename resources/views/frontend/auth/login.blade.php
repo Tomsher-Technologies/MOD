@@ -21,11 +21,9 @@
 
                     {{-- Username Field --}}
                     <div class="icon-field mb-4 relative">
-                        <span class="absolute start-4 top-1/2 -translate-y-1/2 pointer-events-none flex text-xl">
-                            <iconify-icon icon="mdi:account"></iconify-icon>
-                        </span>
+                        <label for="password">{{ __db('username') }}</label>
                         <input id="username" type="text" 
-                            class="form-control h-[56px] ps-11 border-neutral-300 bg-neutral-50 rounded-xl" 
+                            class="mt-2 form-control h-[56px] ps-11 border-neutral-300 bg-neutral-50 rounded-xl" 
                             name="username" 
                             value="{{ old('username') }}" 
                             autofocus 
@@ -35,8 +33,9 @@
 
                     {{-- Event Dropdown (hidden by default) --}}
                     <div id="eventWrapper" class="mt-4 mb-4 hidden">
+                        <label for="event_id">{{ __db('event') }}</label>
                         <select name="event_id" id="event_id"
-                            class="select2 form-control h-[56px] border-neutral-300 bg-neutral-50 rounded-xl">
+                            class="mt-2 select2 form-control h-[56px] border-neutral-300 bg-neutral-50 rounded-xl">
                             <option value="">{{ __db('select_an_event') }}</option>
                         </select>
                         
@@ -44,12 +43,13 @@
 
                     {{-- Password Field (hidden by default) --}}
                     <div id="passwordWrapper" class="relative mb-5 hidden">
+                        <label for="password">{{ __db('password') }}</label>
                         <div class="icon-field">
                             <span class="absolute start-4 top-1/2 -translate-y-1/2 pointer-events-none flex text-xl">
                                 <iconify-icon icon="solar:lock-password-outline"></iconify-icon>
                             </span>
                             <input id="password" type="password" 
-                                class="form-control h-[56px] ps-11 border-neutral-300 bg-neutral-50 rounded-xl" 
+                                class="mt-2  form-control h-[56px] ps-11 border-neutral-300 bg-neutral-50 rounded-xl" 
                                 name="password" 
                                 placeholder="{{ __db('password') }}">
                         </div>

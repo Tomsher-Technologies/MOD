@@ -17,10 +17,13 @@ export default {
             fontFamily: {
                 'silk-serif': ['"Silk Serif TRIAL"', 'serif'],
                 'sora': ['Sora', 'sans-serif'],
+                'tajawal': ['Tajawal', 'sans-serif'],
             },
             colors: {
                 primary: '#F8B26A',
                 secondary: '#81562A',
+                'report-red': '#d71920',
+                'header-red': '#a12b2e',
             },
         },
     },
