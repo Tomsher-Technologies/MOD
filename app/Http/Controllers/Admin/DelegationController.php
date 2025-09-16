@@ -1522,8 +1522,8 @@ class DelegationController extends Controller
         $isEditMode = $delegate && $delegate->exists;
 
         $validator = Validator::make($request->all(), [
-            'title_en' => 'nullable|string',
-            'title_ar' => 'nullable|string',
+            'title_en' => 'nullable|string|required_without:title_ar',
+            'title_ar' => 'nullable|string|required_without:title_en',
             'name_en' => 'nullable|string|required_without:name_ar',
             'name_ar' => 'nullable|string|required_without:name_en',
             'designation_en' => 'nullable|string',
