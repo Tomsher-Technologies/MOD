@@ -16,7 +16,7 @@
                     <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
                         <h3 class="font-semibold text-lg">{{ __db('assigning_driver_to_delegation') }}</h3>
                         @if(isset($assignmentDelegation))
-                            <div class="mt-2 pt-2 border-t border-[#d1d5db]">
+                            <div class="mt-2 pt-2 ">
                                 <p class="text-sm"><strong>{{ __db('delegation') }}:</strong> {{ $assignmentDelegation->code }}</p>
                                 @if($assignmentDelegation->country)
                                     <p class="text-sm"><strong>{{ __db('country') }}:</strong> {{ $assignmentDelegation->country->name }}</p>

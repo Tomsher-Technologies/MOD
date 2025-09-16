@@ -597,15 +597,16 @@
     <hr class="mx-6 border-neutral-200 h-10">
 
     <div class="flex items-center justify-between mt-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
         <div class="flex items-center gap-3">
             @directCanany(['add_escorts', 'escort_add_escorts'])
-                <a href={{ route('escorts.index') }}
+                <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
             @enddirectCanany
         </div>
     </div>
+
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
@@ -774,12 +775,11 @@
 
 
     <div class="flex items-center justify-between mt-6">
-        <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
-
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
 
         <div class="flex items-center gap-3">
             @directCanany(['add_drivers', 'driver_add_drivers'])
-                <a href={{ route('drivers.index') }}
+                <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
                     class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
             @enddirectCanany
         </div>
@@ -896,7 +896,7 @@
                             'label' => __db('actions'),
                             'key' => 'actions',
                             'permission' => ['assign_drivers', 'driver_edit_drivers'],
-                            'render' => function ($driver) {
+                            'render' => function ($driver) use ($delegation) {
                                 $editUrl = route('drivers.edit', $driver->id);
                                 $output = '<div class="flex align-center gap-4">';
 
@@ -1028,20 +1028,58 @@
                                 </a>';
                                     }
                                 } else {
-                                    $with =
-                                        '<a href="' .
-                                        route('delegations.show', $row->interviewWithDelegation->id ?? '') .
-                                        '" class="!text-[#B68A35]">' .
-                                        'Delegation ID : ' .
-                                        e($row->interviewWithDelegation->code ?? '') .
-                                        '</a>';
+                                    $toMembers = $row->toMembers->where('type', 'to');
+                                    if ($toMembers->count() > 0) {
+                                        $delegateNames = $toMembers
+                                            ->map(function ($member) use ($row) {
+                                                $delegate = $member->resolveMemberForInterview($row);
+                                                if ($delegate) {
+                                                    if ($delegate instanceof \App\Models\Delegate) {
+                                                        return '<span class="block">' .
+                                                            e(
+                                                                $delegate->getTranslation('title') .
+                                                                    '. ' .
+                                                                    $delegate->getTranslation('name'),
+                                                            ) .
+                                                            '</span>';
+                                                    } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
+                                                        return '<span class="block">Other Member: ' .
+                                                            e($delegate->getTranslation('name')) .
+                                                            '</span>';
+                                                    }
+                                                }
+                                                return '';
+                                            })
+                                            ->filter()
+                                            ->implode('');
+
+                                        if (!empty($delegateNames)) {
+                                            $with = '<span class="!text-[#B68A35]">' . $delegateNames . '</span>';
+                                        } else {
+                                            $with =
+                                                '<a href="' .
+                                                route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                                '" class="!text-[#B68A35]">' .
+                                                'Delegation ID : ' .
+                                                e($row?->interviewWithDelegation?->code ?? '') .
+                                                '</a>';
+                                        }
+                                    } else {
+                                        $with =
+                                            '<a href="' .
+                                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                            '" class="!text-[#B68A35]">' .
+                                            'Delegation ID : ' .
+                                            e(
+                                                ($row->interviewWithDelegation
+                                                    ? $row->interviewWithDelegation->code
+                                                    : '') ?? '',
+                                            ) .
+                                            '</a>';
+                                    }
                                 }
 
-                                $names = $row->interviewMembers
-                                    ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
-                                    ->implode('');
-
-                                return $with . $names;
+                                return $with;
                             },
                         ],
                         [
