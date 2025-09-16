@@ -16,6 +16,8 @@ use App\Models\AccommodationContact;
 use App\Models\RoomAssignment;
 use App\Models\ExternalMemberAssignment;
 use Carbon\Carbon;
+use Spatie\Browsershot\Browsershot;
+use Barryvdh\DomPDF\Facade\Pdf;
 use DB;
 use Hash;
 use Validator;
@@ -143,5 +145,27 @@ class ReportController extends Controller
             ->get();
 
         return view('admin.report.delegations-show', compact('delegation', 'interviews'));
+    }
+
+    public function exportReportDelegationPdf($id)
+    {
+        $id = base64_decode($id);
+
+        $delegation = Delegation::with([
+            'invitationFrom',
+            'continent',
+            'country',
+            'invitationStatus',
+            'participationStatus',
+            'delegates.delegateTransports',
+            'escorts.currentRoomAssignment.hotel',
+            'drivers',
+            'interviews.interviewMembers'
+        ])->findOrFail($id);
+
+        $pdf = Pdf::loadView('admin.report.delegation-escorts', compact('delegation'))
+            ->setPaper('A4', 'portrait');
+
+        return $pdf->download("delegation-report-{$delegation->id}.pdf");
     }
 }

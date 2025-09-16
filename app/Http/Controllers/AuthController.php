@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventUserRole;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Hash;
 
 class AuthController extends Controller
 {
@@ -50,6 +51,11 @@ class AuthController extends Controller
 
         if (Auth::attempt([$field => $login, 'password' => $password])) {
             $user = Auth::user();
+            session(['login_event_id' => $eventId]);
+
+            if ($user->force_password == 1) {
+                return redirect()->route('force.password.form');
+            }
 
             if($user->user_type == 'admin' || $user->user_type == 'staff') {
                 $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
@@ -84,6 +90,7 @@ class AuthController extends Controller
 
                 session(['current_event_id' => $eventId]);
                 session(['current_module' => $roleAssignment->module]);
+                session(['login_event_id' => null]);
             }
             
             return redirect()->route('admin.dashboard');
@@ -97,5 +104,62 @@ class AuthController extends Controller
         Auth::logout();
         return redirect()->route('login');
     }
+
+    public function showForcePasswordForm()
+    {
+        return view('frontend.auth.force_password');
+    }
+
+    public function updateForcePassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = Auth::user();
+        $user->password = Hash::make($request->password);
+        $user->force_password = 0;
+        $user->save();
+
+        if($user->user_type == 'admin' || $user->user_type == 'staff') {
+            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $user->givePermissionTo($rolePermissions);
+        }else{
+            $eventId = session('login_event_id');
+            $roleAssignment = EventUserRole::where('user_id', $user->id)
+                            ->where('event_id', $eventId)
+                            ->first();
+
+            if (!$roleAssignment) {
+                Auth::logout();
+                return back()->withErrors(['password' => __db('event_not_assigned')]);
+            }
+            $role = $roleAssignment->role?->name;
+            $user->syncRoles($role);
+
+            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+
+            $user->syncPermissions([]);
+
+            $event = $roleAssignment->event;
+
+            if ($event?->status == 1) {
+                $filtered = collect($rolePermissions)->filter(function ($perm) {
+                    return str_contains($perm, '_view_') || str_contains($perm, '_manage_');
+                })->toArray();
+
+                $user->givePermissionTo($filtered);
+            } else {
+                $user->givePermissionTo($rolePermissions);
+            }
+
+            session(['current_event_id' => $eventId]);
+            session(['current_module' => $roleAssignment->module]);
+            session(['login_event_id' => null]);
+        }
+        
+        return redirect()->route('admin.dashboard');
+    }
+
 
 }

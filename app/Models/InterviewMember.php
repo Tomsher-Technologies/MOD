@@ -45,6 +45,9 @@ class InterviewMember extends Model
         return $this->belongsTo(Interview::class, 'interview_id');
     }
 
+    public function delegate(){
+        return $this->belongsTo(Delegate::class, 'member_id');
+    }
     public function fromDelegate()
     {
         return $this->belongsTo(Delegate::class, 'member_id');

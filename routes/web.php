@@ -19,6 +19,9 @@ Route::get('/news-details/{id}', [FrontController::class, 'newsDetails'])->name(
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('web.login');
 Route::get('logout', [AuthController::class, 'logout'])->name('web.logout');
+Route::get('/force-password', [AuthController::class, 'showForcePasswordForm'])->name('force.password.form');
+Route::post('/force-password', [AuthController::class, 'updateForcePassword'])->name('force.password.update');
+    
 
 // Delegate Module
 Route::prefix('mod-delegate') ->middleware(['auth', 'check.permission']) ->group(function () {
