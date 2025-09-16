@@ -82,7 +82,7 @@
                         <span id="event-error" class="text-red-500 text-xs hidden"></span>
                         <span id="password-error" class="text-red-500 text-xs hidden"></span>
                     </div>
-                    {{-- Final Sign In Button --}}
+                
                     <button type="button" id="loginBtn" class="btn text-md  !bg-[#B68A35] text-white rounded-lg h-12 mr-4">
                         {{ __db('login') }}
                     </button>
@@ -106,13 +106,12 @@
         const loginForm = document.getElementById("loginForm");
         const usernameError = document.getElementById("username-error");
 
-        let step = 1; // step 1 = username check, step 2 = real login
+        let step = 1; 
 
         loginBtn.addEventListener("click", function (e) {
             e.preventDefault();
 
             if (step === 1) {
-                // First click → check username
                 const username = usernameInput.value.trim();
                 if (!username) {
                     usernameError.textContent = "⚠️ {{ __db('username_required') }}";
@@ -136,13 +135,11 @@
                         return;
                     }
 
-                    // ✅ Clear error
                     usernameError.classList.add("hidden");
 
                     if (data.type === "admin") {
                         eventWrapper.classList.add("hidden");
                     } else {
-                        // fill events
                         eventSelect.innerHTML = `<option value="">{{ __db('select_an_event') }}</option>`;
                         data.events.forEach(ev => {
                             eventSelect.innerHTML += `<option value="${ev.id}">${ev.name}</option>`;
@@ -152,11 +149,9 @@
 
                     passwordWrapper.classList.remove("hidden");
 
-                    // Switch to Step 2
                     step = 2;
                 });
             } else {
-                // Step 2 → real login
                 loginForm.submit();
             }
         });
