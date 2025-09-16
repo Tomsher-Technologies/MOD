@@ -170,7 +170,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/accommodation/{id}/rooms', [AccommodationController::class, 'getHotelRooms'])->name('accommodation.rooms');
     Route::post('/accommodation/room-assign', [AccommodationController::class, 'assignRoom'])->name('accommodation.assign-rooms');
     Route::get('/accommodation/hotel/{hotel}/occupancy', [AccommodationController::class, 'hotelOccupancy'])->name('accommodation.occupancy');
-    Route::post('/accommodation/room-unassign', [AccommodationController::class, 'unassignAccommodation'])->name('accommodation.unassign-rooms');
+    Route::post('/accommodation/room-unassign', [AccommodationController::class, 'unassignAccommodation'])->name('accommodation.remove-rooms');
 
     Route::get('/add-external-accommodation/{id}', [AccommodationController::class, 'addExternalMembers'])->name('external_accommodations.add');
     Route::post('/add-external-accommodation', [AccommodationController::class, 'storeExternalMembers'])->name('admin.external-members.store');

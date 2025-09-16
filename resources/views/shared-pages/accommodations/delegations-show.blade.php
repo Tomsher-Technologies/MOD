@@ -106,7 +106,7 @@
                                 {{ __db('parent_id') }}</th>
 
                             <th scope="col"
-                                class="p-2 !bg-[#B68A35] w-[100px] text-start text-white border !border-[#cbac71]">
+                                class="p-2 !bg-[#B68A35] w-[115px] text-start text-white border !border-[#cbac71]">
                                 {{ __db('participation_status') }}</th>
                             <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('hotel') }}</th>
@@ -115,7 +115,7 @@
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
-                                class="p-2 w-[100px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-2 w-[115px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('room_number') }}</th>
 
 
@@ -379,6 +379,7 @@
 
                         [
                             'label' => __db('room_number'),
+                            'class' => 'w-[115px]',
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
                                 if(can(['assign_accommodations', 'hotel_assign_accommodations'])){
@@ -396,16 +397,23 @@
                             'label' => __db('action'),
                             'permission' =>['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row) {
+                                $room = $row->currentRoomAssignment ?? null;
 
+                                $action = '<div class="flex items-center gap-5">';
                                 if ($row->accommodation == 1){
-                                    return '<div class="flex items-center gap-5">
-                                                <a href="#" id="add-attachment-btn"
+                                    $action .= '<a href="#" id="add-attachment-btn"
                                                     class="save-room-assignment text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
                                                     <span>'.__db('save').' </span>
                                                 </a>
-                                            </div>';
+                                            ';
                                 }
-                                 
+                                if($room){
+                                    $action .= '<a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3" data-assignment-id="'.$room->id.'">
+                                                '.__db('remove').'
+                                                </a>';
+                                }
+                                 $action .= '</div>';
+                                 return $action;
                             },
                         ],
                     ];
@@ -516,7 +524,7 @@
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
-                                class="p-2 w-[100px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-2 w-[115px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('room_number') }}</th>
 
 
@@ -623,6 +631,12 @@
                                                 class="save-room-assignment-escort text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
                                                 <span>{{ __db('save') }} </span>
                                             </a>
+
+                                            @if($roomEscort)
+                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3" data-assignment-id="{{ $roomEscort->id }}">
+                                                {{ __db('remove') }}
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
                                 @enddirectCanany
@@ -719,7 +733,7 @@
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
-                                class="p-2 w-[100px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-2 w-[115px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('room_number') }}</th>
 
 
@@ -818,11 +832,17 @@
 
                                 @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                     <td class="px-1 py-3 border border-gray-200">
-                                        <div class="flex items-center gap-5">
+                                        <div class="flex items-center gap-1">
                                             <a href="#" id="add-attachment-btn"
                                                 class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
                                                 <span>{{ __db('save') }} </span>
                                             </a>
+
+                                            @if($roomDriver)
+                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3" data-assignment-id="{{ $roomDriver->id }}">
+                                                {{ __db('remove') }}
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
                                 @enddirectCanany
@@ -980,82 +1000,82 @@
     </div>
 </div>
 
- @foreach ($delegation->delegates as $delegate)
-        <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
-            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-            <div class="relative w-full max-w-2xl mx-auto">
-                <div class="bg-white rounded-lg shadow ">
-                    <div class="flex items-start justify-between p-4 border-b rounded-t">
-                        <h3 class="text-xl font-semibold text-gray-900">{{ __db('transport_information_for') }}
-                            {{ $delegate->name_en ?? '-' }}</h3>
-                        <button type="button"
-                            class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
-                            data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
+@foreach ($delegation->delegates as $delegate)
+    <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
+        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow ">
+                <div class="flex items-start justify-between p-4 border-b rounded-t">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ __db('transport_information_for') }}
+                        {{ $delegate->name_en ?? '-' }}</h3>
+                    <button type="button"
+                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
+                        data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="p-6 space-y-6">
+                    <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
+                    @php
+                        $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                    @endphp
+                    <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
+                        @if ($arrival)
+                            <div class="border-b py-4">
+                                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                                <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
+                            </div>
+                            <div class="border-b py-4">
+                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                <p class="text-base">{{ $arrival->flight_no ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 border-b md:border-b-0">
+                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                <p class="text-base">{{ $arrival->flight_name ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 !pb-0">
+                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
+                            </div>
+                        @else
+                            <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
+                        @endif
                     </div>
-                    <div class="p-6 space-y-6">
-                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
-                        @php
-                            $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
-                        @endphp
-                        <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            @if ($arrival)
-                                <div class="border-b py-4">
-                                    <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                                    <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
-                                </div>
-                                <div class="border-b py-4">
-                                    <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                    <p class="text-base">{{ $arrival->flight_no ?? '-' }}</p>
-                                </div>
-                                <div class="py-4 border-b md:border-b-0">
-                                    <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                    <p class="text-base">{{ $arrival->flight_name ?? '-' }}</p>
-                                </div>
-                                <div class="py-4 !pb-0">
-                                    <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                    <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
-                                </div>
-                            @else
-                                <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
-                            @endif
-                        </div>
 
-                        <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
-                        @php
-                            $departure = $delegate->delegateTransports->where('type', 'departure')->first();
-                        @endphp
-                        <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                            @if ($departure)
-                                <div class="border-b py-4">
-                                    <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                                    <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
-                                </div>
-                                <div class="border-b py-4">
-                                    <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                    <p class="text-base">{{ $departure->flight_no ?? '-' }}</p>
-                                </div>
-                                <div class="py-4 border-b md:border-b-0">
-                                    <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                    <p class="text-base">{{ $departure->flight_name ?? '-' }}</p>
-                                </div>
-                                <div class="py-4 !pb-0">
-                                    <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                    <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
-                                </div>
-                            @else
-                                <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
-                            @endif
-                        </div>
+                    <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
+                    @php
+                        $departure = $delegate->delegateTransports->where('type', 'departure')->first();
+                    @endphp
+                    <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
+                        @if ($departure)
+                            <div class="border-b py-4">
+                                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
+                            </div>
+                            <div class="border-b py-4">
+                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                <p class="text-base">{{ $departure->flight_no ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 border-b md:border-b-0">
+                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                <p class="text-base">{{ $departure->flight_name ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 !pb-0">
+                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
+                            </div>
+                        @else
+                            <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
+@endforeach
 
 @section('script')
     <script>
@@ -1216,8 +1236,17 @@
                     if (res.success === 1) {
                         row.css('background-color', '#acf3bc');
                         toastr.success('{{ __db('room_assigned') }}');
-                        // row.find('.room-type-dropdown').val('');
-                        // row.find('.room-number-input').val('');
+                        
+                        let actionCellDel = row.find('td').last(); // assuming last cell is action
+                        if (actionCellDel.find('.remove-room-assignment').length === 0) {
+                            let removeBtnHtml = `
+                                <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res.assignment_id}">
+                                    {{ __db('remove') }}
+                                </a>`;
+                            actionCellDel.append(removeBtnHtml);
+                        } else {
+                            actionCellDel.find('.remove-room-assignment').show();
+                        }
                     } else if (res.success === 0) {
                         toastr.success('{{ __db('room_already_assigned') }}');
                     } else if (res.success === 2) {
@@ -1303,8 +1332,19 @@
                     if (res.success === 1) {
                         escortrow.css('background-color', '#acf3bc');
                         toastr.success('{{ __db('room_assigned') }}');
-                        // escortrow.find('.room-type-dropdown').val('');
-                        // escortrow.find('.room-number-input').val('');
+                        
+
+                        let actionCellEsc = escortrow.find('td').last(); 
+                        if (actionCellEsc.find('.remove-room-assignment').length === 0) {
+                            let removeBtnHtml = `
+                                <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res.assignment_id}">
+                                    {{ __db('remove') }}
+                                </a>`;
+                            actionCellEsc.append(removeBtnHtml);
+                        } else {
+                            actionCellEsc.find('.remove-room-assignment').show();
+                        }
+
                     } else if (res.success === 0) {
                         toastr.success('{{ __db('room_already_assigned') }}');
                     } else if (res.success === 2) {
@@ -1390,8 +1430,17 @@
                     if (res.success === 1) {
                         driverrow.css('background-color', '#acf3bc');
                         toastr.success('{{ __db('room_assigned') }}');
-                        // driverrow.find('.room-type-dropdown').val('');
-                        // driverrow.find('.room-number-input').val('');
+                        
+                        let actionCell = driverrow.find('td').last(); // assuming last cell is action
+                        if (actionCell.find('.remove-room-assignment').length === 0) {
+                            let removeBtnHtml = `
+                                <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-driver-id="${idDriver}" data-assignment-id="${res.assignment_id}">
+                                    {{ __db('remove') }}
+                                </a>`;
+                            actionCell.append(removeBtnHtml);
+                        } else {
+                            actionCell.find('.remove-room-assignment').show();
+                        }
                     } else if (res.success === 0) {
                         toastr.success('{{ __db('room_already_assigned') }}');
                     } else if (res.success === 2) {
@@ -1406,6 +1455,43 @@
                     }
                 });
             });
+
+            $(document).on('click', '.remove-room-assignment', function(e){
+                e.preventDefault();
+                let assignmentId = $(this).data('assignment-id');
+
+                Swal.fire({
+                    title: "{{ __db('are_you_sure') }}",
+                    text: "{{ __db('unassign_confirm_text_accommodation') }}",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: "{{ __db('yes_unassign') }}",
+                    cancelButtonText: "{{ __db('cancel') }}",
+                    customClass: {
+                        popup: 'w-full max-w-2xl',
+                        confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                        cancelButton: 'px-4 rounded-lg'
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post("{{ route('accommodation.remove-rooms') }}", {
+                            _token: '{{ csrf_token() }}',
+                            assignable_id: assignmentId
+                        }, function(res){
+                            if(res.success){
+                                toastr.success('{{ __db('room_removed') }}');
+                                window.location.reload();
+                            } else {
+                                toastr.error('{{ __db('room_remove_failed') }}');
+                            }
+                        });
+                    }
+                });
+                
+            });
+
         });
     </script>
 @endsection

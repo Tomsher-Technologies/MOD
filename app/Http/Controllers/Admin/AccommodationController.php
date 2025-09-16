@@ -520,10 +520,10 @@ class AccommodationController extends Controller
                 changedFields: $changes,
             );
 
-            return response()->json(['success' => 1]);
+            return response()->json(['success' => 1, 'assignment_id' => $assignment->id]);
         }
 
-        return response()->json(['success' => 0]);
+        return response()->json(['success' => 0,  'assignment_id' =>null]);
     }
 
     public function hotelOccupancy($hotelId)
@@ -819,14 +819,15 @@ class AccommodationController extends Controller
         return redirect()->back()->with('success', __db('external_member_deleted'));
     }
 
-    public function unassignAccommodation($id)
+    public function unassignAccommodation(Request $request)
     {
-        $assignment = RoomAssignment::findOrFail($id);
-
-        $hotel_id = $assignment->hotel_id;
-        $room_number = $assignment->room_number;
+        $assignment = RoomAssignment::find($request->assignable_id);
+    
+        $hotel_id = $assignment?->hotel_id ?? NULL;
+        $room_number = $assignment?->room_number ?? NULL;
 
         if ($assignment) {
+            $type = $assignment->assignable_type;
             $oldRoom = AccommodationRoom::find($assignment->room_type_id);
 
             $alreadyAssignedCount = RoomAssignment::where('hotel_id', $assignment->hotel_id)
@@ -843,8 +844,24 @@ class AccommodationController extends Controller
             }
             $assignment->active_status = 0;
             $assignment->save();
+
+            if($type == 'App\Models\Driver'){
+                $driver = Driver::find($assignment->assignable_id);
+                $driver->current_room_assignment_id = NULL;
+                $driver->save();
+            }elseif($type == 'App\Models\Escort'){
+                $escort = Escort::find($assignment->assignable_id);
+                $escort->current_room_assignment_id = NULL;
+                $escort->save();
+            }elseif($type == 'App\Models\Delegate'){
+                $delegate = Delegate::find($assignment->assignable_id);
+                $delegate->current_room_assignment_id = NULL;
+                $delegate->save();
+            }
+            
+            return response()->json(['success' => 1]);
         }
 
-        return redirect()->back()->with('success', __db('room_unassigned_successfully'));
+         return response()->json(['success' => 0]);
     }
 }

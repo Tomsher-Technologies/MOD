@@ -62,7 +62,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             if ($request->is('mod-admin/*')) {
-                return redirect()->route('admin.login')->with('error', 'Unauthorized access.');
+                return redirect()->route('login')->with('error', 'Unauthorized access.');
             }
 
             return redirect()->route('login')->with('error', 'Unauthorized access.');
