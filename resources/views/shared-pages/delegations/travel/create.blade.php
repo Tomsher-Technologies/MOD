@@ -187,7 +187,7 @@
             <div class="xl:col-span-12 h-full">
                 <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-                    <x-reusable-table :columns="$columns" :data="$delegates" :rowClass="function ($row) use (
+                    <x-reusable-table :columns="$columns" table-id="delegatesTable" :data="$delegates" :rowClass="function ($row) use (
                         $existingArrivals,
                         $existingDepartures,
                         $showArrival,
