@@ -63,8 +63,9 @@ class EscortController extends Controller
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->whereDoesntHave('delegations', function ($q) {
-                $q->where('delegation_escorts.status', 1);
+            $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
+                $q->where('delegations.id', $delegationId)
+                  ->where('delegation_escorts.status', 1);
             });
         }
 
@@ -101,7 +102,15 @@ class EscortController extends Controller
             });
         }
 
-        if ($request->has('delegation_id') && !empty($request->delegation_id)) {
+        if ($request->has('title_en') && !empty($request->title_en)) {
+            $query->where('title_en', 'like', '%' . $request->title_en . '%');
+        }
+
+        if ($request->has('title_ar') && !empty($request->title_ar)) {
+            $query->where('title_ar', 'like', '%' . $request->title_ar . '%');
+        }
+
+        if ($request->has('delegation_id') && !empty($request->delegation_id) && $assignmentMode !== 'escort') {
             $delegations = is_array($request->delegation_id) ? $request->delegation_id : [$request->delegation_id];
             $query->whereHas('delegations', function ($q) use ($delegations) {
                 $q->whereIn('delegations.id', $delegations);
@@ -112,8 +121,16 @@ class EscortController extends Controller
 
         $escorts = $query->paginate($limit);
         $delegations = Delegation::where('event_id', $currentEventId)->get();
+        
+        $titleEns = Escort::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
+        $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
+        
+        $assignmentDelegation = null;
+        if ($delegationId && $assignmentMode === 'escort') {
+            $assignmentDelegation = Delegation::find($delegationId);
+        }
 
-        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode'));
+        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs'));
     }
 
     public function updateStatus(Request $request)

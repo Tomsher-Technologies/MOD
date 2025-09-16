@@ -2,26 +2,36 @@
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
         @canany(['import_drivers', 'driver_add_drivers'])
-        <a href="{{ route('drivers.import.form') }}"
-            class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
-            {{ __db('import') . ' ' . __db('driver') }}
-        </a>
+            <a href="{{ route('drivers.import.form') }}"
+                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
+                {{ __db('import') . ' ' . __db('driver') }}
+            </a>
         @endcanany
     </div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
 
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver')
+                                @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver')
                     <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
                         <h3 class="font-semibold text-lg">{{ __db('assigning_driver_to_delegation') }}</h3>
-                        <p>{{ __db('all_drivers_shown_for_assignment') }}</p>
+                        @if(isset($assignmentDelegation))
+                            <div class="mt-2 pt-2 border-t border-[#d1d5db]">
+                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong> {{ $assignmentDelegation->code }}</p>
+                                @if($assignmentDelegation->country)
+                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong> {{ $assignmentDelegation->country->name }}</p>
+                                @endif
+                                @if($assignmentDelegation->continent)
+                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong> {{ $assignmentDelegation->continent->value }}</p>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @endif
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
                     <form class="w-[50%] me-4" action="{{ route('drivers.index') }}" method="GET">
-                        @if(isset($delegationId) && isset($assignmentMode))
+                        @if (isset($delegationId) && isset($assignmentMode))
                             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
                             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
                         @endif
@@ -201,9 +211,8 @@
                             'render' => function ($driver) use ($delegationId, $assignmentMode) {
                                 $editUrl = route('drivers.edit', $driver->id);
 
-                                $output = '<div class="flex items-start gap-2">'; // flex column with gap
+                                $output = '<div class="flex items-start gap-2">';
 
-                                // Edit button
                                 if (can(['edit_drivers', 'driver_edit_drivers'])) {
                                     $output .=
                                         '
@@ -219,17 +228,29 @@
                                 if (isset($delegationId) && isset($assignmentMode) && $assignmentMode == 'driver') {
                                     if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
                                         $assignUrl = route('drivers.assign', $driver->id);
+                                        $hasAssignment = $driver->delegations()->wherePivot('status', 1)->exists();
                                         $output .=
                                             '
-                                <form action="' . $assignUrl . '" method="POST" class="assign-form" style="display:inline;">
-                                    ' . csrf_field() . '
-                                    <input type="hidden" name="delegation_id" value="' . $delegationId . '" />
+                                <form action="' .
+                                            $assignUrl .
+                                            '" method="POST" class="assign-form" style="display:inline;" data-has-assignment="' .
+                                            ($hasAssignment ? 'true' : 'false') .
+                                            '">
+                                    ' .
+                                            csrf_field() .
+                                            '
+                                    <input type="hidden" name="delegation_id" value="' .
+                                            $delegationId .
+                                            '" />
                                     <input type="hidden" name="action" value="reassign" />
-                                    <button type="submit" class="lex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
+                                    <input type="hidden" name="start_date" class="start-date-input" value="" />
+                                    <button type="submit" class="assign-btn lex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                     </svg>
-                                        <span>' . __db('assign') . '</span>
+                                        <span>' .
+                                            __db('assign') .
+                                            '</span>
                                     </button>
                                 </form>';
                                     }
@@ -288,15 +309,38 @@
     </button>
 
     <form action="{{ route('drivers.index') }}" method="GET">
+        @if (isset($delegationId) && isset($assignmentMode))
+            <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
+            <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
+        @endif
         <div class="flex flex-col gap-4 mt-4">
+
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
+                <select name="title_en" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                    <option value="">{{ __db('all') }}</option>
+                    @foreach ($titleEns as $titleEn)
+                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>{{ $titleEn }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
+                <select name="title_ar" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                    <option value="">{{ __db('all') }}</option>
+                    @foreach ($titleArs as $titleAr)
+                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>{{ $titleAr }}</option>
+                    @endforeach
+                </select>
+            </div>
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle_type') }}</label>
                 <select name="car_type[]" multiple data-placeholder="{{ __db('select_vehicle_types') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getAllDrivers() as $driver)
-                        <option value="{{ $driver->car_type }}" @if (is_array(request('car_type', [])) && in_array($driver->car_type, request('car_type', []))) selected @endif>
-                            {{ $driver->car_type }}</option>
+                    @foreach ($carTypes as $carType)
+                        <option value="{{ $carType }}" @if (is_array(request('car_type', [])) && in_array($carType, request('car_type', []))) selected @endif>
+                            {{ $carType }}</option>
                     @endforeach
                 </select>
             </div>
@@ -306,9 +350,9 @@
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('car_number') }}</label>
                 <select name="car_number[]" multiple data-placeholder="{{ __db('select_plate_numbers') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getAllDrivers() as $driver)
-                        <option value="{{ $driver->car_number }}" @if (is_array(request('car_number', [])) && in_array($driver->car_number, request('car_number', []))) selected @endif>
-                            {{ $driver->car_number }}</option>
+                    @foreach ($carNumbers as $carNumber)
+                        <option value="{{ $carNumber }}" @if (is_array(request('car_number', [])) && in_array($carNumber, request('car_number', []))) selected @endif>
+                            {{ $carNumber }}</option>
                     @endforeach
                 </select>
             </div>
@@ -317,10 +361,9 @@
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('capacity') }}</label>
                 <select name="capacity[]" multiple data-placeholder="{{ __db('select_capacities') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getAllDrivers() as $driver)
-                        <option value="{{ $driver->capacity }}" @if (is_array(request('capacity', [])) && in_array($driver->capacity, request('capacity', []))) selected @endif>
-                            {{ $driver->capacity }}
-                        </option>
+                    @foreach ($capacities as $capacity)
+                        <option value="{{ $capacity }}" @if (is_array(request('capacity', [])) && in_array($capacity, request('capacity', []))) selected @endif>
+                            {{ $capacity }}</option>
                     @endforeach
                 </select>
             </div>
@@ -340,7 +383,7 @@
 
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
-            <a href="{{ route('drivers.index') }}"
+            <a href="{{ route('drivers.index', isset($delegationId) && isset($assignmentMode) ? ['delegation_id' => $delegationId, 'assignment_mode' => $assignmentMode] : []) }}"
                 class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
@@ -471,7 +514,7 @@
 
             unassignForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                     Swal.fire({
                         title: 'Are you sure?',
                         text: "You are about to unassign this delegation!",
@@ -492,20 +535,81 @@
             document.querySelectorAll('.assign-form').forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    Swal.fire({
-                        title: '{{ __db('are_you_sure') }}',
-                        text: '{{ __db('assign_confirm_text') }}',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#4CAF50',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: '{{ __db('yes_assign') }}',
-                        cancelButtonText: '{{ __db('cancel') }}'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
+
+                    const hasAssignment = form.getAttribute('data-has-assignment');
+
+                    if (hasAssignment === 'true') {
+                        Swal.fire({
+                            title: '{{ __db('driver_already_has_assignment') }}',
+                            text: '{{ __db('reassign_or_replace_assignment') }}',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            showDenyButton: true,
+                            confirmButtonText: '{{ __db('reassign') }}',
+                            denyButtonText: '{{ __db('replace') }}',
+                            cancelButtonText: '{{ __db('cancel') }}',
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                                cancelButton: 'px-4 rounded-lg'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                    title: '{{ __db('start_date_for_reassignment') }}',
+                                    input: 'date',
+                                    inputLabel: '{{ __db('start_date') }}',
+                                    inputPlaceholder: '{{ __db('select_date') }}',
+                                    inputValidator: (value) => {
+                                        if (!value)
+                                            return '{{ __db('start_date_required') }}';
+                                    },
+                                    showCancelButton: true,
+                                    confirmButtonText: '{{ __db('submit') }}',
+                                    cancelButtonText: '{{ __db('cancel') }}',
+                                    customClass: {
+                                        popup: 'w-full max-w-2xl',
+                                        confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                                        cancelButton: 'px-4 rounded-lg'
+                                    },
+                                }).then((dateResult) => {
+                                    if (dateResult.isConfirmed) {
+                                        form.querySelector('input[name="action"]')
+                                            .value = 'reassign';
+                                        form.querySelector(
+                                                'input[name="start_date"]').value =
+                                            dateResult.value;
+                                        form.submit();
+                                    }
+                                });
+                            } else if (result.isDenied) {
+                                form.querySelector('input[name="action"]').value =
+                                    'replace';
+                                form.querySelector('input[name="start_date"]').value = '';
+                                form.submit();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: '{{ __db('are_you_sure') }}',
+                            text: '{{ __db('assign_confirm_text') }}',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#4CAF50',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: '{{ __db('yes_assign') }}',
+                            cancelButtonText: '{{ __db('cancel') }}',
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                                cancelButton: 'px-4 rounded-lg'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    }
                 });
             });
         });

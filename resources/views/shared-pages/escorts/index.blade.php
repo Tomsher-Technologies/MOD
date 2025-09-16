@@ -14,13 +14,23 @@
                 @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort')
                     <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
                         <h3 class="font-semibold text-lg">{{ __db('assigning_escort_to_delegation') }}</h3>
-                        <p>{{ __db('only_unassigned_escorts_shown') }}</p>
+                        @if(isset($assignmentDelegation))
+                            <div class="mt-2 pt-2 border-t border-[#d1d5db]">
+                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong> {{ $assignmentDelegation->code }}</p>
+                                @if($assignmentDelegation->country)
+                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong> {{ $assignmentDelegation->country->name }}</p>
+                                @endif
+                                @if($assignmentDelegation->continent)
+                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong> {{ $assignmentDelegation->continent->value }}</p>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 @endif
 
                 <div class=" mb-4 flex items-center justify-between gap-3">
                     <form class="w-[50%] me-4" action="{{ route('escorts.index') }}" method="GET">
-                        @if(isset($delegationId) && isset($assignmentMode))
+                        @if (isset($delegationId) && isset($assignmentMode))
                             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
                             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
                         @endif
@@ -160,17 +170,27 @@
                                         '"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg></a>';
                                 }
                                 if ($escort->status == 1) {
-                                    if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort') {
+                                    if (
+                                        isset($delegationId) &&
+                                        isset($assignmentMode) &&
+                                        $assignmentMode === 'escort'
+                                    ) {
                                         if ($escort->delegations->where('pivot.status', 1)->count() == 0) {
                                             if (can(['assign_escorts', 'escort_edit_escorts'])) {
                                                 $assignUrl = route('escorts.assign', $escort->id);
                                                 $output .=
-                                                    '<form action="' . $assignUrl . '" method="POST" class="assign-form" style="display:inline;">' .
+                                                    '<form action="' .
+                                                    $assignUrl .
+                                                    '" method="POST" class="assign-form" style="display:inline;">' .
                                                     csrf_field() .
-                                                    '<input type="hidden" name="delegation_id" value="' . $delegationId . '" />' .
+                                                    '<input type="hidden" name="delegation_id" value="' .
+                                                    $delegationId .
+                                                    '" />' .
                                                     '<button type="submit" class="assign-btn !bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto">
                                                        <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                                                        <span>' . __db('assign') . '</span>
+                                                        <span>' .
+                                                    __db('assign') .
+                                                    '</span>
                                                     </button>
                                                     </form>';
                                             }
@@ -178,7 +198,10 @@
                                     } else {
                                         if ($escort->delegations->where('pivot.status', 1)->count() > 0) {
                                             if (can(['unassign_escorts', 'escort_edit_escorts'])) {
-                                                foreach ($escort->delegations->where('pivot.status', 1) as $delegation) {
+                                                foreach (
+                                                    $escort->delegations->where('pivot.status', 1)
+                                                    as $delegation
+                                                ) {
                                                     $unassignUrl = route('escorts.unassign', $escort->id);
                                                     $output .=
                                                         '<form action="' .
@@ -239,14 +262,26 @@
     </button>
 
     <form action="{{ route('escorts.index') }}" method="GET">
+        @if(isset($delegationId) && isset($assignmentMode))
+            <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
+            <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
+        @endif
         <div class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title') }}</label>
-                <select name="title_id[]" multiple data-placeholder="{{ __db('select_titles') }}"
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
-                    @foreach (getDropDown('title')->options as $option)
-                        <option value="{{ $option->id }}" @if (in_array($option->id, request('title_id', []))) selected @endif>
-                            {{ $option->value }}</option>
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
+                <select name="title_en" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                    <option value="">{{ __db('all') }}</option>
+                    @foreach ($titleEns as $titleEn)
+                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>{{ $titleEn }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
+                <select name="title_ar" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                    <option value="">{{ __db('all') }}</option>
+                    @foreach ($titleArs as $titleAr)
+                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>{{ $titleAr }}</option>
                     @endforeach
                 </select>
             </div>
@@ -283,7 +318,7 @@
             </div>
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
-            <a href="{{ route('escorts.index') }}"
+            <a href="{{ route('escorts.index', isset($delegationId) && isset($assignmentMode) ? ['delegation_id' => $delegationId, 'assignment_mode' => $assignmentMode] : []) }}"
                 class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
@@ -416,7 +451,12 @@
                         confirmButtonColor: '#B68A35',
                         cancelButtonColor: '#d33',
                         confirmButtonText: '{{ __db('yes_unassign') }}',
-                        cancelButtonText: '{{ __db('cancel') }}'
+                        cancelButtonText: '{{ __db('cancel') }}',
+                        customClass: {
+                            popup: 'w-full max-w-2xl',
+                            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                            cancelButton: 'px-4 rounded-lg'
+                        },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();
@@ -436,7 +476,12 @@
                         confirmButtonColor: '#4CAF50',
                         cancelButtonColor: '#d33',
                         confirmButtonText: '{{ __db('yes_assign') }}',
-                        cancelButtonText: '{{ __db('cancel') }}'
+                        cancelButtonText: '{{ __db('cancel') }}',
+                        customClass: {
+                            popup: 'w-full max-w-2xl',
+                            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                            cancelButton: 'px-4 rounded-lg'
+                        },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();

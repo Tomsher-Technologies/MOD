@@ -61,6 +61,12 @@ class DriverController extends Controller
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
 
+        if ($delegationId && $assignmentMode === 'driver') {
+            $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
+                $q->where('delegations.id', $delegationId)
+                  ->where('delegation_drivers.status', 1);
+            });
+        }
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -76,6 +82,14 @@ class DriverController extends Controller
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
             });
+        }
+
+        if ($request->has('title_en') && !empty($request->title_en)) {
+            $query->where('title_en', 'like', '%' . $request->title_en . '%');
+        }
+
+        if ($request->has('title_ar') && !empty($request->title_ar)) {
+            $query->where('title_ar', 'like', '%' . $request->title_ar . '%');
         }
 
         if ($request->has('title_id') && !empty($request->title_id)) {
@@ -98,7 +112,7 @@ class DriverController extends Controller
             $query->whereIn('capacity', $capacities);
         }
 
-        if ($request->has('delegation_id') && !empty($request->delegation_id)) {
+        if ($request->has('delegation_id') && !empty($request->delegation_id) && $assignmentMode !== 'driver') {
             $delegations = is_array($request->delegation_id) ? $request->delegation_id : [$request->delegation_id];
             $query->whereHas('delegations', function ($q) use ($delegations) {
                 $q->whereIn('delegations.id', $delegations);
@@ -110,8 +124,20 @@ class DriverController extends Controller
         $drivers = $query->paginate($limit);
 
         $delegations = Delegation::where('event_id', $currentEventId)->get();
+        
+        // Get unique values for filter dropdowns
+        $titleEns = Driver::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
+        $titleArs = Driver::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
+        $carTypes = Driver::where('event_id', $currentEventId)->whereNotNull('car_type')->distinct()->pluck('car_type')->sort()->values()->all();
+        $carNumbers = Driver::where('event_id', $currentEventId)->whereNotNull('car_number')->distinct()->pluck('car_number')->sort()->values()->all();
+        $capacities = Driver::where('event_id', $currentEventId)->whereNotNull('capacity')->distinct()->pluck('capacity')->sort()->values()->all();
+        
+        $assignmentDelegation = null;
+        if ($delegationId && $assignmentMode === 'driver') {
+            $assignmentDelegation = Delegation::find($delegationId);
+        }
 
-        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode'));
+        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities'));
     }
 
 
@@ -347,7 +373,7 @@ class DriverController extends Controller
         $request->validate([
             'delegation_id' => 'required|exists:delegations,id',
             'start_date' => 'nullable|date',
-            'action' => 'required|in:reassign,replace',
+            'action' => 'nullable|in:reassign,replace',
         ]);
 
         $delegationId = $request->delegation_id;
@@ -357,6 +383,14 @@ class DriverController extends Controller
         $today = now()->toDateString();
 
         $activeAssignments = $driver->delegations()->wherePivot('status', 1)->orderBy('pivot_start_date')->get();
+
+        if (!$action) {
+            if ($activeAssignments->isEmpty()) {
+                $action = 'reassign'; 
+            } else {
+                return redirect()->back()->with('error', 'Action is required for drivers with existing assignments.');
+            }
+        }
 
         if ($activeAssignments->isNotEmpty()) {
             if ($action === 'reassign') {
