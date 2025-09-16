@@ -63,11 +63,9 @@ class EscortController extends Controller
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
-                $q->where('delegations.id', $delegationId)
-                  ->where('delegation_escorts.status', 1);
-            });
+            $query->whereDoesntHave('delegations');
         }
+
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -121,10 +119,10 @@ class EscortController extends Controller
 
         $escorts = $query->paginate($limit);
         $delegations = Delegation::where('event_id', $currentEventId)->get();
-        
+
         $titleEns = Escort::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
-        
+
         $assignmentDelegation = null;
         if ($delegationId && $assignmentMode === 'escort') {
             $assignmentDelegation = Delegation::find($delegationId);
