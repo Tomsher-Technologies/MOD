@@ -61,7 +61,7 @@
                                 <input type="checkbox" class="form-check-input border border-neutral-300" id="check-1"  name="remember">
                                 <label class="ps-2" for="remeber">{{ __db('remember_me') }} </label>
                             </div>
-                            <a href="javascript:void(0)" class="text-primary-600 font-medium hover:underline">{{ __db('forgot_password') }}</a>
+                           
                         </div>
                     </div>
 

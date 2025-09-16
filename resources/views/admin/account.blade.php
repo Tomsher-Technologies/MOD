@@ -9,7 +9,7 @@
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
             <div class="container mx-auto py-6">
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 class="text-xl font-bold mb-4">{{ __db('profile_details') }}</h2>
+                    <h2 class="text-lg font-bold mb-4">{{ __db('profile_details') }}</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-md">
                         <div><strong>{{ __db('username') }}:</strong> {{ $user->username }}</div>
                         <div><strong>{{ __db('name') }}:</strong> {{ $user->name ?? '-' }}</div>
@@ -19,7 +19,7 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 class="text-xl font-bold mb-4">{{ __db('assigned') }} {{ __db('roles') }}</h2>
+                    <h2 class="text-lg font-bold mb-4">{{ __db('assigned') }} {{ __db('roles') }}</h2>
                     @forelse($user->eventUserRoles as $eur)
                         <div class="mb-2">
                             <span class="font-semibold">{{ $eur->event->getTranslation('name') ?? 'N/A' }}</span>
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold mb-4">{{ __db('change_password') }}</h2>
+                    <h2 class="text-lg font-bold mb-4">{{ __db('change_password') }}</h2>
 
                     @if(session('success'))
                         <div class="bg-green-100 text-green-800 p-3 rounded mb-4">{{ session('success') }}</div>
