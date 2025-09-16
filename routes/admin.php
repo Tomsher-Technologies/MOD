@@ -214,6 +214,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     // Account
     Route::get('/profile',[AdminDashboardController::class, 'account'])->name('account');
+    Route::post('/profile/change-password', [AdminDashboardController::class, 'changePassword'])->name('staffs.change-password');
 
     // Report Section
     Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
