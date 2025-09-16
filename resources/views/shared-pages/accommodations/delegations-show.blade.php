@@ -342,6 +342,7 @@
 
                         [
                             'label' => __db('room_type'),
+                            'class' => 'w-[175px]',
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
                                 if(can(['assign_accommodations', 'hotel_assign_accommodations'])){
@@ -399,16 +400,16 @@
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
 
-                                $action = '<div class="flex items-center gap-5">';
+                                $action = '<div class="flex items-center gap-1">';
                                 if ($row->accommodation == 1){
                                     $action .= '<a href="#" id="add-attachment-btn"
-                                                    class="save-room-assignment text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                                    class="save-room-assignment text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
                                                     <span>'.__db('save').' </span>
                                                 </a>
                                             ';
                                 }
                                 if($room){
-                                    $action .= '<a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3" data-assignment-id="'.$room->id.'">
+                                    $action .= '<a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="'.$room->id.'">
                                                 '.__db('remove').'
                                                 </a>';
                                 }
@@ -626,14 +627,14 @@
 
                                 @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                     <td class="px-1 py-3 border border-gray-200">
-                                        <div class="flex items-center gap-5">
+                                        <div class="flex items-center gap-1">
                                             <a href="#" id="add-attachment-btn"
-                                                class="save-room-assignment-escort text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                                class="save-room-assignment-escort text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
                                                 <span>{{ __db('save') }} </span>
                                             </a>
 
                                             @if($roomEscort)
-                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3" data-assignment-id="{{ $roomEscort->id }}">
+                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="{{ $roomEscort->id }}">
                                                 {{ __db('remove') }}
                                                 </a>
                                             @endif
@@ -834,12 +835,12 @@
                                     <td class="px-1 py-3 border border-gray-200">
                                         <div class="flex items-center gap-1">
                                             <a href="#" id="add-attachment-btn"
-                                                class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-3">
+                                                class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
                                                 <span>{{ __db('save') }} </span>
                                             </a>
 
                                             @if($roomDriver)
-                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3" data-assignment-id="{{ $roomDriver->id }}">
+                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="{{ $roomDriver->id }}">
                                                 {{ __db('remove') }}
                                                 </a>
                                             @endif
