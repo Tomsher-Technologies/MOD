@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
 use Hash;
-
+use Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -827,5 +827,10 @@ class AdminDashboardController extends Controller
             return view('admin.dashboard-tables.arrival', compact('data'));
         }
         return redirect()->route('admin.dashboard');
+    }
+
+    public function account(){
+        $user = Auth::user();
+        return view('admin.account', compact('user'));
     }
 }
