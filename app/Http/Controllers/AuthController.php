@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventUserRole;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Hash;
 
 class AuthController extends Controller
 {
@@ -18,30 +19,116 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email'     => 'required|email',
-            'password'  => 'required|string',
-            'event_id'  => 'required'
-        ], [
-            'email.required'     => __db('email_required'),
-            'email.email'        => __db('valid_email'),
-            'password.required'  => __db('password_required'),
-            'event_id.required'  => __db('event_required'),
-        ]);
+        $user = \App\Models\User::where('username', $request->username)->orWhere('email', $request->username)->first();
 
+        $rules = [
+            'username' => 'required',
+            'password' => 'required|string',
+        ];
+
+        if ($user && !in_array($user->user_type, ['admin', 'staff'])) {
+            $rules['event_id'] = 'required';
+        }
+
+        $validator = Validator::make($request->all(), $rules, [
+            'username.required' => __db('username_required'),
+            'password.required' => __db('password_required'),
+            'event_id.required' => __db('event_required'),
+        ]);
+        
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('username', 'password');
         $eventId = $request->input('event_id');
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+        $login = $request->input('username'); 
+        $password = $request->input('password');
+        $eventId = $request->input('event_id');
 
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$field => $login, 'password' => $password])) {
+            $user = Auth::user();
+            session(['login_event_id' => $eventId]);
+
+            if ($user->force_password == 1) {
+                return redirect()->route('force.password.form');
+            }
+
+            if($user->user_type == 'admin' || $user->user_type == 'staff') {
+                $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+                $user->givePermissionTo($rolePermissions);
+            }else{
+                $roleAssignment = EventUserRole::where('user_id', $user->id)
+                                ->where('event_id', $eventId)
+                                ->first();
+
+                if (!$roleAssignment) {
+                    Auth::logout();
+                    return back()->withErrors(['password' => __db('event_not_assigned')]);
+                }
+                $role = $roleAssignment->role?->name;
+                $user->syncRoles($role);
+
+                $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+
+                $user->syncPermissions([]);
+
+                $event = $roleAssignment->event;
+
+                if ($event?->status == 1) {
+                    $filtered = collect($rolePermissions)->filter(function ($perm) {
+                        return str_contains($perm, '_view_') || str_contains($perm, '_manage_');
+                    })->toArray();
+
+                    $user->givePermissionTo($filtered);
+                } else {
+                    $user->givePermissionTo($rolePermissions);
+                }
+
+                session(['current_event_id' => $eventId]);
+                session(['current_module' => $roleAssignment->module]);
+                session(['login_event_id' => null]);
+            }
+            
+            return redirect()->route('admin.dashboard');
+        }
+
+        return back()->withErrors(['password' => __db('invalid_credentials')]);
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect()->route('login');
+    }
+
+    public function showForcePasswordForm()
+    {
+        return view('frontend.auth.force_password');
+    }
+
+    public function updateForcePassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = Auth::user();
+        $user->password = Hash::make($request->password);
+        $user->force_password = 0;
+        $user->save();
+
+        if($user->user_type == 'admin' || $user->user_type == 'staff') {
+            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+            $user->givePermissionTo($rolePermissions);
+        }else{
+            $eventId = session('login_event_id');
             $roleAssignment = EventUserRole::where('user_id', $user->id)
-                ->where('event_id', $eventId)
-                ->first();
+                            ->where('event_id', $eventId)
+                            ->first();
 
             if (!$roleAssignment) {
                 Auth::logout();
@@ -68,18 +155,11 @@ class AuthController extends Controller
 
             session(['current_event_id' => $eventId]);
             session(['current_module' => $roleAssignment->module]);
-
-            // return redirect()->route($roleAssignment->module . '.dashboard');
-            return redirect()->route('admin.dashboard');
+            session(['login_event_id' => null]);
         }
-
-        return back()->withErrors(['password' => __db('invalid_credentials')]);
+        
+        return redirect()->route('admin.dashboard');
     }
 
-    public function logout(Request $request)
-    {
-        Auth::logout();
-        return redirect()->route('login');
-    }
 
 }

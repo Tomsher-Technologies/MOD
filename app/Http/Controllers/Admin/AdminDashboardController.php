@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
 use Hash;
-
+use Auth;
 
 class AdminDashboardController extends Controller
 {
@@ -827,5 +827,34 @@ class AdminDashboardController extends Controller
             return view('admin.dashboard-tables.arrival', compact('data'));
         }
         return redirect()->route('admin.dashboard');
+    }
+
+    public function account(){
+        $user = Auth::user();
+        return view('admin.account', compact('user'));
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ], [
+            'current_password.required' => __db('current_password_required'),
+            'password.required' => __db('new_password_required'),
+            'password.confirmed' => __db('confirm_password_mismatch'),
+        ]);
+   
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => __db('current_password_incorrect')])->withInput();
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->force_password = 0;
+        $user->save();
+
+        return back()->with('success', __db('password_changed_successfully'));
     }
 }

@@ -326,6 +326,14 @@ class DelegationController extends Controller
             'drivers'
         ])->findOrFail($id);
 
+        // Return JSON for AJAX requests
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'delegation' => $delegation
+            ]);
+        }
+
         $interviews = Interview::with(['interviewMembers', 'interviewMembers.fromDelegate', 'interviewMembers.toDelegate', 'interviewWithDelegation'])
             ->where('delegation_id', $id)
             ->get();

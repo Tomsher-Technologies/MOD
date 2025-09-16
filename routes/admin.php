@@ -19,11 +19,13 @@ use App\Http\Controllers\Admin\AlertController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\EventPageController;
+use App\Http\Controllers\Admin\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/check-username', [LoginController::class, 'checkUsername'])->name('check.username');
     Route::post('login', [LoginController::class, 'login'])->name('post.login');
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
@@ -206,9 +208,19 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::post('/committees/status', [CommitteeController::class, 'updateStatus'])->name('committees.status');
 
     //Manage Page Contents
-    Route::get('event-pages', [EventPageController::class, 'index'])->name('event_pages.index');
-    Route::get('event-pages/edit/{id}', [EventPageController::class, 'edit'])->name('event_pages.edit');
-    Route::post('event-pages/{id}/update', [EventPageController::class, 'update'])->name('event_pages.update');
+    Route::get('event-pages', [EventPageController::class,'index'])->name('event_pages.index');
+    Route::get('event-pages/edit/{id}', [EventPageController::class,'edit'])->name('event_pages.edit');
+    Route::post('event-pages/{id}/update', [EventPageController::class,'update'])->name('event_pages.update');
+
+    // Account
+    Route::get('/profile',[AdminDashboardController::class, 'account'])->name('account');
+    Route::post('/profile/change-password', [AdminDashboardController::class, 'changePassword'])->name('staffs.change-password');
+
+    // Report Section
+    Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
+    Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
+    Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
+
 });
 
 Route::get('/lang/{lang}', function ($lang) {

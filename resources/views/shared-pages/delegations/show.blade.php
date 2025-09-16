@@ -8,7 +8,7 @@
                     {{ __db('edit') }}
                 </a>
             @enddirectCanany
-            
+
             <x-back-btn title="" class=""
                 back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
 
@@ -182,7 +182,17 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
+
+        <div class="flex items-center gap-3">
+            @directCanany(['add_escorts', 'escort_add_escorts'])
+                <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+            @enddirectCanany
+        </div>
+    </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
@@ -264,6 +274,34 @@
                                 return $accommodation ?? '-';
                             },
                         ],
+                        [
+                            'label' => __db('actions'),
+                            'render' => function ($escort) use ($delegation) {
+                                if (can(['unassign_escorts', 'escort_edit_escorts'])) {
+                                    $unassignUrl = route('escorts.unassign', $escort->id);
+                                    return '
+                                    <form action="' .
+                                        $unassignUrl .
+                                        '" method="POST" class="unassign-escort-form" style="display:inline;">
+                                        ' .
+                                        csrf_field() .
+                                        '
+                                        <input type="hidden" name="delegation_id" value="' .
+                                        $delegation->id .
+                                        '" />
+                                        <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto">
+                                            <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                            </svg>
+                                            <span>' .
+                                        __db('unassign') .
+                                        '</span>
+                                        </button>
+                                    </form>';
+                                }
+                                return '';
+                            },
+                        ],
                     ];
                 @endphp
 
@@ -274,7 +312,16 @@
     </div>
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+    <div class="flex items-center justify-between mt-6">
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
+
+        <div class="flex items-center gap-3">
+            @directCanany(['add_drivers', 'driver_add_drivers'])
+                <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
+                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+            @enddirectCanany
+        </div>
+    </div>
 
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -359,6 +406,57 @@
                                     : '-';
                                 //;
                                 return $accommodation ?? '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('actions'),
+                            'key' => 'actions',
+                            'permission' => ['assign_drivers', 'driver_edit_drivers'],
+                            'render' => function ($driver) use ($delegation) {
+                                $editUrl = route('drivers.edit', $driver->id);
+                                $output = '<div class="flex align-center gap-4">';
+
+                                $output .=
+                                    '<a href="' .
+                                    $editUrl .
+                                    '">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="#B68A35" d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/></svg>
+                                        </a>';
+                                if ($driver->status == 1) {
+                                    $currentDelegationAssignment = $driver->delegations
+                                        ->where('pivot.status', 1)
+                                        ->where('id', $delegation->id)
+                                        ->first();
+                                    if ($currentDelegationAssignment) {
+                                        $unassignUrl = route('drivers.unassign', $driver->id);
+                                        $output .=
+                                            '<form action="' .
+                                            $unassignUrl .
+                                            '" method="POST" class="unassign-driver-form" style="display:inline;">' .
+                                            csrf_field() .
+                                            '<input type="hidden" name="delegation_id" value="' .
+                                            $delegation->id .
+                                            '" />
+                                                <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto">
+                                                    <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                                                    <span>' .
+                                            __db('unassign') .
+                                            '</span>
+                                                </button>
+                                            </form>';
+                                    } else {
+                                        $assignUrl = route('drivers.assignIndex', $driver->id);
+                                        $output .=
+                                            '<a href="' .
+                                            $assignUrl .
+                                            '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-xs flex items-center gap-2 py-1 rounded-lg me-auto">
+                                                <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
+                                                <span>Assign</span>
+                                            </a>';
+                                    }
+                                }
+                                $output .= '</div>';
+                                return $output;
                             },
                         ],
                         //             [
@@ -622,7 +720,64 @@
                         confirmButtonColor: '#d33',
                         cancelButtonColor: '#3085d6',
                         confirmButtonText: "{{ __db('yes_delete') }}",
-                        cancelButtonText: "{{ __db('cancel') }}"
+                        cancelButtonText: "{{ __db('cancel') }}",
+                        customClass: {
+                            popup: 'w-full max-w-2xl',
+                            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                            cancelButton: 'px-4 rounded-lg'
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.unassign-escort-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: "{{ __db('are_you_sure') }}",
+                        text: "{{ __db('unassign_confirm_text') }}",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: "{{ __db('yes_unassign') }}",
+                        cancelButtonText: "{{ __db('cancel') }}",
+                        customClass: {
+                            popup: 'w-full max-w-2xl',
+                            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                            cancelButton: 'px-4 rounded-lg'
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.unassign-driver-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: "{{ __db('are_you_sure') }}",
+                        text: "{{ __db('unassign_confirm_text') }}",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: "{{ __db('yes_unassign') }}",
+                        cancelButtonText: "{{ __db('cancel') }}",
+                        customClass: {
+                            popup: 'w-full max-w-2xl',
+                            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                            cancelButton: 'px-4 rounded-lg'
+                        },
                     }).then((result) => {
                         if (result.isConfirmed) {
                             this.submit();
@@ -631,8 +786,6 @@
                 });
             });
         });
-
-
 
         function update_escort_status(el) {
             if (el.checked) {
@@ -659,7 +812,6 @@
                 }
             });
         }
-
 
         function update_driver_status(el) {
             if (el.checked) {

@@ -27,7 +27,8 @@ class User extends Authenticatable
         'password',
         'phone',
         'user_type',
-        'military_number'
+        'username',
+        'force_password'
     ];
 
     /**
@@ -92,4 +93,10 @@ class User extends Authenticatable
     {
         return $this->notifications()->whereNull('read_at')->whereNull('alert_id');
     }
+
+    public function eventUserRoles()
+    {
+        return $this->hasMany(EventUserRole::class, 'user_id');
+    }
+
 }
