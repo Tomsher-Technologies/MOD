@@ -63,9 +63,8 @@ class EscortController extends Controller
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->whereDoesntHave('delegations');
+            $query->where('delegation_id', null);
         }
-
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -417,6 +416,9 @@ class EscortController extends Controller
             ],
         ]);
 
+        $escort->delegation_id = $delegationId;
+        $escort->save();
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'assignment',
@@ -452,6 +454,8 @@ class EscortController extends Controller
             'status' => 0,
         ]);
 
+        $escort->delegation_id = null;
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'assignment',
@@ -480,8 +484,9 @@ class EscortController extends Controller
             }
 
             $escort->current_room_assignment_id = null;
-            $escort->save();
         }
+
+        $escort->save();
 
         return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
     }
