@@ -1,209 +1,310 @@
 @extends('layouts.admin_account', ['title' => __db('delegation_details')])
 
 @section('content')
-<div class="font-sans p-6 bg-white">
+  <div>
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+          <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('delegations_escort_report') }}</h2>
+          
 
-  <!-- Header Logos and Titles -->
-  <div class="flex items-center justify-between mb-5">
-    <!-- Right Logo -->
-    <img src="dubai-airshow-logo.png" alt="Dubai Airshow Logo" class="h-12 mr-4">
+          <div class="flex gap-3 ms-auto">
+             <a href="{{ route('delegations.exportPdf', ['id' => base64_encode($delegation->id)]) }}" class="!text-[#5D471D]  !bg-[#E6D7A2] hover:bg-yellow-400  rounded-lg py-2 px-3">
+              {{ __db('export_pdf') }}
+            </a>
+            <x-back-btn class="" back-url="{{ route('reports-delegations') }}" />
+          </div>
+         
+      </div>
 
-    <!-- Center Titles -->
-    <div class="flex-1 text-center">
-      <div class="text-xl font-bold">United Arab Emirates</div>
-      <div class="text-lg">Ministry of Defence</div>
-      <div class="text-xl font-bold text-[#a12b2e] mt-2">Report Name</div>
-    </div>
+      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
+          <div class="xl:col-span-12 h-full">
+              <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+                  <div class=" mb-4 items-center justify-between gap-3">
+                      <header class="flex justify-between items-center mb-4">
+                          <img src="{{ asset('assets/img/md-logo.svg') }}" alt="{{ env('APP_NAME') }}" class="h-16">
+                          <div class="flex-1 text-center">
+                              <h1 class="text-lg font-bold">{{ __db('united_arab_emirates') }}</h1>
+                              <h2 class="text-lg">{{ __db('ministry_of_defense') }}</h2>
+                              <h3 class="text-lg font-bold text-header-red mt-2">{{ __db('delegations_escort_report') }}</h3>
+                          </div>
+                          <img src="{{ getAdminEventLogo() }}" alt="{{ getCurrentEventName() }}" class="h-12">
+                      </header>
+                      <hr class="border-t-2 border-black mb-6">
 
-    <!-- Left Logo -->
-    <img src="uae-logo.png" alt="UAE Logo" class="h-16 ml-4">
+                      @php
+                          $assignedHotels = [];
+                      @endphp
+
+                      @foreach ($delegation->escorts as $escort)
+                          <div class="flex flex-col md:flex-row justify-between mb-2 text-sm ">
+                              <div class="space-y-1 mt-4 md:mt-0 ">
+                                
+                                      <div class="flex">
+                                          <div><b>{{ __db('escort') }} :</b> <span>{{ $escort->name }}-{{ $escort->code }}</span></div> &nbsp; 
+                                          <div class="mr-4"><b>{{ __db('mobile') }} :</b> <span>{{ $escort->phone_number }}</span></div>
+                                      </div>
+                                                       
+                              </div>
+                              <div class="space-y-1">
+                                  @php
+                                      $roomEscort = $escort->currentRoomAssignment ?? null;
+                                      $assignedHotels[] = $roomEscort?->hotel_id ?? null;
+                                  @endphp
+                                  <div><b>{{ __db('accommodation') }} :</b> <span>{{ $roomEscort?->room_number }}-{{ $roomEscort?->hotel?->hotel_name ?? '' }}</span></div>
+                              </div>
+                          </div>
+                        @endforeach
+
+                      <div class="flex flex-col md:flex-row justify-between mt-8 mb-8 text-sm ">
+                        <div class="space-y-1 mt-4 md:mt-0 ">
+                              <div><b>{{ __db('country') }} :</b> <span>{{ $delegation->country?->name ?? '-' }}</span></div>
+                              <div><b>{{ __db('invitation_status') }} :</b> <span>{{ $delegation->invitationStatus?->value ?? '-' }}</span></div>
+                          </div>
+
+                          <div class="space-y-1 md:text-right rtl:md:text-left">
+                              <div><b>{{ __db('invitation_from') }} :</b> <span>{{ $delegation->invitationFrom?->value ?? '-' }}</span></div>
+                              <div><b>{{ __db('participation_status') }} :</b> <span>{{ $delegation->participationStatus?->value ?? '-' }}</span></div>
+                          </div>
+                          
+                      </div>
+                      @php
+                          $teamHead = '';
+                      @endphp
+                      <section class="mb-8">
+                          <h2 class="text-md font-bold text-center mb-3">{{ __db('arrival_details') }}
+                          </h2>
+                          <div class="overflow-x-auto">
+                              <table class="w-full border-collapse text-xs">
+                                  <thead>
+                                      <tr class="bg-gray-200">
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('sl_no') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                            {{ __db('delegations') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                            {{ __db('position') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('room') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                            {{ __db('flight_name') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                            {{ __db('flight_number') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('airport') }}
+                                          </th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('date') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('time') }}</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      @forelse ($delegation->delegates as $key => $delegate)
+                                          @php
+                                              $delegateRoom = $delegate->currentRoomAssignment ?? null;
+                                              $assignedHotels[] = $delegateRoom?->hotel_id ?? null;
+                                              if($delegate->team_head == 1){
+                                                  $departure = $delegate->delegateTransports->where('type', 'departure')->first();
+                                          
+                                                  $teamHead.= '<tr>
+                                                      <td class="border-2 border-black p-2">'.($departure?->flight_name).'</td>
+                                                      <td class="border-2 border-black p-2">'.($departure?->flight_no).'</td>
+                                                      <td class="border-2 border-black p-2">'.($departure?->airport?->value) .'</td>
+                                                      <td class="border-2 border-black p-2">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
+                                                      <td class="border-2 border-black p-2">'.date('H:i', strtotime($departure?->date_time)).'</td>
+                                                  </tr>';
+                                              }
+                                          @endphp
+                                          <tr>
+                                              <td class="border-2 border-black p-2">{{ $key + 1 }}</td>
+                                              <td class="border-2 border-black p-2 @if($delegate->team_head === true) text-report-red @endif  font-bold">
+                                                {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
+                                              </td>
+                                              <td class="border-2 border-black p-2">
+                                                @php
+                                                    $relation = '';
+                                                    if($delegate->relationship){
+                                                        $relation = $delegate->relationship?->value .' '. __db('of') .' '. $delegate->parent?->getTranslation('name');
+                                                    }
+                                                @endphp
+                                                  {{ $delegate->internalRanking?->value ?? $relation }}
+                                              </td>
+                                              <td class="border-2 border-black p-2">
+                                                  {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : 'Not Required'}}
+                                              </td>
+                                              <td class="border-2 border-black p-2">
+                                                  @php
+                                                      $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                                                  @endphp
+                                                  {{ $arrival?->flight_name ?? '-' }}
+                                              </td>
+                                              <td class="border-2 border-black p-2">{{ $arrival?->flight_no ?? '-' }}</td>
+                                              <td class="border-2 border-black p-2">{{ $arrival?->airport?->value ?? '-' }}</td>
+                                              <td class="border-2 border-black p-2">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
+                                              <td class="border-2 border-black p-2">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                                             
+                                          </tr>
+                                      @empty
+                                          <tr class="border-t">
+                                              <td colspan="9" class="border-2 border-black p-2 text-center">
+                                                  {{ __db('no_record_found') }}
+                                              </td>
+                                          </tr>
+                                      @endforelse
+                                  </tbody>
+                              </table>
+                          </div>
+                      </section>
+
+                      <section class="mb-8">
+                          <h2 class="text-md font-bold text-center mb-3">{{  __db('departure_details_of_head_of_delegation') }}</h2>
+                          <div class="overflow-x-auto">
+                              <table class="w-full border-collapse text-xs">
+                                  <thead>
+                                      <tr class="bg-gray-200">
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                            {{ __db('flight_name') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                            {{ __db('flight_number') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('airport') }}
+                                          </th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('date') }}</th>
+                                          <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('time') }}</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      {!! $teamHead !!}
+                                  </tbody>
+                              </table>
+                          </div>
+                      </section>
+
+                      @php
+                          $assignedHotels = array_filter(array_unique($assignedHotels));
+                          // $assignedHotels = implode(',', $assignedHotels);
+                          $hotelDetails = getAccommodationDetails($assignedHotels);
+
+                      @endphp
+                      
+                      @foreach($hotelDetails as $key => $hotel)
+                          @php
+                              $acc_con = '';
+                          @endphp
+                          <div class="flex flex-col md:flex-row justify-between mb-8 text-sm ">
+                              <div class="space-y-1">
+                                  <div><b>{{ __db('hotel') }}:</b> <span>{{ $hotel->hotel_name }}</span></div>
+                                  @foreach($hotel->contacts as $k => $con)
+                                      <div><b>{{ __db('res'.$k) }}:</b> <span>{{ $con->name }}</span></div>
+                                      @php
+                                          $acc_con .= '<div><b>'. __db('mobile').':</b> <span>'.$con->phone.'</span></div>';
+                                      @endphp
+                                  @endforeach
+                              </div>
+
+                              <div class="space-y-1 mt-4 md:mt-0 md:text-right rtl:md:text-left">
+                                  <div><b>{{ __db('hotel_number') }}:</b> <span>{{ $hotel->contact_number }}</span></div>
+                                  
+                                  {!! $acc_con !!}
+                              </div>
+                          </div>
+                      @endforeach
+                      
+                          
+
+
+                      <hr class="border-t-2 border-black my-6">
+
+                      <div class="grid grid-cols-1 md:grid-cols-1 gap-x-0 md:gap-x-8 gap-y-8">
+                          <section>
+                              <h2 class="text-md font-bold mb-3">{{ __db('drivers') }}</h2>
+                              <div class="overflow-x-auto">
+                                  <table class="w-full border-collapse text-xs">
+                                      <thead>
+                                          <tr class="bg-gray-200">
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('sl_no') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('name') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('phone') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">
+                                                {{ __db('car_type') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('car_number') }}</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          @forelse ($delegation->drivers as $keyDriver => $rowDriver)
+                                              <tr>
+                                                  <td class="border-2 border-black p-2">{{ $keyDriver + 1 }}</td>
+                                                  <td class="border-2 border-black p-2">
+                                                      {{ $rowDriver->name ?? '-' }}
+                                                  </td>
+                                                  <td class="border-2 border-black p-2">{{ $rowDriver->phone_number ?? '-' }}</td>
+                                                  <td class="border-2 border-black p-2">{{ $rowDriver->car_type ?? '-' }}</td>
+                                                  <td class="border-2 border-black p-2">{{ $rowDriver->car_number ?? '-' }}</td>
+                                              </tr>
+                                          @empty
+                                              <tr class="border-t">
+                                                  <td colspan="5" class="border-2 border-black p-2 text-center">
+                                                      {{ __db('no_record_found') }}
+                                                  </td>
+                                              </tr>
+                                          @endforelse
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </section>
+
+                          <section>
+                              <h2 class="text-md font-bold mb-3">{{ __db('interviews') }}</h2>
+                              <div class="overflow-x-auto">
+                                  <table class="w-full border-collapse text-xs">
+                                      <thead>
+                                          <tr class="bg-gray-200">
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('sl_no') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('interview_request_with') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('date') }}
+                                              </th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('time') }}</th>
+                                              <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('notes') }}
+                                              </th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          @php
+                                              $interviewData = $delegation->interviews ?? collect();
+                                              $interviewMembers = '';
+                                          @endphp 
+                                          @forelse ( $interviewData as $in => $row)
+                                              @php
+                                                  if (!empty($row->other_member_id) && $row->otherMember) {
+                                                      $otherMemberName = $row->otherMember->name ?? '';
+                                                      $otherMemberId = $row->otherMember->getTranslation('name') ?? $row->other_member_id;
+                                                      if ($otherMemberId) {
+                                                          $with = 'Other Member: '.$otherMemberId;
+                                                      }
+                                                  } else {
+                                                      $with = 'Delegation ID : ' .$row->interviewWithDelegation->code ?? '';
+                                                  }
+
+                                                  $names = $row->interviewMembers
+                                                      ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                                                      ->implode('');
+
+                                                  $interviewMembers =  $with . $names;
+                                              @endphp
+
+                                              <tr>
+                                                  <td class="border-2 border-black p-2">{{ $in + 1 }}</td>
+                                                  <td class="border-2 border-black p-2">{!! $interviewMembers !!}</td>
+                                                  <td class="border-2 border-black p-2">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
+                                                  <td class="border-2 border-black p-2">{{ date('H:i', strtotime($row->date_time)) }}</td>
+                                                  <td class="border-2 border-black p-2">in
+                                                    Airshow venue</td>
+                                              </tr>
+                                          @empty
+                                            
+                                          @endforelse
+                                          
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </section>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
   </div>
-
-  <hr class="border-t-4 border-black mb-6">
-
-  <!-- Accommodation & Escort Info -->
-  <div class="flex justify-between mb-5">
-    <div class="text-right">
-        <span class="font-bold">Escort:</span> Major Ahmed Ali Al Suwaidi-1001 <span> &nbsp; &nbsp; &nbsp;
-        <span class="font-bold">Mobile :</span>050-1234567 </span> &nbsp;<br>
-        <span class="mr-10">Capt Noora Salem Al Nuami-1002</span>
-      
-        <span class="font-bold">Mobile :</span>050-1234567 </span> &nbsp;<br>
-    </div>
-
-    <div>
-      PR006-Armani Hotel <span class="font-bold">:Accommodation</span><br>
-      PR007-Armani Hotel <span class="font-bold">:Accommodation</span>
-    </div>
-    
-  </div>
-
-  <!-- Invitation Info -->
-  <div class="flex justify-between mb-6">
-    <div>
-      Navy <span class="font-bold">:Invitation From</span><br>
-      Arrived <span class="font-bold">:Participation Status</span>
-    </div>
-    <div class="text-right">
-      Oman <span class="font-bold">:Country</span><br>
-      Accepted <span class="font-bold">:Invitation Status</span>
-    </div>
-  </div>
-
-  <!-- Arrivals Table -->
-  <div class="mb-6">
-    <div class="text-lg font-bold text-center mb-3">Arrivals Details</div>
-    <table class="w-full border-collapse border-2 border-black text-sm text-right">
-      <thead>
-        <tr class="bg-gray-300 text-base">
-          <th class="border-2 border-black px-3 py-2">Time</th>
-          <th class="border-2 border-black px-3 py-2">Date</th>
-          <th class="border-2 border-black px-3 py-2">Airport</th>
-          <th class="border-2 border-black px-3 py-2">Flight NUM</th>
-          <th class="border-2 border-black px-3 py-2">Flight Name</th>
-          <th class="border-2 border-black px-3 py-2">Room</th>
-          <th class="border-2 border-black px-3 py-2">Position</th>
-          <th class="border-2 border-black px-3 py-2">Delegations</th>
-          <th class="border-2 border-black px-3 py-2">Ser</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="border-2 border-black px-3 py-2">14:00</td>
-          <td class="border-2 border-black px-3 py-2">17-11-2025</td>
-          <td class="border-2 border-black px-3 py-2">DXB</td>
-          <td class="border-2 border-black px-3 py-2">OMA005</td>
-          <td class="border-2 border-black px-3 py-2">Oman Air</td>
-          <td class="border-2 border-black px-3 py-2">S001</td>
-          <td class="border-2 border-black px-3 py-2">Commander of the Navy</td>
-          <td class="border-2 border-black px-3 py-2 text-red-600 font-bold">Lt.Colonel-Saif bin Nasser</td>
-          <td class="border-2 border-black px-3 py-2">1</td>
-        </tr>
-        <tr>
-          <td class="border-2 border-black px-3 py-2">14:00</td>
-          <td class="border-2 border-black px-3 py-2">17-11-2025</td>
-          <td class="border-2 border-black px-3 py-2">DXB</td>
-          <td class="border-2 border-black px-3 py-2">OMA005</td>
-          <td class="border-2 border-black px-3 py-2">Oman Air</td>
-          <td class="border-2 border-black px-3 py-2">S001</td>
-          <td class="border-2 border-black px-3 py-2">Wife of Commander</td>
-          <td class="border-2 border-black px-3 py-2">Ms. Huda bin Salem</td>
-          <td class="border-2 border-black px-3 py-2">2</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Departure Table -->
-  <div class="mb-6">
-    <div class="text-lg font-bold text-center mb-3">Departure Details of Head of Delegation</div>
-    <table class="w-full border-collapse border-2 border-black text-sm text-right">
-      <thead>
-        <tr class="bg-gray-300 text-base">
-          <th class="border-2 border-black px-3 py-2">Time</th>
-          <th class="border-2 border-black px-3 py-2">Date</th>
-          <th class="border-2 border-black px-3 py-2">Airport</th>
-          <th class="border-2 border-black px-3 py-2">Flight NUM</th>
-          <th class="border-2 border-black px-3 py-2">Flight Name</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="border-2 border-black px-3 py-2">22:00</td>
-          <td class="border-2 border-black px-3 py-2">19-11-2025</td>
-          <td class="border-2 border-black px-3 py-2">DXB</td>
-          <td class="border-2 border-black px-3 py-2">OMA007</td>
-          <td class="border-2 border-black px-3 py-2">Oman Air</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Hotel & Contacts -->
-  <div class="flex justify-between my-9">
-    <div class="max-w-sm text-right">
-      04-1234567 <span class="font-bold">:Hotel Number</span><br>
-      050-1234567 <span class="font-bold">:Mobile</span><br>
-      050-1234567 <span class="font-bold">:Mobile</span>
-    </div>
-    <div class="max-w-md text-right">
-      Armani <span class="font-bold">:Hotel</span><br>
-      Mr.Darwish Ali <span class="font-bold">:Res1</span><br>
-      Mr.Majid Ali <span class="font-bold">:Res1</span>
-    </div>
-  </div>
-
-  <hr class="border-t-4 border-black my-7">
-
-  <!-- Drivers & Interviews -->
-  <div class="flex justify-between mb-2">
-    <div class="text-lg font-bold">Drivers</div>
-    <div class="text-lg font-bold text-right">Interviews</div>
-  </div>
-
-  <div class="flex">
-    <!-- Drivers Table -->
-    <div class="pr-5 w-1/2">
-      <table class="w-full border-collapse border-2 border-black text-sm text-right">
-        <thead>
-          <tr class="bg-gray-300">
-            <th class="border-2 border-black px-2 py-1">Car Number</th>
-            <th class="border-2 border-black px-2 py-1">Car Type</th>
-            <th class="border-2 border-black px-2 py-1">Mobile</th>
-            <th class="border-2 border-black px-2 py-1">Driver Name</th>
-            <th class="border-2 border-black px-2 py-1">Ser</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="border-2 border-black px-2 py-1">J-1234</td>
-            <td class="border-2 border-black px-2 py-1">GMC</td>
-            <td class="border-2 border-black px-2 py-1">050-1234567</td>
-            <td class="border-2 border-black px-2 py-1">Mr.Shehab Ahmed Ali</td>
-            <td class="border-2 border-black px-2 py-1">1</td>
-          </tr>
-          <tr>
-            <td class="border-2 border-black px-2 py-1">M-3242</td>
-            <td class="border-2 border-black px-2 py-1">Nissan</td>
-            <td class="border-2 border-black px-2 py-1">050-1234567</td>
-            <td class="border-2 border-black px-2 py-1">Mr.Othman Abdullah</td>
-            <td class="border-2 border-black px-2 py-1">2</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Interviews Table -->
-    <div class="pl-5 w-1/2">
-      <table class="w-full border-collapse border-2 border-black text-sm text-right">
-        <thead>
-          <tr class="bg-gray-300">
-            <th class="border-2 border-black px-2 py-1">Notes</th>
-            <th class="border-2 border-black px-2 py-1">Time</th>
-            <th class="border-2 border-black px-2 py-1">Date</th>
-            <th class="border-2 border-black px-2 py-1">Interview request with</th>
-            <th class="border-2 border-black px-2 py-1">Ser</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="border-2 border-black px-2 py-1">in Airshow venu</td>
-            <td class="border-2 border-black px-2 py-1">10:00</td>
-            <td class="border-2 border-black px-2 py-1">18-11-2025</td>
-            <td class="border-2 border-black px-2 py-1">Commander of UAE Navy</td>
-            <td class="border-2 border-black px-2 py-1">1</td>
-          </tr>
-          <tr>
-            <td class="border-2 border-black px-2 py-1">Note yet confirmed</td>
-            <td class="border-2 border-black px-2 py-1">11:00</td>
-            <td class="border-2 border-black px-2 py-1">19-11-2025</td>
-            <td class="border-2 border-black px-2 py-1">Deputy Naval Operations</td>
-            <td class="border-2 border-black px-2 py-1">2</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
 @endsection
