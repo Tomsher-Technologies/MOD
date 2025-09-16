@@ -14,7 +14,7 @@
                 <span>{{ __db('back_to_alerts') }}</span>
             </a>
         </div>
-        
+
         @if ($errors->any())
             <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">
                 <h4 class="font-semibold mb-2">{{ __db('please_fix_the_following_errors') }}</h4>
@@ -81,20 +81,53 @@
 
                     <div class="col-span-12">
                         <label class="form-label">{{ __db('recipients') }}:</label>
-                        <select name="users[]" id="usersSelect" multiple
-                            class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm" required>
-                            <option value="all">{{ __db('all_users') }}</option>
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}"
-                                    {{ in_array($user->id, old('users', [])) ? 'selected' : '' }}>
-                                    {{ $user->name }} ({{ $user->email }})
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('users')
-                            <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
-                        @enderror
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('recipient_type') }}:</label>
+                                <select name="recipient_type" id="recipientTypeSelect" 
+                                    class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm">
+                                    <option value="">{{ __db('select_recipient_type') }}</option>
+                                    <option value="all" {{ old('recipient_type') == 'all' ? 'selected' : '' }}>
+                                        {{ __db('all_users') }}</option>
+                                    <option value="module" {{ old('recipient_type') == 'module' ? 'selected' : '' }}>
+                                        {{ __db('select_module') }}</option>
+                                    <option value="users" {{ old('recipient_type') == 'users' ? 'selected' : '' }}>
+                                        {{ __db('select_users') }}</option>
+                                </select>
+                            </div>
+
+                            <div id="moduleSelectContainer"
+                                style="display: {{ old('recipient_type') == 'module' ? 'block' : 'none' }};">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('select_module') }}:</label>
+                                <select name="module" id="moduleSelect"
+                                    class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm">
+                                    <option value="">{{ __db('select_module') }}</option>
+                                    @foreach($modules as $key => $label)
+                                        <option value="{{ $key }}" {{ old('module') == $key ? 'selected' : '' }}>{{ __db(strtolower(str_replace(' ', '_', $label))) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div id="usersSelectContainer"
+                                style="display: {{ old('recipient_type') == 'users' ? 'block' : 'none' }};">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('select_users') }}:</label>
+                                <select name="users[]" id="usersSelect" multiple
+                                    class="select2 w-full p-3 rounded-lg border border-gray-300 text-sm"
+                                    data-placeholder="{{ __db('select_users') }}">q
+                                    @foreach ($assignedUsers as $user)
+                                        <option value="{{ $user->id }}"
+                                            {{ in_array($user->id, old('users', [])) ? 'selected' : '' }}>
+                                            {{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('users')
+                                    <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="flex justify-between items-center mt-8">
@@ -108,18 +141,34 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            $('#usersSelect').on('select2:select', function(e) {
-                var selectedValue = e.params.data.id;
-                if (selectedValue === 'all') {
-                    $(this).val(['all']).trigger('change');
+            // Initialize all Select2 elements
+            $('#recipientTypeSelect').select2({
+                placeholder: "{{ __db('select_recipient_type') }}",
+                allowClear: true
+            });
+            
+            $('#moduleSelect').select2({
+                placeholder: "{{ __db('select_module') }}",
+                allowClear: true
+            });
+            
+            $('#usersSelect').select2({
+                placeholder: "{{ __db('select_users') }}",
+                allowClear: true
+            });
+
+            $('#recipientTypeSelect').on('change', function() {
+                var selectedType = $(this).val();
+
+                if (selectedType === 'module') {
+                    $('#moduleSelectContainer').show();
+                    $('#usersSelectContainer').hide();
+                } else if (selectedType === 'users') {
+                    $('#moduleSelectContainer').hide();
+                    $('#usersSelectContainer').show();
                 } else {
-                    var selectedValues = $(this).val();
-                    if (selectedValues && selectedValues.includes('all')) {
-                        var filteredValues = selectedValues.filter(function(value) {
-                            return value !== 'all';
-                        });
-                        $(this).val(filteredValues).trigger('change');
-                    }
+                    $('#moduleSelectContainer').hide();
+                    $('#usersSelectContainer').hide();
                 }
             });
         });

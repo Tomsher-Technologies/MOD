@@ -414,7 +414,17 @@ trait HandlesUpdateConfirmation
             'created_at' => $activity->created_at,
         ];
 
-        $users = \App\Models\User::all();
+        $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
+        
+        if (!$currentEventId) {
+            return;
+        }
+        
+        $users = \App\Models\EventUserRole::with('user')
+            ->where('event_id', $currentEventId)
+            ->get()
+            ->pluck('user')
+            ->unique('id');
 
         foreach ($users as $user) {
             $user->notify(new \App\Notifications\CommonNotification($notificationData));

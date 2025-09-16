@@ -1534,14 +1534,14 @@ class DelegationController extends Controller
             'arrival.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'arrival.flight_no' => 'nullable|string|max:255',
             'arrival.flight_name' => 'nullable|string|max:255',
-            'arrival.date_time' => 'nullable|date',
+            'arrival.date_time' => 'nullable|string',
+            'departure.date_time' => 'nullable|string',
             'arrival.status' => 'nullable|string|max:255',
             'arrival.comment' => 'nullable|string',
             'departure.mode' => 'nullable|string|in:flight,land,sea',
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
             'departure.flight_name' => 'nullable|string|max:255',
-            'departure.date_time' => 'nullable|date|after:arrival.date_time',
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
@@ -1555,12 +1555,27 @@ class DelegationController extends Controller
             'arrival.airport_id.exists' => __db('airport_id_exists'),
             'arrival.flight_no.max' => __db('flight_no_max', ['max' => 255]),
             'arrival.flight_name.max' => __db('flight_name_max', ['max' => 255]),
-            'arrival.date_time.date' => __db('date_time_date'),
             'departure.airport_id.exists' => __db('airport_id_exists'),
             'departure.flight_no.max' => __db('flight_no_max', ['max' => 255]),
             'departure.flight_name.max' => __db('flight_name_max', ['max' => 255]),
-            'departure.date_time.after' => __db('departure_date_after_arrival_date'),
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $arrivalDate = $request->input('arrival.date_time');
+            $departureDate = $request->input('departure.date_time');
+
+            if (!empty($arrivalDate) && !empty($departureDate)) {
+                $arrivalTimestamp = strtotime($arrivalDate);
+                $departureTimestamp = strtotime($departureDate);
+
+                if ($arrivalTimestamp === false || $departureTimestamp === false) {
+                    $validator->errors()->add('arrival.date_time', __db('invalid_date_format'));
+                    $validator->errors()->add('departure.date_time', __db('invalid_date_format'));
+                } elseif ($departureTimestamp <= $arrivalTimestamp) {
+                    $validator->errors()->add('departure.date_time', __db('departure_date_after_arrival_date'));
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json(['message' => 'The given data was invalid.', 'errors' => $validator->errors()], 422);
@@ -1586,7 +1601,6 @@ class DelegationController extends Controller
 
                 DB::commit();
 
-                // Log delegate creation activity
                 $this->logActivity(
                     module: 'Delegation',
                     submodule: 'delegate',
