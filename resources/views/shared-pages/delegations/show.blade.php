@@ -540,20 +540,46 @@
                                 </a>';
                         }
                     } else {
-                        $with =
-                            '<a href="' .
-                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
-                            '" class="!text-[#B68A35]">' .
-                            'Delegation ID : ' .
-                            e($row->interviewWithDelegation->code ?? '') .
-                            '</a>';
+                        $toMembers = $row->toMembers->where('type', 'to');
+                        if ($toMembers->count() > 0) {
+                            $delegateNames = $toMembers
+                                ->map(function ($member) use ($row) {
+                                    $delegate = $member->resolveMemberForInterview($row);
+                                    if ($delegate) {
+                                        if ($delegate instanceof \App\Models\Delegate) {
+                                            return '<span class="block">' . e($delegate->getTranslation('title') . '. ' . $delegate->getTranslation('name')) . '</span>';
+                                        } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
+                                            return '<span class="block">Other Member: ' . e($delegate->getTranslation('name')) . '</span>';
+                                        }
+                                    }
+                                    return '';
+                                })
+                                ->filter()
+                                ->implode('');
+                            
+                            if (!empty($delegateNames)) {
+                                $with = '<span class="!text-[#B68A35]">' . $delegateNames . '</span>';
+                            } else {
+                                $with =
+                                    '<a href="' .
+                                    route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                    '" class="!text-[#B68A35]">' .
+                                    'Delegation ID : ' .
+                                    e($row->interviewWithDelegation->code ?? '') .
+                                    '</a>';
+                            }
+                        } else {
+                            $with =
+                                '<a href="' .
+                                route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                '" class="!text-[#B68A35]">' .
+                                'Delegation ID : ' .
+                                e($row->interviewWithDelegation->code ?? '') .
+                                '</a>';
+                        }
                     }
 
-                    $names = $row->interviewMembers
-                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
-                        ->implode('');
-
-                    return $with . $names;
+                    return $with;
                 },
             ],
             ['label' => 'Status', 'render' => fn($row) => e(ucfirst($row->status->value))],
