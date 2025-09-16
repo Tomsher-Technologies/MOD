@@ -379,6 +379,7 @@
 
                         [
                             'label' => __db('room_number'),
+                            'class' => 'w-[100px]',
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
                                 if(can(['assign_accommodations', 'hotel_assign_accommodations'])){
