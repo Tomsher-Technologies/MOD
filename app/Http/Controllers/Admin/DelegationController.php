@@ -198,7 +198,6 @@ class DelegationController extends Controller
 
     public function interviewsIndex(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Interview::with([
@@ -206,9 +205,9 @@ class DelegationController extends Controller
             'delegation.country',
             'status',
             'interviewWithDelegation',
-            'fromMembers.fromDelegate',  // explicitly load fromDelegate
-            'toMembers.toDelegate',      // explicitly load toDelegate
-            'toMembers.otherMember',     // also load otherMember if needed for del_others type
+            'fromMembers.fromDelegate',
+            'toMembers.toDelegate',
+            'toMembers.otherMember',
         ])->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
             $delegationQuery->where('event_id', $currentEventId);
         });
@@ -306,7 +305,7 @@ class DelegationController extends Controller
         return view('admin.delegations.edit', compact('delegation'));
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         $delegation = Delegation::with([
             'invitationFrom',
@@ -345,6 +344,9 @@ class DelegationController extends Controller
             ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
             ->orderBy('hotel_name', 'asc')
             ->get();
+
+        $request->session()->put('interview_member_last_url', url()->full());
+
 
         return view('admin.delegations.show', compact('delegation', 'hotels'));
     }

@@ -1019,11 +1019,11 @@
                                         $with =
                                             '<a href="' .
                                             route('other-interview-members.show', [
-                                                'other_interview_member' => base64_encode($otherMemberId),
+                                                'other_interview_member' => base64_encode($row->other_member_id),
                                             ]) .
                                             '" class="!text-[#B68A35]">
                                     <span class="block">Other Member: ' .
-                                            e($otherMemberId) .
+                                            e($row->otherMember->getTranslation('name')) .
                                             '</span>
                                 </a>';
                                     }
@@ -1035,17 +1035,23 @@
                                                 $delegate = $member->resolveMemberForInterview($row);
                                                 if ($delegate) {
                                                     if ($delegate instanceof \App\Models\Delegate) {
-                                                        return '<span class="block">' .
+                                                        return '<a href="' . 
+                                                            route('delegations.show', $row->interviewWithDelegation->id ?? '') . 
+                                                            '" class="block !text-[#B68A35]">' .
                                                             e(
                                                                 $delegate->getTranslation('title') .
                                                                     '. ' .
                                                                     $delegate->getTranslation('name'),
                                                             ) .
-                                                            '</span>';
+                                                            '</a>';
                                                     } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
-                                                        return '<span class="block">Other Member: ' .
+                                                        return '<a href="' . 
+                                                            route('other-interview-members.show', [
+                                                                'other_interview_member' => base64_encode($delegate->id),
+                                                            ]) . 
+                                                            '" class="block !text-[#B68A35]">Other Member: ' .
                                                             e($delegate->getTranslation('name')) .
-                                                            '</span>';
+                                                            '</a>';
                                                     }
                                                 }
                                                 return '';
@@ -1054,7 +1060,7 @@
                                             ->implode('');
 
                                         if (!empty($delegateNames)) {
-                                            $with = '<span class="!text-[#B68A35]">' . $delegateNames . '</span>';
+                                            $with = $delegateNames;
                                         } else {
                                             $with =
                                                 '<a href="' .
