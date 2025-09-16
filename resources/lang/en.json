@@ -237,5 +237,6 @@
     "assign_confirm_text": "Are you sure you want to assign this member?",
     "yes_assign": "Yes, Assign",
     "unassign_confirm_text": "Are you sure you want to unassign this member?",
-    "yes_unassign": "Yes, Unassign"
+    "yes_unassign": "Yes, Unassign",
+    "unassign_confirm_text_accommodation": "Are you sure you want to unassign this accommodation?"
 }
