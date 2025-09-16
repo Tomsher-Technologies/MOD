@@ -79,7 +79,8 @@
                         : null;
                 @endphp
                 @if (!$colPermissions || can($colPermissions))
-                    <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]"
+                    <th scope="col"
+                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : "" }}"
                         data-column-key="{{ $column['key'] }}">
                         {{ $column['label'] }}
                     </th>
