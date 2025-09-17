@@ -277,17 +277,7 @@
                 @endphp
 
                 <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :enableColumnListBtn="true"
-                    :defaultVisibleKeys="[
-                        'sl_no',
-                        'continent',
-                        'team_head',
-                        'invitation_from',
-                        'escorts',
-                        'drivers',
-                        'invitation_status',
-                        'participation_status',
-                        'note',
-                    ]" :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
+                   :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
 
                 @if (isEscort() || isDriver() || isHotel())
                     <div class="mt-3 flex flex-wrap items-center gap-3">
