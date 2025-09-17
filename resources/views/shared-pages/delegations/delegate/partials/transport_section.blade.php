@@ -115,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
             inline: false,       
             todayButton: true,   
             hours24: true,       
-            mask: true,    
         });
     }
 });

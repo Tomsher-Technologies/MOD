@@ -63,10 +63,7 @@ class EscortController extends Controller
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
-                $q->where('delegations.id', $delegationId)
-                  ->where('delegation_escorts.status', 1);
-            });
+            $query->where('delegation_id', null);
         }
 
         if ($search = $request->input('search')) {
@@ -121,10 +118,10 @@ class EscortController extends Controller
 
         $escorts = $query->paginate($limit);
         $delegations = Delegation::where('event_id', $currentEventId)->get();
-        
+
         $titleEns = Escort::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
-        
+
         $assignmentDelegation = null;
         if ($delegationId && $assignmentMode === 'escort') {
             $assignmentDelegation = Delegation::find($delegationId);
@@ -419,6 +416,9 @@ class EscortController extends Controller
             ],
         ]);
 
+        $escort->delegation_id = $delegationId;
+        $escort->save();
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'assignment',
@@ -454,6 +454,8 @@ class EscortController extends Controller
             'status' => 0,
         ]);
 
+        $escort->delegation_id = null;
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'assignment',
@@ -482,8 +484,9 @@ class EscortController extends Controller
             }
 
             $escort->current_room_assignment_id = null;
-            $escort->save();
         }
+
+        $escort->save();
 
         return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
     }

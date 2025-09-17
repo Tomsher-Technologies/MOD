@@ -45,8 +45,9 @@
                                 </div>
                                 <div class="flex gap-2">
                                     <a href="{{ route('alerts.show', $alert) }}"
-                                        class="text-blue-600 hover:text-blue-800 text-sm">
-                                        {{ __db('view_details') }}
+                                        class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
+                                        
+                                        <span>{{ __db('view_details') }}</span>
                                     </a>
                                 </div>
                             </div>

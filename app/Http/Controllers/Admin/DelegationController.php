@@ -110,10 +110,18 @@ class DelegationController extends Controller
             'delegates',
             'escorts',
             'drivers'
-        ])->orderBy('id', 'desc');
+        ]);
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
+
+        $query->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->leftJoin('dropdown_options as participation_status_sort', 'delegations.participation_status_id', '=', 'participation_status_sort.id')
+            ->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('participation_status_sort.sort_order', 'asc')
+            ->select('delegations.*');
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -144,8 +152,6 @@ class DelegationController extends Controller
                     });
             });
         }
-
-
 
         if ($invitationFrom = $request->input('invitation_from')) {
             if (is_array($invitationFrom)) {
@@ -198,7 +204,6 @@ class DelegationController extends Controller
 
     public function interviewsIndex(Request $request)
     {
-        // Get current event ID from session or default event
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Interview::with([
@@ -206,9 +211,9 @@ class DelegationController extends Controller
             'delegation.country',
             'status',
             'interviewWithDelegation',
-            'fromMembers.fromDelegate',  // explicitly load fromDelegate
-            'toMembers.toDelegate',      // explicitly load toDelegate
-            'toMembers.otherMember',     // also load otherMember if needed for del_others type
+            'fromMembers.fromDelegate',
+            'toMembers.toDelegate',
+            'toMembers.otherMember',
         ])->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
             $delegationQuery->where('event_id', $currentEventId);
         });
@@ -306,7 +311,7 @@ class DelegationController extends Controller
         return view('admin.delegations.edit', compact('delegation'));
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
         $delegation = Delegation::with([
             'invitationFrom',
@@ -345,6 +350,9 @@ class DelegationController extends Controller
             ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
             ->orderBy('hotel_name', 'asc')
             ->get();
+
+        $request->session()->put('interview_member_last_url', url()->full());
+
 
         return view('admin.delegations.show', compact('delegation', 'hotels'));
     }
@@ -1514,8 +1522,8 @@ class DelegationController extends Controller
         $isEditMode = $delegate && $delegate->exists;
 
         $validator = Validator::make($request->all(), [
-            'title_en' => 'nullable|string',
-            'title_ar' => 'nullable|string',
+            'title_en' => 'nullable|string|required_without:title_ar',
+            'title_ar' => 'nullable|string|required_without:title_en',
             'name_en' => 'nullable|string|required_without:name_ar',
             'name_ar' => 'nullable|string|required_without:name_en',
             'designation_en' => 'nullable|string',
@@ -1532,17 +1540,19 @@ class DelegationController extends Controller
             'arrival.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'arrival.flight_no' => 'nullable|string|max:255',
             'arrival.flight_name' => 'nullable|string|max:255',
-            'arrival.date_time' => 'nullable|date',
+            'arrival.date_time' => 'nullable|string',
+            'departure.date_time' => 'nullable|string',
             'arrival.status' => 'nullable|string|max:255',
             'arrival.comment' => 'nullable|string',
             'departure.mode' => 'nullable|string|in:flight,land,sea',
             'departure.airport_id' => 'nullable|integer|exists:dropdown_options,id',
             'departure.flight_no' => 'nullable|string|max:255',
             'departure.flight_name' => 'nullable|string|max:255',
-            'departure.date_time' => 'nullable|date|after:arrival.date_time',
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
+            'title_en.required_without' => __db('either_english_title_or_arabic_title'),
+            'title_ar.required_without' => __db('either_english_title_or_arabic_title'),
             'name_en.required_without' => __db('either_english_name_or_arabic_name'),
             'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'gender_id.required' => __db('gender_id_required'),
@@ -1553,12 +1563,27 @@ class DelegationController extends Controller
             'arrival.airport_id.exists' => __db('airport_id_exists'),
             'arrival.flight_no.max' => __db('flight_no_max', ['max' => 255]),
             'arrival.flight_name.max' => __db('flight_name_max', ['max' => 255]),
-            'arrival.date_time.date' => __db('date_time_date'),
             'departure.airport_id.exists' => __db('airport_id_exists'),
             'departure.flight_no.max' => __db('flight_no_max', ['max' => 255]),
             'departure.flight_name.max' => __db('flight_name_max', ['max' => 255]),
-            'departure.date_time.after' => __db('departure_date_after_arrival_date'),
         ]);
+
+        $validator->after(function ($validator) use ($request) {
+            $arrivalDate = $request->input('arrival.date_time');
+            $departureDate = $request->input('departure.date_time');
+
+            if (!empty($arrivalDate) && !empty($departureDate)) {
+                $arrivalTimestamp = strtotime($arrivalDate);
+                $departureTimestamp = strtotime($departureDate);
+
+                if ($arrivalTimestamp === false || $departureTimestamp === false) {
+                    $validator->errors()->add('arrival.date_time', __db('invalid_date_format'));
+                    $validator->errors()->add('departure.date_time', __db('invalid_date_format'));
+                } elseif ($departureTimestamp <= $arrivalTimestamp) {
+                    $validator->errors()->add('departure.date_time', __db('departure_date_after_arrival_date'));
+                }
+            }
+        });
 
         if ($validator->fails()) {
             return response()->json(['message' => 'The given data was invalid.', 'errors' => $validator->errors()], 422);
@@ -1584,7 +1609,6 @@ class DelegationController extends Controller
 
                 DB::commit();
 
-                // Log delegate creation activity
                 $this->logActivity(
                     module: 'Delegation',
                     submodule: 'delegate',

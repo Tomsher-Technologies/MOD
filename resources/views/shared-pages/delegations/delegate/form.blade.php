@@ -39,25 +39,25 @@
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('title_en') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}" 
+                    <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('title_ar') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="title_ar" value="{{ old('title_ar', $delegate->title_ar) }}" 
+                    <input type="text" name="title_ar" value="{{ old('title_ar', $delegate->title_ar) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('name_en') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="name_en" value="{{ old('name_en', $delegate->name_en) }}" 
+                    <input type="text" name="name_en" value="{{ old('name_en', $delegate->name_en) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('name_ar') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="name_ar" value="{{ old('name_ar', $delegate->name_ar) }}" 
+                    <input type="text" name="name_ar" value="{{ old('name_ar', $delegate->name_ar) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
@@ -96,14 +96,14 @@
                             @if ($parentDelegate->id !== $delegate->id)
                                 <option value="{{ $parentDelegate->id }}"
                                     @if (old('parent_id', $delegate->parent_id) == $parentDelegate->id) selected @endif>
-                                    {{ $parentDelegate->name_en }}
+                                    {{ $parentDelegate?->getTranslation('title') . " " . $parentDelegate?->getTranslation('name') }}
                                 </option>
                             @endif
                         @endforeach
                     </select>
                 </div>
 
-                <div class="col-span-4">
+                <div class="col-span-4" id="relationship-field">
                     <label class="form-label">{{ __db('relationship') }}:</label>
                     <select name="relationship_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm">
@@ -215,6 +215,34 @@
 
             setupTransportModeToggle('arrival');
             setupTransportModeToggle('departure');
+
+
+            const parentSelect = document.querySelector('select[name="parent_id"]');
+            const relationshipField = document.getElementById('relationship-field');
+            const relationshipSelect = document.querySelector('select[name="relationship_id"]');
+
+            const toggleRelationshipField = () => {
+                const parentSelected = parentSelect.value !== '';
+
+                if (parentSelected) {
+                    relationshipField.style.display = '';
+                } else {
+                    relationshipField.style.display = 'none';
+                    relationshipSelect.value = '';
+                    if ($(relationshipSelect).hasClass('select2-hidden-accessible')) {
+                        $(relationshipSelect).val('').trigger('change');
+                    }
+                }
+            };
+
+            toggleRelationshipField();
+
+            parentSelect.addEventListener('change', toggleRelationshipField);
+
+            if (typeof $ !== 'undefined' && $.fn.select2) {
+                $(parentSelect).on('change', toggleRelationshipField);
+            }
+
         });
     </script>
 @endpush

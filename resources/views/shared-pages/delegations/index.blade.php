@@ -125,7 +125,7 @@
                                     ? $teamHeads
                                         ->map(
                                             fn($head) => e(
-                                                $head->getTranslation('title') . '. ' . $head->getTranslation('name'),
+                                                $head->getTranslation('title') . ' ' . $head->getTranslation('name'),
                                             ),
                                         )
                                         ->implode('<br>')
