@@ -53,7 +53,7 @@
                 ],
                 [
                     'label' => __db('title'),
-                    'render' => fn($row) => $row->title->value ?? '',
+                    'render' => fn($row) => $row?->getTranslation('title') ?? '',
                 ],
                 [
                     'label' => __db('name'),

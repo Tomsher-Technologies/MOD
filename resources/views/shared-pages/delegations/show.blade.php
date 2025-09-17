@@ -97,7 +97,7 @@
                                     : '';
                                 $name = $row->name_en;
                                 $title = $row->title_en;
-                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
+                                return $badge . '<div class="block">' . e($title . ' ' . $name) . '</div>';
                             },
                         ],
                         [
@@ -108,7 +108,7 @@
                                     : '';
                                 $name = $row->name_ar;
                                 $title = $row->title_ar;
-                                return $badge . '<div class="block">' . e($title . '. ' . $name) . '</div>';
+                                return $badge . '<div class="block">' . e($title . ' ' . $name) . '</div>';
                             },
                         ],
                         [
@@ -237,7 +237,7 @@
                                 return '<a href="' .
                                     $searchUrl .
                                     '" class="text-[#B68A35] hover:underline">' .
-                                    e($escort->getTranslation('title') . '. ' . $escort->getTranslation('name')) .
+                                    e($escort->getTranslation('title') . ' ' . $escort->getTranslation('name')) .
                                     '</a>';
                             },
                         ],
@@ -370,7 +370,7 @@
                                 return '<a href="' .
                                     $searchUrl .
                                     '" class="text-[#B68A35] hover:underline">' .
-                                    e($driverTitle . '. ' . $driverName) .
+                                    e($driverTitle . ' ' . $driverName) .
                                     '</a>';
                             },
                         ],
@@ -555,7 +555,7 @@
                                                 '" class="block !text-[#B68A35]">' .
                                                 e(
                                                     $delegate->getTranslation('title') .
-                                                        '. ' .
+                                                        ' ' .
                                                         $delegate->getTranslation('name'),
                                                 ) .
                                                 '</a>';
