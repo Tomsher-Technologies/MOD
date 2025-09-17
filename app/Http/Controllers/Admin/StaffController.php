@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
 use App\Models\EventUserRole;
+use App\Imports\UsersImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Hash;
 
 class StaffController extends Controller
@@ -266,5 +268,21 @@ class StaffController extends Controller
     public function show($id)
     {
         return redirect()->route('staffs.index');
+    }
+
+    public function showForm()
+    {
+        return view('admin.staffs.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        Excel::import(new UsersImport, $request->file('file'));
+
+        return back()->with('success', 'Users imported successfully!');
     }
 }

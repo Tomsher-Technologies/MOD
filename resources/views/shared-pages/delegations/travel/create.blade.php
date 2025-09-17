@@ -110,7 +110,7 @@
 
                 [
                     'label' => __db('title'),
-                    'render' => fn($row) => e($row->title->value ?? ''),
+                    'render' => fn($row) => e($row->getTranslation('title') ?? ''),
                 ],
                 [
                     'label' => __db('name'),
@@ -118,12 +118,12 @@
                         $badge = $row->team_head
                             ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                             : '';
-                        return $badge . '<div class="block">' . e($row->name_en ?? '-') . '</div>';
+                        return $badge . '<div class="block">' . e($row->getTranslation('name') ?? '-') . '</div>';
                     },
                 ],
                 [
                     'label' => __db('designation'),
-                    'render' => fn($row) => e($row->designation_en ?? ''),
+                    'render' => fn($row) => e($row->getTranslation('designation') ?? ''),
                 ],
                 [
                     'label' => __db('internal_ranking'),

@@ -1551,6 +1551,8 @@ class DelegationController extends Controller
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
+            'title_en.required_without' => __db('either_english_title_or_arabic_title'),
+            'title_ar.required_without' => __db('either_english_title_or_arabic_title'),
             'name_en.required_without' => __db('either_english_name_or_arabic_name'),
             'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'gender_id.required' => __db('gender_id_required'),

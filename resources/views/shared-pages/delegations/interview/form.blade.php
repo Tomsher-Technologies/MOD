@@ -69,9 +69,9 @@
                                         ' />';
                                 },
                             ],
-                            ['label' => __db('title'), 'render' => fn($row) => $row->title->value ?? ''],
-                            ['label' => __db('name'), 'render' => fn($row) => e($row->name_en ?? '-')],
-                            ['label' => __db('designation'), 'render' => fn($row) => $row->designation_en ?? ''],
+                            ['label' => __db('title'), 'render' => fn($row) => $row?->getTranslation('title') ?? ''],
+                            ['label' => __db('name'), 'render' => fn($row) => e($row->getTranslation('name') ?? '-')],
+                            ['label' => __db('designation'), 'render' => fn($row) => $row->getTranslation('designation') ?? ''],
                             [
                                 'label' => __db('internal_ranking'),
                                 'render' => fn($row) => $row->internalRanking->value ?? '',
@@ -311,8 +311,8 @@
         function toggleInterviewInput(el) {
             const delegationInput = document.getElementById('delegation-input');
             const otherInput = document.getElementById('other-input');
-            const membersBox = document.getElementById('membersbox'); // lowercase id
-            const statusBox = document.getElementById('statusbox'); // lowercase id
+            const membersBox = document.getElementById('membersbox'); 
+            const statusBox = document.getElementById('statusbox'); 
 
             if (el.value === 'delegation') {
                 delegationInput.classList.remove('hidden');
