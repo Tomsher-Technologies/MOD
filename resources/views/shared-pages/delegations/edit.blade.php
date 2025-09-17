@@ -495,20 +495,7 @@
                     $noDataMessage = __db('no_data_found');
                 @endphp
 
-                <x-reusable-table :data="$delegation->delegates" :defaultVisibleKeys="[
-                    'sl_no',
-                    'name_ar',
-                    'designation',
-                    'internal_ranking',
-                    'gender',
-                    'parent_id',
-                    'relationship',
-                    'badge_printed',
-                    'participation_status',
-                    'accommodation',
-                    'arrival_status',
-                    'action',
-                ]" table-id="delegatesTableEdit" :enableColumnListBtn="true"
+                <x-reusable-table :data="$delegation->delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true"
                     :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 @foreach ($delegation->delegates as $delegate)
