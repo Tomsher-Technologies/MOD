@@ -45,6 +45,9 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/staffs/destroy/{id}', [StaffController::class, 'destroy'])->name('staffs.destroy');
     Route::post('/staff/status', [StaffController::class, 'updateStatus'])->name('staff.status');
     Route::get('/get-roles-by-module/{module}', [StaffController::class, 'getByModule']);
+    Route::get('/staff/import', [StaffController::class, 'showForm'])->name('users.import.form');
+    Route::post('/staff/import', [StaffController::class, 'import'])->name('users.import');
+
 
     // Manage roles & permissions
     Route::resource('roles', RoleController::class);
