@@ -56,24 +56,118 @@
                             $module = $data['module'] ?? null;
                             $action = $data['action'] ?? null;
                             $delegationId = $data['delegation_id'] ?? null;
+                            $submoduleId = $data['submodule_id'] ?? null;
+                            
+                            $moduleName = null;
+                            $moduleCode = null;
+                            $moduleDetails = [];
+                            
+                            if (isset($data['changes'])) {
+                                if (isset($data['changes']['escort_name'])) {
+                                    $moduleName = $data['changes']['escort_name'];
+                                } elseif (isset($data['changes']['driver_name'])) {
+                                    $moduleName = $data['changes']['driver_name'];
+                                } elseif (isset($data['changes']['member_name'])) {
+                                    $moduleName = $data['changes']['member_name'];
+                                } elseif (isset($data['changes']['delegation_code'])) {
+                                    $moduleCode = $data['changes']['delegation_code'];
+                                } elseif (isset($data['changes']['code'])) {
+                                    $moduleCode = $data['changes']['code'];
+                                }
+                                
+                                foreach ($data['changes'] as $key => $value) {
+                                    if (in_array($key, ['escort_name', 'driver_name', 'member_name', 'delegation_code', 'code', 'title'])) {
+                                        continue;
+                                    }
+                                    
+                                    $displayValue = is_array($value) ? (isset($value['new']) ? $value['new'] : json_encode($value)) : $value;
+                                    if (!empty($displayValue) && $displayValue !== 'N/A') {
+                                        $moduleDetails[$key] = $displayValue;
+                                    }
+                                }
+                            }
+                            
                             $url = '#';
 
-                            if ($module && $delegationId) {
+                            if ($delegationId) {
+                                $url = route('delegations.show', $delegationId);
+                            } 
+                            elseif ($module && $submoduleId) {
                                 switch (strtolower($module)) {
                                     case 'escorts':
-                                        $url = route('escorts.index');
+                                        $url = route('escorts.edit', $submoduleId);
                                         break;
                                     case 'drivers':
-                                        $url = route('drivers.index');
+                                        $url = route('drivers.edit', $submoduleId);
                                         break;
-                                    case 'delegations':
-                                        $url = route('delegations.show', $delegationId);
+                                    default:
+                                        switch (strtolower($module)) {
+                                            case 'escorts':
+                                                $escortName = null;
+                                                if (isset($data['changes']['escort_name'])) {
+                                                    $escortName = $data['changes']['escort_name'];
+                                                } elseif (isset($data['changes']['member_name'])) {
+                                                    $escortName = $data['changes']['member_name'];
+                                                }
+                                                
+                                                if ($escortName) {
+                                                    $url = route('escorts.index', ['search' => $escortName]);
+                                                } else {
+                                                    $url = route('escorts.index');
+                                                }
+                                                break;
+                                            case 'drivers':
+                                                $driverName = null;
+                                                if (isset($data['changes']['driver_name'])) {
+                                                    $driverName = $data['changes']['driver_name'];
+                                                } elseif (isset($data['changes']['member_name'])) {
+                                                    $driverName = $data['changes']['member_name'];
+                                                }
+                                                
+                                                if ($driverName) {
+                                                    $url = route('drivers.index', ['search' => $driverName]);
+                                                } else {
+                                                    $url = route('drivers.index');
+                                                }
+                                                break;
+                                            default:
+                                                $url = '#';
+                                        }
+                                }
+                            }
+                            elseif ($module) {
+                                switch (strtolower($module)) {
+                                    case 'escorts':
+                                        $escortName = null;
+                                        if (isset($data['changes']['escort_name'])) {
+                                            $escortName = $data['changes']['escort_name'];
+                                        } elseif (isset($data['changes']['member_name'])) {
+                                            $escortName = $data['changes']['member_name'];
+                                        }
+                                        
+                                        if ($escortName) {
+                                            $url = route('escorts.index', ['search' => $escortName]);
+                                        } else {
+                                            $url = route('escorts.index');
+                                        }
+                                        break;
+                                    case 'drivers':
+                                        $driverName = null;
+                                        if (isset($data['changes']['driver_name'])) {
+                                            $driverName = $data['changes']['driver_name'];
+                                        } elseif (isset($data['changes']['member_name'])) {
+                                            $driverName = $data['changes']['member_name'];
+                                        }
+                                        
+                                        if ($driverName) {
+                                            $url = route('drivers.index', ['search' => $driverName]);
+                                        } else {
+                                            $url = route('drivers.index');
+                                        }
                                         break;
                                     default:
                                         $url = '#';
                                 }
-                            } elseif ($delegationId) {
-                                $url = route('delegations.show', $delegationId);
                             }
 
                             $changes = $data['changes'] ?? [];
@@ -89,7 +183,29 @@
                                             <h3 class="font-medium text-neutral-900">{{ $title ?: ($module ?? (getActiveLanguage() === 'ar' ? 'إشعار' : 'Notification')) }}</h3>
                                         </div>
                                         <p class="text-neutral-700 mb-2">{{ $message }}</p>
-                                                                                @if (!empty($changes) && is_array($changes))
+                                        
+                                        @if($moduleName || $moduleCode || !empty($moduleDetails))
+                                        <div class="text-sm text-neutral-600 bg-gray-50 p-2 rounded mb-2">
+                                            @if($moduleName)
+                                            <div class="font-medium">{{ __db('name') }}: {{ $moduleName }}</div>
+                                            @endif
+                                            @if($moduleCode)
+                                            <div class="font-medium">{{ __db('code') }}: {{ $moduleCode }}</div>
+                                            @endif
+                                            @if(!empty($moduleDetails))
+                                            <div class="mt-1">
+                                                @foreach($moduleDetails as $key => $value)
+                                                <div>
+                                                    <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span> 
+                                                    {{ is_array($value) ? json_encode($value) : $value }}
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                            @endif
+                                        </div>
+                                        @endif
+                                        
+                                        @if (!empty($changes) && is_array($changes))
                                         <div class="text-sm text-neutral-600">
                                             <ul class="list-disc list-inside">
                                                 @foreach ($changes as $field => $change)

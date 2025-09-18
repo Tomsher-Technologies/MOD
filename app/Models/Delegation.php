@@ -137,6 +137,11 @@ class Delegation extends Model
         return $this->delegates()->where('team_head', true)->first();
     }
 
+    public function getTeamHead()
+    {
+        return $this->delegates()->where('team_head', true)->first();
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class);

@@ -258,7 +258,7 @@
                     $delegates = $delegates ?? collect();
                 @endphp
 
-                <x-reusable-table :data="$delegates" :defaultVisibleKeys="['sl_no', 'title', 'name_ar', 'designation_ar', 'internal_ranking', 'gender', 'parent_id', 'relationship', 'badge_printed', 'participation_status', 'accommodation', 'arrival_status', 'action']" table-id="delegatesTableEdit" :enableColumnListBtn="true"
+                <x-reusable-table :data="$delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true"
                     :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 @foreach ($delegates as $delegate)

@@ -407,6 +407,7 @@ trait HandlesUpdateConfirmation
     {
         $notificationData = [
             'delegation_id' => $delegationId,
+            'submodule_id' => $activity->submodule_id ?? null,
             'message' => $activity->message,
             'module' => $module,
             'action' => $action,
