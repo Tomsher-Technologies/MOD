@@ -80,7 +80,7 @@
                 @endphp
                 @if (!$colPermissions || can($colPermissions))
                     <th scope="col"
-                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : "" }}"
+                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
                         data-column-key="{{ $column['key'] }}">
                         {{ $column['label'] }}
                     </th>
@@ -229,16 +229,11 @@
                             checkbox.checked = defaultVisibleTableKeys.includes(checkbox.value);
                         });
                     } else {
-                        const idCheckbox = Array.from(checkboxes).find(c => c.value === 'id');
-                        if (idCheckbox) {
-                            idCheckbox.checked = false;
-                            document.querySelectorAll(
-                                `#${tableId} th[data-column-key='id'], #${tableId} td[data-column-key='id']`
-                            ).forEach(el => {
-                                el.style.display = 'none';
-                            });
-                        }
+                        checkboxes.forEach(checkbox => {
+                            checkbox.checked = true;
+                        });
                     }
+
 
                     // Always show action columns
                     document.querySelectorAll(
