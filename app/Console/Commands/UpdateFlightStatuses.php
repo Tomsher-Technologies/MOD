@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\DelegateTransport;
+use App\Services\DelegationStatusService;
 use Carbon\Carbon;
 
 class UpdateFlightStatuses extends Command
@@ -27,20 +28,6 @@ class UpdateFlightStatuses extends Command
     {
         $this->info('Updating flight statuses...');
         
-        $arrivalStatusDropdown = \App\Models\Dropdown::where('code', 'arrival_status')->first();
-        
-        if (!$arrivalStatusDropdown) {
-            $this->error('Arrival status dropdown not found');
-            return;
-        }
-        
-        $arrivedStatus = $arrivalStatusDropdown->options()->where('value', 'Arrived')->first();
-            
-        if (!$arrivedStatus) {
-            $this->error('Arrived status not found in dropdown options');
-            return;
-        }
-        
         $passedArrivals = DelegateTransport::where('type', 'arrival')
             ->where('date_time', '<', Carbon::now())
             ->get();
@@ -48,36 +35,35 @@ class UpdateFlightStatuses extends Command
         $updatedCount = 0;
         
         foreach ($passedArrivals as $arrival) {
-            if ($arrival->status_id != $arrivedStatus->id) {
-                $arrival->update(['status_id' => $arrivedStatus->id]);
+            if ($arrival->status != 'arrived') {
+                $arrival->status = 'arrived';
+                $arrival->save();
                 $updatedCount++;
             }
         }
         
         $this->info("Updated {$updatedCount} arrival statuses to 'Arrived'");
         
-        $departureStatusDropdown = \App\Models\Dropdown::where('code', 'departure_status')->first();
-        
-        if ($departureStatusDropdown) {
-            $departedStatus = $departureStatusDropdown->options()->where('value', 'Departed')->first();
+        $passedDepartures = DelegateTransport::where('type', 'departure')
+            ->where('date_time', '<', Carbon::now())
+            ->get();
             
-            if ($departedStatus) {
-                $passedDepartures = DelegateTransport::where('type', 'departure')
-                    ->where('date_time', '<', Carbon::now())
-                    ->get();
-                    
-                $departedCount = 0;
-                
-                foreach ($passedDepartures as $departure) {
-                    if ($departure->status_id != $departedStatus->id) {
-                        $departure->update(['status_id' => $departedStatus->id]);
-                        $departedCount++;
-                    }
-                }
-                
-                $this->info("Updated {$departedCount} departure statuses to 'Departed'");
+        $departedCount = 0;
+        
+        foreach ($passedDepartures as $departure) {
+            if ($departure->status != 'departed') {
+                $departure->status = 'departed';
+                $departure->save();
+                $departedCount++;
             }
         }
+        
+        $this->info("Updated {$departedCount} departure statuses to 'Departed'");
+        
+        // Update delegation statuses based on updated delegate statuses
+        $this->info('Updating delegation statuses...');
+        $delegationService = new DelegationStatusService();
+        $delegationService->updateAllDelegationStatuses();
         
         $this->info('Flight status update completed.');
     }

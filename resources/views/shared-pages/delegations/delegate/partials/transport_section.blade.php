@@ -85,13 +85,14 @@
             <div>
                 <label class="form-label block mb-1 text-sm">{{ __db('status') }}:</label>
                 <select name="{{ $type }}[status]"
-                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm">
+                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm" disabled>
                     <option value="">{{ __db('select_status') }}</option>
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}" @if ($selectedStatus == $value) selected @endif>
                             {{ $label }}</option>
                     @endforeach
                 </select>
+                <div class="text-xs text-gray-500 mt-1">{{ __db('field_automatically_managed_by_system') }}</div>
             </div>
         </div>
     </div>

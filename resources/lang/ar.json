@@ -201,5 +201,6 @@
     "yes_assign": "نعم، قم بالتعيين",
     "unassign_confirm_text": "هل أنت متأكد أنك تريد إلغاء تعيين هذا العضو؟",
     "yes_unassign": "نعم، قم بإلغاء التعيين",
-    "either_english_title_or_arabic_title": "مطلوب إما العنوان باللغة الإنجليزية أو العنوان العربي"
+    "either_english_title_or_arabic_title": "مطلوب إما العنوان باللغة الإنجليزية أو العنوان العربي",
+    "field_automatically_managed_by_system": "تتم إدارة الحقل تلقائيًا بواسطة النظام"
 }

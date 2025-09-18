@@ -93,8 +93,9 @@
                     <label class="form-label">{{ __db('participation_status') }}: <span
                             class="text-red-600">*</span></label>
                     <select name="participation_status_id"
-                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled>{{ __('Select Participation Status') }}</option>
+                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        disabled>
+                        <option disabled>{{ __db('select') . ' ' . __db('participation_status') }}</option>
                         @foreach (getDropDown('participation_status')->options as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('participation_status_id', $delegation->participation_status_id) == $option->id ? 'selected' : '' }}>
@@ -102,6 +103,9 @@
                             </option>
                         @endforeach
                     </select>
+                    <div class="text-xs text-gray-500 mt-1">
+                        {{ __db('field_automatically_managed_by_system') }}
+                    </div>
                     @error('participation_status_id')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
@@ -1036,8 +1040,11 @@
                                                 $delegate = $member->resolveMemberForInterview($row);
                                                 if ($delegate) {
                                                     if ($delegate instanceof \App\Models\Delegate) {
-                                                        return '<a href="' . 
-                                                            route('delegations.show', $row->interviewWithDelegation->id ?? '') . 
+                                                        return '<a href="' .
+                                                            route(
+                                                                'delegations.show',
+                                                                $row->interviewWithDelegation->id ?? '',
+                                                            ) .
                                                             '" class="block !text-[#B68A35]">' .
                                                             e(
                                                                 $delegate->getTranslation('title') .
@@ -1046,10 +1053,12 @@
                                                             ) .
                                                             '</a>';
                                                     } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
-                                                        return '<a href="' . 
+                                                        return '<a href="' .
                                                             route('other-interview-members.show', [
-                                                                'other_interview_member' => base64_encode($delegate->id),
-                                                            ]) . 
+                                                                'other_interview_member' => base64_encode(
+                                                                    $delegate->id,
+                                                                ),
+                                                            ]) .
                                                             '" class="block !text-[#B68A35]">Other Member: ' .
                                                             e($delegate->getTranslation('name')) .
                                                             '</a>';

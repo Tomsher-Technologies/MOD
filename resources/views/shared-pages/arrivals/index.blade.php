@@ -4,7 +4,8 @@
             <div class="flex flex-col">
                 <input type="text" class="form-control date-range" id="date_range" name="date_range"
                     placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
-                    data-separator=" to " autocomplete="off" value="{{ request('date_range') ?? '' }}">
+                    data-separator=" to " autocomplete="off"
+                    value="{{ request('date_range') ?? now()->format('d-m-Y') . ' to ' . now()->format('d-m-Y') }}">
             </div>
             <div class="flex-1">
                 <div class="relative">
@@ -43,9 +44,7 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-
                 <div class="flex items-center justify-between mb-5">
-
                     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('arrivals') }}</h2>
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
@@ -53,15 +52,14 @@
                         <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
                     </div>
 
-
                     <a href="#" id="fullscreenToggleBtn"
                         class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
                         <span>{{ __db('go_fullscreen') }}</span>
                     </a>
-
                 </div>
 
                 <hr class=" border-neutral-200 h-5 ">
+
                 @php
 
                     $statusLabels = [
@@ -200,6 +198,7 @@
                     $rowClass = function ($row) use ($bgClass) {
                         $now = \Carbon\Carbon::now();
 
+
                         $statusName =
                             is_object($row['status']) && isset($row['status']->value)
                                 ? $row['status']->value
@@ -229,11 +228,12 @@
                     };
                 @endphp
 
-                <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table" :enableColumnListBtn="true"
-                    :data="$paginator ?? $arrivals" :row-class="$rowClass" />
+                <div>
+                    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table" :enableColumnListBtn="true"
+                        :data="$paginator" :row-class="$rowClass" />
+                </div>
 
                 <div class="mt-3 flex items-center flex-wrap gap-4">
-
                     <div class="flex items-center gap-2">
                         <div class="h-5 w-5 bg-[#fff] rounded border border-gray-300"></div>
                         <span class="text-gray-800 text-sm">{{ __db('Scheduled / No active status') }}</span>
@@ -248,24 +248,12 @@
                         <div class="h-5 w-5 bg-[#ffc5c5] rounded border"></div>
                         <span class="text-gray-800 text-sm">{{ __db('To be arrived (within 1 hour)') }}</span>
                     </div>
-
                 </div>
-                {{-- 
-                @if (isset($paginator))
-                    <div class="mt-4">
-                        {{ $paginator->links() }}
-                    </div>
-                @else
-                    <div class="mt-4">
-                        {{ $arrivals->links() }}
-                    </div>
-                @endif --}}
-
             </div>
         </div>
     </div>
-
 </div>
+
 
 <div x-data="{
     isArrivalEditModalOpen: false,
@@ -328,7 +316,8 @@
                     </div>
 
                     <div>
-                        <label class="form-label">{{ __db('date_time') }}: <span class="text-red-600">*</span></label>
+                        <label class="form-label">{{ __db('date_time') }}: <span
+                                class="text-red-600">*</span></label>
                         <input type="text" name="date_time" x-model="arrival.date_time" id="arrival_datetime"
                             class="p-3 rounded-lg w-full border text-sm datetimepicker-input">
                     </div>
@@ -462,7 +451,7 @@
                     <option value="">{{ __db('all_arrival_statuses') }}</option>
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}"
-                            {{ is_array(request('status')) && in_array($label, request('status')) ? 'selected' : '' }}>
+                            {{ is_array(request('status')) && in_array($value, request('status')) ? 'selected' : '' }}>
                             {{ $label }}
                         </option>
                     @endforeach
@@ -471,7 +460,7 @@
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('delegations.arrivalsIndex') }}"
-                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
         </div>
@@ -547,36 +536,7 @@
                 });
             }
 
-            const continentSelect = $("#continent");
-            const countrySelect = $("#country");
-
-            continentSelect.on("change", async function() {
-                const selectedContinent = $(this).val();
-
-                countrySelect.find('option[value!=""]').remove();
-
-                if (selectedContinent) {
-                    try {
-                        let response = await fetch(
-                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
-                        let countries = await response.json();
-
-                        countries.forEach(country => {
-                            let option = new Option(country.name, country.id, false, false);
-                            countrySelect.append(option);
-                        });
-
-                        countrySelect.trigger("change");
-                    } catch (error) {
-                        console.error("Error fetching countries:", error);
-                    }
-                }
-            });
-
-            const selectedContinent = continentSelect.val();
-            if (selectedContinent) {
-                continentSelect.trigger("change");
-            }
+            // Remove the duplicate continent/country selector code as it's handled by the select2 initialization above
         });
     </script>
 @endsection
