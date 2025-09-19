@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Session;
 class Delegation extends Model
 {
     use HasFactory;
+
+    const ASSIGNABLE_STATUS_CODES = ['2', '10']; 
+    const UNASSIGNABLE_STATUS_CODES = ['3', '9']; 
+
     protected $fillable = [
         'code',
         'updated_by',
@@ -156,12 +160,21 @@ class Delegation extends Model
 
     public function canAssignServices()
     {
-        $allowedStatusCodes = [2, 10];
-        return in_array($this->invitation_status_id, $allowedStatusCodes);
+        if (!$this->relationLoaded('invitationStatus')) {
+            $this->load('invitationStatus');
+        }
+
+        return $this->invitationStatus &&
+            in_array($this->invitationStatus->code, self::ASSIGNABLE_STATUS_CODES);
     }
+
     public function shouldUnassignServices()
     {
-        $unassignStatusCodes = [3, 9];
-        return in_array($this->invitation_status_id, $unassignStatusCodes);
+        if (!$this->relationLoaded('invitationStatus')) {
+            $this->load('invitationStatus');
+        }
+
+        return $this->invitationStatus &&
+            in_array($this->invitationStatus->code, self::UNASSIGNABLE_STATUS_CODES);
     }
 }
