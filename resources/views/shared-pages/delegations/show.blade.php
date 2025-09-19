@@ -759,7 +759,7 @@
             </div>
         </div>
     @endforeach
-    </div>
+@endsection
 
 @section('script')
     <script>

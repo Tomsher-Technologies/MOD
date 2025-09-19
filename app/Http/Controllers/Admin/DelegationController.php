@@ -959,7 +959,6 @@ class DelegationController extends Controller
             'participation_status_id.exists' => __db('participation_status_id_exists'),
         ]);
 
-        // Define relations with display labels for confirmation dialog
         $relationsToCompare = [
             'invitation_from_id' => [
                 'display_with' => [
@@ -1024,6 +1023,8 @@ class DelegationController extends Controller
                 $delegation->escorts()->updateExistingPivot($delegation->escorts->pluck('id')->toArray(), ['status' => 0]);
 
                 $delegation->drivers()->updateExistingPivot($delegation->drivers->pluck('id')->toArray(), ['status' => 0]);
+
+                 $delegation->interviews()->delete();
 
                 \App\Models\RoomAssignment::where('delegation_id', $delegation->id)->update(['active_status' => 0]);
             }

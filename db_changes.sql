@@ -616,3 +616,6 @@
 
 ALTER TABLE dropdown_options
 ADD COLUMN code VARCHAR(255) NULL AFTER value_ar;
+
+
+ALTER TABLE `interview_members` DROP FOREIGN KEY `interview_members_ibfk_3`; ALTER TABLE `interview_members` ADD CONSTRAINT `interview_members_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `interviews`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT; 
