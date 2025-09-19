@@ -25,6 +25,8 @@ class AccommodationController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+
     public function index(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
@@ -306,6 +308,10 @@ class AccommodationController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
 
+        $query->whereDoesntHave('participationStatus', function ($q) {
+            $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+        });
+
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
@@ -413,9 +419,15 @@ class AccommodationController extends Controller
             'hotel_id'        => 'required|integer',
             'room_type_id'    => 'nullable|integer',
             'room_number'     => 'nullable|string',
+            'delegation_id'   => 'required|integer',
         ]);
 
-        $model = "App\\Models\\" . $request->assignable_type;
+        $delegation = Delegation::find($request->delegation_id);
+        if (!$delegation || !$delegation->canAssignServices()) {
+            return response()->json(['success' => 4, 'message' => 'Hotel assignments can only be made for delegations with status Accepted or Accepted with Secretary.']);
+        }
+
+        $model = "App\Models\\" . $request->assignable_type;
         $user  = $model::findOrFail($request->assignable_id);
 
         $current = $user->roomAssignments()

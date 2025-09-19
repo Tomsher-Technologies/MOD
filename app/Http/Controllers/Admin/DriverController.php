@@ -15,6 +15,8 @@ class DriverController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -123,7 +125,11 @@ class DriverController extends Controller
 
         $drivers = $query->paginate($limit);
 
-        $delegations = Delegation::where('event_id', $currentEventId)->get();
+        $delegations = Delegation::where('event_id', $currentEventId)
+            ->whereDoesntHave('invitationStatus', function ($q) {
+                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            })
+            ->get();
         
         // Get unique values for filter dropdowns
         $titleEns = Driver::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
@@ -378,6 +384,11 @@ class DriverController extends Controller
 
         $delegationId = $request->delegation_id;
         $delegation = \App\Models\Delegation::find($delegationId);
+        
+        if (!$delegation->canAssignServices()) {
+            return back()->withErrors(['error' => ' Drivers can only be assigned to delegations with status Accepted or Accepted with Secretary.'])->withInput();
+        }
+
         $action = $request->action;
         $startDate = $request->start_date;
         $today = now()->toDateString();

@@ -41,6 +41,27 @@
                     $continentOptions = getDropDown('continents');
                     $invitationStatusOptions = getDropDown('invitation_status');
                     $participationStatusOptions = getDropDown('participation_status');
+
+                    $participationStatusDefaultOption = null;
+                    if ($participationStatusOptions && $participationStatusOptions->options) {
+                        $participationStatusDefaultOption = $participationStatusOptions->options->firstWhere(function (
+                            $option,
+                        ) {
+                            $originalValue = $option->getOriginal('value');
+                            $currentValue = $option->value; 
+
+                            return strtolower($originalValue) === 'not yet arrived' ||
+                                strtolower($currentValue) === 'not yet arrived' ||
+                                strtolower($originalValue) === 'لم يصل بعد' ||
+                                strtolower($currentValue) === 'لم يصل بعد';
+                        });
+                    }
+
+                    $selectedValue = old(
+                        'participation_status_id',
+                        request('participation_status_id', optional($participationStatusDefaultOption)->id),
+                    );
+
                 @endphp
 
                 <div class="col-span-3">
@@ -128,23 +149,41 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('participation_status') }}: <span
                             class="text-red-600">*</span></label>
-                    <select name="participation_status_id"
+
+                    <select name="participation_status_id" disabled
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option value="">{{ __db('select_participation_status') }}</option>
+
+                        @if ($participationStatusDefaultOption)
+                            <option value="{{ $participationStatusDefaultOption->id }}"
+                                {{ $selectedValue == $participationStatusDefaultOption->id ? 'selected' : '' }}>
+                                {{ $participationStatusDefaultOption->value }}
+                            </option>
+                        @else
+                            <option value="" {{ !$selectedValue ? 'selected' : '' }}>
+                                {{ __db('not_yet_arrived') }}
+                            </option>
+                        @endif
+
                         @if ($participationStatusOptions)
                             @foreach ($participationStatusOptions->options as $option)
-                                <option value="{{ $option->id }}"
-                                    {{ old('participation_status_id', request('participation_status_id')) == $option->id ? 'selected' : '' }}>
-                                    {{ $option->value }}
-                                </option>
+                                @if (!$participationStatusDefaultOption || $option->id != $participationStatusDefaultOption->id)
+                                    <option value="{{ $option->id }}"
+                                        {{ $selectedValue == $option->id ? 'selected' : '' }}>
+                                        {{ $option->value }}
+                                    </option>
+                                @endif
                             @endforeach
                         @endif
                     </select>
+
+                    <input type="hidden" name="participation_status_id"
+                        value="{{ $participationStatusDefaultOption->id ?? '' }}">
 
                     @error('participation_status_id')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
                 </div>
+
 
                 <div class="col-span-12 grid grid-cols-12 gap-5">
                     <div class="col-span-6">
@@ -328,7 +367,7 @@
                         <input type="hidden" :name="`delegates[${index}][tmp_id]`" :value="delegate.tmp_id" />
 
                         <div class="delegate-row border rounded p-4 grid grid-cols-12 gap-4 relative">
-                            
+
                             <!-- Title en -->
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('title') }}</label>
@@ -504,15 +543,18 @@
                                     <input type="checkbox" :id="`accommodation-${index}`"
                                         :name="`delegates[${index}][accommodation]`" value="1"
                                         class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                        x-model="delegate.accommodation" checked/>
+                                        x-model="delegate.accommodation" checked />
                                     <label :for="`accommodation-${index}`"
                                         class="text-sm text-gray-700">{{ __db('accommodation') }}</label>
                                 </div>
                                 <div class=" items-center ms-auto">
-                                    <button type="button" class="delete-row top-2 text-sm end-2 text-white hover:text-white-800 font-medium rounded-lg px-4 py-2 bg-red-600"  title="Remove delegate" @click="removeDelegate(index)" x-show="delegates.length > 0">{{ __db('delete') }}</button>
+                                    <button type="button"
+                                        class="delete-row top-2 text-sm end-2 text-white hover:text-white-800 font-medium rounded-lg px-4 py-2 bg-red-600"
+                                        title="Remove delegate" @click="removeDelegate(index)"
+                                        x-show="delegates.length > 0">{{ __db('delete') }}</button>
 
                                 </div>
-                                
+
                             </span>
                         </div>
                     </div>
@@ -580,7 +622,7 @@
                                 isSelected));
                         });
 
-                        countrySelect.trigger('change'); 
+                        countrySelect.trigger('change');
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });

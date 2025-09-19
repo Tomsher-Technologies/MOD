@@ -15,6 +15,8 @@ class EscortController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -117,7 +119,11 @@ class EscortController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         $escorts = $query->paginate($limit);
-        $delegations = Delegation::where('event_id', $currentEventId)->get();
+        $delegations = Delegation::where('event_id', $currentEventId)
+            ->whereDoesntHave('invitationStatus', function ($q) {
+                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            })
+            ->get();
 
         $titleEns = Escort::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
@@ -404,6 +410,10 @@ class EscortController extends Controller
 
         $delegationId = $request->delegation_id;
         $delegation = \App\Models\Delegation::find($delegationId);
+
+        if (!$delegation->canAssignServices()) {
+            return back()->withErrors(['error' => ' Escorts can only be assigned to delegations with status Accepted or Accepted with Secretary.'])->withInput();
+        }
 
         $escort->delegations()->update([
             'delegation_escorts.status' => 0,

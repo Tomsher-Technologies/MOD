@@ -1,4 +1,13 @@
 <div x-data="{ isAttachmentEditModalOpen: false }">
+
+    @if (!$delegation->canAssignServices())
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+            <p><strong>{{ __db('Note') }}:</strong> 
+                {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus->value }}"
+                {{ __db('cannot_assign_these_services') }}.</p>
+        </div>
+    @endif
+
     <x-back-btn title=""
         back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
 
@@ -21,7 +30,8 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_from') }}: <span class="text-red-600">*</span></label>
+                    <label class="form-label">{{ __db('invitation_from') }}: <span
+                            class="text-red-600">*</span></label>
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __db('select_invitation_from') }}</option>
@@ -89,23 +99,65 @@
                     @enderror
                 </div>
 
+
+                @php
+                    $participationStatusOptions = getDropDown('participation_status');
+                    $participationStatusDefaultOption = null;
+                    if ($participationStatusOptions && $participationStatusOptions->options) {
+                        $participationStatusDefaultOption = $participationStatusOptions->options->firstWhere(function (
+                            $option,
+                        ) {
+                            $originalValue = $option->getOriginal('value');
+                            $currentValue = $option->value;
+
+                            return strtolower($originalValue) === 'not yet arrived' ||
+                                strtolower($currentValue) === 'not yet arrived' ||
+                                strtolower($originalValue) === 'لم يصل بعد' ||
+                                strtolower($currentValue) === 'لم يصل بعد';
+                        });
+                    }
+
+                    $selectedValue = old(
+                        'participation_status_id',
+                        $delegation->participation_status_id ?? optional($participationStatusDefaultOption)->id,
+                    );
+
+                @endphp
+
+
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('participation_status') }}: <span
                             class="text-red-600">*</span></label>
-                    <select name="participation_status_id"
-                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        disabled>
-                        <option disabled>{{ __db('select') . ' ' . __db('participation_status') }}</option>
-                        @foreach (getDropDown('participation_status')->options as $option)
-                            <option value="{{ $option->id }}"
-                                {{ old('participation_status_id', $delegation->participation_status_id) == $option->id ? 'selected' : '' }}>
-                                {{ $option->value }}
+
+                    <select name="participation_status_id" disabled
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+
+                        @if ($participationStatusDefaultOption)
+                            <option value="{{ $participationStatusDefaultOption->id }}"
+                                {{ $selectedValue == $participationStatusDefaultOption->id ? 'selected' : '' }}>
+                                {{ $participationStatusDefaultOption->value }}
                             </option>
-                        @endforeach
+                        @else
+                            <option value="" {{ !$selectedValue ? 'selected' : '' }}>
+                                {{ __db('not_yet_arrived') }}
+                            </option>
+                        @endif
+
+                        @if ($participationStatusOptions)
+                            @foreach ($participationStatusOptions->options as $option)
+                                @if (!$participationStatusDefaultOption || $option->id != $participationStatusDefaultOption->id)
+                                    <option value="{{ $option->id }}"
+                                        {{ $selectedValue == $option->id ? 'selected' : '' }}>
+                                        {{ $option->value }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        @endif
                     </select>
-                    <div class="text-xs text-gray-500 mt-1">
-                        {{ __db('field_automatically_managed_by_system') }}
-                    </div>
+
+                    <input type="hidden" name="participation_status_id"
+                        value="{{ $participationStatusDefaultOption->id ?? '' }}">
+
                     @error('participation_status_id')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
@@ -499,8 +551,8 @@
                     $noDataMessage = __db('no_data_found');
                 @endphp
 
-                <x-reusable-table :data="$delegation->delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true"
-                    :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true" :columns="$columns"
+                    :no-data-message="__db('no_data_found')" />
 
                 @foreach ($delegation->delegates as $delegate)
                     <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
@@ -590,12 +642,14 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
-        <div class="flex items-center gap-3">
-            @directCanany(['add_escorts', 'escort_add_escorts'])
-                <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_escorts', 'escort_add_escorts'])
+                    <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
 
@@ -769,12 +823,14 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
 
-        <div class="flex items-center gap-3">
-            @directCanany(['add_drivers', 'driver_add_drivers'])
-                <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_drivers', 'driver_add_drivers'])
+                    <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
 
@@ -959,12 +1015,14 @@
     <hr class="mx-6 border-neutral-200 h-10">
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
-        <div class="flex items-center gap-3">
-            @directCanany(['add_interviews', 'delegate_edit_delegations'])
-                <a href="{{ route('delegations.addInterview', $delegation) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_interviews', 'delegate_edit_delegations'])
+                    <a href="{{ route('delegations.addInterview', $delegation) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">

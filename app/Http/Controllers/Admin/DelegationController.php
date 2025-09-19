@@ -34,6 +34,8 @@ class DelegationController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -115,6 +117,12 @@ class DelegationController extends Controller
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
+
+        if ($request->filter_services_assignable) {
+            $query->whereDoesntHave('invitationStatus', function ($q) {
+                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            });
+        }
 
         $query->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
             ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
@@ -400,7 +408,7 @@ class DelegationController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         $pastArrivals = $pastArrivalsQuery->orderBy('date_time', 'desc')->get();
-        
+
         $futureArrivals = $futureArrivalsQuery->orderBy('date_time', 'asc')->get();
 
         $groupedPastArrivals = $this->groupTransports($pastArrivals);
@@ -463,7 +471,7 @@ class DelegationController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         $pastDepartures = $pastDeparturesQuery->orderBy('date_time', 'desc')->get();
-        
+
         $futureDepartures = $futureDeparturesQuery->orderBy('date_time', 'asc')->get();
 
         $groupedPastDepartures = $this->groupTransports($pastDepartures);
@@ -621,10 +629,10 @@ class DelegationController extends Controller
         try {
             foreach ($transports as $t) {
                 $t->update($dataToSave);
-                
+
                 $service = new DelegationStatusService();
                 $service->updateTransportStatuses($t->delegate);
-                
+
                 $this->updateParticipationStatus($t->delegate);
             }
 
@@ -1004,9 +1012,16 @@ class DelegationController extends Controller
                 'note2' => $dataToSave['note2'] ?? null,
             ]);
 
+            if ($delegation->shouldUnassignServices()) {
+                $delegation->escorts()->updateExistingPivot($delegation->escorts->pluck('id')->toArray(), ['status' => 0]);
+
+                $delegation->drivers()->updateExistingPivot($delegation->drivers->pluck('id')->toArray(), ['status' => 0]);
+
+                \App\Models\RoomAssignment::where('delegation_id', $delegation->id)->update(['active_status' => 0]);
+            }
+
             DB::commit();
 
-            // Log delegation update activity if there were changes
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
@@ -1584,11 +1599,11 @@ class DelegationController extends Controller
 
                 $this->syncTransportInfo($newDelegate, $dataToProcess['arrival'] ?? null, 'arrival');
                 $this->syncTransportInfo($newDelegate, $dataToProcess['departure'] ?? null, 'departure');
-                
+
                 $service = new DelegationStatusService();
                 $service->updateTransportStatuses($newDelegate);
                 $this->updateParticipationStatus($newDelegate);
-                
+
                 $this->updateDelegationParticipationStatus($delegation);
 
                 DB::commit();
@@ -1718,11 +1733,11 @@ class DelegationController extends Controller
 
             $this->syncTransportInfo($delegate, $dataToSave['arrival'] ?? null, 'arrival');
             $this->syncTransportInfo($delegate, $dataToSave['departure'] ?? null, 'departure');
-            
+
             $service = new DelegationStatusService();
             $service->updateTransportStatuses($delegate);
             $this->updateParticipationStatus($delegate);
-            
+
             $this->updateDelegationParticipationStatus($delegation);
 
             DB::commit();
@@ -1790,7 +1805,7 @@ class DelegationController extends Controller
             }
 
             $delegate->delete();
-            
+
             $this->updateDelegationParticipationStatus($delegation);
 
             return redirect()
@@ -1869,6 +1884,8 @@ class DelegationController extends Controller
     {
         $query = Delegation::query();
 
+        $filterNonAssignableDeligations = true;
+
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $driverId = $request->input('driver_id');
@@ -1904,6 +1921,13 @@ class DelegationController extends Controller
                     ->where('delegation_escorts.status', 1);
             });
         }
+
+        if ($filterNonAssignableDeligations) {
+            $query->whereDoesntHave('invitationStatus', function ($q) {
+                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            });
+        }
+
 
         $delegations = $query->with('invitationFrom', 'country', 'continent')->get();
 
@@ -1977,24 +2001,19 @@ class DelegationController extends Controller
     protected function updateParticipationStatus(Delegate $delegate)
     {
         $service = new DelegationStatusService();
-        
-        // For new delegates, set default status
+
         if (!$delegate->exists) {
             $delegate->participation_status = 'to_be_arrived';
             $delegate->save();
-            
-            // Update delegation status based on all delegates
+
             $service->updateDelegationParticipationStatus($delegate->delegation);
             return;
         }
-        
-        // Update transport statuses based on current date/time
+
         $service->updateTransportStatuses($delegate);
-        
-        // Update delegate participation status
+
         $service->updateDelegateParticipationStatus($delegate);
-        
-        // Update delegation status based on all delegates
+
         $service->updateDelegationParticipationStatus($delegate->delegation);
     }
 

@@ -613,3 +613,6 @@
 -- ALTER TABLE `users` CHANGE `force_password` `force_password` TINYINT(1) NULL DEFAULT '0' COMMENT '1- force password change on first login';
 
 -- ALTER TABLE `delegates` CHANGE `name_en` `name_en` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL; -- DONE IN LIVE
+
+ALTER TABLE dropdown_options
+ADD COLUMN code VARCHAR(255) NULL AFTER value_ar;

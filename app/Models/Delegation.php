@@ -153,4 +153,15 @@ class Delegation extends Model
             ->where('module', 'Delegation')
             ->orderBy('created_at', 'desc');
     }
+
+    public function canAssignServices()
+    {
+        $allowedStatusCodes = [2, 10];
+        return in_array($this->invitation_status_id, $allowedStatusCodes);
+    }
+    public function shouldUnassignServices()
+    {
+        $unassignStatusCodes = [3, 9];
+        return in_array($this->invitation_status_id, $unassignStatusCodes);
+    }
 }

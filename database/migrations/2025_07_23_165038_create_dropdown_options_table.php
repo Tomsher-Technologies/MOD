@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('dropdown_id')->constrained()->onDelete('cascade');
             $table->string('value');
+            $table->string('value_ar')->nullable();
+            $table->string('code')->nullable();
             $table->integer('sort_order')->default(0);
             $table->boolean('status')->default(true);
             $table->timestamps();

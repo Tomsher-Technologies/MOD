@@ -1,4 +1,14 @@
-<div>
+@extends('layouts.admin_account', ['title' => __db('delegation_details')])
+
+@section('content')
+    @if (!$delegation->canAssignServices())
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+            <p><strong>{{ __db('Note') }}:</strong> {{ __db('delegation_cannot_assign_services') }}.
+                {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus->value }}"
+                {{ __db('cannot_assign_these_services') }}.</p>
+        </div>
+    @endif
+
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
         <h2 class="font-semibold text-2xl">{{ __db('delegation') }}</h2>
         <div class="flex gap-3 ms-auto">
@@ -189,12 +199,14 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
-        <div class="flex items-center gap-3">
-            @directCanany(['add_escorts', 'escort_add_escorts'])
-                <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_escorts', 'escort_add_escorts'])
+                    <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -318,12 +330,14 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
 
-        <div class="flex items-center gap-3">
-            @directCanany(['add_drivers', 'driver_add_drivers'])
-                <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_drivers', 'driver_add_drivers'])
+                    <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
 
@@ -661,8 +675,7 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <x-reusable-table :columns="$columns" table-id="attachmentsTable" :data="$data"
-                    :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" table-id="attachmentsTable" :data="$data" :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>
@@ -746,7 +759,7 @@
             </div>
         </div>
     @endforeach
-</div>
+    </div>
 
 @section('script')
     <script>

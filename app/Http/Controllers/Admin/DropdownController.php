@@ -50,74 +50,23 @@ class DropdownController extends Controller
         return view('admin.dropdowns.options', compact('dropdown', 'options'));
     }
 
-    public function countries()
-    {
-        // Get the Country dropdown (assuming it has code 'country')
-        $countryDropdown = Dropdown::where('code', 'country')->first();
-        $continentDropdown = Dropdown::where('code', 'continents')->first();
-        
-        if (!$countryDropdown) {
-            return redirect()->back()->with('error', 'Country dropdown not found');
-        }
-        
-        $query = $countryDropdown->options();
-        $continents = $continentDropdown ? $continentDropdown->options()->where('status', 1)->get() : collect();
-        
-        $countries = $query->paginate(20);
-        return view('admin.dropdowns.countries', compact('countries', 'continents'));
-    }
-
-    public function storeCountry(Request $request)
-    {
-        $request->validate([
-            'value' => 'required|string|max:255',
-            'value_ar' => 'nullable|string|max:255',
-        ]);
-
-        // Get the Country dropdown
-        $countryDropdown = Dropdown::where('code', 'country')->first();
-        
-        if (!$countryDropdown) {
-            return back()->with('error', 'Country dropdown not found');
-        }
-
-        // Check if country already exists
-        $existingCountry = DropdownOption::where('dropdown_id', $countryDropdown->id)
-            ->where('value', $request->value)
-            ->first();
-            
-        if ($existingCountry) {
-            return back()->with('error', 'Country already exists');
-        }
-
-        // Create the country option
-        $country = DropdownOption::create([
-            'dropdown_id' => $countryDropdown->id,
-            'value' => $request->value,
-            'value_ar' => $request->value_ar,
-            'sort_order' => 0, // You can modify this as needed
-            'status' => 1
-        ]);
-
-        return back()->with('success', 'Country added successfully');
-    }
-
     public function storeOption(Request $request)
     {
         $request->validate([
             'dropdown_id' => 'required|exists:dropdowns,id',
             'value' => 'required|string',
             'value_ar' => 'nullable|string',
+            'code' => 'nullable|string',
             'sort_order' => 'nullable|integer',
         ]);
 
-        DropdownOption::create($request->only('dropdown_id', 'value', 'value_ar', 'sort_order'));
+        DropdownOption::create($request->only('dropdown_id', 'value', 'value_ar', 'code', 'sort_order'));
         return back()->with('success', 'Option added successfully');
     }
 
     public function updateOption(Request $request, DropdownOption $option)
     {
-        $option->update($request->only('value', 'value_ar', 'sort_order', 'status'));
+        $option->update($request->only('value', 'value_ar', 'code', 'sort_order', 'status'));
         return back()->with('success', 'Option updated successfully');
     }
 
