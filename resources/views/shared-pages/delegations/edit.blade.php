@@ -3,7 +3,7 @@
     @if (!$delegation->canAssignServices())
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
             <p><strong>{{ __db('Note') }}:</strong> 
-                {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus->value }}"
+                {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus?->value }}"
                 {{ __db('cannot_assign_these_services') }}.</p>
         </div>
     @endif

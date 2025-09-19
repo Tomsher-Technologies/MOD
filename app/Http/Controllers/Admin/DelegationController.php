@@ -386,7 +386,9 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
+                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                });
             });
 
         $futureArrivalsQuery = DelegateTransport::where('type', 'arrival')
@@ -399,7 +401,9 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
+                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                });
             });
 
         $this->applyTransportFilters($pastArrivalsQuery, $request, $currentEventId);
@@ -449,7 +453,9 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
+                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                });
             });
 
         $futureDeparturesQuery = DelegateTransport::where('type', 'departure')
@@ -462,7 +468,9 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
+                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                });
             });
 
         $this->applyTransportFilters($pastDeparturesQuery, $request, $currentEventId);
