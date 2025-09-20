@@ -20,6 +20,18 @@
 
     </div>
 
+    <style>
+        .team-head-indicator {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
+    </style>
+
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
@@ -117,7 +129,6 @@
 
                                 return '
                                                  
-
                                                         <a href="' .
                                     $delegationUrl .
                                     '" class="font-medium !text-[#B68A35] hover:underline">
@@ -131,10 +142,18 @@
                         ],
                         [
                             'label' => __db('delegate_name'),
-                            'render' => fn($row) => $row->getTranslation('title') .
-                                '. ' .
-                                $row->getTranslation('name') ??
-                                '-',
+                            'render' => function ($row) {
+                                return $row->getTranslation('title') .
+                                    '. ' .
+                                    $row->getTranslation('name') ??
+                                    '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('user_type'),
+                            'render' => function ($row) {
+                                return $row->team_head ? __db('team_head') : __db('member');
+                            },
                         ],
 
                         [
@@ -173,11 +192,15 @@
                             'label' => __db('badge_printed'),
                             'render' => function ($row) {
                                 $checked = $row->badge_printed ? 'checked' : '';
+                                $teamHead = $row->team_head ? 'true' : 'false';
                                 return '
                                 <input type="checkbox" 
                                     data-delegate-id="' .
                                     $row->id .
                                     '" 
+                                    data-team-head="' .
+                                    $teamHead .
+                                    '"
                                     ' .
                                     $checked .
                                     '
@@ -191,9 +214,43 @@
                     ];
                 @endphp
 
+                @if (request('badge_printed') == '0')
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="select-all-checkbox"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            <label for="select-all-checkbox"
+                                class="ml-2 text-sm font-bold text-gray-700">{{ __db('select') }}
+                                {{ __db('all') }}</label>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- <div class="mb-4 text-sm">
+                    <span class="team-head-indicator">TH</span> = Team Head | 
+                    <span style="background-color: #fee2e2; padding: 2px 6px; border-radius: 4px;">Red background</span> = Team Head rows
+                </div> --}}
+
                 <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="badge-printed-delegates-table"
                     :enableColumnListBtn="true" :data="$delegates" />
 
+
+
+                <div class="mt-3 flex items-center flex-wrap gap-4">
+
+                    <div class="mt-3 flex items-center flex-wrap gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-[#fee2e2] rounded"></div>
+                            <span class="text-gray-800 text-sm">{{ __db('team_head') }}</span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <div class="h-5 w-5 bg-[#ffffff] rounded border border-gray-300"></div>
+                            <span class="text-gray-800 text-sm">{{ __db('members') }}</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="mt-4">
                     {{ $delegates->links() }}
                 </div>
@@ -267,12 +324,12 @@
                     </select>
                 </div>
 
-                  <div class="grid grid-cols-2 gap-4 mt-6">
-                <a href="{{ route('delegates.badgePrintedIndex') }}"
-                    class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
-                <button type="submit"
-                    class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
-            </div>
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <a href="{{ route('delegates.badgePrintedIndex') }}"
+                        class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
+                    <button type="submit"
+                        class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
+                </div>
             </form>
         </div>
     </div>
@@ -334,14 +391,43 @@
                 originalBadgePrintedStatus[delegateId] = checkbox.checked;
             });
 
-            const selectAllCheckbox = document.getElementById('select-all-checkbox');
-            if (selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('.delegate-checkbox');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
+            if ("{{ request('badge_printed') }}" == "0") {
+                const selectAllCheckbox = document.getElementById('select-all-checkbox');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', function() {
+                        const checkboxes = document.querySelectorAll('.delegate-checkbox');
+                        checkboxes.forEach(checkbox => {
+                            if ((this.checked && !checkbox.checked) || (!this.checked && checkbox
+                                    .checked)) {
+                                checkbox.checked = this.checked;
+                            }
+                        });
                     });
+                }
+            }
+
+            setTimeout(function() {
+                document.querySelectorAll('.delegate-checkbox').forEach(checkbox => {
+                    if (checkbox.hasAttribute('data-team-head') && checkbox.getAttribute(
+                            'data-team-head') === 'true') {
+                        const row = checkbox.closest('tr');
+                        if (row) {
+                            row.style.backgroundColor = '#fee2e2';
+                        }
+                    }
                 });
+            }, 100);
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.classList.contains('delegate-checkbox')) {
+                const allCheckboxes = document.querySelectorAll('.delegate-checkbox');
+                const selectAllCheckbox = document.getElementById('select-all-checkbox');
+
+                if (selectAllCheckbox) {
+                    const allChecked = Array.from(allCheckboxes).every(cb => cb.checked);
+                    selectAllCheckbox.checked = allChecked;
+                }
             }
         });
 

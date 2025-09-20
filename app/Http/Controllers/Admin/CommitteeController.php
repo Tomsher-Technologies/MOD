@@ -58,16 +58,16 @@ class CommitteeController extends Controller
 
         $committee_members = $query->paginate(15);
 
-        $designations = DropdownOption::whereHas('dropdown', fn($q) => $q->where('code', 'committee_designation'))->get();
-        $committees   = DropdownOption::whereHas('dropdown', fn($q) => $q->where('code', 'committee'))->get();
+        $designations = getDropdown('committee_designation')->options;
+        $committees   = getDropdown('committee')->options;
         $events = Event::orderBy('name_en')->get();
         return view('admin.committee.index', compact('designations','committees','committee_members','events'));
     }
 
     public function create()
     {
-        $designations = DropdownOption::whereHas('dropdown', fn($q) => $q->where('code', 'committee_designation'))->get();
-        $committees   = DropdownOption::whereHas('dropdown', fn($q) => $q->where('code', 'committee'))->get();
+        $designations = getDropdown('committee_designation')->options;
+        $committees   = getDropdown('committee')->options;
         $events = Event::orderBy('name_en')->get();
         return view('admin.committee.create', compact('designations','committees','events'));
     }
@@ -100,8 +100,8 @@ class CommitteeController extends Controller
 
     public function edit(CommitteeMember $committee)
     {
-        $designations = DropdownOption::whereHas('dropdown', fn($q) => $q->where('code', 'committee_designation'))->get();
-        $committees   = DropdownOption::whereHas('dropdown', fn($q) => $q->where('code', 'committee'))->get();
+        $designations = getDropdown('committee_designation')->options;
+        $committees   = getDropdown('committee')->options;
         $events = Event::orderBy('name_en')->get();
         return view('admin.committee.edit', compact('committee', 'events', 'designations', 'committees'));
     }

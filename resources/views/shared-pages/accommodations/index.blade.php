@@ -23,7 +23,7 @@
                             <a href="{{ route('accommodations.create') }}"
                                 class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') . ' ' . __db('manually') }}</a>
                         </li>
-                        @directCanany(['import_accommodations', 'hotel_import_accommodations'])
+                        @directCanany(['import_accommodations'])
                             <li>
                                 <a href="{{ route('accommodations.import.form') }}"
                                     class="block px-4 py-2 hover:bg-gray-100">{{ __db('add') . ' ' . __db('hotel') . ' ' . __db('bulk') }}</a>
