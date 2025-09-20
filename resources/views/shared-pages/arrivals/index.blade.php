@@ -382,7 +382,7 @@
                                 'to_be_arrived' => __db('to_be_arrived'),
                             ];
                         @endphp
-                        <select name="status" x-model="arrival.status"
+                        <select disabled name="status" x-model="arrival.status"
                             class="p-3 rounded-lg w-full border border-neutral-300 text-sm" required>
                             <option value="">{{ __db('select_status') }}</option>
                             @foreach ($arrivalStatuses as $value => $label)
@@ -390,6 +390,9 @@
                                     value="{{ $value }}">{{ $label }}</option>
                             @endforeach
                         </select>
+                        <div class="text-xs text-gray-500 mt-1">{{ __db('field_automatically_managed_by_system') }}
+                        </div>
+
                     </div>
                 </div>
 
