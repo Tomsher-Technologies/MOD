@@ -99,7 +99,7 @@ class DelegationController extends Controller
 
         // Badge Print Export
         $this->middleware('permission:badge_print_export', [
-            'only' => ['exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
+            'only' => ['badgePrintedIndex', 'exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
         ]);
     }
 

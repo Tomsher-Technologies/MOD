@@ -74,7 +74,7 @@
                 </li>
             @enddirectCanany
 
-            @directCanany(['edit_delegations', 'delegate_edit_delegations'])
+            @directCanany(['badge_print_export'])
                 <li>
                     <a href="{{ route('delegates.badgePrintedIndex') }}"
                         class="{{ areActiveRoutes(['delegates.badgePrintedIndex']) }}">

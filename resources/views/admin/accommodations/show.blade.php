@@ -231,10 +231,6 @@
                                 'render' => fn($row) => $row->assignable?->relationship?->value ?? '-',
                             ],
                             [
-                                'label' => __db('badge_printed'),
-                                'render' => fn($row) => $row->assignable?->badge_printed ? 'Yes' : 'No',
-                            ],
-                            [
                                 'label' => __db('participation_status'),
                                 'render' => function ($row) {
                                     return $row->assignable?->participation_status ?? '-';
