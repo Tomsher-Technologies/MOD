@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class DropdownOption extends Model
 {
-    protected $fillable = ['dropdown_id', 'value', 'value_ar', 'sort_order', 'status'];
+    protected $fillable = ['dropdown_id', 'value', 'value_ar', 'code', 'sort_order', 'status'];
 
     public function dropdown()
     {

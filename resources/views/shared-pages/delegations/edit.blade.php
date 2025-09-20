@@ -1,4 +1,13 @@
 <div x-data="{ isAttachmentEditModalOpen: false }">
+
+    @if (!$delegation->canAssignServices())
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+            <p><strong>{{ __db('Note') }}:</strong>
+                {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus?->value }}"
+                {{ __db('cannot_assign_these_services') }}.</p>
+        </div>
+    @endif
+
     <x-back-btn title=""
         back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
 
@@ -74,7 +83,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('invitation_status') }}: <span
                             class="text-red-600">*</span></label>
-                    <select name="invitation_status_id"
+                    <select name="invitation_status_id" id="invitation_status_select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Invitation Status') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $option)
@@ -89,19 +98,65 @@
                     @enderror
                 </div>
 
+
+                @php
+                    $participationStatusOptions = getDropDown('participation_status');
+                    $participationStatusDefaultOption = null;
+                    if ($participationStatusOptions && $participationStatusOptions->options) {
+                        $participationStatusDefaultOption = $participationStatusOptions->options->firstWhere(function (
+                            $option,
+                        ) {
+                            $originalValue = $option->getOriginal('value');
+                            $currentValue = $option->value;
+
+                            return strtolower($originalValue) === 'not yet arrived' ||
+                                strtolower($currentValue) === 'not yet arrived' ||
+                                strtolower($originalValue) === 'لم يصل بعد' ||
+                                strtolower($currentValue) === 'لم يصل بعد';
+                        });
+                    }
+
+                    $selectedValue = old(
+                        'participation_status_id',
+                        $delegation->participation_status_id ?? optional($participationStatusDefaultOption)->id,
+                    );
+
+                @endphp
+
+
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('participation_status') }}: <span
                             class="text-red-600">*</span></label>
-                    <select name="participation_status_id"
-                        class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled>{{ __('Select Participation Status') }}</option>
-                        @foreach (getDropDown('participation_status')->options as $option)
-                            <option value="{{ $option->id }}"
-                                {{ old('participation_status_id', $delegation->participation_status_id) == $option->id ? 'selected' : '' }}>
-                                {{ $option->value }}
+
+                    <select name="participation_status_id" disabled
+                        class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+
+                        @if ($participationStatusDefaultOption)
+                            <option value="{{ $participationStatusDefaultOption->id }}"
+                                {{ $selectedValue == $participationStatusDefaultOption->id ? 'selected' : '' }}>
+                                {{ $participationStatusDefaultOption->value }}
                             </option>
-                        @endforeach
+                        @else
+                            <option value="" {{ !$selectedValue ? 'selected' : '' }}>
+                                {{ __db('not_yet_arrived') }}
+                            </option>
+                        @endif
+
+                        @if ($participationStatusOptions)
+                            @foreach ($participationStatusOptions->options as $option)
+                                @if (!$participationStatusDefaultOption || $option->id != $participationStatusDefaultOption->id)
+                                    <option value="{{ $option->id }}"
+                                        {{ $selectedValue == $option->id ? 'selected' : '' }}>
+                                        {{ $option->value }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        @endif
                     </select>
+
+                    <input type="hidden" name="participation_status_id"
+                        value="{{ $participationStatusDefaultOption->id ?? '' }}">
+
                     @error('participation_status_id')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
@@ -133,7 +188,7 @@
                 </div>
 
                 @directCanany(['edit_delegations', 'delegate_edit_delegations'])
-                    <div class="col-span-12 mt-6">
+                    <div class="col-span-12 mt-6 flex gap-3">
                         <button type="submit"
                             class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition"
                             @click="window.hasUnsavedAttachments = false">
@@ -495,8 +550,8 @@
                     $noDataMessage = __db('no_data_found');
                 @endphp
 
-                <x-reusable-table :data="$delegation->delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true"
-                    :columns="$columns" :no-data-message="__db('no_data_found')" />
+                <x-reusable-table :data="$delegation->delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true" :columns="$columns"
+                    :no-data-message="__db('no_data_found')" />
 
                 @foreach ($delegation->delegates as $delegate)
                     <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
@@ -586,12 +641,14 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('escorts') }} ({{ $delegation->escorts->count() }})</h2>
 
-        <div class="flex items-center gap-3">
-            @directCanany(['add_escorts', 'escort_add_escorts'])
-                <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_escorts', 'escort_add_escorts'])
+                    <a href="{{ route('escorts.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'escort']) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('escorts') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
 
@@ -765,12 +822,14 @@
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('drivers') }} ({{ $delegation->drivers->count() }})</h2>
 
-        <div class="flex items-center gap-3">
-            @directCanany(['add_drivers', 'driver_add_drivers'])
-                <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_drivers', 'driver_add_drivers'])
+                    <a href="{{ route('drivers.index', ['delegation_id' => $delegation->id, 'assignment_mode' => 'driver']) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('drivers') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
 
@@ -955,12 +1014,14 @@
     <hr class="mx-6 border-neutral-200 h-10">
     <div class="flex items-center justify-between mt-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('interviews') }}</h2>
-        <div class="flex items-center gap-3">
-            @directCanany(['add_interviews', 'delegate_edit_delegations'])
-                <a href="{{ route('delegations.addInterview', $delegation) }}"
-                    class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
-            @enddirectCanany
-        </div>
+        @if ($delegation->canAssignServices())
+            <div class="flex items-center gap-3">
+                @directCanany(['add_interviews', 'delegate_edit_delegations'])
+                    <a href="{{ route('delegations.addInterview', $delegation) }}"
+                        class="bg-[#B68A35] text-white px-4 py-2 rounded-lg">{{ __db('add') . ' ' . __db('interview') }}</a>
+                @enddirectCanany
+            </div>
+        @endif
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
@@ -1023,8 +1084,11 @@
                                                 $delegate = $member->resolveMemberForInterview($row);
                                                 if ($delegate) {
                                                     if ($delegate instanceof \App\Models\Delegate) {
-                                                        return '<a href="' . 
-                                                            route('delegations.show', $row->interviewWithDelegation->id ?? '') . 
+                                                        return '<a href="' .
+                                                            route(
+                                                                'delegations.show',
+                                                                $row->interviewWithDelegation->id ?? '',
+                                                            ) .
                                                             '" class="block !text-[#B68A35]">' .
                                                             e(
                                                                 $delegate->getTranslation('title') .
@@ -1033,10 +1097,12 @@
                                                             ) .
                                                             '</a>';
                                                     } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
-                                                        return '<a href="' . 
+                                                        return '<a href="' .
                                                             route('other-interview-members.show', [
-                                                                'other_interview_member' => base64_encode($delegate->id),
-                                                            ]) . 
+                                                                'other_interview_member' => base64_encode(
+                                                                    $delegate->id,
+                                                                ),
+                                                            ]) .
                                                             '" class="block !text-[#B68A35]">Other Member: ' .
                                                             e($delegate->getTranslation('name')) .
                                                             '</a>';
@@ -1219,10 +1285,45 @@
 
 </div>
 
+@php
+    $invitationDropdowns = getDropDown('invitation_status');
+    $unassignableStatuses = $unassignableStatus;
+@endphp
+
 
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+            const invitationDropdowns = @json($invitationDropdowns);
+            const unassignableStatusCodes = @json($unassignableStatuses);
+
+            console.log("unassignableStatusCodes",unassignableStatusCodes);
+            
+            $('#invitation_status_select').on('change', function() {
+                let selectedValue = parseInt($(this).val(), 10);
+                const selectOptionSettings = invitationDropdowns?.options?.find((val) => val.id === selectedValue);
+
+                if (!selectOptionSettings) {
+                    console.log("No settings found for selected value:", selectedValue);
+                    return; 
+                }
+
+              const isUnassignable = unassignableStatusCodes.includes(Number(selectOptionSettings?.code));
+
+                  if (isUnassignable) {
+                Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This option will unassign all the services that have already been assigned to this delegation.",
+                        icon: 'warning',
+                        showCancelButton: false,
+                        confirmButtonColor: '#B68A35',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'I understand'
+                    })
+            }
+            });
+
             document.querySelectorAll('.edit-attachment-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const data = JSON.parse(btn.getAttribute('data-attachment'));
@@ -1327,6 +1428,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+
+
             document.querySelectorAll('.delete-attachment-form').forEach(function(form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -1501,5 +1605,52 @@
                 }
             });
         }
+        
+        // Handle delegation delete button
+        document.querySelectorAll('.delete-delegation-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const delegationId = this.getAttribute('data-delegation-id');
+                const delegationCode = this.getAttribute('data-delegation-code');
+                
+                Swal.fire({
+                    title: '{{ __db('are_you_sure') }}',
+                    text: "{{ __db('delete_delegation_confirm_msg') }} " + delegationCode + "?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ __db('yes_delete') }}',
+                    cancelButtonText: '{{ __db('cancel') }}',
+                    customClass: {
+                        popup: 'w-full max-w-2xl',
+                        confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                        cancelButton: 'px-4 rounded-lg'
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit delete form
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ url('/mod-admin/delegations') }}/' + delegationId;
+                        
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = '{{ csrf_token() }}';
+                        form.appendChild(tokenInput);
+                        
+                        const methodInput = document.createElement('input');
+                        methodInput.type = 'hidden';
+                        methodInput.name = '_method';
+                        methodInput.value = 'DELETE';
+                        form.appendChild(methodInput);
+                        
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
     </script>
 @endsection

@@ -36,6 +36,7 @@ class DropdownOptionImport implements ToModel, WithHeadingRow
         return new DropdownOption([
             'dropdown_id' => $dropdown->id,
             'value'       => $value,
+            'code'        => $row['option_code'] ?? null,
             'sort_order'  => $row['sort_order'] ?? 0,
             'status'      => $row['status'] ?? 1,
         ]);

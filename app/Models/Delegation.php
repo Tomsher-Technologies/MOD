@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Session;
 class Delegation extends Model
 {
     use HasFactory;
+
+    const ASSIGNABLE_STATUS_CODES = ['2', '10']; 
+    const UNASSIGNABLE_STATUS_CODES = ['3', '9']; 
+
     protected $fillable = [
         'code',
         'updated_by',
@@ -137,6 +141,11 @@ class Delegation extends Model
         return $this->delegates()->where('team_head', true)->first();
     }
 
+    public function getTeamHead()
+    {
+        return $this->delegates()->where('team_head', true)->first();
+    }
+
     public function event()
     {
         return $this->belongsTo(Event::class);
@@ -147,5 +156,25 @@ class Delegation extends Model
         return $this->hasMany(DelegationActivity::class, 'module_id')
             ->where('module', 'Delegation')
             ->orderBy('created_at', 'desc');
+    }
+
+    public function canAssignServices()
+    {
+        if (!$this->relationLoaded('invitationStatus')) {
+            $this->load('invitationStatus');
+        }
+
+        return $this->invitationStatus &&
+            in_array($this->invitationStatus->code, self::ASSIGNABLE_STATUS_CODES);
+    }
+
+    public function shouldUnassignServices()
+    {
+        if (!$this->relationLoaded('invitationStatus')) {
+            $this->load('invitationStatus');
+        }
+
+        return $this->invitationStatus &&
+            in_array($this->invitationStatus->code, self::UNASSIGNABLE_STATUS_CODES);
     }
 }
