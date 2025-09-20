@@ -2098,14 +2098,16 @@ class DelegationController extends Controller
             'delegation.country',
             'delegation.continent',
             'delegation.invitationFrom',
+            'delegation.invitationStatus'
         ])
-            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
-            })
-            // Join with delegation, country and invitation_from for ordering
-            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
-            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
-            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->leftJoin('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->leftJoin('dropdown_options as invitation_status', 'delegations.invitation_status_id', '=', 'invitation_status.id')
+            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+
+            ->where('delegations.event_id', $currentEventId)
+            ->whereIn('invitation_status.code', \App\Models\Delegation::ASSIGNABLE_STATUS_CODES)
+
             ->select('delegates.*');
 
         if ($searchKey = $request->input('search_key')) {
@@ -2113,11 +2115,10 @@ class DelegationController extends Controller
                 $q->where('delegates.name_en', 'like', "%{$searchKey}%")
                     ->orWhere('delegates.name_ar', 'like', "%{$searchKey}%")
                     ->orWhere('delegates.code', 'like', "%{$searchKey}%")
-                    ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
-                        $delegationQuery->where('code', 'like', "%{$searchKey}%");
-                    });
+                    ->orWhere('delegations.code', 'like', "%{$searchKey}%");
             });
         }
+
 
         $badgePrintedFilter = $request->input('badge_printed');
         if ($badgePrintedFilter !== null) {
@@ -2169,7 +2170,7 @@ class DelegationController extends Controller
         $delegates = $query->orderBy('country_sort.sort_order', 'asc')
             ->orderBy('invitation_from_sort.sort_order', 'asc')
             ->orderBy('delegations.id', 'asc')
-            ->orderBy('delegates.team_head', 'desc') 
+            ->orderBy('delegates.team_head', 'desc')
             ->orderBy('delegates.id', 'asc')
             ->paginate($limit);
 
@@ -2331,7 +2332,7 @@ class DelegationController extends Controller
         $delegates = $query->orderBy('country_sort.sort_order', 'asc')
             ->orderBy('invitation_from_sort.sort_order', 'asc')
             ->orderBy('delegations.id', 'asc')
-            ->orderBy('delegates.team_head', 'desc') 
+            ->orderBy('delegates.team_head', 'desc')
             ->orderBy('delegates.id', 'asc')
             ->get();
 
@@ -2408,7 +2409,7 @@ class DelegationController extends Controller
         $delegates = $query->orderBy('country_sort.sort_order', 'asc')
             ->orderBy('invitation_from_sort.sort_order', 'asc')
             ->orderBy('delegations.id', 'asc')
-            ->orderBy('delegates.team_head', 'desc') 
+            ->orderBy('delegates.team_head', 'desc')
             ->orderBy('delegates.id', 'asc')
             ->get();
 
