@@ -153,6 +153,16 @@
                                 'render' => fn($row, $key) => $key + 1,
                             ],
                             [
+                                'label' => __db('country'),
+                                'render' => fn($row) => e($row->delegation?->country->name ?? ''),
+                            ],
+
+                            [
+                                'label' => __db('invitation_from'),
+                                'render' => fn($row) => $row->delegation->invitationFrom->value ?? '-',
+                            ],
+
+                            [
                                 'label' => __db('delegation'),
                                 'render' => fn($row) => e($row->delegation?->code ?? ''),
                             ],
@@ -667,7 +677,7 @@
             </div>
         @enddirectCanany
     </div>
-    
+
 @endsection
 
 @section('style')
