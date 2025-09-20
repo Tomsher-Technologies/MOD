@@ -29,7 +29,7 @@ class EscortController extends Controller
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:import_escorts|escort_add_escorts', [
+        $this->middleware('permission:import_escorts', [
             'only' => ['showImportForm', 'import']
         ]);
 

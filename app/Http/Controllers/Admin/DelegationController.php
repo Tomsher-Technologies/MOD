@@ -50,7 +50,7 @@ class DelegationController extends Controller
             'only' => ['create', 'store', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:import_delegations|delegate_add_delegations', [
+        $this->middleware('permission:import_delegations', [
             'only' => ['showImportForm', 'import']
         ]);
 

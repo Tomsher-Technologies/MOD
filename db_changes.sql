@@ -614,8 +614,8 @@
 
 -- ALTER TABLE `delegates` CHANGE `name_en` `name_en` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL; -- DONE IN LIVE
 
-ALTER TABLE dropdown_options
-ADD COLUMN code VARCHAR(255) NULL AFTER value_ar;
+-- ALTER TABLE dropdown_options
+-- ADD COLUMN code VARCHAR(255) NULL AFTER value_ar;
 
 
-ALTER TABLE `interview_members` DROP FOREIGN KEY `interview_members_ibfk_3`; ALTER TABLE `interview_members` ADD CONSTRAINT `interview_members_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `interviews`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT; 
+-- ALTER TABLE `interview_members` DROP FOREIGN KEY `interview_members_ibfk_3`; ALTER TABLE `interview_members` ADD CONSTRAINT `interview_members_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `interviews`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT; 

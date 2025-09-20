@@ -1,12 +1,12 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
-        @canany(['import_drivers', 'driver_add_drivers'])
+        @directCanany(['import_drivers'])
             <a href="{{ route('drivers.import.form') }}"
                 class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
                 {{ __db('import') . ' ' . __db('driver') }}
             </a>
-        @endcanany
+        @enddirectCanany
     </div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
 
