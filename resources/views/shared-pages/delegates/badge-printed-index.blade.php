@@ -143,15 +143,16 @@
                         [
                             'label' => __db('delegate_name'),
                             'render' => function ($row) {
-                                $teamHeadIndicator = $row->team_head
-                                    ? '<span class="team-head-indicator">TH</span>'
-                                    : '';
                                 return $row->getTranslation('title') .
                                     '. ' .
-                                    $row->getTranslation('name') .
-                                    ' ' .
-                                    $teamHeadIndicator ??
+                                    $row->getTranslation('name') ??
                                     '-';
+                            },
+                        ],
+                        [
+                            'label' => __db('user_type'),
+                            'render' => function ($row) {
+                                return $row->team_head ? __db('team_head') : __db('member');
                             },
                         ],
 
