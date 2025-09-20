@@ -149,9 +149,8 @@ class EscortController extends Controller
     public function create()
     {
         $delegations = Delegation::all();
-        $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.escorts.create', compact('delegations', 'dropdowns'));
+        return view('admin.escorts.create', compact('delegations', ));
     }
 
     public function store(Request $request)
@@ -231,9 +230,8 @@ class EscortController extends Controller
     {
         $escort = Escort::findOrFail($id);
         $delegations = Delegation::all();
-        $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.escorts.edit', compact('escort', 'delegations', 'dropdowns'));
+        return view('admin.escorts.edit', compact('escort', 'delegations', ));
     }
 
     public function assignIndex(Request $request, Escort $escort)
@@ -518,18 +516,4 @@ class EscortController extends Controller
             ->with('success',  __db('escort') . __db('created_successfully'));
     }
 
-    protected function loadDropdownOptions()
-    {
-        $gender = Dropdown::with('options')->where('code', 'gender')->first();
-        $nationality = Dropdown::with('options')->where('code', 'nationality')->first();
-        $languages = Dropdown::with('options')->where('code', 'language')->first();
-        $ranks = Dropdown::with('options')->where('code', 'rank')->first();
-
-        return [
-            'genders' => $gender ? $gender->options : collect(),
-            'nationalities' => $nationality ? $nationality->options : collect(),
-            'languages' => $languages ? $languages->options : collect(),
-            'ranks' => $ranks ? $ranks->options : collect(),
-        ];
-    }
 }

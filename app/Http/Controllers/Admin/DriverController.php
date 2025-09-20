@@ -159,9 +159,8 @@ class DriverController extends Controller
     public function create()
     {
         $delegations = Delegation::all();
-        $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.drivers.create', compact('delegations', 'dropdowns'));
+        return view('admin.drivers.create', compact('delegations'));
     }
 
     public function store(Request $request)
@@ -230,9 +229,8 @@ class DriverController extends Controller
     {
         $driver = Driver::with('delegations')->findOrFail($id);
         $delegations = Delegation::all();
-        $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.drivers.edit', compact('driver', 'delegations', 'dropdowns'));
+        return view('admin.drivers.edit', compact('driver', 'delegations'));
     }
 
     public function assignIndex(Request $request, Driver $driver)
@@ -540,18 +538,5 @@ class DriverController extends Controller
             ->with('success',  __db('driver') . __db('created_successfully'));
     }
 
-    protected function loadDropdownOptions()
-    {
-        $gender = Dropdown::with('options')->where('code', 'gender')->first();
-        $nationality = Dropdown::with('options')->where('code', 'nationality')->first();
-        $languages = Dropdown::with('options')->where('code', 'language')->first();
-        $ranks = Dropdown::with('options')->where('code', 'rank')->first();
-
-        return [
-            'genders' => $gender ? $gender->options : collect(),
-            'nationalities' => $nationality ? $nationality->options : collect(),
-            'languages' => $languages ? $languages->options : collect(),
-            'ranks' => $ranks ? $ranks->options : collect(),
-        ];
-    }
+ 
 }

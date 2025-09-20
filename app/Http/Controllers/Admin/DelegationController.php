@@ -284,9 +284,7 @@ class DelegationController extends Controller
 
     public function create()
     {
-        $dropdowns = $this->loadDropdownOptions();
-
-        return view('admin.delegations.create', array_merge($dropdowns, [
+        return view('admin.delegations.create', array_merge( [
             'uniqueDelegateId' => '',
         ]));
     }
@@ -1972,27 +1970,6 @@ class DelegationController extends Controller
 
         return response()->json(['success' => true, 'members' => $members]);
     }
-
-    protected function loadDropdownOptions()
-    {
-        $invitationFrom = Dropdown::with('options')->where('code', 'departments')->first();
-        $continent = Dropdown::with('options')->where('code', 'continents')->first();
-        $country = Dropdown::with('options')->where('code', 'country')->first();
-        $invitationStatus = Dropdown::with('options')->where('code', 'invitation_status')->first();
-        $participationStatus = Dropdown::with('options')->where('code', 'participation_status')->first();
-        $gender = Dropdown::with('options')->where('code', 'gender')->first();
-
-        return [
-            'invitationFromOptions' => $invitationFrom ? $invitationFrom->options : collect(),
-            'continentOptions' => $continent ? $continent->options : collect(),
-            'countryOptions' => $country ? $country->options : collect(),
-            'invitationStatusOptions' => $invitationStatus ? $invitationStatus->options : collect(),
-            'participationStatusOptions' => $participationStatus ? $participationStatus->options : collect(),
-            'genderOptions' => $gender ? $gender->options : collect(),
-        ];
-    }
-
-
 
     private function syncTransportInfo(Delegate $delegate, ?array $transportData, string $type): void
     {

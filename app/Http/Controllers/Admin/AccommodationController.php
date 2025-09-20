@@ -50,7 +50,7 @@ class AccommodationController extends Controller
         $limit = $request->input('limit') ?? 10;
         $accommodations = $accommodations->latest()->paginate($limit);
 
-        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+        $roomTypes = getDropDown('room_type');
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
 
         return view('admin.accommodations.index', compact('accommodations', 'roomTypes'));
@@ -58,7 +58,7 @@ class AccommodationController extends Controller
 
     public function create()
     {
-        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+        $roomTypes = getDropDown('room_type');
 
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
 
@@ -127,7 +127,7 @@ class AccommodationController extends Controller
     {
         $accommodation = Accommodation::with(['rooms', 'contacts'])->findOrFail(base64_decode($id));
 
-        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+        $roomTypes = getDropDown('room_type');
 
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
 
