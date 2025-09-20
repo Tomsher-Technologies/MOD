@@ -2099,20 +2099,20 @@ class DelegationController extends Controller
             'delegation.continent',
             'delegation.invitationFrom',
         ])
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            })
+            // Join with delegation, country and invitation_from for ordering
             ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
-            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
-            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
-            ->where('delegations.event_id', $currentEventId)
-            ->orderBy('country_sort.sort_order', 'asc')
-            ->orderBy('invitation_from_sort.sort_order', 'asc')
-            ->select('delegates.*', 'country_sort.sort_order');
-
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
-                $q->where('name_en', 'like', "%{$searchKey}%")
-                    ->orWhere('name_ar', 'like', "%{$searchKey}%")
-                    ->orWhere('code', 'like', "%{$searchKey}%")
+                $q->where('delegates.name_en', 'like', "%{$searchKey}%")
+                    ->orWhere('delegates.name_ar', 'like', "%{$searchKey}%")
+                    ->orWhere('delegates.code', 'like', "%{$searchKey}%")
                     ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
                         $delegationQuery->where('code', 'like', "%{$searchKey}%");
                     });
@@ -2122,9 +2122,9 @@ class DelegationController extends Controller
         $badgePrintedFilter = $request->input('badge_printed');
         if ($badgePrintedFilter !== null) {
             if ($badgePrintedFilter == '1') {
-                $query->where('badge_printed', true);
+                $query->where('delegates.badge_printed', true);
             } elseif ($badgePrintedFilter == '0') {
-                $query->where('badge_printed', false);
+                $query->where('delegates.badge_printed', false);
             }
         }
 
@@ -2166,7 +2166,12 @@ class DelegationController extends Controller
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $delegates = $query->orderBy('id', 'desc')->paginate($limit);
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc') 
+            ->orderBy('delegates.id', 'asc')
+            ->paginate($limit);
 
         return view('admin.delegates.badge-printed-index', compact('delegates'));
     }
@@ -2200,7 +2205,7 @@ class DelegationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
 
-        $delegates = Delegate::with([
+        $query = Delegate::with([
             'delegation.country',
             'delegation.continent',
             'delegation.invitationFrom',
@@ -2209,6 +2214,52 @@ class DelegationController extends Controller
             ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
             })
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
+
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            if (is_array($invitation_from)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->whereIn('invitation_from_id', $invitation_from);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->where('invitation_from_id', $invitation_from);
+                });
+            }
+        }
+
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc')
+            ->orderBy('delegates.id', 'asc')
             ->get();
 
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
@@ -2226,18 +2277,63 @@ class DelegationController extends Controller
             ->where('badge_printed', true)
             ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
-            });
+            })
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
 
         $badgePrintedFilter = $request->input('badge_printed');
         if ($badgePrintedFilter !== null) {
             if ($badgePrintedFilter == '1') {
-                $query->where('badge_printed', true);
+                $query->where('delegates.badge_printed', true);
             } elseif ($badgePrintedFilter == '0') {
-                $query->where('badge_printed', false);
+                $query->where('delegates.badge_printed', false);
             }
         }
 
-        $delegates = $query->get();
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            if (is_array($invitation_from)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->whereIn('invitation_from_id', $invitation_from);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->where('invitation_from_id', $invitation_from);
+                });
+            }
+        }
+
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc') 
+            ->orderBy('delegates.id', 'asc')
+            ->get();
 
         $selectedDelegateIds = $request->input('delegate_ids');
         if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
@@ -2267,9 +2363,54 @@ class DelegationController extends Controller
             ->where('badge_printed', false)
             ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
-            });
+            })
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
 
-        $delegates = $query->get();
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            if (is_array($invitation_from)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->whereIn('invitation_from_id', $invitation_from);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->where('invitation_from_id', $invitation_from);
+                });
+            }
+        }
+
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc') 
+            ->orderBy('delegates.id', 'asc')
+            ->get();
 
         $selectedDelegateIds = $request->input('delegate_ids');
         if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
