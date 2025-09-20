@@ -35,7 +35,7 @@ class DelegationController extends Controller
     use HandlesUpdateConfirmation;
 
     const UNASSIGNABLE_STATUS_CODES = [3, 9];
-    const ASSIGNABLE_STATUS_CODES = [2, 10]; 
+    const ASSIGNABLE_STATUS_CODES = [2, 10];
 
     public function __construct()
     {
@@ -2099,9 +2099,14 @@ class DelegationController extends Controller
             'delegation.continent',
             'delegation.invitationFrom',
         ])
-            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
-            });
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->where('delegations.event_id', $currentEventId)
+            ->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->select('delegates.*', 'country_sort.sort_order');
+
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
