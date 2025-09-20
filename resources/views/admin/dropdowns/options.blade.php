@@ -72,6 +72,7 @@
                     <tr class="text-[13px]">
                         <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('code') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('sort_order') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('status') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('action') }}</th>
@@ -85,6 +86,7 @@
                                 {{ ($key+1) }}
                             </td>
                             <td class="px-4 py-3 text-black text-center">{{ $option->value }}</td>
+                            <td class="px-4 py-3 text-black text-center">{{ $option->code ?? '-' }}</td>
                             <td class="px-4 py-3 text-black text-center">{{ $option->sort_order }}</td>
                             <td class="px-4 py-3 text-center">
                                 @directCan('edit_dropdown_options')
@@ -123,20 +125,25 @@
                                         @csrf
                                         @method('PUT')
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }} ({{ __db('english') }})</label>
-                                            <input type="text" name="value" value="{{ $option->getRawOriginal('value') }}" required
-                                                class="w-full border border-gray-300 rounded p-2">
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }} ({{ __db('arabic') }})</label>
-                                            <input type="text" name="value_ar" value="{{ $option->value_ar }}"
-                                                class="w-full border border-gray-300 rounded p-2">
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
-                                            <input type="number" name="sort_order" value="{{ $option->sort_order ?? 0 }}"
-                                                class="w-full border border-gray-300 rounded p-2">
-                                        </div>
+                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }} ({{ __db('english') }})</label>
+                            <input type="text" name="value" value="{{ $option->getRawOriginal('value') }}" required
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }} ({{ __db('arabic') }})</label>
+                            <input type="text" name="value_ar" value="{{ $option->value_ar }}"
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('code') }}</label>
+                            <input type="text" name="code" value="{{ $option->code }}"
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
+                            <input type="number" name="sort_order" value="{{ $option->sort_order ?? 0 }}"
+                                class="w-full border border-gray-300 rounded p-2">
+                        </div>
                                         <div class="mb-4">
                                             <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
                                             <select name="status" class="w-full border border-gray-300 rounded p-2">
@@ -159,7 +166,7 @@
                         </tr>
                     @empty
                         <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
-                            <td class="px-4 py-3 text-center " colspan="5" dir="ltr">
+                            <td class="px-4 py-3 text-center " colspan="6" dir="ltr">
                                 {{ __db('no_data_found') }}
                             </td>
                         </tr>
@@ -188,6 +195,9 @@
 
                         <label class="block mb-2 font-medium">{{ __db('value') }} ({{ __db('arabic') }})</label>
                         <input type="text" name="value_ar" class="w-full border p-2 rounded mb-4">
+
+                        <label class="block mb-2 font-medium">{{ __db('code') }}</label>
+                        <input type="text" name="code" class="w-full border p-2 rounded mb-4">
 
                         <label class="block mb-2 font-medium">{{ __db('sort_order') }}</label>
                         <input type="number" name="sort_order" class="w-full border p-2 rounded mb-4" value="0">

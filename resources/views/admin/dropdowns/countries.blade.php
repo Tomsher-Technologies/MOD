@@ -133,6 +133,11 @@
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Code</label>
+                                            <input type="text" name="code" value="{{ $country->code }}"
+                                                class="w-full border border-gray-300 rounded p-2">
+                                        </div>
+                                        <div class="mb-4">
                                             <label class="block mb-2 text-sm font-medium text-gray-900 ">Sort Order</label>
                                             <input type="number" name="sort_order" value="{{ $country->sort_order ?? 0 }}"
                                                 class="w-full border border-gray-300 rounded p-2">
@@ -159,7 +164,7 @@
                         </tr>
                     @empty
                         <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
-                            <td class="px-4 py-3 text-center " colspan="6" dir="ltr">
+                            <td class="px-4 py-3 text-center " colspan="7" dir="ltr">
                                 No data found
                             </td>
                         </tr>
@@ -187,6 +192,9 @@
 
                         <label class="block mb-2 font-medium">Value (Arabic)</label>
                         <input type="text" name="value_ar" class="w-full border p-2 rounded mb-4">
+
+                        <label class="block mb-2 font-medium">Code</label>
+                        <input type="text" name="code" class="w-full border p-2 rounded mb-4">
 
                         <div class="text-right">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">

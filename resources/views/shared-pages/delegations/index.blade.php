@@ -2,12 +2,12 @@
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all_delegations') }}</h2>
 
-        @canany(['import_delegations', 'delegate_add_delegations'])
+        @directCanany(['import_delegations'])
             <a href="{{ route('delegations.import.form') }}"
                 class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
                 {{ __db('import') . ' ' . __db('delegations') }}
             </a>
-        @endcanany
+        @enddirectCanany
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
@@ -54,28 +54,26 @@
                             if ($hasEscortAssignments) {
                                 return 'bg-green-100';
                             } else {
-                                return ''; 
+                                return '';
                             }
-                        }
-                        elseif (isDriver()) {
+                        } elseif (isDriver()) {
                             $hasDriverAssignments = $delegation->drivers->where('pivot.status', 1)->isNotEmpty();
 
                             if ($hasDriverAssignments) {
                                 return 'bg-green-100';
                             } else {
-                                return ''; 
+                                return '';
                             }
-                        }
-                        elseif (isHotel()) {
+                        } elseif (isHotel()) {
                             $hasRoomAssignments =
                                 $delegation->delegates->where('accommodation', 1)->isNotEmpty() ||
                                 $delegation->escorts->where('pivot.status', 1)->isNotEmpty() ||
                                 $delegation->drivers->where('pivot.status', 1)->isNotEmpty();
 
                             if ($hasRoomAssignments) {
-                                return 'bg-green-100'; 
+                                return 'bg-green-100';
                             } else {
-                                return ''; 
+                                return '';
                             }
                         }
 
@@ -270,6 +268,21 @@
                                     </a>';
                                 }
 
+                                if (can(['delete_delegations', 'delegate_delete_delegations'])) {
+                                    $buttons .=
+                                        '<button type="button" title="' .
+                                        __db('delete') .
+                                        '" class="w-8 h-8 text-red-600 dark:text-red-400 rounded-full inline-flex items-center justify-center delete-delegation-btn" data-delegation-id="' .
+                                        $delegation->id .
+                                        '" data-delegation-code="' .
+                                        $delegation->code .
+                                        '">
+                                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
+                                        </svg>
+                                    </button>';
+                                }
+
                                 return $buttons;
                             },
                         ],
@@ -277,7 +290,7 @@
                 @endphp
 
                 <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :enableColumnListBtn="true"
-                   :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
+                    :columns="$columns" :no-data-message="__db('no_data_found')" :row-class="$rowClass" />
 
                 @if (isEscort() || isDriver() || isHotel())
                     <div class="mt-3 flex flex-wrap items-center gap-3">
@@ -470,6 +483,57 @@
                     }
 
                     noteModalContent.innerHTML = html;
+                });
+            });
+
+            document.querySelectorAll('.delete-delegation-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const delegationId = this.getAttribute('data-delegation-id');
+                    const delegationCode = this.getAttribute('data-delegation-code');
+
+                    const deletionMessage = "{{ __db('delete_delegation_confirm_msg') }}";
+
+                    const finalDeletionMessage = deletionMessage.replace('delegation_id',
+                        delegationCode);
+
+                    Swal.fire({
+                        title: '{{ __db('are_you_sure') }}',
+                        text: finalDeletionMessage + "?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '{{ __db('yes_delete') }}',
+                        cancelButtonText: '{{ __db('cancel') }}',
+                        customClass: {
+                            popup: 'w-full max-w-2xl',
+                            confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-red rounded-lg hover:bg-ref',
+                            cancelButton: 'px-4 rounded-lg'
+                        },
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '{{ url('/mod-admin/delegations') }}/' +
+                                delegationId;
+
+                            const tokenInput = document.createElement('input');
+                            tokenInput.type = 'hidden';
+                            tokenInput.name = '_token';
+                            tokenInput.value = '{{ csrf_token() }}';
+                            form.appendChild(tokenInput);
+
+                            const methodInput = document.createElement('input');
+                            methodInput.type = 'hidden';
+                            methodInput.name = '_method';
+                            methodInput.value = 'DELETE';
+                            form.appendChild(methodInput);
+
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    });
                 });
             });
 

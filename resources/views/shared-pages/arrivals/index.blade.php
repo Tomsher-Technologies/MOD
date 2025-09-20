@@ -4,7 +4,8 @@
             <div class="flex flex-col">
                 <input type="text" class="form-control date-range" id="date_range" name="date_range"
                     placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
-                    data-separator=" to " autocomplete="off" value="{{ request('date_range') ?? '' }}">
+                    data-separator=" to " autocomplete="off"
+                    value="{{ request('date_range') ?? now()->format('d-m-Y') . ' to ' . now()->format('d-m-Y') }}">
             </div>
             <div class="flex-1">
                 <div class="relative">
@@ -43,9 +44,7 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-
                 <div class="flex items-center justify-between mb-5">
-
                     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('arrivals') }}</h2>
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
@@ -53,15 +52,14 @@
                         <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
                     </div>
 
-
                     <a href="#" id="fullscreenToggleBtn"
                         class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
                         <span>{{ __db('go_fullscreen') }}</span>
                     </a>
-
                 </div>
 
                 <hr class=" border-neutral-200 h-5 ">
+
                 @php
 
                     $statusLabels = [
@@ -78,7 +76,21 @@
                         ],
                         [
                             'label' => __db('delegation'),
-                            'render' => fn($row) => $row['delegation']->code ?? '-',
+                            'render' => function ($row) {
+                                $delegationId = $row['delegation']->id ?? null;
+                                $delegationCode = $row['delegation']->code ?? '-';
+
+                                if ($delegationId && $delegationCode !== '-') {
+                                    $viewUrl = route('delegations.show', $delegationId);
+                                    return '<a href="' .
+                                        $viewUrl .
+                                        '" class="text-[#B68A35] hover:underline">' .
+                                        e($delegationCode) .
+                                        '</a>';
+                                }
+
+                                return $delegationCode;
+                            },
                         ],
                         [
                             'label' => __db('continent'),
@@ -112,17 +124,35 @@
                         [
                             'label' => __db('delegates'),
                             'render' => function ($row) {
-                                return collect($row['delegates'])
-                                    ->map(function ($delegate) {
+                                $delegation = $row['delegation'] ?? null;
+
+                                if ($delegation) {
+                                    $teamHead = $delegation->getTeamHead();
+                                    if ($teamHead) {
                                         return e(
-                                            $delegate->getTranslation('title') .
+                                            $teamHead->getTranslation('title') .
                                                 '. ' .
-                                                $delegate->getTranslation('name'),
+                                                $teamHead->getTranslation('name'),
                                         );
-                                    })
-                                    ->implode('<br>');
+                                    }
+                                }
+
+                                $delegates = $row['delegates'] ?? [];
+                                if (!empty($delegates)) {
+                                    $firstDelegate = collect($delegates)->first();
+                                    if ($firstDelegate) {
+                                        return e(
+                                            $firstDelegate->getTranslation('title') .
+                                                '. ' .
+                                                $firstDelegate->getTranslation('name'),
+                                        );
+                                    }
+                                }
+
+                                return '-';
                             },
                         ],
+
                         [
                             'label' => __db('escorts'),
                             'render' => function ($row) {
@@ -172,6 +202,7 @@
                                 }
 
                                 $firstTransport = $row['transports'][0];
+                                $delegationId = $row['delegation']->id ?? null;
 
                                 $arrivalData = [
                                     'ids' => $transportIds,
@@ -184,10 +215,30 @@
                                     'status' => $firstTransport->status,
                                 ];
                                 $json = htmlspecialchars(json_encode($arrivalData), ENT_QUOTES, 'UTF-8');
-                                return '<button type="button" class="edit-arrival-btn w-8 h-8  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center" data-arrival=\'' .
+
+                                $viewButton = '';
+                                if ($delegationId) {
+                                    $viewUrl = route('delegations.show', $delegationId);
+                                    $viewButton =
+                                        '<a href="' .
+                                        $viewUrl .
+                                        '" class="w-8 h-8 text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center" title="' .
+                                        __db('view_delegation') .
+                                        '">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B68A35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </a>';
+                                }
+
+                                $editButton =
+                                    '<button type="button" class="edit-arrival-btn w-8 h-8 text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center ml-1" data-arrival=\'' .
                                     $json .
                                     '\'><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 512 512\'><path d=\'M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z\' fill=\'#B68A35\'></path></svg>
                                 </button>';
+
+                                return $viewButton . $editButton;
                             },
                         ],
                     ];
@@ -229,11 +280,12 @@
                     };
                 @endphp
 
-                <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table" :enableColumnListBtn="true"
-                    :data="$paginator ?? $arrivals" :row-class="$rowClass" />
+                <div>
+                    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table" :enableColumnListBtn="true"
+                        :data="$paginator" :row-class="$rowClass" />
+                </div>
 
                 <div class="mt-3 flex items-center flex-wrap gap-4">
-
                     <div class="flex items-center gap-2">
                         <div class="h-5 w-5 bg-[#fff] rounded border border-gray-300"></div>
                         <span class="text-gray-800 text-sm">{{ __db('Scheduled / No active status') }}</span>
@@ -248,24 +300,12 @@
                         <div class="h-5 w-5 bg-[#ffc5c5] rounded border"></div>
                         <span class="text-gray-800 text-sm">{{ __db('To be arrived (within 1 hour)') }}</span>
                     </div>
-
                 </div>
-                {{-- 
-                @if (isset($paginator))
-                    <div class="mt-4">
-                        {{ $paginator->links() }}
-                    </div>
-                @else
-                    <div class="mt-4">
-                        {{ $arrivals->links() }}
-                    </div>
-                @endif --}}
-
             </div>
         </div>
     </div>
-
 </div>
+
 
 <div x-data="{
     isArrivalEditModalOpen: false,
@@ -328,7 +368,8 @@
                     </div>
 
                     <div>
-                        <label class="form-label">{{ __db('date_time') }}: <span class="text-red-600">*</span></label>
+                        <label class="form-label">{{ __db('date_time') }}: <span
+                                class="text-red-600">*</span></label>
                         <input type="text" name="date_time" x-model="arrival.date_time" id="arrival_datetime"
                             class="p-3 rounded-lg w-full border text-sm datetimepicker-input">
                     </div>
@@ -341,7 +382,7 @@
                                 'to_be_arrived' => __db('to_be_arrived'),
                             ];
                         @endphp
-                        <select name="status" x-model="arrival.status"
+                        <select disabled name="status" x-model="arrival.status"
                             class="p-3 rounded-lg w-full border border-neutral-300 text-sm" required>
                             <option value="">{{ __db('select_status') }}</option>
                             @foreach ($arrivalStatuses as $value => $label)
@@ -349,6 +390,9 @@
                                     value="{{ $value }}">{{ $label }}</option>
                             @endforeach
                         </select>
+                        <div class="text-xs text-gray-500 mt-1">{{ __db('field_automatically_managed_by_system') }}
+                        </div>
+
                     </div>
                 </div>
 
@@ -462,7 +506,7 @@
                     <option value="">{{ __db('all_arrival_statuses') }}</option>
                     @foreach ($statuses as $value => $label)
                         <option value="{{ $value }}"
-                            {{ is_array(request('status')) && in_array($label, request('status')) ? 'selected' : '' }}>
+                            {{ is_array(request('status')) && in_array($value, request('status')) ? 'selected' : '' }}>
                             {{ $label }}
                         </option>
                     @endforeach
@@ -471,7 +515,7 @@
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('delegations.arrivalsIndex') }}"
-                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
+                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
             <button type="submit"
                 class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
         </div>
@@ -547,36 +591,7 @@
                 });
             }
 
-            const continentSelect = $("#continent");
-            const countrySelect = $("#country");
-
-            continentSelect.on("change", async function() {
-                const selectedContinent = $(this).val();
-
-                countrySelect.find('option[value!=""]').remove();
-
-                if (selectedContinent) {
-                    try {
-                        let response = await fetch(
-                            `/mod-admin/get-countries?continent_ids=${selectedContinent}`);
-                        let countries = await response.json();
-
-                        countries.forEach(country => {
-                            let option = new Option(country.name, country.id, false, false);
-                            countrySelect.append(option);
-                        });
-
-                        countrySelect.trigger("change");
-                    } catch (error) {
-                        console.error("Error fetching countries:", error);
-                    }
-                }
-            });
-
-            const selectedContinent = continentSelect.val();
-            if (selectedContinent) {
-                continentSelect.trigger("change");
-            }
+            // Remove the duplicate continent/country selector code as it's handled by the select2 initialization above
         });
     </script>
 @endsection

@@ -13,6 +13,7 @@ use App\Models\Interview;
 use App\Models\InterviewMember;
 use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
+use App\Services\DelegationStatusService;
 use App\Exports\BadgePrintedDelegatesExport;
 use App\Exports\NonBadgePrintedDelegatesExport;
 use App\Exports\DelegationExport;
@@ -33,6 +34,9 @@ class DelegationController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+    const ASSIGNABLE_STATUS_CODES = [2, 10];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -46,7 +50,7 @@ class DelegationController extends Controller
             'only' => ['create', 'store', 'syncTransportInfo']
         ]);
 
-        $this->middleware('permission:import_delegations|delegate_add_delegations', [
+        $this->middleware('permission:import_delegations', [
             'only' => ['showImportForm', 'import']
         ]);
 
@@ -95,7 +99,7 @@ class DelegationController extends Controller
 
         // Badge Print Export
         $this->middleware('permission:badge_print_export', [
-            'only' => ['exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
+            'only' => ['badgePrintedIndex', 'exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
         ]);
     }
 
@@ -114,6 +118,12 @@ class DelegationController extends Controller
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
+
+        if ($request->filter_services_assignable) {
+            $query->whereDoesntHave('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+            });
+        }
 
         $query->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
             ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
@@ -274,9 +284,7 @@ class DelegationController extends Controller
 
     public function create()
     {
-        $dropdowns = $this->loadDropdownOptions();
-
-        return view('admin.delegations.create', array_merge($dropdowns, [
+        return view('admin.delegations.create', array_merge( [
             'uniqueDelegateId' => '',
         ]));
     }
@@ -308,7 +316,10 @@ class DelegationController extends Controller
         //     'delegation' => $delegation,
         // ]);
 
-        return view('admin.delegations.edit', compact('delegation'));
+        return view('admin.delegations.edit', [
+            'delegation' => $delegation,
+            'unassignableStatus' => self::UNASSIGNABLE_STATUS_CODES
+        ]);
     }
 
     public function show($id, Request $request)
@@ -360,8 +371,15 @@ class DelegationController extends Controller
     public function arrivalsIndex(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
+        $now = now();
 
-        $query = DelegateTransport::where('type', 'arrival')
+        if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
+            $today = now()->format('Y-m-d');
+            $request->merge(['date_range' => $today . ' - ' . $today]);
+        }
+
+        $pastArrivalsQuery = DelegateTransport::where('type', 'arrival')
+            ->where('date_time', '<', $now)
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -369,123 +387,66 @@ class DelegationController extends Controller
                 'delegate.delegation.drivers',
                 'airport',
                 'delegate.delegation.invitationFrom',
-                // 'status'
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                });
             });
 
-        if ($searchKey = $request->input('search_key')) {
-            $query->where(function ($q) use ($searchKey) {
-                $q->where('flight_no', 'like', "%{$searchKey}%")
-                    ->orWhere('flight_name', 'like', "%{$searchKey}%")
-                    ->orWhereHas('delegate', function ($delegateQuery) use ($searchKey) {
-                        $delegateQuery->where('name_en', 'like', "%{$searchKey}%")
-                            ->orWhere('name_ar', 'like', "%{$searchKey}%")
-                            ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
-                                $delegationQuery->where('code', 'like', "%{$searchKey}%");
-                            });
-                    });
+        $futureArrivalsQuery = DelegateTransport::where('type', 'arrival')
+            ->where('date_time', '>=', $now)
+            ->with([
+                'delegate.delegation.country',
+                'delegate.delegation.continent',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
+                'airport',
+                'delegate.delegation.invitationFrom',
+            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                });
             });
-        }
 
-        if ($eventId = $request->input('event_id')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($eventId) {
-                $delegationQuery->where('event_id', $eventId);
-            });
-        }
-
-        if ($dateRange = $request->input('date_range')) {
-            $dates = explode(' - ', $dateRange);
-
-            if (count($dates) === 2) {
-                $fromDate = trim($dates[0]);
-                $toDate   = trim($dates[1]);
-
-                $query->whereDate('date_time', '>=', $fromDate)
-                    ->whereDate('date_time', '<=', $toDate);
-            }
-        } else {
-            if ($fromDate = $request->input('from_date')) {
-                $query->whereDate('date_time', '>=', $fromDate);
-            }
-
-            if ($toDate = $request->input('to_date')) {
-                $query->whereDate('date_time', '<=', $toDate);
-            }
-        }
-
-        if ($invitation_from = $request->input('invitation_from')) {
-            $query->whereHas('delegate.delegation', function ($delegationQuery) use ($invitation_from) {
-                $delegationQuery->where('invitation_from_id', $invitation_from);
-            });
-        }
-
-
-        if ($continentIds = $request->input('continent_id')) {
-            if (is_array($continentIds)) {
-                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
-                    $delegationQuery->whereIn('continent_id', $continentIds);
-                });
-            } else {
-                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($continentIds) {
-                    $delegationQuery->where('continent_id', $continentIds);
-                });
-            }
-        }
-
-        if ($countryIds = $request->input('country_id')) {
-            if (is_array($countryIds)) {
-                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
-                    $delegationQuery->whereIn('country_id', $countryIds);
-                });
-            } else {
-                $query->whereHas('delegate.delegation', function ($delegationQuery) use ($countryIds) {
-                    $delegationQuery->where('country_id', $countryIds);
-                });
-            }
-        }
-
-        if ($airportIds = $request->input('airport_id')) {
-            if (is_array($airportIds)) {
-                $query->whereIn('airport_id', $airportIds);
-            } else {
-                $query->where('airport_id', $airportIds);
-            }
-        }
-
-        if ($statusIds = $request->input('status')) {
-            if (is_array($statusIds)) {
-                $query->whereIn('status', $statusIds);
-            } else {
-                $query->where('status', $statusIds);
-            }
-        }
-
+        $this->applyTransportFilters($pastArrivalsQuery, $request, $currentEventId);
+        $this->applyTransportFilters($futureArrivalsQuery, $request, $currentEventId);
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $allArrivals = $query->orderBy('date_time', 'desc')->get();
+        $pastArrivals = $pastArrivalsQuery->orderBy('date_time', 'desc')->get();
 
-        $groupedArrivals = $this->groupTransports($allArrivals);
+        $futureArrivals = $futureArrivalsQuery->orderBy('date_time', 'asc')->get();
+
+        $groupedPastArrivals = $this->groupTransports($pastArrivals);
+        $groupedFutureArrivals = $this->groupTransports($futureArrivals);
+
+        $allGroupedArrivals = array_merge($groupedFutureArrivals, $groupedPastArrivals);
 
         $currentPage = $request->input('page', 1);
 
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-            collect($groupedArrivals)->forPage($currentPage, $limit),
-            count($groupedArrivals),
+            collect($allGroupedArrivals)->forPage($currentPage, $limit),
+            count($allGroupedArrivals),
             $limit,
             $currentPage,
             ['path' => $request->url(), 'pageName' => 'page']
         );
 
-        return view('admin.arrivals.index', compact('paginator'));
+        return view('admin.arrivals.index', compact('paginator', 'allGroupedArrivals'));
     }
 
     public function departuresIndex(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
+        $now = now();
 
-        $query = DelegateTransport::where('type', 'departure')
+        if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
+            $today = now()->format('Y-m-d');
+            $request->merge(['date_range' => $today . ' - ' . $today]);
+        }
+
+        $pastDeparturesQuery = DelegateTransport::where('type', 'departure')
+            ->where('date_time', '<', $now)
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -493,11 +454,56 @@ class DelegationController extends Controller
                 'delegate.delegation.drivers',
                 'airport',
                 'delegate.delegation.invitationFrom',
-                // 'status'
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                });
             });
 
+        $futureDeparturesQuery = DelegateTransport::where('type', 'departure')
+            ->where('date_time', '>=', $now)
+            ->with([
+                'delegate.delegation.country',
+                'delegate.delegation.continent',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
+                'airport',
+                'delegate.delegation.invitationFrom',
+            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                });
+            });
+
+        $this->applyTransportFilters($pastDeparturesQuery, $request, $currentEventId);
+        $this->applyTransportFilters($futureDeparturesQuery, $request, $currentEventId);
+
+        $limit = $request->limit ? $request->limit : 20;
+
+        $pastDepartures = $pastDeparturesQuery->orderBy('date_time', 'desc')->get();
+
+        $futureDepartures = $futureDeparturesQuery->orderBy('date_time', 'asc')->get();
+
+        $groupedPastDepartures = $this->groupTransports($pastDepartures);
+        $groupedFutureDepartures = $this->groupTransports($futureDepartures);
+
+        $allGroupedDepartures = array_merge($groupedFutureDepartures, $groupedPastDepartures);
+
+        $currentPage = $request->input('page', 1);
+
+        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+            collect($allGroupedDepartures)->forPage($currentPage, $limit),
+            count($allGroupedDepartures),
+            $limit,
+            $currentPage,
+            ['path' => $request->url(), 'pageName' => 'page']
+        );
+
+        return view('admin.departures.index', compact('paginator', 'allGroupedDepartures'));
+    }
+
+    protected function applyTransportFilters($query, $request, $currentEventId)
+    {
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
                 $q->where('flight_no', 'like', "%{$searchKey}%")
@@ -583,23 +589,6 @@ class DelegationController extends Controller
                 $query->where('status', $statusIds);
             }
         }
-
-        $limit = $request->limit ? $request->limit : 20;
-
-        $allDepartures = $query->orderBy('date_time', 'desc')->get();
-
-        $groupedDepartures = $this->groupTransports($allDepartures);
-
-        $currentPage = $request->input('page', 1);
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-            collect($groupedDepartures)->forPage($currentPage, $limit),
-            count($groupedDepartures),
-            $limit,
-            $currentPage,
-            ['path' => $request->url(), 'pageName' => 'page']
-        );
-
-        return view('admin.departures.index', compact('paginator'));
     }
 
     public function updateTravel(Request $request, DelegateTransport $transport)
@@ -650,7 +639,15 @@ class DelegationController extends Controller
         try {
             foreach ($transports as $t) {
                 $t->update($dataToSave);
+
+                $service = new DelegationStatusService();
+                $service->updateTransportStatuses($t->delegate);
+
                 $this->updateParticipationStatus($t->delegate);
+            }
+
+            if ($transports->isNotEmpty()) {
+                $this->updateDelegationParticipationStatus($transports->first()->delegate->delegation);
             }
 
             if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
@@ -665,7 +662,7 @@ class DelegationController extends Controller
                 }
             }
 
-            return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => $transport->type == 'arrival' ? route('delegations.arrivalsIndex') : route('delegations.departuresIndex')]);
+            return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => route('delegations.edit', $transports->first()->delegate->delegation_id ?? $transport->delegate->delegation_id)]);
         } catch (\Throwable $e) {
             Log::error('Travel update failed: ' . $e->getMessage(), [
                 'user_id' => auth()->id(),
@@ -918,6 +915,8 @@ class DelegationController extends Controller
                 delegationId: $delegation->id
             );
 
+            // if()
+
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
             } elseif ($request->has('submit_add_interview')) {
@@ -964,7 +963,6 @@ class DelegationController extends Controller
             'participation_status_id.exists' => __db('participation_status_id_exists'),
         ]);
 
-        // Define relations with display labels for confirmation dialog
         $relationsToCompare = [
             'invitation_from_id' => [
                 'display_with' => [
@@ -1025,9 +1023,18 @@ class DelegationController extends Controller
                 'note2' => $dataToSave['note2'] ?? null,
             ]);
 
+            if ($delegation->shouldUnassignServices()) {
+                $delegation->escorts()->updateExistingPivot($delegation->escorts->pluck('id')->toArray(), ['status' => 0]);
+
+                $delegation->drivers()->updateExistingPivot($delegation->drivers->pluck('id')->toArray(), ['status' => 0]);
+
+                $delegation->interviews()->delete();
+
+                \App\Models\RoomAssignment::where('delegation_id', $delegation->id)->update(['active_status' => 0]);
+            }
+
             DB::commit();
 
-            // Log delegation update activity if there were changes
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
@@ -1280,7 +1287,7 @@ class DelegationController extends Controller
 
 
             if ($request->has('submit_exit')) {
-                return redirect()->route('delegations.index')->with('success', __db('travel') . " " . __db("created_successfully"));
+                return redirect()->route('delegations.edit', ['id' => $delegation->id])->with('success', __db('travel') . " " . __db("created_successfully"));
             } elseif ($request->has('submit_add_departure')) {
                 return redirect()->route('delegations.addTravel', ['id' => $delegation->id, 'showDeparture' => '1']);
             } elseif ($request->has('submit_add_arrival')) {
@@ -1605,7 +1612,12 @@ class DelegationController extends Controller
 
                 $this->syncTransportInfo($newDelegate, $dataToProcess['arrival'] ?? null, 'arrival');
                 $this->syncTransportInfo($newDelegate, $dataToProcess['departure'] ?? null, 'departure');
+
+                $service = new DelegationStatusService();
+                $service->updateTransportStatuses($newDelegate);
                 $this->updateParticipationStatus($newDelegate);
+
+                $this->updateDelegationParticipationStatus($delegation);
 
                 DB::commit();
 
@@ -1734,7 +1746,12 @@ class DelegationController extends Controller
 
             $this->syncTransportInfo($delegate, $dataToSave['arrival'] ?? null, 'arrival');
             $this->syncTransportInfo($delegate, $dataToSave['departure'] ?? null, 'departure');
+
+            $service = new DelegationStatusService();
+            $service->updateTransportStatuses($delegate);
             $this->updateParticipationStatus($delegate);
+
+            $this->updateDelegationParticipationStatus($delegation);
 
             DB::commit();
 
@@ -1802,6 +1819,8 @@ class DelegationController extends Controller
 
             $delegate->delete();
 
+            $this->updateDelegationParticipationStatus($delegation);
+
             return redirect()
                 ->route('delegations.edit', $delegation->id)
                 ->with('success', 'Delegate has been deleted successfully.');
@@ -1817,7 +1836,6 @@ class DelegationController extends Controller
         try {
             $delegationId = $interview->delegation_id;
 
-            // Log interview deletion activity before deletion
             $this->logActivity(
                 module: 'Delegation',
                 submodule: 'interview',
@@ -1830,14 +1848,12 @@ class DelegationController extends Controller
             $interview->interviewMembers()->delete();
             $interview->delete();
 
-            // Always go to the delegation show route after delete
             return redirect()
                 ->route('delegations.show', $delegationId)
                 ->with('success', 'Interview deleted successfully.');
         } catch (\Exception $e) {
             Log::error('Interview Delete Failed: ' . $e->getMessage());
 
-            // Still redirect to delegation page on failure
             return redirect()
                 ->route('delegations.show', $interview->delegation_id)
                 ->with('error', 'Failed to delete interview.');
@@ -1881,6 +1897,8 @@ class DelegationController extends Controller
     {
         $query = Delegation::query();
 
+        $filterNonAssignableDeligations = true;
+
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $driverId = $request->input('driver_id');
@@ -1917,6 +1935,13 @@ class DelegationController extends Controller
             });
         }
 
+        if ($filterNonAssignableDeligations) {
+            $query->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+            });
+        }
+
+
         $delegations = $query->with('invitationFrom', 'country', 'continent')->get();
 
         return response()->json([
@@ -1946,27 +1971,6 @@ class DelegationController extends Controller
         return response()->json(['success' => true, 'members' => $members]);
     }
 
-    protected function loadDropdownOptions()
-    {
-        $invitationFrom = Dropdown::with('options')->where('code', 'departments')->first();
-        $continent = Dropdown::with('options')->where('code', 'continents')->first();
-        $country = Dropdown::with('options')->where('code', 'country')->first();
-        $invitationStatus = Dropdown::with('options')->where('code', 'invitation_status')->first();
-        $participationStatus = Dropdown::with('options')->where('code', 'participation_status')->first();
-        $gender = Dropdown::with('options')->where('code', 'gender')->first();
-
-        return [
-            'invitationFromOptions' => $invitationFrom ? $invitationFrom->options : collect(),
-            'continentOptions' => $continent ? $continent->options : collect(),
-            'countryOptions' => $country ? $country->options : collect(),
-            'invitationStatusOptions' => $invitationStatus ? $invitationStatus->options : collect(),
-            'participationStatusOptions' => $participationStatus ? $participationStatus->options : collect(),
-            'genderOptions' => $gender ? $gender->options : collect(),
-        ];
-    }
-
-
-
     private function syncTransportInfo(Delegate $delegate, ?array $transportData, string $type): void
     {
         if (empty($transportData) || (empty($transportData['date_time']) || empty($transportData['mode']))) {
@@ -1988,34 +1992,29 @@ class DelegationController extends Controller
 
     protected function updateParticipationStatus(Delegate $delegate)
     {
+        $service = new DelegationStatusService();
+
         if (!$delegate->exists) {
             $delegate->participation_status = 'to_be_arrived';
             $delegate->save();
+
+            $service->updateDelegationParticipationStatus($delegate->delegation);
             return;
         }
 
-        $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->latest('date_time')->first();
-        $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->latest('date_time')->first();
+        $service->updateTransportStatuses($delegate);
 
-        $newStatus = $delegate->participation_status ?? 'to_be_arrived';
+        $service->updateDelegateParticipationStatus($delegate);
 
-        if ($departureTransport && $departureTransport->status) {
-            if ($departureTransport->status === 'to_be_departed' || $departureTransport->status === 'departed') {
-                $newStatus = $departureTransport->status;
-            } elseif ($arrivalTransport && $arrivalTransport->status) {
-                $newStatus = $arrivalTransport->status;
-            }
-        } elseif ($arrivalTransport && $arrivalTransport->status) {
-            $newStatus = $arrivalTransport->status;
-        } else {
-            $newStatus = 'to_be_arrived';
-        }
-
-        if ($delegate->participation_status !== $newStatus) {
-            $delegate->participation_status = $newStatus;
-            $delegate->save();
-        }
+        $service->updateDelegationParticipationStatus($delegate->delegation);
     }
+
+    protected function updateDelegationParticipationStatus(Delegation $delegation)
+    {
+        $service = new DelegationStatusService();
+        $service->updateDelegationParticipationStatus($delegation);
+    }
+
 
     private function groupTransports($transports)
     {
@@ -2076,28 +2075,34 @@ class DelegationController extends Controller
             'delegation.country',
             'delegation.continent',
             'delegation.invitationFrom',
+            'delegation.invitationStatus'
         ])
-            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId);
-            });
+            ->leftJoin('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->leftJoin('dropdown_options as invitation_status', 'delegations.invitation_status_id', '=', 'invitation_status.id')
+            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+
+            ->where('delegations.event_id', $currentEventId)
+            ->whereIn('invitation_status.code', \App\Models\Delegation::ASSIGNABLE_STATUS_CODES)
+
+            ->select('delegates.*');
 
         if ($searchKey = $request->input('search_key')) {
             $query->where(function ($q) use ($searchKey) {
-                $q->where('name_en', 'like', "%{$searchKey}%")
-                    ->orWhere('name_ar', 'like', "%{$searchKey}%")
-                    ->orWhere('code', 'like', "%{$searchKey}%")
-                    ->orWhereHas('delegation', function ($delegationQuery) use ($searchKey) {
-                        $delegationQuery->where('code', 'like', "%{$searchKey}%");
-                    });
+                $q->where('delegates.name_en', 'like', "%{$searchKey}%")
+                    ->orWhere('delegates.name_ar', 'like', "%{$searchKey}%")
+                    ->orWhere('delegates.code', 'like', "%{$searchKey}%")
+                    ->orWhere('delegations.code', 'like', "%{$searchKey}%");
             });
         }
+
 
         $badgePrintedFilter = $request->input('badge_printed');
         if ($badgePrintedFilter !== null) {
             if ($badgePrintedFilter == '1') {
-                $query->where('badge_printed', true);
+                $query->where('delegates.badge_printed', true);
             } elseif ($badgePrintedFilter == '0') {
-                $query->where('badge_printed', false);
+                $query->where('delegates.badge_printed', false);
             }
         }
 
@@ -2139,7 +2144,12 @@ class DelegationController extends Controller
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $delegates = $query->orderBy('id', 'desc')->paginate($limit);
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc')
+            ->orderBy('delegates.id', 'asc')
+            ->paginate($limit);
 
         return view('admin.delegates.badge-printed-index', compact('delegates'));
     }
@@ -2173,7 +2183,7 @@ class DelegationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
 
-        $delegates = Delegate::with([
+        $query = Delegate::with([
             'delegation.country',
             'delegation.continent',
             'delegation.invitationFrom',
@@ -2182,6 +2192,52 @@ class DelegationController extends Controller
             ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
             })
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
+
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            if (is_array($invitation_from)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->whereIn('invitation_from_id', $invitation_from);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->where('invitation_from_id', $invitation_from);
+                });
+            }
+        }
+
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc')
+            ->orderBy('delegates.id', 'asc')
             ->get();
 
         return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
@@ -2199,30 +2255,73 @@ class DelegationController extends Controller
             ->where('badge_printed', true)
             ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
-            });
+            })
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
 
         $badgePrintedFilter = $request->input('badge_printed');
         if ($badgePrintedFilter !== null) {
             if ($badgePrintedFilter == '1') {
-                $query->where('badge_printed', true);
+                $query->where('delegates.badge_printed', true);
             } elseif ($badgePrintedFilter == '0') {
-                $query->where('badge_printed', false);
+                $query->where('delegates.badge_printed', false);
             }
         }
 
-        $delegates = $query->get();
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            if (is_array($invitation_from)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->whereIn('invitation_from_id', $invitation_from);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->where('invitation_from_id', $invitation_from);
+                });
+            }
+        }
+
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc')
+            ->orderBy('delegates.id', 'asc')
+            ->get();
 
         $selectedDelegateIds = $request->input('delegate_ids');
         if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
             $delegates = $delegates->whereIn('id', $selectedDelegateIds);
 
-            // Only update badge printed status if we're exporting non-badge printed
             if ($badgePrintedFilter == '0') {
                 Delegate::whereIn('id', $selectedDelegateIds)->update(['badge_printed' => true]);
             }
         }
 
-        // Use the appropriate export class based on badge printed status
         if ($badgePrintedFilter == '0' || ($badgePrintedFilter === null && $delegates->first() && !$delegates->first()->badge_printed)) {
             return Excel::download(new \App\Exports\NonBadgePrintedDelegatesExport($delegates), 'non-badge-printed-delegates.xlsx');
         } else {
@@ -2242,9 +2341,54 @@ class DelegationController extends Controller
             ->where('badge_printed', false)
             ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
                 $delegationQuery->where('event_id', $currentEventId);
-            });
+            })
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->join('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+            ->select('delegates.*');
 
-        $delegates = $query->get();
+        if ($continentIds = $request->input('continent_id')) {
+            if (is_array($continentIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->whereIn('continent_id', $continentIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($continentIds) {
+                    $delegationQuery->where('continent_id', $continentIds);
+                });
+            }
+        }
+
+        if ($countryIds = $request->input('country_id')) {
+            if (is_array($countryIds)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->whereIn('country_id', $countryIds);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($countryIds) {
+                    $delegationQuery->where('country_id', $countryIds);
+                });
+            }
+        }
+
+        if ($invitation_from = $request->input('invitation_from')) {
+            if (is_array($invitation_from)) {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->whereIn('invitation_from_id', $invitation_from);
+                });
+            } else {
+                $query->whereHas('delegation', function ($delegationQuery) use ($invitation_from) {
+                    $delegationQuery->where('invitation_from_id', $invitation_from);
+                });
+            }
+        }
+
+        $delegates = $query->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->orderBy('delegations.id', 'asc')
+            ->orderBy('delegates.team_head', 'desc')
+            ->orderBy('delegates.id', 'asc')
+            ->get();
 
         $selectedDelegateIds = $request->input('delegate_ids');
         if ($selectedDelegateIds && is_array($selectedDelegateIds)) {
@@ -2264,6 +2408,51 @@ class DelegationController extends Controller
     public function exportDelegates(Request $request)
     {
         return Excel::download(new DelegateExport, 'delegates.xlsx');
+    }
+
+    public function destroy(Delegation $delegation)
+    {
+        try {
+            $delegation->interviews()->delete();
+            $delegation->attachments()->delete();
+            
+            foreach ($delegation->delegates as $delegate) {
+                if ($delegate->current_room_assignment_id) {
+                    $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
+                    // if ($oldAssignment) {
+                    //     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    //     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    //         $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    //         $oldRoom->save();
+                    //     }
+                    //     $oldAssignment->active_status = 0;
+                    //     $oldAssignment->save();
+                    // }
+                }
+                $delegate->delete();
+            }
+
+            $delegation->delete();
+
+            $this->logActivity(
+                module: 'Delegation',
+                action: 'delete-delegation',
+                model: $delegation,
+                delegationId: $delegation->id,
+                message: [
+                    'en' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed'),
+                    'ar' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
+                ]
+            );
+
+            return redirect()
+                ->route('delegations.index')
+                ->with('success', __db('delegation_deleted_successfully'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Delegation Deletion Failed: ' . $e->getMessage());
+
+            return back()->with('error', 'An error occurred while deleting the delegation.');
+        }
     }
 
     public function showImportForm()

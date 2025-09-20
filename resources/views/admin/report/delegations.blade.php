@@ -212,17 +212,7 @@
                 @endphp
 
                 <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :enableColumnListBtn="true"
-                    :defaultVisibleKeys="[
-                        'sl_no',
-                        'continent',
-                        'team_head',
-                        'invitation_from',
-                        'escorts',
-                        'drivers',
-                        'invitation_status',
-                        'participation_status',
-                        'note',
-                    ]" :columns="$columns" :no-data-message="__db('no_data_found')" />
+                   :columns="$columns" :no-data-message="__db('no_data_found')" />
             </div>
         </div>
     </div>
