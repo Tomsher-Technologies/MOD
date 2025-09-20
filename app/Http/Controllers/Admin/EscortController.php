@@ -15,7 +15,7 @@ class EscortController extends Controller
 {
     use HandlesUpdateConfirmation;
 
-    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+    const ASSIGNABLE_STATUS_CODES = ['2', '10'];
 
     public function __construct()
     {
@@ -120,8 +120,8 @@ class EscortController extends Controller
 
         $escorts = $query->paginate($limit);
         $delegations = Delegation::where('event_id', $currentEventId)
-            ->whereDoesntHave('invitationStatus', function ($q) {
-                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            ->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
             })
             ->get();
 

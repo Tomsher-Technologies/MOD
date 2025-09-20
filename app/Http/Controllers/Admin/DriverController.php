@@ -15,7 +15,7 @@ class DriverController extends Controller
 {
     use HandlesUpdateConfirmation;
 
-    const UNASSIGNABLE_STATUS_CODES = [3, 9];
+    const ASSIGNABLE_STATUS_CODES = ['2', '10'];
 
     public function __construct()
     {
@@ -66,7 +66,7 @@ class DriverController extends Controller
         if ($delegationId && $assignmentMode === 'driver') {
             $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
                 $q->where('delegations.id', $delegationId)
-                  ->where('delegation_drivers.status', 1);
+                    ->where('delegation_drivers.status', 1);
             });
         }
 
@@ -126,18 +126,17 @@ class DriverController extends Controller
         $drivers = $query->paginate($limit);
 
         $delegations = Delegation::where('event_id', $currentEventId)
-            ->whereDoesntHave('invitationStatus', function ($q) {
-                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            ->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
             })
             ->get();
-        
-        // Get unique values for filter dropdowns
+
         $titleEns = Driver::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
         $titleArs = Driver::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
         $carTypes = Driver::where('event_id', $currentEventId)->whereNotNull('car_type')->distinct()->pluck('car_type')->sort()->values()->all();
         $carNumbers = Driver::where('event_id', $currentEventId)->whereNotNull('car_number')->distinct()->pluck('car_number')->sort()->values()->all();
         $capacities = Driver::where('event_id', $currentEventId)->whereNotNull('capacity')->distinct()->pluck('capacity')->sort()->values()->all();
-        
+
         $assignmentDelegation = null;
         if ($delegationId && $assignmentMode === 'driver') {
             $assignmentDelegation = Delegation::find($delegationId);
@@ -384,7 +383,7 @@ class DriverController extends Controller
 
         $delegationId = $request->delegation_id;
         $delegation = \App\Models\Delegation::find($delegationId);
-        
+
         if (!$delegation->canAssignServices()) {
             return back()->withErrors(['error' => ' Drivers can only be assigned to delegations with status Accepted or Accepted with Secretary.'])->withInput();
         }
@@ -397,7 +396,7 @@ class DriverController extends Controller
 
         if (!$action) {
             if ($activeAssignments->isEmpty()) {
-                $action = 'reassign'; 
+                $action = 'reassign';
             } else {
                 return redirect()->back()->with('error', 'Action is required for drivers with existing assignments.');
             }

@@ -2,7 +2,7 @@
 
     @if (!$delegation->canAssignServices())
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
-            <p><strong>{{ __db('Note') }}:</strong> 
+            <p><strong>{{ __db('Note') }}:</strong>
                 {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus?->value }}"
                 {{ __db('cannot_assign_these_services') }}.</p>
         </div>
@@ -30,8 +30,7 @@
                 </div>
 
                 <div class="col-span-3">
-                    <label class="form-label">{{ __db('invitation_from') }}: <span
-                            class="text-red-600">*</span></label>
+                    <label class="form-label">{{ __db('invitation_from') }}: <span class="text-red-600">*</span></label>
                     <select name="invitation_from_id"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __db('select_invitation_from') }}</option>
@@ -84,7 +83,7 @@
                 <div class="col-span-3">
                     <label class="form-label">{{ __db('invitation_status') }}: <span
                             class="text-red-600">*</span></label>
-                    <select name="invitation_status_id"
+                    <select name="invitation_status_id" id="invitation_status_select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option disabled>{{ __('Select Invitation Status') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $option)
@@ -1286,10 +1285,45 @@
 
 </div>
 
+@php
+    $invitationDropdowns = getDropDown('invitation_status');
+    $unassignableStatuses = $unassignableStatus;
+@endphp
+
 
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+            const invitationDropdowns = @json($invitationDropdowns);
+            const unassignableStatusCodes = @json($unassignableStatuses);
+
+            console.log("unassignableStatusCodes",unassignableStatusCodes);
+            
+            $('#invitation_status_select').on('change', function() {
+                let selectedValue = parseInt($(this).val(), 10);
+                const selectOptionSettings = invitationDropdowns?.options?.find((val) => val.id === selectedValue);
+
+                if (!selectOptionSettings) {
+                    console.log("No settings found for selected value:", selectedValue);
+                    return; 
+                }
+
+              const isUnassignable = unassignableStatusCodes.includes(Number(selectOptionSettings?.code));
+
+                  if (isUnassignable) {
+                Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This option will unassign all the services that have already been assigned to this delegation.",
+                        icon: 'warning',
+                        showCancelButton: false,
+                        confirmButtonColor: '#B68A35',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'I understand'
+                    })
+            }
+            });
+
             document.querySelectorAll('.edit-attachment-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const data = JSON.parse(btn.getAttribute('data-attachment'));
@@ -1394,6 +1428,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+
+
             document.querySelectorAll('.delete-attachment-form').forEach(function(form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();

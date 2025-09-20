@@ -35,6 +35,7 @@ class DelegationController extends Controller
     use HandlesUpdateConfirmation;
 
     const UNASSIGNABLE_STATUS_CODES = [3, 9];
+    const ASSIGNABLE_STATUS_CODES = [2, 10]; 
 
     public function __construct()
     {
@@ -120,7 +121,7 @@ class DelegationController extends Controller
 
         if ($request->filter_services_assignable) {
             $query->whereDoesntHave('invitationStatus', function ($q) {
-                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
             });
         }
 
@@ -317,7 +318,10 @@ class DelegationController extends Controller
         //     'delegation' => $delegation,
         // ]);
 
-        return view('admin.delegations.edit', compact('delegation'));
+        return view('admin.delegations.edit', [
+            'delegation' => $delegation,
+            'unassignableStatus' => self::UNASSIGNABLE_STATUS_CODES
+        ]);
     }
 
     public function show($id, Request $request)
@@ -386,8 +390,8 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
                 });
             });
 
@@ -401,8 +405,8 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
                 });
             });
 
@@ -453,8 +457,8 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
                 });
             });
 
@@ -468,8 +472,8 @@ class DelegationController extends Controller
                 'airport',
                 'delegate.delegation.invitationFrom',
             ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereDoesntHave('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
                 });
             });
 
@@ -913,6 +917,8 @@ class DelegationController extends Controller
                 delegationId: $delegation->id
             );
 
+            // if()
+
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
             } elseif ($request->has('submit_add_interview')) {
@@ -1024,7 +1030,7 @@ class DelegationController extends Controller
 
                 $delegation->drivers()->updateExistingPivot($delegation->drivers->pluck('id')->toArray(), ['status' => 0]);
 
-                 $delegation->interviews()->delete();
+                $delegation->interviews()->delete();
 
                 \App\Models\RoomAssignment::where('delegation_id', $delegation->id)->update(['active_status' => 0]);
             }
@@ -1932,8 +1938,8 @@ class DelegationController extends Controller
         }
 
         if ($filterNonAssignableDeligations) {
-            $query->whereDoesntHave('invitationStatus', function ($q) {
-                $q->whereIn('code', self::UNASSIGNABLE_STATUS_CODES);
+            $query->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
             });
         }
 
