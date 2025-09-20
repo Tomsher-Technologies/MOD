@@ -251,7 +251,7 @@ trait HandlesUpdateConfirmation
         ?Model $model = null,
         ?int $userId = null,
         ?array $changedFields = null,
-        ?string $message = null,
+        string|array|null $message = null,
         ?int $currentEventId = null,
         string $activityModelClass = \App\Models\DelegationActivity::class,
         ?string $submodule = null,
@@ -295,7 +295,7 @@ trait HandlesUpdateConfirmation
         try {
             $activity = $activityModelClass::create($activityData);
 
-            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room'])) {
+            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room', 'delete-delegation'])) {
                 $this->sendNotification($activity, $action, $module, $delegationId);
             } elseif ($action === 'update' && !empty($fieldsToNotify) && !empty($changedFields)) {
                 $notifiedChanges = array_intersect_key($changedFields, array_flip($fieldsToNotify));
@@ -333,7 +333,7 @@ trait HandlesUpdateConfirmation
             $changeCount = count($changedFields);
             $changesText = $changeCount == 1 ? '1 field' : "{$changeCount} fields";
             $changesTextAr = $changeCount == 1 ? 'حقل واحد' : "{$changeCount} حقول";
-            
+
             return [
                 'en' => "{$userName} updated {$module} ({$changesText} changed).",
                 'ar' => "{$userName} قام بتحديث {$module} (تم تغيير {$changesTextAr})."
@@ -416,11 +416,11 @@ trait HandlesUpdateConfirmation
         ];
 
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
-        
+
         if (!$currentEventId) {
             return;
         }
-        
+
         $users = \App\Models\EventUserRole::with('user')
             ->where('event_id', $currentEventId)
             ->get()

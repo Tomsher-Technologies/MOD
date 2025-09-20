@@ -188,7 +188,7 @@
                 </div>
 
                 @directCanany(['edit_delegations', 'delegate_edit_delegations'])
-                    <div class="col-span-12 mt-6">
+                    <div class="col-span-12 mt-6 flex gap-3">
                         <button type="submit"
                             class="btn !bg-[#B68A35] text-white rounded-lg py-3 px-6 font-semibold hover:shadow-lg transition"
                             @click="window.hasUnsavedAttachments = false">
@@ -1605,5 +1605,52 @@
                 }
             });
         }
+        
+        // Handle delegation delete button
+        document.querySelectorAll('.delete-delegation-btn').forEach(function(btn) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const delegationId = this.getAttribute('data-delegation-id');
+                const delegationCode = this.getAttribute('data-delegation-code');
+                
+                Swal.fire({
+                    title: '{{ __db('are_you_sure') }}',
+                    text: "{{ __db('delete_delegation_confirm_msg') }} " + delegationCode + "?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ __db('yes_delete') }}',
+                    cancelButtonText: '{{ __db('cancel') }}',
+                    customClass: {
+                        popup: 'w-full max-w-2xl',
+                        confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                        cancelButton: 'px-4 rounded-lg'
+                    },
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit delete form
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '{{ url('/mod-admin/delegations') }}/' + delegationId;
+                        
+                        const tokenInput = document.createElement('input');
+                        tokenInput.type = 'hidden';
+                        tokenInput.name = '_token';
+                        tokenInput.value = '{{ csrf_token() }}';
+                        form.appendChild(tokenInput);
+                        
+                        const methodInput = document.createElement('input');
+                        methodInput.type = 'hidden';
+                        methodInput.name = '_method';
+                        methodInput.value = 'DELETE';
+                        form.appendChild(methodInput);
+                        
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            });
+        });
     </script>
 @endsection

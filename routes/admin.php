@@ -99,6 +99,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/delegations-get', [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+    Route::delete('/delegations/{delegation}', [DelegationController::class, 'destroy'])->name('delegations.destroy');
 
 
     // Delegate

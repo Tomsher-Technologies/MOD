@@ -2410,6 +2410,51 @@ class DelegationController extends Controller
         return Excel::download(new DelegateExport, 'delegates.xlsx');
     }
 
+    public function destroy(Delegation $delegation)
+    {
+        try {
+            $delegation->interviews()->delete();
+            $delegation->attachments()->delete();
+            
+            foreach ($delegation->delegates as $delegate) {
+                if ($delegate->current_room_assignment_id) {
+                    $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
+                    // if ($oldAssignment) {
+                    //     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    //     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    //         $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                    //         $oldRoom->save();
+                    //     }
+                    //     $oldAssignment->active_status = 0;
+                    //     $oldAssignment->save();
+                    // }
+                }
+                $delegate->delete();
+            }
+
+            $delegation->delete();
+
+            $this->logActivity(
+                module: 'Delegation',
+                action: 'delete-delegation',
+                model: $delegation,
+                delegationId: $delegation->id,
+                message: [
+                    'en' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed'),
+                    'ar' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
+                ]
+            );
+
+            return redirect()
+                ->route('delegations.index')
+                ->with('success', __db('delegation_deleted_successfully'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Delegation Deletion Failed: ' . $e->getMessage());
+
+            return back()->with('error', 'An error occurred while deleting the delegation.');
+        }
+    }
+
     public function showImportForm()
     {
         return view('admin.delegations.import');
