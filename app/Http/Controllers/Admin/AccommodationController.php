@@ -25,11 +25,13 @@ class AccommodationController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const ASSIGNABLE_STATUS_CODES = ['2', '10'];
+
     public function index(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
         $request->session()->put('accommodations_last_url', url()->full());
-        $accommodations = Accommodation::with(['rooms', 'contacts'])->where('event_id',$currentEventId);
+        $accommodations = Accommodation::with(['rooms', 'contacts'])->where('event_id', $currentEventId);
 
         if (request()->has('search')) {
             $accommodations->where(function ($query) {
@@ -47,16 +49,16 @@ class AccommodationController extends Controller
         }
         $limit = $request->input('limit') ?? 10;
         $accommodations = $accommodations->latest()->paginate($limit);
-               
-        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+
+        $roomTypes = getDropDown('room_type');
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
-        
-        return view('admin.accommodations.index', compact('accommodations','roomTypes'));
+
+        return view('admin.accommodations.index', compact('accommodations', 'roomTypes'));
     }
 
     public function create()
     {
-        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+        $roomTypes = getDropDown('room_type');
 
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
 
@@ -125,7 +127,7 @@ class AccommodationController extends Controller
     {
         $accommodation = Accommodation::with(['rooms', 'contacts'])->findOrFail(base64_decode($id));
 
-        $roomTypes = Dropdown::with('options')->where('code', 'room_type')->first();
+        $roomTypes = getDropDown('room_type');
 
         $roomTypes = $roomTypes ? $roomTypes->options : collect();
 
@@ -148,7 +150,7 @@ class AccommodationController extends Controller
             'hotel_name_ar.required_without' => __db('fill_either_english_or_arabic_field'),
         ]);
 
-        $accommodation->update($request->only('hotel_name','hotel_name_ar', 'address', 'contact_number'));
+        $accommodation->update($request->only('hotel_name', 'hotel_name_ar', 'address', 'contact_number'));
 
         if ($request->has('rooms')) {
             foreach ($request->rooms as $roomData) {
@@ -195,72 +197,81 @@ class AccommodationController extends Controller
 
         // Delegates
         $delegates = RoomAssignment::with(['assignable', 'roomType.roomType'])
-                    ->where('hotel_id', $hotelId)
-                    ->where('active_status', 1)
-                    ->where('assignable_type', \App\Models\Delegate::class)
-                    ->when($roomTypeId, function ($q) use ($roomTypeId) {
-                        $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
-                            $sub->where('room_type_id', $roomTypeId);
-                        });
-                    })
-                    ->when($delegationId, function ($q) use ($delegationId) {
-                        $q->where('delegation_id', $delegationId);
-                    })
-                    ->get();
+            ->select('room_assignments.*') 
+            ->where('hotel_id', $hotelId)
+            ->where('active_status', 1)
+            ->where('assignable_type', \App\Models\Delegate::class)
+            ->when($roomTypeId, function ($q) use ($roomTypeId) {
+                $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
+                    $sub->where('room_type_id', $roomTypeId);
+                });
+            })
+            ->when($delegationId, function ($q) use ($delegationId) {
+                $q->where('room_assignments.delegation_id', $delegationId)
+                    ->leftJoin('delegations', 'room_assignments.delegation_id', '=', 'delegations.id')
+
+                    ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                    ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+
+                    ->orderBy('country_sort.sort_order', 'asc')
+                    ->orderBy('invitation_from_sort.sort_order', 'asc');
+            })
+            ->get();
+
 
         // Escorts
         $escorts = RoomAssignment::with(['assignable', 'roomType.roomType'])
-                    ->where('hotel_id', $hotelId)
-                    ->where('active_status', 1)
-                    ->where('assignable_type', \App\Models\Escort::class)
-                    ->when($roomTypeId, function ($q) use ($roomTypeId) {
-                        $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
-                            $sub->where('room_type_id', $roomTypeId);
-                        });
-                    })
-                    ->when($delegationId, function ($q) use ($delegationId) {
-                        $q->where('delegation_id', $delegationId);
-                    })
-                    ->get();
+            ->where('hotel_id', $hotelId)
+            ->where('active_status', 1)
+            ->where('assignable_type', \App\Models\Escort::class)
+            ->when($roomTypeId, function ($q) use ($roomTypeId) {
+                $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
+                    $sub->where('room_type_id', $roomTypeId);
+                });
+            })
+            ->when($delegationId, function ($q) use ($delegationId) {
+                $q->where('delegation_id', $delegationId);
+            })
+            ->get();
 
         // Drivers
         $drivers = RoomAssignment::with(['assignable', 'roomType.roomType'])
-                    ->where('hotel_id', $hotelId)
-                    ->where('active_status', 1)
-                    ->where('assignable_type', \App\Models\Driver::class)
-                    ->when($roomTypeId, function ($q) use ($roomTypeId) {
-                        $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
-                            $sub->where('room_type_id', $roomTypeId);
-                        });
-                    })
-                    ->when($delegationId, function ($q) use ($delegationId) {
-                        $q->where('delegation_id', $delegationId);
-                    })
-                    ->get();
+            ->where('hotel_id', $hotelId)
+            ->where('active_status', 1)
+            ->where('assignable_type', \App\Models\Driver::class)
+            ->when($roomTypeId, function ($q) use ($roomTypeId) {
+                $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
+                    $sub->where('room_type_id', $roomTypeId);
+                });
+            })
+            ->when($delegationId, function ($q) use ($delegationId) {
+                $q->where('delegation_id', $delegationId);
+            })
+            ->get();
 
         $externalMembers = ExternalMemberAssignment::where('hotel_id', $hotelId)
-                            ->where('active_status', 1)
-                            ->when($roomTypeId, function ($q) use ($roomTypeId) {
-                                $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
-                                    $sub->where('room_type_id', $roomTypeId);
-                                });
-                            })
-                            ->get();
+            ->where('active_status', 1)
+            ->when($roomTypeId, function ($q) use ($roomTypeId) {
+                $q->whereHas('roomType', function ($sub) use ($roomTypeId) {
+                    $sub->where('room_type_id', $roomTypeId);
+                });
+            })
+            ->get();
 
-        $rooms = AccommodationRoom::with('roomType','accommodation')
+        $rooms = AccommodationRoom::with('roomType', 'accommodation')
             ->where('accommodation_id', $hotelId)
             ->get();
 
         $delegations = RoomAssignment::where('hotel_id', $hotelId)
-                    ->where('active_status', 1)
-                    ->with('delegation') 
-                    ->get()
-                    ->pluck('delegation')
-                    ->unique('id')
-                    ->filter() 
-                    ->values();
+            ->where('active_status', 1)
+            ->with('delegation')
+            ->get()
+            ->pluck('delegation')
+            ->unique('id')
+            ->filter()
+            ->values();
 
-        return view('admin.accommodations.show', compact('hotel', 'delegates', 'escorts', 'drivers','rooms','externalMembers','delegations'));
+        return view('admin.accommodations.show', compact('hotel', 'delegates', 'escorts', 'drivers', 'rooms', 'externalMembers', 'delegations'));
     }
 
     public function destroyRooms($id)
@@ -301,7 +312,12 @@ class AccommodationController extends Controller
             'delegates',
             'escorts',
             'drivers'
-        ])->orderBy('id', 'desc');
+        ])
+            ->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+            })
+            ->orderBy('id', 'desc');
+
 
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('event_id', $currentEventId);
@@ -387,18 +403,18 @@ class AccommodationController extends Controller
         ])->findOrFail($id);
 
         $hotels = Accommodation::where('status', 1)
-                    ->whereHas('rooms', function ($q) {
-                        $q->where('available_rooms', '>', 0);
-                    })
-                    ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
-                    ->orderBy('hotel_name', 'asc')
-                    ->get();
+            ->whereHas('rooms', function ($q) {
+                $q->where('available_rooms', '>', 0);
+            })
+            ->where('event_id', session('current_event_id', getDefaultEventId() ?? null))
+            ->orderBy('hotel_name', 'asc')
+            ->get();
         return view('admin.accommodations.delegations-show', compact('delegation', 'hotels'));
     }
 
     public function getHotelRooms($id)
     {
-        $rooms = AccommodationRoom::with('roomType','accommodation')
+        $rooms = AccommodationRoom::with('roomType', 'accommodation')
             ->where('accommodation_id', $id)
             ->get();
 
@@ -413,9 +429,15 @@ class AccommodationController extends Controller
             'hotel_id'        => 'required|integer',
             'room_type_id'    => 'nullable|integer',
             'room_number'     => 'nullable|string',
+            'delegation_id'   => 'required|integer',
         ]);
 
-        $model = "App\\Models\\" . $request->assignable_type;
+        $delegation = Delegation::find($request->delegation_id);
+        if (!$delegation || !$delegation->canAssignServices()) {
+            return response()->json(['success' => 4, 'message' => 'Hotel assignments can only be made for delegations with status Accepted or Accepted with Secretary.']);
+        }
+
+        $model = "App\Models\\" . $request->assignable_type;
         $user  = $model::findOrFail($request->assignable_id);
 
         $current = $user->roomAssignments()
@@ -459,11 +481,11 @@ class AccommodationController extends Controller
                     $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                         $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                                            ->where('room_type_id', $oldAssignment->room_type_id)
-                                            ->where('room_number', $oldAssignment->room_number)
-                                            ->where('active_status', 1)
-                                            ->count();
-                        if($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number)) ){
+                            ->where('room_type_id', $oldAssignment->room_type_id)
+                            ->where('room_number', $oldAssignment->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                        if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number))) {
                             $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                             $oldRoom->save();
                         }
@@ -522,7 +544,7 @@ class AccommodationController extends Controller
             return response()->json(['success' => 1, 'assignment_id' => $assignment->id]);
         }
 
-        return response()->json(['success' => 0,  'assignment_id' =>null]);
+        return response()->json(['success' => 0,  'assignment_id' => null]);
     }
 
     public function hotelOccupancy($hotelId)
@@ -541,24 +563,24 @@ class AccommodationController extends Controller
         $hotel = Accommodation::findOrFail(base64_decode($id) ?? $id);
 
         $roomTypes = AccommodationRoom::with('roomType')
-                                        ->where('accommodation_id', $hotel->id)
-                                        ->where('available_rooms', '>', 0)
-                                        ->get();
+            ->where('accommodation_id', $hotel->id)
+            ->where('available_rooms', '>', 0)
+            ->get();
 
         $externalMembersQuery = ExternalMemberAssignment::with(['hotel', 'roomType.roomType'])
-                                            ->where('hotel_id', $hotel->id)
-                                            ->where('active_status', 1);
-            
+            ->where('hotel_id', $hotel->id)
+            ->where('active_status', 1);
+
         if ($search = $request->input('search')) {
             $externalMembersQuery->where('name', 'like', '%' . $search . '%')->orWhere('coming_from', 'like', '%' . $search . '%');
         }
-        
+
         if ($roomTypeId = $request->input('room_type_id')) {
             $externalMembersQuery->where('room_type_id', $roomTypeId);
         }
-        
+
         $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->get();
-        return view('admin.accommodations.add-external-members', compact('hotel', 'roomTypes','externalMembers'));
+        return view('admin.accommodations.add-external-members', compact('hotel', 'roomTypes', 'externalMembers'));
     }
 
     public function storeExternalMembers(Request $request)
@@ -635,43 +657,43 @@ class AccommodationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
         $request->session()->put('external_members_last_url', url()->full());
-        
+
         $externalMembersQuery = ExternalMemberAssignment::with(['hotel', 'roomType.roomType'])
             ->whereHas('hotel', function ($hotelQuery) use ($currentEventId) {
                 $hotelQuery->where('event_id', $currentEventId);
             })
             ->where('active_status', 1);
-            
+
         if ($search = $request->input('search')) {
             $externalMembersQuery->where('name', 'like', '%' . $search . '%')->orWhere('coming_from', 'like', '%' . $search . '%');
         }
-        
-        if($request->has('room_number')){
-            $externalMembersQuery->where('room_number', 'like', '%' . $request->input('room_number'). '%');
+
+        if ($request->has('room_number')) {
+            $externalMembersQuery->where('room_number', 'like', '%' . $request->input('room_number') . '%');
         }
         if ($hotelId = $request->input('hotel_id')) {
             $externalMembersQuery->where('hotel_id', $hotelId);
         }
-        
+
         if ($roomTypeId = $request->input('room_type_id')) {
             $externalMembersQuery->where('room_type_id', $roomTypeId);
         }
         $limit = $request->input('limit') ?? 10;
         $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->paginate($limit);
-        
+
         $hotels = Accommodation::where('event_id', $currentEventId)
-                    ->where('status', 1)
-                    ->orderBy('hotel_name', 'asc')
-                    ->get();
-               
+            ->where('status', 1)
+            ->orderBy('hotel_name', 'asc')
+            ->get();
+
         $roomTypes = [];
-        if($request->input('hotel_id')) {
-            $roomTypes = AccommodationRoom::with('roomType','accommodation')
-                                            ->where('accommodation_id', $request->input('hotel_id'))
-                                            ->get();
+        if ($request->input('hotel_id')) {
+            $roomTypes = AccommodationRoom::with('roomType', 'accommodation')
+                ->where('accommodation_id', $request->input('hotel_id'))
+                ->get();
         }
-        
-        return view('admin.accommodations.view-external-members', compact('externalMembers', 'hotels','roomTypes'));
+
+        return view('admin.accommodations.view-external-members', compact('externalMembers', 'hotels', 'roomTypes'));
     }
 
     public function editExternalMembers($id)
@@ -709,10 +731,10 @@ class AccommodationController extends Controller
                 ->exists();
 
             $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                            ->where('room_type_id', $request->room_type)
-                            ->where('room_number', $request->room_number)
-                            ->where('active_status', 1)
-                            ->exists();
+                ->where('room_type_id', $request->room_type)
+                ->where('room_number', $request->room_number)
+                ->where('active_status', 1)
+                ->exists();
 
 
             $roomType = AccommodationRoom::find($request->room_type);
@@ -731,7 +753,7 @@ class AccommodationController extends Controller
                     $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
                     $newRoom->save();
                 }
-            }else{
+            } else {
                 if ($externalMember) {
                     $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
@@ -800,13 +822,13 @@ class AccommodationController extends Controller
             $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
 
             $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
-                                            ->where('room_type_id', $externalMember->room_type_id)
-                                            ->where('room_number', $externalMember->room_number)
-                                            ->where('active_status', 1)
-                                            ->count();
-                        
+                ->where('room_type_id', $externalMember->room_type_id)
+                ->where('room_number', $externalMember->room_number)
+                ->where('active_status', 1)
+                ->count();
+
             if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                if($alreadyAssignedCount <= 1){
+                if ($alreadyAssignedCount <= 1) {
                     $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                     $oldRoom->save();
                 }
@@ -821,7 +843,7 @@ class AccommodationController extends Controller
     public function unassignAccommodation(Request $request)
     {
         $assignment = RoomAssignment::find($request->assignable_id);
-    
+
         $hotel_id = $assignment?->hotel_id ?? NULL;
         $room_number = $assignment?->room_number ?? NULL;
 
@@ -830,13 +852,13 @@ class AccommodationController extends Controller
             $oldRoom = AccommodationRoom::find($assignment->room_type_id);
 
             $alreadyAssignedCount = RoomAssignment::where('hotel_id', $assignment->hotel_id)
-                                            ->where('room_type_id', $assignment->room_type_id)
-                                            ->where('room_number', $assignment->room_number)
-                                            ->where('active_status', 1)
-                                            ->count();
-                        
+                ->where('room_type_id', $assignment->room_type_id)
+                ->where('room_number', $assignment->room_number)
+                ->where('active_status', 1)
+                ->count();
+
             if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                if($alreadyAssignedCount <= 1){
+                if ($alreadyAssignedCount <= 1) {
                     $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                     $oldRoom->save();
                 }
@@ -844,23 +866,23 @@ class AccommodationController extends Controller
             $assignment->active_status = 0;
             $assignment->save();
 
-            if($type == 'App\Models\Driver'){
+            if ($type == 'App\Models\Driver') {
                 $driver = Driver::find($assignment->assignable_id);
                 $driver->current_room_assignment_id = NULL;
                 $driver->save();
-            }elseif($type == 'App\Models\Escort'){
+            } elseif ($type == 'App\Models\Escort') {
                 $escort = Escort::find($assignment->assignable_id);
                 $escort->current_room_assignment_id = NULL;
                 $escort->save();
-            }elseif($type == 'App\Models\Delegate'){
+            } elseif ($type == 'App\Models\Delegate') {
                 $delegate = Delegate::find($assignment->assignable_id);
                 $delegate->current_room_assignment_id = NULL;
                 $delegate->save();
             }
-            
+
             return response()->json(['success' => 1]);
         }
 
-         return response()->json(['success' => 0]);
+        return response()->json(['success' => 0]);
     }
 }

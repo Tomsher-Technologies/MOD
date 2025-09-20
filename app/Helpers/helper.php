@@ -275,8 +275,16 @@ function getAllEvents()
 
 function getDropDown($key)
 {
-    return \App\Models\Dropdown::where('code', $key)->with('options')->first() ?? [];
+    $dropdown = \App\Models\Dropdown::where('code', $key)
+        ->where('status', 1) 
+        ->with(['options' => function ($query) {
+            $query->where('status', 1)->orderBy('sort_order');
+        }])
+        ->first();
+
+    return $dropdown ?? [];
 }
+
 
 function storeUploadedFileToModuleFolder($file, $folder, $parentId, $subDir = 'files')
 {
@@ -604,9 +612,9 @@ if (! function_exists('getCountriesByContinent')) {
     function getCountriesByContinent($continentId)
     {
         return Country::where('continent_id', $continentId)
-                        ->where('status', 1)
-                        ->orderBy('sort_order', 'asc')
-                        ->get();
+            ->where('status', 1)
+            ->orderBy('sort_order', 'asc')
+            ->get();
     }
 }
 
@@ -625,7 +633,7 @@ if (!function_exists('can')) {
             // if ($user->can($permission)) {
             //     return true;
             // }
-             if ($user->getDirectPermissions()->pluck('name')->contains($permission)) {
+            if ($user->getDirectPermissions()->pluck('name')->contains($permission)) {
                 return true;
             }
         }

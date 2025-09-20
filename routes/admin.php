@@ -61,8 +61,6 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     // Manage dynamic dropdowns
     Route::get('/dropdowns', [DropdownController::class, 'index'])->name('dropdowns.index');
-    Route::get('/dropdowns/countries', [DropdownController::class, 'countries'])->name('dropdowns.countries');
-    Route::post('/dropdowns/countries', [DropdownController::class, 'storeCountry'])->name('dropdowns.countries.store');
     Route::get('/dropdowns/{dropdown}/options', [DropdownController::class, 'showOptions'])->name('dropdowns.options.show');
     Route::post('/dropdowns/options', [DropdownController::class, 'storeOption'])->name('dropdowns.options.store');
     Route::put('/dropdowns/options/{option}', [DropdownController::class, 'updateOption'])->name('dropdowns.options.update');
@@ -101,6 +99,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/delegations-get', [DelegationController::class, 'index']);
     Route::get('/delegations/edit/{id}', [DelegationController::class, 'edit'])->name('delegations.edit');
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
+    Route::delete('/delegations/{delegation}', [DelegationController::class, 'destroy'])->name('delegations.destroy');
 
 
     // Delegate

@@ -15,6 +15,8 @@ class EscortController extends Controller
 {
     use HandlesUpdateConfirmation;
 
+    const ASSIGNABLE_STATUS_CODES = ['2', '10'];
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -27,7 +29,7 @@ class EscortController extends Controller
             'only' => ['create', 'store']
         ]);
 
-        $this->middleware('permission:import_escorts|escort_add_escorts', [
+        $this->middleware('permission:import_escorts', [
             'only' => ['showImportForm', 'import']
         ]);
 
@@ -117,7 +119,11 @@ class EscortController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         $escorts = $query->paginate($limit);
-        $delegations = Delegation::where('event_id', $currentEventId)->get();
+        $delegations = Delegation::where('event_id', $currentEventId)
+            ->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+            })
+            ->get();
 
         $titleEns = Escort::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
@@ -143,9 +149,8 @@ class EscortController extends Controller
     public function create()
     {
         $delegations = Delegation::all();
-        $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.escorts.create', compact('delegations', 'dropdowns'));
+        return view('admin.escorts.create', compact('delegations', ));
     }
 
     public function store(Request $request)
@@ -225,9 +230,8 @@ class EscortController extends Controller
     {
         $escort = Escort::findOrFail($id);
         $delegations = Delegation::all();
-        $dropdowns = $this->loadDropdownOptions();
 
-        return view('admin.escorts.edit', compact('escort', 'delegations', 'dropdowns'));
+        return view('admin.escorts.edit', compact('escort', 'delegations', ));
     }
 
     public function assignIndex(Request $request, Escort $escort)
@@ -405,6 +409,10 @@ class EscortController extends Controller
         $delegationId = $request->delegation_id;
         $delegation = \App\Models\Delegation::find($delegationId);
 
+        if (!$delegation->canAssignServices()) {
+            return back()->withErrors(['error' => ' Escorts can only be assigned to delegations with status Accepted or Accepted with Secretary.'])->withInput();
+        }
+
         $escort->delegations()->update([
             'delegation_escorts.status' => 0,
         ]);
@@ -508,18 +516,4 @@ class EscortController extends Controller
             ->with('success',  __db('escort') . __db('created_successfully'));
     }
 
-    protected function loadDropdownOptions()
-    {
-        $gender = Dropdown::with('options')->where('code', 'gender')->first();
-        $nationality = Dropdown::with('options')->where('code', 'nationality')->first();
-        $languages = Dropdown::with('options')->where('code', 'language')->first();
-        $ranks = Dropdown::with('options')->where('code', 'rank')->first();
-
-        return [
-            'genders' => $gender ? $gender->options : collect(),
-            'nationalities' => $nationality ? $nationality->options : collect(),
-            'languages' => $languages ? $languages->options : collect(),
-            'ranks' => $ranks ? $ranks->options : collect(),
-        ];
-    }
 }
