@@ -758,11 +758,11 @@ class AccommodationController extends Controller
                     $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                         $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
-                            ->where('room_type_id', $externalMember->room_type_id)
-                            ->where('room_number', $externalMember->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1 && (strtolower($externalMember->room_number) != strtolower($request->room_number))) {
+                                            ->where('room_type_id', $externalMember->room_type_id)
+                                            ->where('room_number', $externalMember->room_number)
+                                            ->where('active_status', 1)
+                                            ->count();
+                        if($alreadyAssignedCount <= 1 && ((strtolower($externalMember->hotel_id) != strtolower($request->hotel_id)) || (strtolower($externalMember->room_type_id) != strtolower($request->room_type)) || (strtolower($externalMember->room_number) != strtolower($request->room_number))) ){
                             $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                             $oldRoom->save();
                         }
