@@ -19,6 +19,7 @@ use App\Exports\NonBadgePrintedDelegatesExport;
 use App\Exports\DelegationExport;
 use App\Exports\DelegateExport;
 use App\Imports\DelegateImport;
+use App\Imports\DelegationAttachmentImport;
 use App\Imports\DelegationOnlyImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -2452,6 +2453,25 @@ class DelegationController extends Controller
             \Illuminate\Support\Facades\Log::error('Delegation Deletion Failed: ' . $e->getMessage());
 
             return back()->with('error', 'An error occurred while deleting the delegation.');
+        }
+    }
+    public function importAttachments(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new DelegationAttachmentImport, $request->file('file'));
+
+            return redirect()->route('delegations.index')
+                ->with('success', __db('attachments_imported_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Attachment Import Error: ' . $e->getMessage());
+
+            return redirect()->back()
+                ->with('error', __db('attachment_import_failed') . ': ' . $e->getMessage())
+                ->withInput();
         }
     }
 

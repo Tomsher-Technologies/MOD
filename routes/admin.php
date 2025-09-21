@@ -95,6 +95,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/delegations/import', [DelegationController::class, 'showImportForm'])->name('delegations.import.form');
     Route::post('/delegations/import/delegations', [DelegationController::class, 'importDelegations'])->name('delegations.import.delegations');
     Route::post('/delegations/import/delegates', [DelegationController::class, 'importDelegatesWithTravels'])->name('delegations.import.delegates');
+    Route::post('/delegations/import/attachments', [DelegationController::class, 'importAttachments'])->name('delegations.import.attachments');
 
     Route::resource('delegations', DelegationController::class);
     Route::get('/delegations-get', [DelegationController::class, 'index']);
