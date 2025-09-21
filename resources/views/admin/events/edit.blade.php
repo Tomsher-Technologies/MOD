@@ -80,10 +80,11 @@
 
                             <div class="col-span-3 form-group">
                                 <label class="form-label">{{ __db('status') }} <span class="text-red-600">*</span></label>
-                                <select name="status" id="status" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                <select name="status" id="status" onchange="changeStatus(this)" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                                     <option value="0" {{ (old('status', $event->status) === 0) ? 'selected' : '' }}>{{ __db('not_completed') }}</option>
                                     <option value="1" {{ (old('status', $event->status) === 1) ? 'selected' : '' }}>{{ __db('completed') }}</option>
                                 </select>
+                                <input type="hidden" name="active_status" id="active_status" value="0">
 
                                 @error('status')
                                     <div class="text-red-600">{{ $message }}</div>
@@ -127,6 +128,27 @@
 
 @section('script')
 <script>
-
+    function changeStatus(select) {
+        if (select.value == 1) {
+            Swal.fire({
+                title: '{{ __db('are_you_sure') }}',
+                text: "{{ __db('inactivate_user_confirm_msg') }}",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '{{ __db('yes') }}',
+                cancelButtonText: '{{ __db('cancel') }}'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#active_status').val(1);
+                }else{
+                    $('#active_status').val(0);
+                }
+            });
+        } else {
+            $('#active_status').val(0);
+        }
+    }
 </script>
 @endsection

@@ -38,6 +38,7 @@
     "military_number_required" : "Military number is required",
     "military_number_already_exist" : "Military number already in use",
     "are_you_sure" : "Are you sure?",
+    "status_confirm_msg" : "Do you really want to change the status?",
     "event_required" : "Event is required",
     "event_not_assigned" : "'You are not assigned to the selected event.'",
     "user_unassigned" : "User has been unassigned.",
@@ -245,6 +246,7 @@
     "delete_delegation_confirm_msg": "Are you sure you want to delete delegation delegation_id. This is a pemanent deletion and cannot be undone or recovered. ",
     "delegation_deleted_successfully": "Delegation has been deleted successfully.",
     "delegation_deleted_notification": " deleted delegation ",
-    "all_assigned_escorts_drivers_hotels_freed": ". All assigned escorts, drivers and hotels are now free."
+    "all_assigned_escorts_drivers_hotels_freed": ". All assigned escorts, drivers and hotels are now free.",
+    "inactivate_user_confirm_msg" : "Do you want to inactivate all users assigned to this event?"
 
 }
