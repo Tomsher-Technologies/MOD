@@ -68,6 +68,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::post('/dropdowns/options/status', [DropdownController::class, 'updateStatus'])->name('dropdowns.options.status');
     Route::get('/dropdowns/bulk-import', [DropdownController::class, 'bulkImport'])->name('dropdowns.bulk.import');
     Route::post('/dropdowns/options/import', [DropdownController::class, 'import'])->name('admin.dropdowns.import');
+    Route::get('/dropdowns/export', [DropdownController::class, 'export'])->name('dropdowns.export');
 
     // Manage Events
     Route::resource('events', EventController::class);
