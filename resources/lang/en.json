@@ -283,6 +283,7 @@
     "download": "Download",
     "add_new_files": "Add New Files",
     "upload_new_floor_plan_files_msg": "Select PDF files to add to this floor plan",
-    "view": "View"
+    "view": "View",
+    "export": "Export"
 
 }

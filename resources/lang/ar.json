@@ -245,5 +245,6 @@
     "download": "تحميل",
     "add_new_files": "إضافة ملفات جديدة",
     "upload_new_floor_plan_files_msg": "اختر ملفات PDF لإضافتها إلى مخطط الطابق هذا",
-    "view": "عرض"
+    "view": "عرض",
+    "export": "تصدير"
 }
