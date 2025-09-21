@@ -12,7 +12,7 @@
     </div>
     
     <div class="bg-white h-full w-full rounded-lg border-0 p-30 mb-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="border rounded-lg text-center p-10 block">
                 <a href="{{ asset('assets/excel/sample_delegations.xlsx') }}" download class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg w-full">
                     <svg class="w-6 h-6 text-white pe-2 inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -40,6 +40,21 @@
 
                 <p class="text-sm mt-4">
                     {!! __db('download_sample_delegates_excel_description') !!}
+                </p>
+            </div>
+            
+            <div class="border rounded-lg text-center p-10 block">
+                <a href="{{ asset('assets/excel/sample_attachments.xlsx') }}" download class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg w-full">
+                    <svg class="w-6 h-6 text-white pe-2 inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2m-8 1V4m0 12-4-4m4 4 4-4" />
+                    </svg>
+                    <span>{{ __db('download_sample_attachments_excel') }}</span>
+                </a>
+
+                <p class="text-sm mt-4">
+                    {!! __db('download_sample_attachments_excel_description') !!}
                 </p>
             </div>
         </div>
@@ -72,6 +87,15 @@
                         </svg>
                         <span class="text-white">{!! __db('import_delegates') !!}</span>
                     </button>
+                    
+                    <button type="button" onclick="submitImport('attachments')" class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg">
+                        <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                            width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2M12 4v12m0-12 4 4m-4-4L8 8" />
+                        </svg>
+                        <span class="text-white">{!! __db('import_attachments') !!}</span>
+                    </button>
                 </div>
 
                 <p class="text-sm mt-4">
@@ -86,8 +110,10 @@
         function submitImport(importType) {
             if (importType === 'delegations') {
                 document.getElementById('importForm').action = "{{ route('delegations.import.delegations') }}";
-            } else {
+            } else if (importType === 'delegates') {
                 document.getElementById('importForm').action = "{{ route('delegations.import.delegates') }}";
+            } else {
+                document.getElementById('importForm').action = "{{ route('delegations.import.attachments') }}";
             }
             document.getElementById('importForm').submit();
         }

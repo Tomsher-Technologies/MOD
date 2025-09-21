@@ -619,3 +619,23 @@
 
 
 -- ALTER TABLE `interview_members` DROP FOREIGN KEY `interview_members_ibfk_3`; ALTER TABLE `interview_members` ADD CONSTRAINT `interview_members_ibfk_3` FOREIGN KEY (`interview_id`) REFERENCES `interviews`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT; 
+
+
+-- CREATE TABLE `floor_plans` (
+--   `id` bigint(20) UNSIGNED NOT NULL,
+--   `event_id` bigint(20) UNSIGNED NOT NULL,
+--   `title_en` varchar(255) NOT NULL,
+--   `title_ar` varchar(255) NOT NULL,
+--   `file_paths` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`file_paths`)),
+--   `created_at` timestamp NULL DEFAULT NULL,
+--   `updated_at` timestamp NULL DEFAULT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', NULL, 'manage_floor_plans', 'Manage Floor Plans', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 149, 'add_floor_plans', 'Add Floor Plans', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 149, 'view_floor_plans', 'View Floor Plans', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 149, 'edit_floor_plans', 'Edit Floor Plans', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+-- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 149, 'delete_floor_plans', 'Delete Floor Plans', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+-- Done in live
