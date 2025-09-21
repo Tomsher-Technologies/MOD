@@ -21,8 +21,6 @@
 
                     <span class="mr-2">{{ __db('bulk_import_options') }}</span>
                 </a>
-<<<<<<< HEAD
-=======
                 
                 <a href="{{ route('dropdowns.export') }}"
                     class="btn text-sm mb-[-10px] bg-[#a57d30] text-white rounded-lg ">
@@ -35,7 +33,6 @@
                     <span class="mr-2">{{ __db('export') }}</span>
                 </a>
                 
->>>>>>> staging
             @enddirectCan
             
         </div>
