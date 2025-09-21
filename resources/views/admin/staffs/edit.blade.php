@@ -40,7 +40,7 @@
                                 @enderror
                             </div>
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('email') }} <span class="text-red-600">*</span></label>
+                                <label class="form-label">{{ __db('email') }} </label>
                                 <input type="text" id="email" name="email" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('email', $staff->email) }}">
                                 @error('email')
                                     <div class="text-red-600">{{ $message }}</div>
@@ -107,15 +107,12 @@
                                         </svg>
                                     </button>
                                     
-                                    @error('password')
-                                        <div class="text-red-600">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('confirm_password') }}</label>
                                 <input type="text" id="password_confirmation" name="password_confirmation" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('password_confirmation') }}">
-                                @error('password_confirmation')
+                                @error('password')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                             </div>
