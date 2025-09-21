@@ -156,6 +156,10 @@ class EventController extends Controller
             $data['is_default'] = false;
         }
 
+        if($request->active_status == 1){
+            $event->assignedUsers()->update(['status' => 0]);
+        }
+
         $event->update($data);
 
         return redirect()->route('events.index')->with('success', __db('event') . __db('updated_successfully'));
@@ -213,5 +217,14 @@ class EventController extends Controller
         ]);
         session(['current_event_id' => $request->event_id]);
         return redirect()->back();
+    }
+
+    public function updateEventUserStatus(Request $request){
+        $id = $request->id;
+        $status = $request->status;
+        $eventUser = EventUserRole::find($id);
+        $eventUser->status = $status;
+        $eventUser->save();
+        return 1;
     }
 }
