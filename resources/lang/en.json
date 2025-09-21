@@ -38,6 +38,7 @@
     "military_number_required" : "Military number is required",
     "military_number_already_exist" : "Military number already in use",
     "are_you_sure" : "Are you sure?",
+    "status_confirm_msg" : "Do you really want to change the status?",
     "event_required" : "Event is required",
     "event_not_assigned" : "'You are not assigned to the selected event.'",
     "user_unassigned" : "User has been unassigned.",
@@ -284,6 +285,7 @@
     "add_new_files": "Add New Files",
     "upload_new_floor_plan_files_msg": "Select PDF files to add to this floor plan",
     "view": "View",
-    "export": "Export"
+    "export": "Export",
+    "inactivate_user_confirm_msg" : "Do you want to inactivate all users assigned to this event?"
 
 }

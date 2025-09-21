@@ -85,6 +85,7 @@ class LoginController extends Controller
         // non-admin → load user events
         $events = EventUserRole::with('event')
                     ->where('user_id', $user->id)
+                    ->where('status', 1)
                     ->get()
                     ->map(function ($eur) {
                         return [

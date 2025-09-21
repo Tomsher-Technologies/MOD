@@ -8,7 +8,7 @@
         </a>
     </div>
     <div class="sidebar-menu-area flex flex-col justify-between">
-        <ul class="sidebar-menu flex flex-col gap-8" id="sidebar-menu">
+        <ul class="sidebar-menu flex flex-col gap-4" id="sidebar-menu">
             <li>
                 <a href="{{ route('admin.dashboard') }}" class="{{ areActiveRoutes(['admin.dashboard','admin.dashboard.tables']) }}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="pe-2 !text-white" width="36" height="30"
