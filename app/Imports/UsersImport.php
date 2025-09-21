@@ -26,23 +26,39 @@ class UsersImport implements ToCollection, WithHeadingRow
             $phone = trim($row['phone']) ?? NULL;
             $module = strtolower(trim($row['module'])) ?? NULL;
             $role = trim($row['role']) ?? NULL;
-            $eventId = NULL;
+            $eventCheck  = Event::where('code', $event_code)->first();
+            $eventId = $eventCheck->id ?? NULL;
             if($username != NULL || $username != ''){
                 $checkUser = User::where('username', $username)->first();
                 if($checkUser){
                     $checkUser->update([
                         'name'            => $name,
                         'email'           => $email,
+                        'user_type'       => $module,
                         'phone'           => $phone
                     ]);
 
                     $checkRole = Role::where('name', $role)->first();
                     if($checkRole){
                         $checkUser->assignRole($role);
-                    }
-                    if($module != 'admin'){
-                        // $alreadyAssignedEvent = EventUserRole::where('user_id', $checkUser->id)
-                        //                         ->where('event_id', $eventId)->first();
+                        if($module != 'admin'){
+                            $alreadyAssignedEvent = EventUserRole::where('user_id', $checkUser->id)
+                                                    ->where('event_id', $eventId)->first();
+
+                            if($alreadyAssignedEvent){
+                                $alreadyAssignedEvent->update([
+                                    'role_id'   => $checkRole->id,
+                                    'module'    => $module
+                                ]);
+                            }else{
+                                EventUserRole::create([
+                                    'event_id'  => $eventId, 
+                                    'user_id'   => $checkUser->id,
+                                    'module'    => $module,
+                                    'role_id'   => $checkRole->id,
+                                ]);
+                            }
+                        }
                     }
                 }else{
                     if($module == 'admin'){
@@ -67,9 +83,8 @@ class UsersImport implements ToCollection, WithHeadingRow
                             $user->assignRole($role);
 
                             if($module != 'admin'){
-                                $eventCheck  = Event::where('code', $event_code)->first();
+                                
                                 if($eventCheck){
-                                    $eventId = $eventCheck->id;
                                     $roleCheck = Role::where('name', $role)->where('module', $module)->first();
 
                                     if ($roleCheck) {
