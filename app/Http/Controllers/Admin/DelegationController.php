@@ -118,7 +118,7 @@ class DelegationController extends Controller
         ]);
 
         $currentEventId = session('current_event_id', getDefaultEventId());
-        $query->where('event_id', $currentEventId);
+        $query->where('delegations.event_id', $currentEventId);
 
         if ($request->filter_services_assignable) {
             $query->whereDoesntHave('invitationStatus', function ($q) {
@@ -136,10 +136,11 @@ class DelegationController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
+                $q->where('delegations.code', 'like', "%{$search}%")
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
                         $delegateQuery->where(function ($dq) use ($search) {
                             $dq->where('name_en', 'like', "%{$search}%")
+                                ->orWhere('name_ar', 'like', "%{$search}%") 
                                 ->orWhere('title_en', 'like', "%{$search}%")
                                 ->orWhere('title_ar', 'like', "%{$search}%");
                         });
@@ -152,7 +153,6 @@ class DelegationController extends Controller
                                 ->orWhere('title_ar', 'like', "%{$search}%");
                         });
                     })
-
                     ->orWhereHas('drivers', function ($driverQuery) use ($search) {
                         $driverQuery->where(function ($eq) use ($search) {
                             $eq->where('name_en', 'like', "%{$search}%")
@@ -164,43 +164,44 @@ class DelegationController extends Controller
             });
         }
 
+
         if ($invitationFrom = $request->input('invitation_from')) {
             if (is_array($invitationFrom)) {
-                $query->whereIn('invitation_from_id', $invitationFrom);
+                $query->whereIn('delegations.invitation_from_id', $invitationFrom);
             } else {
-                $query->where('invitation_from_id', $invitationFrom);
+                $query->where('delegations.invitation_from_id', $invitationFrom);
             }
         }
 
         if ($continentId = $request->input('continent_id')) {
             if (is_array($continentId)) {
-                $query->whereIn('continent_id', $continentId);
+                $query->whereIn('delegations.continent_id', $continentId);
             } else {
-                $query->where('continent_id', $continentId);
+                $query->where('delegations.continent_id', $continentId);
             }
         }
 
         if ($countryId = $request->input('country_id')) {
             if (is_array($countryId)) {
-                $query->whereIn('country_id', $countryId);
+                $query->whereIn('delegations.country_id', $countryId);
             } else {
-                $query->where('country_id', $countryId);
+                $query->where('delegations.country_id', $countryId);
             }
         }
 
         if ($invitationStatusId = $request->input('invitation_status_id')) {
             if (is_array($invitationStatusId)) {
-                $query->whereIn('invitation_status_id', $invitationStatusId);
+                $query->whereIn('delegations.invitation_status_id', $invitationStatusId);
             } else {
-                $query->where('invitation_status_id', $invitationStatusId);
+                $query->where('delegations.invitation_status_id', $invitationStatusId);
             }
         }
 
         if ($participationStatusId = $request->input('participation_status_id')) {
             if (is_array($participationStatusId)) {
-                $query->whereIn('participation_status_id', $participationStatusId);
+                $query->whereIn('delegations.participation_status_id', $participationStatusId);
             } else {
-                $query->where('participation_status_id', $participationStatusId);
+                $query->where('delegations.participation_status_id', $participationStatusId);
             }
         }
 
@@ -212,6 +213,7 @@ class DelegationController extends Controller
 
         return view('admin.delegations.index', compact('delegations'));
     }
+
 
     public function interviewsIndex(Request $request)
     {
@@ -285,7 +287,7 @@ class DelegationController extends Controller
 
     public function create()
     {
-        return view('admin.delegations.create', array_merge( [
+        return view('admin.delegations.create', array_merge([
             'uniqueDelegateId' => '',
         ]));
     }
@@ -2391,7 +2393,7 @@ class DelegationController extends Controller
         try {
             $delegation->interviews()->delete();
             $delegation->attachments()->delete();
-            
+
             foreach ($delegation->delegates as $delegate) {
                 if ($delegate->current_room_assignment_id) {
                     $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
