@@ -377,7 +377,7 @@ class DelegationController extends Controller
         $now = now();
 
         $oneHourAgo = $now->copy()->subHour();
-        $twoHoursFromNow = $now->copy()->addHours(1);
+        $oneHourFromNow = $now->copy()->addHours(1);
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
@@ -385,7 +385,7 @@ class DelegationController extends Controller
         }
 
         $arrivalsQuery = DelegateTransport::where('type', 'arrival')
-            ->where(function ($query) use ($now, $oneHourAgo, $twoHoursFromNow) {
+            ->where(function ($query) use ($now, $oneHourAgo, $oneHourFromNow) {
                 $query->whereDate('date_time', $now->toDateString());
             })
             ->with([
@@ -409,9 +409,9 @@ class DelegationController extends Controller
 
         $arrivals = $arrivalsQuery->orderBy('date_time', 'asc')
             ->get()
-            ->sortBy(function ($transport) use ($now, $oneHourAgo, $twoHoursFromNow) {
+            ->sortBy(function ($transport) use ($now, $oneHourAgo, $oneHourFromNow) {
                 $scheduledTime = \Carbon\Carbon::parse($transport->date_time);
-                $isInCriticalWindow = $scheduledTime->between($oneHourAgo, $twoHoursFromNow);
+                $isInCriticalWindow = $scheduledTime->between($oneHourAgo, $oneHourFromNow);
                 $isOverdue = $scheduledTime->lt($now) && $transport->status !== 'arrived';
                 $isUpcoming = $scheduledTime->gt($now) && $scheduledTime->lte($now->copy()->addHour());
                 $isArrived = $transport->status === 'arrived';
@@ -463,7 +463,7 @@ class DelegationController extends Controller
         $now = now();
 
         $oneHourAgo = $now->copy()->subHour();
-        $twoHoursFromNow = $now->copy()->addHours(1);
+        $oneHourFromNow = $now->copy()->addHours(1);
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
@@ -471,7 +471,7 @@ class DelegationController extends Controller
         }
 
         $departuresQuery = DelegateTransport::where('type', 'departure')
-            ->where(function ($query) use ($now, $oneHourAgo, $twoHoursFromNow) {
+            ->where(function ($query) use ($now, $oneHourAgo, $oneHourFromNow) {
                 $query->whereDate('date_time', $now->toDateString());
             })
             ->with([
@@ -495,9 +495,9 @@ class DelegationController extends Controller
 
         $departures = $departuresQuery->orderBy('date_time', 'asc')
             ->get()
-            ->sortBy(function ($transport) use ($now, $oneHourAgo, $twoHoursFromNow) {
+            ->sortBy(function ($transport) use ($now, $oneHourAgo, $oneHourFromNow) {
                 $scheduledTime = \Carbon\Carbon::parse($transport->date_time);
-                $isInCriticalWindow = $scheduledTime->between($oneHourAgo, $twoHoursFromNow);
+                $isInCriticalWindow = $scheduledTime->between($oneHourAgo, $oneHourFromNow);
                 $isOverdue = $scheduledTime->lt($now) && $transport->status !== 'departed';
                 $isDepartingSoon = $scheduledTime->gt($now) && $scheduledTime->lte($now->copy()->addHour());
                 $hasDeparted = $transport->status === 'departed';
