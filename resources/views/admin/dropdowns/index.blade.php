@@ -33,6 +33,7 @@
                     <span class="mr-2">{{ __db('export') }}</span>
                 </a>
             @enddirectCan
+            
         </div>
     </div>
 
