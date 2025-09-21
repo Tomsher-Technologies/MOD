@@ -140,7 +140,7 @@ class DelegationController extends Controller
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
                         $delegateQuery->where(function ($dq) use ($search) {
                             $dq->where('name_en', 'like', "%{$search}%")
-                                ->orWhere('name_ar', 'like', "%{$search}%") 
+                                ->orWhere('name_ar', 'like', "%{$search}%")
                                 ->orWhere('title_en', 'like', "%{$search}%")
                                 ->orWhere('title_ar', 'like', "%{$search}%");
                         });
@@ -375,16 +375,19 @@ class DelegationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         $now = now();
+
         $oneHourAgo = $now->copy()->subHour();
+        $twoHoursFromNow = $now->copy()->addHours(1);
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
             $request->merge(['date_range' => $today . ' - ' . $today]);
         }
 
-        // Get all arrivals within the date range and within 1 hour ago or in the future
         $arrivalsQuery = DelegateTransport::where('type', 'arrival')
-            ->where('date_time', '>=', $oneHourAgo)
+            ->where(function ($query) use ($now, $oneHourAgo, $twoHoursFromNow) {
+                $query->whereDate('date_time', $now->toDateString());
+            })
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -392,10 +395,12 @@ class DelegationController extends Controller
                 'delegate.delegation.drivers',
                 'airport',
                 'delegate.delegation.invitationFrom',
-            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-                });
+            ])
+            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId)
+                    ->whereHas('invitationStatus', function ($q) {
+                        $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                    });
             });
 
         $this->applyTransportFilters($arrivalsQuery, $request, $currentEventId);
@@ -404,11 +409,37 @@ class DelegationController extends Controller
 
         $arrivals = $arrivalsQuery->orderBy('date_time', 'asc')
             ->get()
-            ->sortBy(function ($transport) {
-                $statusOrder = $transport->status === 'arrived' ? 1 : 0;
-                return [$transport->date_time, $statusOrder];
+            ->sortBy(function ($transport) use ($now, $oneHourAgo, $twoHoursFromNow) {
+                $scheduledTime = \Carbon\Carbon::parse($transport->date_time);
+                $isInCriticalWindow = $scheduledTime->between($oneHourAgo, $twoHoursFromNow);
+                $isOverdue = $scheduledTime->lt($now) && $transport->status !== 'arrived';
+                $isUpcoming = $scheduledTime->gt($now) && $scheduledTime->lte($now->copy()->addHour());
+                $isArrived = $transport->status === 'arrived';
+
+                if ($isArrived) {
+                    return [5, $scheduledTime]; // Lowest priority: All arrived flights at the end
+                } elseif ($isOverdue) {
+                    return [0, $scheduledTime]; // Critical: Overdue flights
+                } elseif ($isUpcoming) {
+                    return [1, $scheduledTime]; // High priority: Arriving within 1 hour
+                } elseif ($isInCriticalWindow) {
+                    return [2, $scheduledTime]; // Medium priority: In time window
+                } else {
+                    return [3, $scheduledTime]; // Low priority: All other today's flights
+                }
             })
             ->values();
+
+
+        $arrivals = $arrivals->filter(function ($transport) use ($now) {
+            $scheduledTime = \Carbon\Carbon::parse($transport->date_time);
+            $oneHourAfterScheduled = $scheduledTime->copy()->addHour();
+
+            return $transport->status !== 'arrived' ||
+                $now->lte($oneHourAfterScheduled) ||
+                $scheduledTime->lt($now->copy()->subHour());
+        });
+
 
         $groupedArrivals = $this->groupTransports($arrivals);
 
@@ -425,20 +456,24 @@ class DelegationController extends Controller
         return view('admin.arrivals.index', compact('paginator', 'groupedArrivals'));
     }
 
+
     public function departuresIndex(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         $now = now();
+
         $oneHourAgo = $now->copy()->subHour();
+        $twoHoursFromNow = $now->copy()->addHours(1);
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
             $request->merge(['date_range' => $today . ' - ' . $today]);
         }
 
-        // Get all departures within the date range and within 1 hour ago or in the future
         $departuresQuery = DelegateTransport::where('type', 'departure')
-            ->where('date_time', '>=', $oneHourAgo)
+            ->where(function ($query) use ($now, $oneHourAgo, $twoHoursFromNow) {
+                $query->whereDate('date_time', $now->toDateString());
+            })
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -446,24 +481,52 @@ class DelegationController extends Controller
                 'delegate.delegation.drivers',
                 'airport',
                 'delegate.delegation.invitationFrom',
-            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-                });
+            ])
+            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId)
+                    ->whereHas('invitationStatus', function ($q) {
+                        $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                    });
             });
 
         $this->applyTransportFilters($departuresQuery, $request, $currentEventId);
 
         $limit = $request->limit ? $request->limit : 20;
 
-        // Order by date_time ascending, then by status (non-departed first)
         $departures = $departuresQuery->orderBy('date_time', 'asc')
             ->get()
-            ->sortBy(function ($transport) {
-                $statusOrder = $transport->status === 'departed' ? 1 : 0;
-                return [$transport->date_time, $statusOrder];
+            ->sortBy(function ($transport) use ($now, $oneHourAgo, $twoHoursFromNow) {
+                $scheduledTime = \Carbon\Carbon::parse($transport->date_time);
+                $isInCriticalWindow = $scheduledTime->between($oneHourAgo, $twoHoursFromNow);
+                $isOverdue = $scheduledTime->lt($now) && $transport->status !== 'departed';
+                $isDepartingSoon = $scheduledTime->gt($now) && $scheduledTime->lte($now->copy()->addHour());
+                $hasDeparted = $transport->status === 'departed';
+
+                if ($hasDeparted) {
+                    return [5, $scheduledTime]; // Lowest priority: All departed flights at the end
+                } elseif ($isOverdue) {
+                    return [0, $scheduledTime]; // Critical: Overdue departures (delayed flights)
+                } elseif ($isDepartingSoon) {
+                    return [1, $scheduledTime]; // High priority: Departing within 1 hour
+                } elseif ($isInCriticalWindow) {
+                    return [2, $scheduledTime]; // Medium priority: In time window
+                } else {
+                    return [3, $scheduledTime]; // Low priority: All other today's departures
+                }
             })
             ->values();
+
+        $departures = $departures->filter(function ($transport) use ($now) {
+            $scheduledTime = \Carbon\Carbon::parse($transport->date_time);
+            $oneHourAfterScheduled = $scheduledTime->copy()->addHour();
+
+            // 1. Not yet departed
+            // 2. Already departed but still within 1-hour display margin
+            // 3. Overdue and not yet departed (critical)
+            return $transport->status !== 'departed' ||
+                $now->lte($oneHourAfterScheduled) ||
+                $scheduledTime->lt($now->copy()->subHour());
+        });
 
         $groupedDepartures = $this->groupTransports($departures);
 
@@ -479,6 +542,7 @@ class DelegationController extends Controller
 
         return view('admin.departures.index', compact('paginator', 'groupedDepartures'));
     }
+
 
     protected function applyTransportFilters($query, $request, $currentEventId)
     {
