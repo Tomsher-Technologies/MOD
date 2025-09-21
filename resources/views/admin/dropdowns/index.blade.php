@@ -22,6 +22,7 @@
                     <span class="mr-2">{{ __db('bulk_import_options') }}</span>
                 </a>
             @enddirectCan
+            
         </div>
     </div>
 
