@@ -12,17 +12,20 @@
 
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                                @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver')
+                @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver')
                     <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
                         <h3 class="font-semibold text-lg">{{ __db('assigning_driver_to_delegation') }}</h3>
-                        @if(isset($assignmentDelegation))
+                        @if (isset($assignmentDelegation))
                             <div class="mt-2 pt-2 ">
-                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong> {{ $assignmentDelegation->code }}</p>
-                                @if($assignmentDelegation->country)
-                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong> {{ $assignmentDelegation->country->name }}</p>
+                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong>
+                                    {{ $assignmentDelegation->code }}</p>
+                                @if ($assignmentDelegation->country)
+                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong>
+                                        {{ $assignmentDelegation->country->name }}</p>
                                 @endif
-                                @if($assignmentDelegation->continent)
-                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong> {{ $assignmentDelegation->continent->value }}</p>
+                                @if ($assignmentDelegation->continent)
+                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong>
+                                        {{ $assignmentDelegation->continent->value }}</p>
                                 @endif
                             </div>
                         @endif
@@ -211,7 +214,7 @@
                             'render' => function ($driver) use ($delegationId, $assignmentMode) {
                                 $editUrl = route('drivers.edit', $driver->id);
 
-                                $output = '<div class="flex items-start gap-2">';
+                                $output = '<div class="flex items-start  flex-wrap justify-start gap-2">';
 
                                 if (can(['edit_drivers', 'driver_edit_drivers'])) {
                                     $output .=
@@ -317,19 +320,25 @@
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select name="title_en" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                <select name="title_en"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select_title_en') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleEns as $titleEn)
-                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>{{ $titleEn }}</option>
+                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>
+                            {{ $titleEn }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select name="title_ar" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                <select name="title_ar"
+                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select_title_ar') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleArs as $titleAr)
-                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>{{ $titleAr }}</option>
+                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>
+                            {{ $titleAr }}</option>
                     @endforeach
                 </select>
             </div>

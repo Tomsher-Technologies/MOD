@@ -162,7 +162,7 @@
                             'key' => 'actions',
                             'render' => function ($escort) use ($delegationId, $assignmentMode) {
                                 $editUrl = route('escorts.edit', $escort->id);
-                                $output = '<div class="flex align-center gap-4">';
+                                 $output = '<div class="flex items-center gap-4 flex-wrap justify-start">';
                                 if (can(['edit_escorts', 'escort_edit_escorts'])) {
                                     $output .=
                                         '<a href="' .
