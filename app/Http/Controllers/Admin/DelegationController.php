@@ -453,6 +453,13 @@ class DelegationController extends Controller
             ['path' => $request->url(), 'pageName' => 'page']
         );
 
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => view('shared-pages.arrivals.table', compact('paginator', 'groupedArrivals'))->render()
+            ]);
+        }
+
         return view('admin.arrivals.index', compact('paginator', 'groupedArrivals'));
     }
 
@@ -539,6 +546,13 @@ class DelegationController extends Controller
             $currentPage,
             ['path' => $request->url(), 'pageName' => 'page']
         );
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'data' => view('shared-pages.departures.table', compact('paginator', 'groupedDepartures'))->render()
+            ]);
+        }
 
         return view('admin.departures.index', compact('paginator', 'groupedDepartures'));
     }

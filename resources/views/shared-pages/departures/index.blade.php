@@ -111,12 +111,23 @@
                             },
                         ],
                         [
+                            'label' => __db('invitation_from'),
+                            'render' => fn($row) => $row['delegation']->invitationFrom->value ?? '-',
+                        ],
+                        [
                             'label' => __db('delegates'),
                             'render' => function ($row) {
                                 $delegation = $row['delegation'] ?? null;
 
                                 if ($delegation) {
-                                    $teamHead = $delegation->getTeamHead();
+                                    $teamHead = null;
+                                    foreach ($row['delegates'] as $delegate) {
+                                        if ($delegate->team_head) {
+                                            $teamHead = $delegate;
+                                            break;
+                                        }
+                                    }
+
                                     if ($teamHead) {
                                         return e(
                                             $teamHead->getTranslation('title') .
@@ -124,11 +135,8 @@
                                                 $teamHead->getTranslation('name'),
                                         );
                                     }
-                                }
 
-                                $delegates = $row['delegates'] ?? [];
-                                if (!empty($delegates)) {
-                                    $firstDelegate = collect($delegates)->first();
+                                    $firstDelegate = collect($row['delegates'])->first();
                                     if ($firstDelegate) {
                                         return e(
                                             $firstDelegate->getTranslation('title') .
@@ -264,7 +272,7 @@
                     };
                 @endphp
 
-                <div>
+                <div id="departures-table-container">
                     <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="departures-table" :enableColumnListBtn="true"
                         :data="$paginator" :row-class="$rowClass" />
                 </div>
@@ -379,8 +387,9 @@
                                         value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
-                             <div class="text-xs text-gray-500 mt-1">{{ __db('field_automatically_managed_by_system') }}
-                        </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                {{ __db('field_automatically_managed_by_system') }}
+                            </div>
                         </div>
                     </div>
 
@@ -554,21 +563,6 @@
                 if (selectedContinent && selectedContinent.length > 0) {
                     $('#continent-select').trigger('change');
                 }
-            });
-        </script>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-
-                document.querySelectorAll('.edit-departure-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const departure = JSON.parse(btn.getAttribute('data-departure'));
-                        window.dispatchEvent(new CustomEvent('open-edit-departure', {
-                            detail: departure
-                        }));
-                    });
-
-                });
 
                 // Initialize datetimepicker for departure modal
                 const departureDateTimeInput = document.getElementById('departure_datetime');
@@ -582,8 +576,19 @@
                         mask: true,
                     });
                 }
-
-                // Remove the duplicate continent/country selector code as it's handled by the select2 initialization above
             });
+
+            function bindDepartureEditButtons() {
+                document.querySelectorAll('.edit-departure-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const departure = JSON.parse(btn.getAttribute('data-departure'));
+                        window.dispatchEvent(new CustomEvent('open-edit-departure', {
+                            detail: departure
+                        }));
+                    });
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', bindDepartureEditButtons);
         </script>
     @endsection

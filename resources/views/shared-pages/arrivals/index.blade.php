@@ -61,7 +61,6 @@
                 <hr class=" border-neutral-200 h-5 ">
 
                 @php
-
                     $statusLabels = [
                         'arrived' => __db('arrived'),
                         'to_be_arrived' => __db('to_be_arrived'),
@@ -127,7 +126,14 @@
                                 $delegation = $row['delegation'] ?? null;
 
                                 if ($delegation) {
-                                    $teamHead = $delegation->getTeamHead();
+                                    $teamHead = null;
+                                    foreach ($row['delegates'] as $delegate) {
+                                        if ($delegate->team_head) {
+                                            $teamHead = $delegate;
+                                            break;
+                                        }
+                                    }
+                                    
                                     if ($teamHead) {
                                         return e(
                                             $teamHead->getTranslation('title') .
@@ -135,11 +141,8 @@
                                                 $teamHead->getTranslation('name'),
                                         );
                                     }
-                                }
-
-                                $delegates = $row['delegates'] ?? [];
-                                if (!empty($delegates)) {
-                                    $firstDelegate = collect($delegates)->first();
+                                    
+                                    $firstDelegate = collect($row['delegates'])->first();
                                     if ($firstDelegate) {
                                         return e(
                                             $firstDelegate->getTranslation('title') .
@@ -280,7 +283,7 @@
                     };
                 @endphp
 
-                <div>
+                <div id="arrivals-table-container">
                     <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table" :enableColumnListBtn="true"
                         :data="$paginator" :row-class="$rowClass" />
                 </div>
@@ -564,21 +567,7 @@
             if (selectedContinent && selectedContinent.length > 0) {
                 $('#continent-select').trigger('change');
             }
-        });
-    </script>
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.edit-arrival-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const arrival = JSON.parse(btn.getAttribute('data-arrival'));
-                    window.dispatchEvent(new CustomEvent('open-edit-arrival', {
-                        detail: arrival
-                    }));
-                });
-            });
-
+            
             const arrivalDateTimeInput = document.getElementById('arrival_datetime');
             if (arrivalDateTimeInput) {
                 $(arrivalDateTimeInput).datetimepicker({
@@ -590,8 +579,19 @@
                     mask: true,
                 });
             }
-
-            // Remove the duplicate continent/country selector code as it's handled by the select2 initialization above
         });
+        
+        function bindArrivalEditButtons() {
+            document.querySelectorAll('.edit-arrival-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const arrival = JSON.parse(btn.getAttribute('data-arrival'));
+                    window.dispatchEvent(new CustomEvent('open-edit-arrival', {
+                        detail: arrival
+                    }));
+                });
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', bindArrivalEditButtons);
     </script>
 @endsection
