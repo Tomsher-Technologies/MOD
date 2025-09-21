@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\AlertController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\EventPageController;
+use App\Http\Controllers\Admin\FloorPlanController;
 use App\Http\Controllers\Admin\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -180,6 +181,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/external-accommodations/{id}/edit', [AccommodationController::class, 'editExternalMembers'])->name('external-members.edit');
     Route::put('/external-accommodations/{id}', [AccommodationController::class, 'updateExternalMembers'])->name('admin.external-members.update');
     Route::delete('/external-accommodations/{id}', [AccommodationController::class, 'destroyExternalMembers'])->name('admin.external-members.destroy');
+
+    // Floor Plans
+    Route::resource('floor-plans', FloorPlanController::class);
+    Route::delete('/floor-plans/{floorPlan}/file/{fileIndex}', [FloorPlanController::class, 'queueFileDeletion'])->name('floor-plans.delete-file');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
