@@ -95,4 +95,29 @@ class DropdownController extends Controller
 
         return back()->with('success', 'Dropdown options imported successfully.');
     }
+    
+    public function export()
+    {
+        $dropdowns = Dropdown::with('options')->get();
+        
+        $data = [];
+        foreach ($dropdowns as $dropdown) {
+            foreach ($dropdown->options as $option) {
+                $data[] = [
+                    $dropdown->id,
+                    $dropdown->name,
+                    $option->id,
+                    $option->value,
+                    $option->value_ar,
+                    $option->code,
+                    $option->sort_order,
+                    $option->status,
+                ];
+            }
+        }
+        
+        $filename = 'dropdowns_export_' . date('Y-m-d_H-i-s') . '.xlsx';
+        
+        return Excel::download(new \App\Exports\DropdownExport($data), $filename);
+    }
 }

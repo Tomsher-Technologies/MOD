@@ -154,13 +154,15 @@
         </form>
     </div>
 
-    @php
-        $hasActiveAssignment = $escort->delegations()->where('status', 1)->exists();
-    @endphp
+    @if ($escort->status == 1)
+        @php
+            $hasActiveAssignment = $escort->delegations()->where('status', 1)->exists();
+        @endphp
 
-    <h2 class="font-semibold !text-[22px] mt-6 mb-6">
-        {{ $hasActiveAssignment ? __db('reassign') : __db('assign') }}
-    </h2>
+        <h2 class="font-semibold !text-[22px] mt-6 mb-6">
+            {{ $hasActiveAssignment ? __db('reassign') : __db('assign') }}
+        </h2>
 
-    <x-assign-delegation-with-search :escort="$escort" />
+        <x-assign-delegation-with-search :escort="$escort" />
+    @endif
 </div>

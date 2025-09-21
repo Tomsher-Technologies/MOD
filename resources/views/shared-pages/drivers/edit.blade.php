@@ -69,7 +69,7 @@
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('phone_number') }}:</label>
                     <div class="flex">
-                        <input type="text" name="phone_number" 
+                        <input type="text" name="phone_number"
                             class="p-3 w-full border text-sm border-neutral-300 border-l-0 text-neutral-600 focus:border-primary-600 focus:ring-0 ltr"
                             placeholder="501234567" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" minlength="9"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" dir="ltr"
@@ -148,13 +148,15 @@
         </form>
     </div>
 
-    @php
-        $hasActiveAssignment = $driver->delegations()->where('status', 1)->exists();
-    @endphp
+    @if ($driver->status == 1)
+        @php
+            $hasActiveAssignment = $driver->delegations()->where('status', 1)->exists();
+        @endphp
 
-    <h2 class="font-semibold !text-[22px] mt-6 mb-6">
-        {{ $hasActiveAssignment ? __db('reassign') : __db('assign') }}
-    </h2>
+        <h2 class="font-semibold !text-[22px] mt-6 mb-6">
+            {{ $hasActiveAssignment ? __db('reassign') : __db('assign') }}
+        </h2>
 
-    <x-assign-delegation-to-driver :driver="$driver" />
+        <x-assign-delegation-to-driver :driver="$driver" />
+    @endif
 </div>

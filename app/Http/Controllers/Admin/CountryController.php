@@ -139,7 +139,7 @@ class CountryController extends Controller
         $continentIds = $request->query('continent_ids');
 
         if (is_array($continentIds)) {
-            $continentIds = array_filter($continentIds); 
+            $continentIds = array_filter($continentIds);
         } else if (is_string($continentIds)) {
             $continentIds = array_filter(explode(',', $continentIds));
         } else {
@@ -149,6 +149,7 @@ class CountryController extends Controller
         $countries = Country::whereIn('continent_id', $continentIds)
             ->select('id', 'name', 'name_ar')
             ->orderBy('name')
+            ->where('status', 1)
             ->get();
 
         return response()->json($countries);
