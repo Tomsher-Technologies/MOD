@@ -112,12 +112,12 @@
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select_country') }}</option>
-                        @foreach (getAllCountries() as $option)
+                        {{-- @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('country_id', request('country_id')) == $option->id ? 'selected' : '' }}>
                                 {{ $option->name }}
                             </option>
-                        @endforeach
+                        @endforeach --}}
                     </select>
 
                     @error('country_id')
