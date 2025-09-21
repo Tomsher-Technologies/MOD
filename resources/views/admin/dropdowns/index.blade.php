@@ -24,13 +24,7 @@
                 
                 <a href="{{ route('dropdowns.export') }}"
                     class="btn text-sm mb-[-10px] bg-[#a57d30] text-white rounded-lg ">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="white" stroke-width="2"
-                        viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 12l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-
-                    <span class="mr-2">{{ __db('export') }}</span>
+                    <span class="mr-2">{{ __db('export') . " " . __db('dropdown_options') }}</span>
                 </a>
             @enddirectCan
         </div>
