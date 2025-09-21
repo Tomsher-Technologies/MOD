@@ -106,7 +106,6 @@ class DropdownController extends Controller
                 $data[] = [
                     $dropdown->id,
                     $dropdown->name,
-                    $dropdown->code,
                     $option->id,
                     $option->value,
                     $option->value_ar,
