@@ -78,6 +78,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::post('/events/{event}/assign-user', [EventController::class, 'assignUsers'])->name('events.assignUsers');
     Route::post('/events/{event}/unassign-user/{assigned}', [EventController::class, 'unassignUser'])->name('events.unassignUser');
     Route::post('/set-current-event', [EventController::class, 'setCurrentEvent'])->name('events.setCurrentEvent');
+    Route::post('/event/user/status', [EventController::class, 'updateEventUserStatus'])->name('event.user.status');
 
     // Manage Other Interview Members
     Route::resource('other-interview-members', OtherMemberController::class);
