@@ -373,14 +373,16 @@ class DelegationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         $now = now();
+        $oneHourAgo = $now->copy()->subHour();
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
             $request->merge(['date_range' => $today . ' - ' . $today]);
         }
 
-        $pastArrivalsQuery = DelegateTransport::where('type', 'arrival')
-            ->where('date_time', '<', $now)
+        // Get all arrivals within the date range and within 1 hour ago or in the future
+        $arrivalsQuery = DelegateTransport::where('type', 'arrival')
+            ->where('date_time', '>=', $oneHourAgo)
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -394,60 +396,47 @@ class DelegationController extends Controller
                 });
             });
 
-        $futureArrivalsQuery = DelegateTransport::where('type', 'arrival')
-            ->where('date_time', '>=', $now)
-            ->with([
-                'delegate.delegation.country',
-                'delegate.delegation.continent',
-                'delegate.delegation.escorts',
-                'delegate.delegation.drivers',
-                'airport',
-                'delegate.delegation.invitationFrom',
-            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-                });
-            });
-
-        $this->applyTransportFilters($pastArrivalsQuery, $request, $currentEventId);
-        $this->applyTransportFilters($futureArrivalsQuery, $request, $currentEventId);
+        $this->applyTransportFilters($arrivalsQuery, $request, $currentEventId);
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $pastArrivals = $pastArrivalsQuery->orderBy('date_time', 'desc')->get();
+        $arrivals = $arrivalsQuery->orderBy('date_time', 'asc')
+            ->get()
+            ->sortBy(function ($transport) {
+                $statusOrder = $transport->status === 'arrived' ? 1 : 0;
+                return [$transport->date_time, $statusOrder];
+            })
+            ->values();
 
-        $futureArrivals = $futureArrivalsQuery->orderBy('date_time', 'asc')->get();
-
-        $groupedPastArrivals = $this->groupTransports($pastArrivals);
-        $groupedFutureArrivals = $this->groupTransports($futureArrivals);
-
-        $allGroupedArrivals = array_merge($groupedFutureArrivals, $groupedPastArrivals);
+        $groupedArrivals = $this->groupTransports($arrivals);
 
         $currentPage = $request->input('page', 1);
 
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-            collect($allGroupedArrivals)->forPage($currentPage, $limit),
-            count($allGroupedArrivals),
+            collect($groupedArrivals)->forPage($currentPage, $limit),
+            count($groupedArrivals),
             $limit,
             $currentPage,
             ['path' => $request->url(), 'pageName' => 'page']
         );
 
-        return view('admin.arrivals.index', compact('paginator', 'allGroupedArrivals'));
+        return view('admin.arrivals.index', compact('paginator', 'groupedArrivals'));
     }
 
     public function departuresIndex(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         $now = now();
+        $oneHourAgo = $now->copy()->subHour();
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
             $request->merge(['date_range' => $today . ' - ' . $today]);
         }
 
-        $pastDeparturesQuery = DelegateTransport::where('type', 'departure')
-            ->where('date_time', '<', $now)
+        // Get all departures within the date range and within 1 hour ago or in the future
+        $departuresQuery = DelegateTransport::where('type', 'departure')
+            ->where('date_time', '>=', $oneHourAgo)
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -461,46 +450,32 @@ class DelegationController extends Controller
                 });
             });
 
-        $futureDeparturesQuery = DelegateTransport::where('type', 'departure')
-            ->where('date_time', '>=', $now)
-            ->with([
-                'delegate.delegation.country',
-                'delegate.delegation.continent',
-                'delegate.delegation.escorts',
-                'delegate.delegation.drivers',
-                'airport',
-                'delegate.delegation.invitationFrom',
-            ])->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                $delegationQuery->where('event_id', $currentEventId)->whereHas('invitationStatus', function ($q) {
-                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-                });
-            });
-
-        $this->applyTransportFilters($pastDeparturesQuery, $request, $currentEventId);
-        $this->applyTransportFilters($futureDeparturesQuery, $request, $currentEventId);
+        $this->applyTransportFilters($departuresQuery, $request, $currentEventId);
 
         $limit = $request->limit ? $request->limit : 20;
 
-        $pastDepartures = $pastDeparturesQuery->orderBy('date_time', 'desc')->get();
+        // Order by date_time ascending, then by status (non-departed first)
+        $departures = $departuresQuery->orderBy('date_time', 'asc')
+            ->get()
+            ->sortBy(function ($transport) {
+                $statusOrder = $transport->status === 'departed' ? 1 : 0;
+                return [$transport->date_time, $statusOrder];
+            })
+            ->values();
 
-        $futureDepartures = $futureDeparturesQuery->orderBy('date_time', 'asc')->get();
-
-        $groupedPastDepartures = $this->groupTransports($pastDepartures);
-        $groupedFutureDepartures = $this->groupTransports($futureDepartures);
-
-        $allGroupedDepartures = array_merge($groupedFutureDepartures, $groupedPastDepartures);
+        $groupedDepartures = $this->groupTransports($departures);
 
         $currentPage = $request->input('page', 1);
 
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
-            collect($allGroupedDepartures)->forPage($currentPage, $limit),
-            count($allGroupedDepartures),
+            collect($groupedDepartures)->forPage($currentPage, $limit),
+            count($groupedDepartures),
             $limit,
             $currentPage,
             ['path' => $request->url(), 'pageName' => 'page']
         );
 
-        return view('admin.departures.index', compact('paginator', 'allGroupedDepartures'));
+        return view('admin.departures.index', compact('paginator', 'groupedDepartures'));
     }
 
     protected function applyTransportFilters($query, $request, $currentEventId)
@@ -583,11 +558,11 @@ class DelegationController extends Controller
             }
         }
 
-        if ($statusIds = $request->input('status')) {
-            if (is_array($statusIds)) {
-                $query->whereIn('status', $statusIds);
+        if ($statuses = $request->input('status')) {
+            if (is_array($statuses)) {
+                $query->whereIn('status', $statuses);
             } else {
-                $query->where('status', $statusIds);
+                $query->where('status', $statuses);
             }
         }
     }
