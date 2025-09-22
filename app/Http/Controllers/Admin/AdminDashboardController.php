@@ -23,14 +23,21 @@ use Auth;
 class AdminDashboardController extends Controller
 {
 
+    const ASSIGNABLE_STATUS_CODES = [2, 10];
+
     public function dashboard()
     {
 
         $lang = app()->getLocale() ?? 'en';
         $currentEventId = session('current_event_id', getDefaultEventId());
 
-        $totalDelegates = Delegate::whereHas('delegation', function ($q) use ($currentEventId) {
-            $q->where('event_id', $currentEventId);
+        $invitationStatusIds = DropdownOption::whereHas('dropdown', function ($query) {
+            $query->where('code', 'invitation_status');
+        })->whereIn('code', self::ASSIGNABLE_STATUS_CODES)->pluck('id')->toArray();
+
+        $totalDelegates = Delegate::whereHas('delegation', function ($q) use ($currentEventId, $invitationStatusIds) {
+            $q->where('event_id', $currentEventId)
+                ->whereIn('invitation_status_id', $invitationStatusIds);
         })->count();
 
         $totalEscortsAssigned = DelegationEscort::where('status', 1)
