@@ -123,6 +123,10 @@ class DriverController extends Controller
 
         $limit = $request->limit ?: 20;
 
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+
         $drivers = $query->paginate($limit);
 
         $delegations = Delegation::where('event_id', $currentEventId)
@@ -537,6 +541,4 @@ class DriverController extends Controller
         return redirect()->route('drivers.index')
             ->with('success',  __db('driver') . __db('created_successfully'));
     }
-
- 
 }

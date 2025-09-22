@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class NotificationController extends Controller
 {
+
     public function index(Request $request)
     {
         $notifications = auth()->user()->notifications()->whereNull('alert_id')
@@ -34,12 +35,10 @@ class NotificationController extends Controller
 
         $data = $notification->data;
         $module = $data['module'] ?? null;
-        $action = $data['action'] ?? null;
         $delegationId = $data['delegation_id'] ?? null;
         $submoduleId = $data['submodule_id'] ?? null;
-        $moduleType = $data['module_type'] ?? null;
 
-        if ($delegationId ) {
+        if ($delegationId) {
             try {
                 $delegation = \App\Models\Delegation::find($delegationId);
                 if ($delegation) {
@@ -54,7 +53,7 @@ class NotificationController extends Controller
                     try {
                         $escort = \App\Models\Escort::find($submoduleId);
                         if ($escort) {
-                            return redirect()->route('escorts.edit', $submoduleId);
+                            return redirect()->route('escorts.index', ['id' => $submoduleId]);
                         }
                     } catch (\Exception $e) {
                         return redirect()->route('escorts.index');
@@ -64,7 +63,7 @@ class NotificationController extends Controller
                     try {
                         $driver = \App\Models\Driver::find($submoduleId);
                         if ($driver) {
-                            return redirect()->route('drivers.edit', $submoduleId);
+                            return redirect()->route('drivers.index', ['id' => $submoduleId]);
                         }
                     } catch (\Exception $e) {
                         return redirect()->route('drivers.index');
@@ -81,6 +80,14 @@ class NotificationController extends Controller
                         $escortName = $data['changes']['escort_name'];
                     } elseif (isset($data['changes']['member_name'])) {
                         $escortName = $data['changes']['member_name'];
+                    } elseif (isset($data['changes']['name_en'])) {
+                        $escortName = $data['changes']['name_en'];
+                    } elseif (isset($data['changes']['name_ar'])) {
+                        $escortName = $data['changes']['name_ar'];
+                    }
+                    
+                    if ($escortName && is_array($escortName)) {
+                        $escortName = $escortName['new'] ?? $escortName['old'] ?? null;
                     }
                     
                     if ($escortName) {
@@ -94,6 +101,14 @@ class NotificationController extends Controller
                         $driverName = $data['changes']['driver_name'];
                     } elseif (isset($data['changes']['member_name'])) {
                         $driverName = $data['changes']['member_name'];
+                    } elseif (isset($data['changes']['name_en'])) {
+                        $driverName = $data['changes']['name_en'];
+                    } elseif (isset($data['changes']['name_ar'])) {
+                        $driverName = $data['changes']['name_ar'];
+                    }
+                    
+                    if ($driverName && is_array($driverName)) {
+                        $driverName = $driverName['new'] ?? $driverName['old'] ?? null;
                     }
                     
                     if ($driverName) {

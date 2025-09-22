@@ -55,6 +55,7 @@ class EscortController extends Controller
 
     public function index(Request $request)
     {
+
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
@@ -118,7 +119,12 @@ class EscortController extends Controller
 
         $limit = $request->limit ? $request->limit : 20;
 
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+
         $escorts = $query->paginate($limit);
+
         $delegations = Delegation::where('event_id', $currentEventId)
             ->whereHas('invitationStatus', function ($q) {
                 $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
@@ -129,6 +135,7 @@ class EscortController extends Controller
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
 
         $assignmentDelegation = null;
+
         if ($delegationId && $assignmentMode === 'escort') {
             $assignmentDelegation = Delegation::find($delegationId);
         }
@@ -150,7 +157,7 @@ class EscortController extends Controller
     {
         $delegations = Delegation::all();
 
-        return view('admin.escorts.create', compact('delegations', ));
+        return view('admin.escorts.create', compact('delegations',));
     }
 
     public function store(Request $request)
@@ -231,7 +238,7 @@ class EscortController extends Controller
         $escort = Escort::findOrFail($id);
         $delegations = Delegation::all();
 
-        return view('admin.escorts.edit', compact('escort', 'delegations', ));
+        return view('admin.escorts.edit', compact('escort', 'delegations',));
     }
 
     public function assignIndex(Request $request, Escort $escort)
@@ -515,5 +522,4 @@ class EscortController extends Controller
         return redirect()->route('escorts.index')
             ->with('success',  __db('escort') . __db('created_successfully'));
     }
-
 }

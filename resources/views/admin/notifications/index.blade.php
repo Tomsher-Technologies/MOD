@@ -120,39 +120,36 @@
                                         @endif
 
                                         <div class="bg-gray-50 rounded-lg p-6 border-l-4 border-blue-500">
-                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Module Details</h3>
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __db('module_details') }}
+                                            </h3>
 
                                             <dl class="grid grid-cols-1 gap-x-3 gap-y-3 sm:grid-cols-2">
                                                 <div class="sm:col-span-1">
-                                                    <dt class="text-sm font-medium text-gray-500">Module</dt>
+                                                    <dt class="text-sm font-medium text-gray-500">{{ __db('module') }}</dt>
                                                     <dd class="mt-1 text-sm text-gray-900">{{ $module ?? 'N/A' }}</dd>
                                                 </div>
 
                                                 <div class="sm:col-span-1">
-                                                    <dt class="text-sm font-medium text-gray-500">Action</dt>
+                                                    <dt class="text-sm font-medium text-gray-500">{{ __db('action') }}</dt>
                                                     <dd class="mt-1 text-sm text-gray-900">{{ $action ?? 'N/A' }}</dd>
                                                 </div>
 
                                                 <div class="sm:col-span-1">
-                                                    <dt class="text-sm font-medium text-gray-500">Delegation ID</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900">{{ $delegationId ?? 'N/A' }}
+                                                    <dt class="text-sm font-medium text-gray-500">
+                                                        {{ __db('delegation_code') }}</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">
+                                                        {{ getModuleCode('delegations', $delegationId) ?? 'N/A' }}
                                                     </dd>
                                                 </div>
 
                                                 <div class="sm:col-span-1">
-                                                    <dt class="text-sm font-medium text-gray-500">Submodule ID</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900">{{ $submoduleId ?? 'N/A' }}</dd>
+                                                    <dt class="text-sm font-medium text-gray-500">{{ __db('module_code') }}
+                                                    </dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">
+                                                        {{ getModuleCode(strtolower($module), $submoduleId) ?? 'N/A' }}
+                                                    </dd>
                                                 </div>
 
-                                                <div class="sm:col-span-1">
-                                                    <dt class="text-sm font-medium text-gray-500">Module Name</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900">{{ $moduleName ?? 'N/A' }}</dd>
-                                                </div>
-
-                                                <div class="sm:col-span-1">
-                                                    <dt class="text-sm font-medium text-gray-500">Module Code</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900">{{ $moduleCode ?? 'N/A' }}</dd>
-                                                </div>
                                             </dl>
                                         </div>
 

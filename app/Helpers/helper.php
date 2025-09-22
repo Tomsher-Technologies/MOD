@@ -276,7 +276,7 @@ function getAllEvents()
 function getDropDown($key)
 {
     $dropdown = \App\Models\Dropdown::where('code', $key)
-        ->where('status', 1) 
+        ->where('status', 1)
         ->with(['options' => function ($query) {
             $query->where('status', 1)->orderBy('sort_order');
         }])
@@ -721,4 +721,32 @@ function humanize(string|null $text): string
     $text = str_replace('_', ' ', strtolower($text));
 
     return ucwords($text);
+}
+
+if (!function_exists('getModuleCode')) {
+    function getModuleCode($module, $id)
+    {
+
+        Log::info($module);
+        try {
+            switch (strtolower($module)) {
+                case 'delegations':
+                    $delegation = \App\Models\Delegation::find($id);
+                    return $delegation ? $delegation->code : null;
+
+                case 'escorts':
+                    $escort = \App\Models\Escort::find($id);
+                    return $escort ? $escort->code : null;
+
+                case 'drivers':
+                    $driver = \App\Models\Driver::find($id);
+                    return $driver ? $driver->code : null;
+
+                default:
+                    return null;
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }
