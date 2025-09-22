@@ -535,10 +535,15 @@ class DriverController extends Controller
             'file' => 'required|mimes:xlsx,csv',
         ]);
 
-
-        $excel = Excel::import(new DriverImport, $request->file('file'));
-
-        return redirect()->route('drivers.index')
-            ->with('success',  __db('driver') . __db('created_successfully'));
+        try {
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DriverImport($fileName), $request->file('file'));
+            
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'drivers'])
+                ->with('success', __db('drivers_imported_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Driver Import Error: ' . $e->getMessage());
+            return back()->with('error', __db('driver_import_failed') . ': ' . $e->getMessage());
+        }
     }
 }

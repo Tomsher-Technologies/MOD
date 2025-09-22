@@ -517,9 +517,15 @@ class EscortController extends Controller
             'file' => 'required|mimes:xlsx,csv',
         ]);
 
-        Excel::import(new EscortImport, $request->file('file'));
-
-        return redirect()->route('escorts.index')
-            ->with('success',  __db('escort') . __db('created_successfully'));
+        try {
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new EscortImport($fileName), $request->file('file'));
+            
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'escorts'])
+                ->with('success', __db('escorts_imported_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Escort Import Error: ' . $e->getMessage());
+            return back()->with('error', __db('escort_import_failed') . ': ' . $e->getMessage());
+        }
     }
 }

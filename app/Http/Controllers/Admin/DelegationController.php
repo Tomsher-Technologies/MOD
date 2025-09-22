@@ -2426,40 +2426,37 @@ class DelegationController extends Controller
     public function importDelegations(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-            Excel::import(new DelegationOnlyImport, $request->file('file'));
-
-            return redirect()->route('delegations.index')
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DelegationOnlyImport($fileName), $request->file('file'));
+            
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'delegations'])
                 ->with('success', __db('delegations_only_imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage())
-                ->withInput();
+            return back()
+                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage());
         }
     }
 
     public function importDelegatesWithTravels(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-            Excel::import(new DelegateImport, $request->file('file'));
-
-            return redirect()->route('delegations.index')
-                ->with('success', __db('delegate') . ' ' . __db('created_successfully'));
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DelegateImport($fileName), $request->file('file'));
+            
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'delegates'])
+                ->with('success', __db('delegates_imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->with('error', __db('delegate_import_failed') . ': ' . $e->getMessage())
-                ->withInput();
+            return back()->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage());
         }
     }
 }

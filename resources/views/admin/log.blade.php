@@ -1,9 +1,9 @@
 @extends('layouts.admin_account')
 
 @section('content')
-<div class="card">
+<div class="card  !max-w-[1600px]">
     <div class="card-header">
-        <h4 class="card-title">Laravel Log - Last 20 Lines</h4>
+        <h4 class="card-title">Laravel Log - Last 3000 Lines</h4>
     </div>
     <div class="card-body">
         @if(count($lines) > 0)

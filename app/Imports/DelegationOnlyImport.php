@@ -11,40 +11,61 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Services\DelegationStatusService;
+use App\Services\ImportLogService;
 
 class DelegationOnlyImport implements ToCollection, WithHeadingRow
 {
 
     protected $delegationStatusService;
+    protected $importLogService;
+    protected $fileName;
 
-    public function __construct()
+    public function __construct($fileName = 'delegations.xlsx')
     {
         $this->delegationStatusService = new DelegationStatusService();
+        $this->importLogService = new ImportLogService();
+        $this->fileName = $fileName;
+        $this->importLogService->clearLogs('delegations');
     }
+    
     public function collection(Collection $rows)
     {
 
         DB::beginTransaction();
 
         try {
+            $rowNumber = 1;
+            
             foreach ($rows as $row) {
+                $rowNumber++;
+                
+                try {
+                    if (empty($row['invitation_from_id'])) {
+                        $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing invitation_from_id', $row->toArray());
+                        continue;
+                    }
 
-                if (empty($row['invitation_from_id'])) {
-                    continue;
+                    $delegationData = $this->processDelegationData($row);
+
+                    // $existingDelegation = Delegation::where('code', trim($row['code']))->first();
+
+                    // if ($existingDelegation) {
+                    //     $existingDelegation->update($delegationData);
+                    //     $delegation = $existingDelegation;
+                    //     
+                    //     $this->importLogService->logSuccess('delegations', $this->fileName, $rowNumber, $row->toArray());
+                    // } else {
+                    $delegation = Delegation::create($delegationData);
+
+                    $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
+                    
+                    $this->importLogService->logSuccess('delegations', $this->fileName, $rowNumber, $row->toArray());
+                    // }
+                } catch (\Exception $e) {
+                    Log::error('Delegation Only Import Error: ' . $e->getMessage());
+                    $this->importLogService->logError('delegations', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
+
                 }
-
-                $delegationData = $this->processDelegationData($row);
-
-                // $existingDelegation = Delegation::where('code', trim($row['code']))->first();
-
-                // if ($existingDelegation) {
-                //     $existingDelegation->update($delegationData);
-                //     $delegation = $existingDelegation;
-                // } else {
-                $delegation = Delegation::create($delegationData);
-
-                $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
-                // }
             }
 
             DB::commit();
@@ -74,6 +95,8 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
             if ($invitationFrom) {
                 $delegationData['invitation_from_id'] = $invitationFrom->id;
+            } else {
+                throw new \Exception('Invalid invitation_from_id: ' . $row['invitation_from_id']);
             }
         }
 
@@ -84,6 +107,8 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
             if ($continent) {
                 $delegationData['continent_id'] = $continent->id;
+            } else {
+                throw new \Exception('Invalid continent_id: ' . $row['continent_id']);
             }
         }
 
@@ -92,6 +117,8 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
             if ($country) {
                 $delegationData['country_id'] = $country->id;
+            } else {
+                throw new \Exception('Invalid country_id: ' . $row['country_id']);
             }
         }
 

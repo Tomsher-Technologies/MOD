@@ -287,13 +287,18 @@ class AccommodationController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
-        Excel::import(new AccommodationsImport, $request->file('file'));
-
-        return redirect()->route('accommodations.index')
-            ->with('success',  __db('accommodation') . __db('created_successfully'));
+        try {
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new AccommodationsImport($fileName), $request->file('file'));
+            
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'hotels'])
+                ->with('success', __db('accommodations_imported_successfully'));
+        } catch (\Exception $e) {
+            return back()->with('error', __db('accommodations_import_failed') . ': ' . $e->getMessage());
+        }
     }
 
     public function exportRoomTypes()
