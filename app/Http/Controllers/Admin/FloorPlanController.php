@@ -23,7 +23,10 @@ class FloorPlanController extends Controller
 
     public function index(Request $request)
     {
-        $query = FloorPlan::with('event');
+        $query = FloorPlan::query();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $query->where('event_id', $currentEventId);
 
         if ($eventId = $request->input('event_id')) {
             $query->where('event_id', $eventId);

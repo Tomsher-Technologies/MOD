@@ -1939,7 +1939,7 @@ class DelegationController extends Controller
 
         $members = $delegation->delegates->map(fn($d) => [
             'id' => $d->id,
-            'name_en' => $d->name_en,
+            'name_en' => $d->getTranslation('name'),
         ]);
 
         return response()->json([
@@ -2021,7 +2021,7 @@ class DelegationController extends Controller
 
         $members = $delegation->delegates->map(fn($d) => [
             'id' => $d->id,
-            'name_en' => $d->name_en,
+            'name_en' => $d->getTranslation('name'),
         ]);
 
         return response()->json(['success' => true, 'members' => $members]);
