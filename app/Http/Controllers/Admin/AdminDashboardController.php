@@ -22,71 +22,72 @@ use Auth;
 
 class AdminDashboardController extends Controller
 {
-    
-    public function dashboard(){
-   
+
+    public function dashboard()
+    {
+
         $lang = app()->getLocale() ?? 'en';
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $totalDelegates = Delegate::whereHas('delegation', function ($q) use ($currentEventId) {
-                                $q->where('event_id', $currentEventId);
-                            })->count();
+            $q->where('event_id', $currentEventId);
+        })->count();
 
         $totalEscortsAssigned = DelegationEscort::where('status', 1)
-                                    ->whereHas('delegation', function ($q) use ($currentEventId) {
-                                        $q->where('event_id', $currentEventId);
-                                    })
-                                    ->distinct('escort_id')
-                                    ->count('escort_id');
+            ->whereHas('delegation', function ($q) use ($currentEventId) {
+                $q->where('event_id', $currentEventId);
+            })
+            ->distinct('escort_id')
+            ->count('escort_id');
 
         $totalDriversAssigned = DelegationDriver::where('status', 1)
-                                    ->whereHas('delegation', function ($q) use ($currentEventId) {
-                                        $q->where('event_id', $currentEventId);
-                                    })
-                                    ->distinct('driver_id')
-                                    ->count('driver_id');
+            ->whereHas('delegation', function ($q) use ($currentEventId) {
+                $q->where('event_id', $currentEventId);
+            })
+            ->distinct('driver_id')
+            ->count('driver_id');
 
         $totalHotels = Accommodation::where('status', 1)
-                            ->where('event_id', $currentEventId)
-                            ->count();
+            ->where('event_id', $currentEventId)
+            ->count();
 
         // Delegates by division
-        $delegatesByDivision =  DropdownOption::leftJoin('delegations', function($join) use ($currentEventId) {
-                                            $join->on('delegations.invitation_from_id', '=', 'dropdown_options.id')
-                                                ->where('delegations.event_id', $currentEventId);
-                                        })
-                                        // ->leftJoin('delegates', 'delegates.delegation_id', '=', 'delegations.id')
-                                        ->join('dropdowns', 'dropdowns.id', '=', 'dropdown_options.dropdown_id')
-                                        ->where('dropdowns.code', 'departments')
-                                        ->where('dropdown_options.status', 1)
-                                        ->groupBy('dropdown_options.id', 'dropdown_options.value', 'dropdown_options.sort_order')
-                                        ->orderBy('dropdown_options.sort_order')
-                                        ->select(DB::raw($lang === 'ar' ? 'COALESCE(dropdown_options.value_ar, dropdown_options.value) as department_name' : 'dropdown_options.value as department_name'), DB::raw('COUNT(delegations.id) as total'))
-                                        ->get();
+        $delegatesByDivision =  DropdownOption::leftJoin('delegations', function ($join) use ($currentEventId) {
+            $join->on('delegations.invitation_from_id', '=', 'dropdown_options.id')
+                ->where('delegations.event_id', $currentEventId);
+        })
+            // ->leftJoin('delegates', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('dropdowns', 'dropdowns.id', '=', 'dropdown_options.dropdown_id')
+            ->where('dropdowns.code', 'departments')
+            ->where('dropdown_options.status', 1)
+            ->groupBy('dropdown_options.id', 'dropdown_options.value', 'dropdown_options.sort_order')
+            ->orderBy('dropdown_options.sort_order')
+            ->select(DB::raw($lang === 'ar' ? 'COALESCE(dropdown_options.value_ar, dropdown_options.value) as department_name' : 'dropdown_options.value as department_name'), DB::raw('COUNT(delegations.id) as total'))
+            ->get();
 
-        $seriesDelegatesByDivision = $delegatesByDivision->pluck('total')->toArray();   
+        $seriesDelegatesByDivision = $delegatesByDivision->pluck('total')->toArray();
         $labelsDelegatesByDivision = $delegatesByDivision->pluck('department_name')->toArray();
 
         // Delegates Assignments
         $delegationIds = Delegation::where('event_id', $currentEventId)->whereIN('invitation_status_id', [41, 42])->pluck('id');
         $totalDelegations = count($delegationIds);
-      
+
         $assignedEscorts = DelegationEscort::whereIn('delegation_id', $delegationIds)
-                                        ->where('status', 1)
-                                        ->distinct('delegation_id')
-                                        ->count('delegation_id');
+            ->where('status', 1)
+            ->distinct('delegation_id')
+            ->count('delegation_id');
         $notAssignedEscorts = $totalDelegations - $assignedEscorts;
 
         $assignedDrivers = DelegationDriver::whereIn('delegation_id', $delegationIds)
-                                            ->where('status', 1)
-                                            ->distinct('delegation_id')
-                                            ->count('delegation_id');
+            ->where('status', 1)
+            ->distinct('delegation_id')
+            ->count('delegation_id');
         $notAssignedDrivers = $totalDelegations - $assignedDrivers;
 
         $hotels_status = DB::table('delegations as d')->select(
-                        'd.id as delegation_id',
-                        'd.code as delegation_name',
-                        DB::raw("
+            'd.id as delegation_id',
+            'd.code as delegation_name',
+            DB::raw("
                             CASE
                                 WHEN (COALESCE(delegates_summary.total_count, 0) +
                                     COALESCE(escorts_summary.total_count, 0) +
@@ -106,66 +107,72 @@ class AdminDashboardController extends Controller
                                 ELSE 2
                             END as status
                         "),
-                        DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
+            DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
                                 COALESCE(escorts_summary.total_count, 0) + 
                                 COALESCE(drivers_summary.total_count, 0)) as total_count"),
-                        DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
+            DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
                                 COALESCE(escorts_summary.assigned_count, 0) + 
                                 COALESCE(drivers_summary.assigned_count, 0)) as assigned_count")
-                    )
-                    ->leftJoin(
-                        DB::raw("(select delegation_id,
+        )
+            ->leftJoin(
+                DB::raw("(select delegation_id,
                                         COUNT(*) as total_count,
                                         SUM(CASE WHEN current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
                                 from delegates
                                 where accommodation = 1
                                 group by delegation_id) as delegates_summary"),
-                        'delegates_summary.delegation_id', '=', 'd.id'
-                    )
-                    ->leftJoin(
-                        DB::raw("(select de.delegation_id,
+                'delegates_summary.delegation_id',
+                '=',
+                'd.id'
+            )
+            ->leftJoin(
+                DB::raw("(select de.delegation_id,
                                         COUNT(*) as total_count,
                                         SUM(CASE WHEN e.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
                                 from delegation_escorts de
                                 inner join escorts e on e.id = de.escort_id
                                 where de.status = 1
                                 group by de.delegation_id) as escorts_summary"),
-                        'escorts_summary.delegation_id', '=', 'd.id'
-                    )
-                    ->leftJoin(
-                        DB::raw("(select dd.delegation_id,
+                'escorts_summary.delegation_id',
+                '=',
+                'd.id'
+            )
+            ->leftJoin(
+                DB::raw("(select dd.delegation_id,
                                         COUNT(*) as total_count,
                                         SUM(CASE WHEN dr.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
                                 from delegation_drivers dd
                                 inner join drivers dr on dr.id = dd.driver_id
                                 where dd.status = 1
                                 group by dd.delegation_id) as drivers_summary"),
-                        'drivers_summary.delegation_id', '=', 'd.id'
-                    )
-                    ->where('d.event_id', $currentEventId)
-                    ->whereIN('d.invitation_status_id', [41, 42])
-                    ->get();
-        
+                'drivers_summary.delegation_id',
+                '=',
+                'd.id'
+            )
+            ->where('d.event_id', $currentEventId)
+            ->whereIN('d.invitation_status_id', [41, 42])
+            ->get();
+
 
         $data['delegation_assignments'] = [
-                                            'assignedEscorts' => $assignedEscorts,
-                                            'notAssignedEscorts' => $notAssignedEscorts,
-                                            'assignedDrivers' => $assignedDrivers,
-                                            'notAssignedDrivers' => $notAssignedDrivers,
-                                            'assignedHotels' => $hotels_status->where('status', 1)->count(),
-                                            'notAssignedHotels' => $hotels_status->whereIN('status', [0, 2])->count()
-                                        ];
+            'assignedEscorts' => $assignedEscorts,
+            'notAssignedEscorts' => $notAssignedEscorts,
+            'assignedDrivers' => $assignedDrivers,
+            'notAssignedDrivers' => $notAssignedDrivers,
+            'assignedHotels' => $hotels_status->where('status', 1)->count(),
+            'notAssignedHotels' => $hotels_status->whereIN('status', [0, 2])->count()
+        ];
 
-        
+
         // Arrival Status
         $delegIds = Delegation::where('event_id', $currentEventId)->pluck('id');
 
         $statuses = Delegate::whereIn('delegation_id', $delegIds)
-                            ->select('participation_status')
-                            ->get()
-                            ->groupBy('participation_status')
-                            ->map->count();
-                            
+            ->select('participation_status')
+            ->get()
+            ->groupBy('participation_status')
+            ->map->count();
+
         $allStatuses = [
             'to_be_arrived' => 0,
             'arrived' => 0,
@@ -184,7 +191,7 @@ class AdminDashboardController extends Controller
 
         // Member arrivals and departures
         $summary =  DelegateTransport::query()
-                        ->selectRaw("
+            ->selectRaw("
                             CASE 
                                 WHEN delegate_transports.mode = 'flight' THEN dropdown_options.value 
                                 WHEN delegate_transports.mode = 'sea' THEN 'Sea' 
@@ -193,63 +200,64 @@ class AdminDashboardController extends Controller
                             SUM(CASE WHEN delegate_transports.type = 'arrival' THEN 1 ELSE 0 END) AS arrival_count,
                             SUM(CASE WHEN delegate_transports.type = 'departure' THEN 1 ELSE 0 END) AS departure_count
                         ")
-                        ->leftJoin('dropdown_options', function ($join) {
-                            $join->on('delegate_transports.airport_id', '=', 'dropdown_options.id')
-                                ->where('delegate_transports.mode', '=', 'flight');
-                        })
-                        ->whereDate('delegate_transports.date_time', now()->toDateString())
-                        ->groupBy('transport_point')
-                        ->get();
+            ->leftJoin('dropdown_options', function ($join) {
+                $join->on('delegate_transports.airport_id', '=', 'dropdown_options.id')
+                    ->where('delegate_transports.mode', '=', 'flight');
+            })
+            ->whereDate('delegate_transports.date_time', now()->toDateString())
+            ->groupBy('transport_point')
+            ->get();
 
         // Delegates By Invitation Status
         $departments = DB::table('dropdown_options as d')
-                            ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
-                            ->where('dropdowns.code', 'departments')
-                            ->where('d.status', 1)
-                            ->select('d.id', DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
-                            ->get();
+            ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
+            ->where('dropdowns.code', 'departments')
+            ->where('d.status', 1)
+            ->select('d.id', DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+            ->get();
 
         $statusesList = DB::table('dropdown_options as d')
-                            ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
-                            ->where('dropdowns.code', 'invitation_status')
-                            ->where('d.status', 1)
-                            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
-                            ->get();
+            ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
+            ->where('dropdowns.code', 'invitation_status')
+            ->where('d.status', 1)
+            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+            ->get();
 
         $rawData = DB::table('delegates')
-                    ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
-                    ->join('dropdown_options as departments', function ($join) {
-                        $join->on('delegations.invitation_from_id', '=', 'departments.id')
-                            ->where('departments.status', 1);
-                    })
-                    ->join('dropdown_options as statuses', function ($join) {
-                        $join->on('delegations.invitation_status_id', '=', 'statuses.id')
-                            ->where('statuses.status', 1);
-                    })
-                    ->join('dropdowns as d1', 'departments.dropdown_id', '=', 'd1.id')
-                    ->join('dropdowns as d2', 'statuses.dropdown_id', '=', 'd2.id')
-                    ->where('delegations.event_id', $currentEventId)
-                    ->where('d1.code', 'departments')
-                    ->where('d2.code', 'invitation_status')
-                    ->select(
-                        'departments.id as department_id',
-                        'statuses.id as status_id',
-                        DB::raw('COUNT(delegates.id) as total')
-                    )
-                    ->groupBy('departments.id', 'statuses.id')
-                    ->get();
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->join('dropdown_options as departments', function ($join) {
+                $join->on('delegations.invitation_from_id', '=', 'departments.id')
+                    ->where('departments.status', 1);
+            })
+            ->join('dropdown_options as statuses', function ($join) {
+                $join->on('delegations.invitation_status_id', '=', 'statuses.id')
+                    ->where('statuses.status', 1);
+            })
+            ->join('dropdowns as d1', 'departments.dropdown_id', '=', 'd1.id')
+            ->join('dropdowns as d2', 'statuses.dropdown_id', '=', 'd2.id')
+            ->where('delegations.event_id', $currentEventId)
+            ->where('d1.code', 'departments')
+            ->where('d2.code', 'invitation_status')
+            ->select(
+                'departments.id as department_id',
+                'statuses.id as status_id',
+                DB::raw('COUNT(delegates.id) as total')
+            )
+            ->groupBy('departments.id', 'statuses.id')
+            ->get();
 
         $categories = $departments->pluck('value')->values();
 
         $delegatesByInvitationStatus = [];
 
         $baseColor = '#B68A35';
-        $spread = 50; 
+        $spread = 50;
         $labelsCount = $statusesList->count();
         foreach ($statusesList as $i => $status) {
             $dataNew = [];
             foreach ($departments as $dept) {
-                $match = $rawData->first(fn ($row) =>
+                $match = $rawData->first(
+                    fn($row) =>
                     $row->department_id === $dept->id && $row->status_id === $status->id
                 );
                 $dataNew[] = $match ? (int) $match->total : 0;
@@ -266,85 +274,86 @@ class AdminDashboardController extends Controller
             ];
         }
         $data['delegatesByInvitationStatus'] = [
-                                                    'categories' => $categories,
-                                                    'series' => $delegatesByInvitationStatus
-                                                ];
-        
+            'categories' => $categories,
+            'series' => $delegatesByInvitationStatus
+        ];
+
         // Delegates By participation status
 
-        $participation_statuses = ['to_be_arrived','arrived','to_be_departed','departed'];
+        $participation_statuses = ['to_be_arrived', 'arrived', 'to_be_departed', 'departed'];
 
         $rawDataParticipation = DB::table('delegates')
-                                    ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
-                                    ->where('delegations.event_id', $currentEventId)
-                                    ->select(
-                                        'delegations.invitation_from_id',
-                                        'delegates.participation_status',
-                                        DB::raw('COUNT(delegates.id) as total')
-                                    )
-                                    ->groupBy('delegations.invitation_from_id', 'delegates.participation_status')
-                                    ->get();
+            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+            ->where('delegations.event_id', $currentEventId)
+            ->select(
+                'delegations.invitation_from_id',
+                'delegates.participation_status',
+                DB::raw('COUNT(delegates.id) as total')
+            )
+            ->groupBy('delegations.invitation_from_id', 'delegates.participation_status')
+            ->get();
 
-        $departmentsIds = $departments->pluck('id');   
+        $departmentsIds = $departments->pluck('id');
         $categoriesParticipation = $departments->pluck('value');
         $seriesParticipation = [];
 
         $statusColors = [
-                'arrived'        => '#7c5e24',
-                'to_be_arrived'  => '#b68a35',
-                'to_be_departed' => '#d1c1a2',
-                'departed'       => '#f0da8b',
-            ];
+            'arrived'        => '#7c5e24',
+            'to_be_arrived'  => '#b68a35',
+            'to_be_departed' => '#d1c1a2',
+            'departed'       => '#f0da8b',
+        ];
 
         foreach ($participation_statuses as $part_status) {
             $dataPart = [];
             foreach ($departmentsIds as $deptId) {
-                $match = $rawDataParticipation->first(fn($row) =>
+                $match = $rawDataParticipation->first(
+                    fn($row) =>
                     $row->invitation_from_id == $deptId &&
-                    $row->participation_status == $part_status
+                        $row->participation_status == $part_status
                 );
                 $dataPart[] = $match ? (int)$match->total : 0;
             }
             $seriesParticipation[] = [
-                'name'  => __db($part_status), 
+                'name'  => __db($part_status),
                 'data'  => $dataPart,
                 'color' => $statusColors[$part_status] ?? null,
             ];
         }
 
         $data['delegatesByParticipationStatus'] = [
-                                                    'categories' => $categoriesParticipation,
-                                                    'series' => $seriesParticipation
-                                                ];
+            'categories' => $categoriesParticipation,
+            'series' => $seriesParticipation
+        ];
 
         // Total number of accepted invitations by Continents.
         $continents = DB::table('dropdown_options')
-                            ->where('dropdown_id', function ($q) {
-                                $q->select('id')->from('dropdowns')->where('code', 'continents')->limit(1);
-                            })
-                            ->where('status', 1)
-                            ->pluck( DB::raw($lang === 'ar' ? 'COALESCE(value_ar, value) as value' : 'value as value'), 'id');
+            ->where('dropdown_id', function ($q) {
+                $q->select('id')->from('dropdowns')->where('code', 'continents')->limit(1);
+            })
+            ->where('status', 1)
+            ->pluck(DB::raw($lang === 'ar' ? 'COALESCE(value_ar, value) as value' : 'value as value'), 'id');
 
         $rawDataContinents = DB::table('delegations')
-                            ->where('event_id', $currentEventId)
-                            ->whereIN('invitation_status_id', [41, 42])
-                            ->select('continent_id','invitation_from_id as department_id', DB::raw('COUNT(delegations.id) as total'))
-                            ->groupBy('continent_id', 'invitation_from_id')
-                            ->get();
-                            
+            ->where('event_id', $currentEventId)
+            ->whereIN('invitation_status_id', [41, 42])
+            ->select('continent_id', 'invitation_from_id as department_id', DB::raw('COUNT(delegations.id) as total'))
+            ->groupBy('continent_id', 'invitation_from_id')
+            ->get();
+
         $lookup = [];
         foreach ($rawDataContinents as $row) {
             $lookup[$row->continent_id][$row->department_id] = (int) $row->total;
         }
 
         $seriesContinents = [];
-        $baseColorCont = ['#d9a644','#A0782F','#f0da8b', '#806028','#5C451D','#e8bc64','#D2AA59','#E0BA6B','#ECCC85','#F7DEA0'];
-        
+        $baseColorCont = ['#d9a644', '#A0782F', '#f0da8b', '#806028', '#5C451D', '#e8bc64', '#D2AA59', '#E0BA6B', '#ECCC85', '#F7DEA0'];
+
         $ij = 0;
         foreach ($continents as $continentId => $continentName) {
             $dataCont = [];
             foreach ($departments as $dept) {
-                $dataCont[] = $lookup[$continentId][$dept->id] ?? 0; 
+                $dataCont[] = $lookup[$continentId][$dept->id] ?? 0;
             }
 
             $seriesContinents[] = [
@@ -367,52 +376,52 @@ class AdminDashboardController extends Controller
         $oneHourAfter  = $now->copy()->addHour();
 
         $arrivals_query = DelegateTransport::where('type', 'arrival')
-                            ->with([
-                                'delegate.delegation.country',
-                                'delegate.delegation.continent',
-                                'delegate.delegation.escorts',
-                                'delegate.delegation.drivers',
-                                'airport'
-                            ])
-                            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                                $delegationQuery->where('event_id', $currentEventId);
-                            })
-                            ->whereDate('date_time', $now->toDateString()) // Only today
-                            ->where('status', '!=', 'arrived')
-                            ->orderByRaw("
+            ->with([
+                'delegate.delegation.country',
+                'delegate.delegation.continent',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
+                'airport'
+            ])
+            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            })
+            ->whereDate('date_time', $now->toDateString()) // Only today
+            ->where('status', '!=', 'arrived')
+            ->orderByRaw("
                                 CASE 
                                     WHEN date_time BETWEEN ? AND ? THEN 0
                                     ELSE 1
                                 END ASC
                             ", [$oneHourBefore, $oneHourAfter])
-                            ->orderBy('date_time', 'asc');
+            ->orderBy('date_time', 'asc');
         $data['upcomming_arrivals'] = $arrivals_query->get();
 
         $departure_query = DelegateTransport::where('type', 'departure')
-                            ->with([
-                                'delegate.delegation.country',
-                                'delegate.delegation.continent',
-                                'delegate.delegation.escorts',
-                                'delegate.delegation.drivers',
-                                'airport'
-                            ])
-                            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                                $delegationQuery->where('event_id', $currentEventId);
-                            })
-                            ->whereDate('date_time', $now->toDateString()) // Only today
-                            ->where('status', '!=', 'departed')
-                            ->orderByRaw("
+            ->with([
+                'delegate.delegation.country',
+                'delegate.delegation.continent',
+                'delegate.delegation.escorts',
+                'delegate.delegation.drivers',
+                'airport'
+            ])
+            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId);
+            })
+            ->whereDate('date_time', $now->toDateString()) // Only today
+            ->where('status', '!=', 'departed')
+            ->orderByRaw("
                                 CASE 
                                     WHEN date_time BETWEEN ? AND ? THEN 0
                                     ELSE 1
                                 END ASC
                             ", [$oneHourBefore, $oneHourAfter])
-                            ->orderBy('date_time', 'asc');
+            ->orderBy('date_time', 'asc');
         $data['upcomming_departures'] = $departure_query->get();
 
-        
+
         $data['arr_dep_summary'] = $summary;
-       
+
 
         $data['totalDelegates'] = $totalDelegates;
         $data['totalEscortsAssigned'] = $totalEscortsAssigned;
@@ -426,62 +435,64 @@ class AdminDashboardController extends Controller
         return view('admin.dashboard', compact('data'));
     }
 
-    public function dashboardTables($table) {
-       
+    public function dashboardTables($table)
+    {
+
         $lang = app()->getLocale() ?? 'en';
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $departments = DB::table('dropdown_options as d')
-                            ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
-                            ->where('dropdowns.code', 'departments')
-                            ->where('d.status', 1)
-                            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
-                            ->get();
-                           
+            ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
+            ->where('dropdowns.code', 'departments')
+            ->where('d.status', 1)
+            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+            ->get();
 
-        if($table == 'invitations') {
+
+        if ($table == 'invitations') {
 
             $statusesList = DB::table('dropdown_options as d')
-                                ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
-                                ->where('dropdowns.code', 'invitation_status')
-                                ->where('d.status', 1)
-                                ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
-                                ->get();
+                ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
+                ->where('dropdowns.code', 'invitation_status')
+                ->where('d.status', 1)
+                ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+                ->get();
 
             $rawData = DB::table('delegates')
-                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
-                        ->join('dropdown_options as departments', function ($join) {
-                            $join->on('delegations.invitation_from_id', '=', 'departments.id')
-                                ->where('departments.status', 1);
-                        })
-                        ->join('dropdown_options as statuses', function ($join) {
-                            $join->on('delegations.invitation_status_id', '=', 'statuses.id')
-                                ->where('statuses.status', 1);
-                        })
-                        ->join('dropdowns as d1', 'departments.dropdown_id', '=', 'd1.id')
-                        ->join('dropdowns as d2', 'statuses.dropdown_id', '=', 'd2.id')
-                        ->where('delegations.event_id', $currentEventId)
-                        ->where('d1.code', 'departments')
-                        ->where('d2.code', 'invitation_status')
-                        ->select(
-                            'departments.id as department_id',
-                            'statuses.id as status_id',
-                            DB::raw('COUNT(delegates.id) as total')
-                        )
-                        ->groupBy('departments.id', 'statuses.id')
-                        ->get();
+                ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                ->join('dropdown_options as departments', function ($join) {
+                    $join->on('delegations.invitation_from_id', '=', 'departments.id')
+                        ->where('departments.status', 1);
+                })
+                ->join('dropdown_options as statuses', function ($join) {
+                    $join->on('delegations.invitation_status_id', '=', 'statuses.id')
+                        ->where('statuses.status', 1);
+                })
+                ->join('dropdowns as d1', 'departments.dropdown_id', '=', 'd1.id')
+                ->join('dropdowns as d2', 'statuses.dropdown_id', '=', 'd2.id')
+                ->where('delegations.event_id', $currentEventId)
+                ->where('d1.code', 'departments')
+                ->where('d2.code', 'invitation_status')
+                ->select(
+                    'departments.id as department_id',
+                    'statuses.id as status_id',
+                    DB::raw('COUNT(delegates.id) as total')
+                )
+                ->groupBy('departments.id', 'statuses.id')
+                ->get();
 
             $categories = $departments->pluck('value')->values();
 
             $baseColor = '#B68A35';
-            $spread = 50; 
+            $spread = 50;
             $labelsCount = $statusesList->count();
 
             $delegatesByInvitationStatus = [];
             foreach ($statusesList as $i => $status) {
                 $dataNew = [];
                 foreach ($departments as $dept) {
-                    $match = $rawData->first(fn ($row) =>
+                    $match = $rawData->first(
+                        fn($row) =>
                         $row->department_id === $dept->id && $row->status_id === $status->id
                     );
                     $dataNew[] = $match ? (int) $match->total : 0;
@@ -531,25 +542,25 @@ class AdminDashboardController extends Controller
             ];
 
             $data['delegatesByInvitationStatus'] = [
-                                                    'categories' => $categories,
-                                                    'series' => $delegatesByInvitationStatus
-                                                ];
+                'categories' => $categories,
+                'series' => $delegatesByInvitationStatus
+            ];
 
             return view('admin.dashboard-tables.invitations', compact('data'));
-        }elseif($table == 'participations') {
+        } elseif ($table == 'participations') {
 
-            $participation_statuses = ['to_be_arrived','arrived','to_be_departed','departed'];
+            $participation_statuses = ['to_be_arrived', 'arrived', 'to_be_departed', 'departed'];
 
             $rawDataParticipation = DB::table('delegates')
-                                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
-                                        ->where('delegations.event_id', $currentEventId)
-                                        ->select(
-                                            'delegations.invitation_from_id',
-                                            'delegates.participation_status',
-                                            DB::raw('COUNT(delegates.id) as total')
-                                        )
-                                        ->groupBy('delegations.invitation_from_id', 'delegates.participation_status')
-                                        ->get();
+                ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                ->where('delegations.event_id', $currentEventId)
+                ->select(
+                    'delegations.invitation_from_id',
+                    'delegates.participation_status',
+                    DB::raw('COUNT(delegates.id) as total')
+                )
+                ->groupBy('delegations.invitation_from_id', 'delegates.participation_status')
+                ->get();
 
             $departmentsIds   = $departments->pluck('id');
             $categories       = $departments->pluck('value');
@@ -565,23 +576,24 @@ class AdminDashboardController extends Controller
             foreach ($participation_statuses as $part_status) {
                 $dataPart = [];
                 foreach ($departmentsIds as $deptId) {
-                    $match = $rawDataParticipation->first(fn($row) =>
+                    $match = $rawDataParticipation->first(
+                        fn($row) =>
                         $row->invitation_from_id == $deptId &&
-                        $row->participation_status == $part_status
+                            $row->participation_status == $part_status
                     );
                     $dataPart[] = $match ? (int)$match->total : 0;
                 }
                 $seriesParticipation[] = [
-                    'name'  => __db($part_status), 
+                    'name'  => __db($part_status),
                     'data'  => $dataPart,
                     'color' => $statusColors[$part_status] ?? null,
                 ];
             }
 
             $data['delegatesByParticipationStatus'] = [
-                                                    'categories' => $categories,
-                                                    'series' => $seriesParticipation
-                                                ];
+                'categories' => $categories,
+                'series' => $seriesParticipation
+            ];
 
             $tableData = [];
             $rowTotals = [];
@@ -612,34 +624,34 @@ class AdminDashboardController extends Controller
                 'grandTotal'     => $grandTotal,
             ];
             return view('admin.dashboard-tables.participations', compact('data'));
-        }elseif($table == 'continents') {
+        } elseif ($table == 'continents') {
             $continents = DB::table('dropdown_options')
-                            ->where('dropdown_id', function ($q) {
-                                $q->select('id')->from('dropdowns')->where('code', 'continents')->limit(1);
-                            })
-                            ->where('status', 1)
-                            ->pluck( DB::raw($lang === 'ar' ? 'COALESCE(value_ar, value) as value' : 'value as value'), 'id');
+                ->where('dropdown_id', function ($q) {
+                    $q->select('id')->from('dropdowns')->where('code', 'continents')->limit(1);
+                })
+                ->where('status', 1)
+                ->pluck(DB::raw($lang === 'ar' ? 'COALESCE(value_ar, value) as value' : 'value as value'), 'id');
 
             $rawDataContinents = DB::table('delegations')
-                                ->where('event_id', $currentEventId)
-                                ->whereIN('invitation_status_id', [41, 42])
-                                ->select('continent_id','invitation_from_id as department_id', DB::raw('COUNT(delegations.id) as total'))
-                                ->groupBy('continent_id', 'invitation_from_id')
-                                ->get();
+                ->where('event_id', $currentEventId)
+                ->whereIN('invitation_status_id', [41, 42])
+                ->select('continent_id', 'invitation_from_id as department_id', DB::raw('COUNT(delegations.id) as total'))
+                ->groupBy('continent_id', 'invitation_from_id')
+                ->get();
             $lookup = [];
             foreach ($rawDataContinents as $row) {
                 $lookup[$row->continent_id][$row->department_id] = (int) $row->total;
             }
 
             $seriesContinents = [];
-            $baseColorCont = ['#d9a644','#A0782F','#f0da8b', '#806028','#5C451D','#e8bc64','#D2AA59','#E0BA6B','#ECCC85','#F7DEA0'];
-            
+            $baseColorCont = ['#d9a644', '#A0782F', '#f0da8b', '#806028', '#5C451D', '#e8bc64', '#D2AA59', '#E0BA6B', '#ECCC85', '#F7DEA0'];
+
             $ij = 0;
 
             foreach ($continents as $continentId => $continentName) {
                 $dataCont = [];
                 foreach ($departments as $dept) {
-                    $dataCont[] = $lookup[$continentId][$dept->id] ?? 0; 
+                    $dataCont[] = $lookup[$continentId][$dept->id] ?? 0;
                 }
 
                 $seriesContinents[] = [
@@ -651,8 +663,8 @@ class AdminDashboardController extends Controller
             }
 
             $data['invitationByContinents'] = [
-                'categories' => $departments->pluck('value')->values(), 
-                'series'     => $seriesContinents,                  
+                'categories' => $departments->pluck('value')->values(),
+                'series'     => $seriesContinents,
             ];
 
             $tableData = [];
@@ -688,21 +700,21 @@ class AdminDashboardController extends Controller
                 'colTotals'   => $colTotals,
             ];
             return view('admin.dashboard-tables.continents', compact('data'));
-        }elseif($table == 'divisions') {
-            $delegatesByDivision =  DropdownOption::leftJoin('delegations', function($join) use ($currentEventId) {
-                                            $join->on('delegations.invitation_from_id', '=', 'dropdown_options.id')
-                                                ->where('delegations.event_id', $currentEventId);
-                                        })
-                                        // ->leftJoin('delegates', 'delegates.delegation_id', '=', 'delegations.id')
-                                        ->join('dropdowns', 'dropdowns.id', '=', 'dropdown_options.dropdown_id')
-                                        ->where('dropdowns.code', 'departments')
-                                        ->where('dropdown_options.status', 1)
-                                        ->groupBy('dropdown_options.id', 'dropdown_options.value', 'dropdown_options.sort_order')
-                                        ->orderBy('dropdown_options.sort_order')
-                                        ->select(DB::raw($lang === 'ar' ? 'COALESCE(dropdown_options.value_ar, dropdown_options.value) as department_name' : 'dropdown_options.value as department_name'), DB::raw('COUNT(delegations.id) as total'))
-                                        ->get();
+        } elseif ($table == 'divisions') {
+            $delegatesByDivision =  DropdownOption::leftJoin('delegations', function ($join) use ($currentEventId) {
+                $join->on('delegations.invitation_from_id', '=', 'dropdown_options.id')
+                    ->where('delegations.event_id', $currentEventId);
+            })
+                // ->leftJoin('delegates', 'delegates.delegation_id', '=', 'delegations.id')
+                ->join('dropdowns', 'dropdowns.id', '=', 'dropdown_options.dropdown_id')
+                ->where('dropdowns.code', 'departments')
+                ->where('dropdown_options.status', 1)
+                ->groupBy('dropdown_options.id', 'dropdown_options.value', 'dropdown_options.sort_order')
+                ->orderBy('dropdown_options.sort_order')
+                ->select(DB::raw($lang === 'ar' ? 'COALESCE(dropdown_options.value_ar, dropdown_options.value) as department_name' : 'dropdown_options.value as department_name'), DB::raw('COUNT(delegations.id) as total'))
+                ->get();
 
-            $seriesDelegatesByDivision = $delegatesByDivision->pluck('total')->toArray();   
+            $seriesDelegatesByDivision = $delegatesByDivision->pluck('total')->toArray();
             $labelsDelegatesByDivision = $delegatesByDivision->pluck('department_name')->toArray();
 
             $data['delegatesByDivision'] = [
@@ -710,26 +722,26 @@ class AdminDashboardController extends Controller
                 'labels' => $labelsDelegatesByDivision,
             ];
             return view('admin.dashboard-tables.divisions', compact('data', 'delegatesByDivision'));
-        }elseif($table == 'assignments') {
+        } elseif ($table == 'assignments') {
             $delegationIds = Delegation::where('event_id', $currentEventId)->whereIN('invitation_status_id', [41, 42])->pluck('id');
             $totalDelegations = count($delegationIds);
-        
+
             $assignedEscorts = DelegationEscort::whereIn('delegation_id', $delegationIds)
-                                            ->where('status', 1)
-                                            ->distinct('delegation_id')
-                                            ->count('delegation_id');
+                ->where('status', 1)
+                ->distinct('delegation_id')
+                ->count('delegation_id');
             $notAssignedEscorts = $totalDelegations - $assignedEscorts;
 
             $assignedDrivers = DelegationDriver::whereIn('delegation_id', $delegationIds)
-                                                ->where('status', 1)
-                                                ->distinct('delegation_id')
-                                                ->count('delegation_id');
+                ->where('status', 1)
+                ->distinct('delegation_id')
+                ->count('delegation_id');
             $notAssignedDrivers = $totalDelegations - $assignedDrivers;
 
             $hotels_status = DB::table('delegations as d')->select(
-                                'd.id as delegation_id',
-                                'd.code as delegation_name',
-                                DB::raw("
+                'd.id as delegation_id',
+                'd.code as delegation_name',
+                DB::raw("
                                     CASE
                                         WHEN (COALESCE(delegates_summary.total_count, 0) +
                                             COALESCE(escorts_summary.total_count, 0) +
@@ -749,57 +761,63 @@ class AdminDashboardController extends Controller
                                         ELSE 2
                                     END as status
                                 "),
-                                DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
+                DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
                                         COALESCE(escorts_summary.total_count, 0) + 
                                         COALESCE(drivers_summary.total_count, 0)) as total_count"),
-                                DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
+                DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
                                         COALESCE(escorts_summary.assigned_count, 0) + 
                                         COALESCE(drivers_summary.assigned_count, 0)) as assigned_count")
-                            )
-                            ->leftJoin(
-                                DB::raw("(select delegation_id,
+            )
+                ->leftJoin(
+                    DB::raw("(select delegation_id,
                                                 COUNT(*) as total_count,
                                                 SUM(CASE WHEN current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
                                         from delegates
                                         where accommodation = 1
                                         group by delegation_id) as delegates_summary"),
-                                'delegates_summary.delegation_id', '=', 'd.id'
-                            )
-                            ->leftJoin(
-                                DB::raw("(select de.delegation_id,
+                    'delegates_summary.delegation_id',
+                    '=',
+                    'd.id'
+                )
+                ->leftJoin(
+                    DB::raw("(select de.delegation_id,
                                                 COUNT(*) as total_count,
                                                 SUM(CASE WHEN e.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
                                         from delegation_escorts de
                                         inner join escorts e on e.id = de.escort_id
                                         where de.status = 1
                                         group by de.delegation_id) as escorts_summary"),
-                                'escorts_summary.delegation_id', '=', 'd.id'
-                            )
-                            ->leftJoin(
-                                DB::raw("(select dd.delegation_id,
+                    'escorts_summary.delegation_id',
+                    '=',
+                    'd.id'
+                )
+                ->leftJoin(
+                    DB::raw("(select dd.delegation_id,
                                                 COUNT(*) as total_count,
                                                 SUM(CASE WHEN dr.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
                                         from delegation_drivers dd
                                         inner join drivers dr on dr.id = dd.driver_id
                                         where dd.status = 1
                                         group by dd.delegation_id) as drivers_summary"),
-                                'drivers_summary.delegation_id', '=', 'd.id'
-                            )
-                            ->where('d.event_id', $currentEventId)
-                            ->whereIN('d.invitation_status_id', [41, 42])
-                            ->get();
-            
+                    'drivers_summary.delegation_id',
+                    '=',
+                    'd.id'
+                )
+                ->where('d.event_id', $currentEventId)
+                ->whereIN('d.invitation_status_id', [41, 42])
+                ->get();
+
 
             $data['delegation_assignments'] = [
-                                            'assignedEscorts' => $assignedEscorts,
-                                            'notAssignedEscorts' => $notAssignedEscorts,
-                                            'assignedDrivers' => $assignedDrivers,
-                                            'notAssignedDrivers' => $notAssignedDrivers,
-                                            'assignedHotels' => $hotels_status->where('status', 1)->count(),
-                                            'notAssignedHotels' => $hotels_status->whereIN('status', [0, 2])->count()
-                                        ];
+                'assignedEscorts' => $assignedEscorts,
+                'notAssignedEscorts' => $notAssignedEscorts,
+                'assignedDrivers' => $assignedDrivers,
+                'notAssignedDrivers' => $notAssignedDrivers,
+                'assignedHotels' => $hotels_status->where('status', 1)->count(),
+                'notAssignedHotels' => $hotels_status->whereIN('status', [0, 2])->count()
+            ];
             return view('admin.dashboard-tables.assignments', compact('data'));
-        }elseif($table == 'arrival') {
+        } elseif ($table == 'arrival') {
             $delegIds = Delegation::where('event_id', $currentEventId)->pluck('id');
 
             $statuses = Delegate::whereIn('delegation_id', $delegIds)
@@ -829,9 +847,17 @@ class AdminDashboardController extends Controller
         return redirect()->route('admin.dashboard');
     }
 
-    public function account(){
+    public function account()
+    {
         $user = Auth::user();
-        return view('admin.account', compact('user'));
+
+        $showSystemTools = false;
+
+        if ($user->hasRole('Super Admin')) {
+            $showSystemTools = true;
+        }
+
+        return view('admin.account', compact('user', 'showSystemTools'));
     }
 
     public function changePassword(Request $request)
@@ -846,7 +872,7 @@ class AdminDashboardController extends Controller
             'password.required' => __db('new_password_required'),
             'password.confirmed' => __db('confirm_password_mismatch'),
         ]);
-   
+
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => __db('current_password_incorrect')])->withInput();
         }
