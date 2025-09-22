@@ -87,7 +87,7 @@
                                 {{ $new->event?->name_en ?? '' }}
                             </td>
                             <td class="px-4 border text-center border-gray-200 py-3">
-                                {{ $new->news_date ? \Carbon\Carbon::parse($new->news_date)->format('d M Y') : '-' }}
+                                {{ $new->news_date ? \Carbon\Carbon::parse($new->news_date)->format('Y-m-d') : '-' }}
                             </td>
                             <td class="px-4 py-3 border border-gray-200 text-center">
                                 @directCan('edit_news')
