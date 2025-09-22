@@ -90,7 +90,6 @@ class DelegateImport implements ToCollection, WithHeadingRow
     {
         $delegateData = [
             'delegation_id' => $delegationId,
-            'code' => trim($row['delegate_code']) ?? null,
             'title_en' => trim($row['delegate_title_en']) ?? null,
             'title_ar' => trim($row['delegate_title_ar']) ?? null,
             'name_en' => trim($row['delegate_name_en']) ?? null,

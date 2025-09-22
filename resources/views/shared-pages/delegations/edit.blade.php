@@ -432,6 +432,10 @@
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
+                            'label' => __db('delegate_code'),
+                            'render' => fn($row) => $row->code ?? '-',
+                        ],
+                        [
                             'label' => __db('name_en'),
                             'render' => function ($row) {
                                 $badge = $row->team_head
