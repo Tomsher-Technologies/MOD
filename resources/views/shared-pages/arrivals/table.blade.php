@@ -229,16 +229,16 @@
 <div class="mt-3 flex items-center flex-wrap gap-4">
     <div class="flex items-center gap-2">
         <div class="h-5 w-5 bg-[#fff] rounded border border-gray-300"></div>
-        <span class="text-gray-800 text-sm">{{ __db('Scheduled / No active status') }}</span>
+        <span class="text-gray-800 text-sm">{{ __db('scheduled_no_active_status') }}</span>
     </div>
 
     <div class="flex items-center gap-2">
         <div class="h-5 w-5 bg-[#b7e9b2] rounded border"></div>
-        <span class="text-gray-800 text-sm">{{ __db('Arrived') }}</span>
+        <span class="text-gray-800 text-sm">{{ __db('arrived') }}</span>
     </div>
 
     <div class="flex items-center gap-2">
         <div class="h-5 w-5 bg-[#ffc5c5] rounded border"></div>
-        <span class="text-gray-800 text-sm">{{ __db('To be arrived (within 1 hour)') }}</span>
+        <span class="text-gray-800 text-sm">{{ __db('to_be_arrived_within_1_hour') }}</span>
     </div>
 </div>

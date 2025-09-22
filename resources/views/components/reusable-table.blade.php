@@ -7,7 +7,7 @@
     'enableColumnListBtn' => false,
     'tableId' => 'table',
     'defaultVisibleKeys' => [],
-    'loading' => false,  {{-- Add loading prop to trigger skeleton --}}
+    'loading' => false, 
 ])
 
 @php

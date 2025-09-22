@@ -714,13 +714,13 @@
                 'render' => fn($row, $key) => $key + 1,
             ],
             [
-                'label' => 'Date & Time',
+                'label' => __db('date_time'),
                 'render' => fn($row) => $row->date_time
                     ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                     : '-',
             ],
             [
-                'label' => 'Attended By',
+                'label' => __db('attended_by'),
                 'render' => function ($row) {
                     $attendees = $row->interviewMembers->where('type', 'from');
                     $names = $attendees
@@ -743,7 +743,7 @@
                                     'other_interview_member' => base64_encode($otherMemberId),
                                 ]) .
                                 '" class="!text-[#B68A35]">
-                                    <span class="block">Other Member: ' .
+                                    <span class="block">' . __db('other_member') . ': ' .
                                 e($otherMemberId) .
                                 '</span>
                                 </a>';
@@ -753,7 +753,7 @@
                             '<a href="' .
                             route('delegations.show', $row->interviewWithDelegation->id ?? '') .
                             '" class="!text-[#B68A35]">' .
-                            'Delegation ID : ' .
+                            ''. __db('delegation_id') .' : ' .
                             e($row->interviewWithDelegation->code ?? '') .
                             '</a>';
                     }
@@ -765,7 +765,7 @@
                     return $with . $names;
                 },
             ],
-            ['label' => 'Status', 'render' => fn($row) => e(ucfirst($row->status?->value))],
+            ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status?->value))],
         ];
         $data = $delegation->interviews ?? collect();
         $noDataMessage = __db('no_data_found');
