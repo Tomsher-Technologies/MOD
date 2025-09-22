@@ -13,15 +13,10 @@
 @php
     $columns = collect($columns)
         ->map(function ($column, $index) {
-            // Reduce first column width (index 0) to narrow fixed width if desired
             if (!isset($column['key'])) {
                 $column['key'] = \Illuminate\Support\Str::slug($column['label']);
             }
-            if ($index === 0) {
-                $column['narrow'] = true;
-            } else {
-                $column['narrow'] = false;
-            }
+            $column['narrow'] = $index === 0;
             return $column;
         })
         ->toArray();
@@ -30,6 +25,40 @@
     $modalId = $tableId . '-column-visibility-modal';
 @endphp
 
+{{-- Enhanced loader styles --}}
+<style>
+    @keyframes shimmer {
+        100% { transform: translateX(100%); }
+    }
+    .shimmer-bg {
+        position: relative;
+        overflow: hidden;
+        background-color: #e2e8f0; /* Tailwind's bg-gray-200 */
+    }
+    .shimmer-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+        background-image: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        animation: shimmer 1.5s infinite linear;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .table-body-fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+</style>
 
 @if ($enableColumnListBtn || $enableRowLimit)
     <div class="mb-2 flex items-center justify-between flex-wrap gap-2">
@@ -74,7 +103,6 @@
     </div>
 @endif
 
-
 <div class="overflow-x-auto w-full rounded-lg border border-[#e5e4b2]">
     <table class="table-auto w-full border-collapse mb-0 border border-[#e5e4b2]" id="{{ $tableId }}">
         <thead class="bg-[#B68A35] sticky top-0 z-10 shadow-md">
@@ -97,34 +125,37 @@
                 @endforeach
             </tr>
         </thead>
-        <tbody>
-            @if($loading)
-                {{-- Skeleton loading rows --}}
+        @if($loading)
+            <tbody>
+                {{-- UPDATED: Switched to a smoother shimmer effect loader --}}
                 @foreach(range(1, request('limit', 10)) as $i)
-                    <tr class="animate-pulse">
+                    <tr>
                         @foreach ($columns as $column)
                             @php
                                 $permissionKey = $column['permission'] ?? null;
-                                $colPermissions = $permissionKey
-                                    ? (is_array($permissionKey) ? $permissionKey : [$permissionKey])
-                                    : null;
+                                $colPermissions = $permissionKey ? (is_array($permissionKey) ? $permissionKey : [$permissionKey]) : null;
                                 $tdClasses = $column['narrow'] ? 'w-14 max-w-[56px]' : '';
                             @endphp
                             @if (!$colPermissions || can($colPermissions))
-                                <td class="px-4 py-2 border border-gray-200 {{ $tdClasses }}">
-                                    <div class="h-4 bg-gray-300 rounded"></div>
+                                <td class="px-4 py-3 border border-gray-200 {{ $tdClasses }}" data-column-key="{{ $column['key'] }}">
+                                    <div class="h-4 rounded shimmer-bg"></div>
                                 </td>
                             @endif
                         @endforeach
                     </tr>
                 @endforeach
-            @elseif ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+            </tbody>
+        @elseif ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+            <tbody>
                 <tr>
-                    <td class="px-4 py-2 border border-gray-200 text-center italic" colspan="{{ count($columns) }}">
+                    <td class="px-4 py-4 border border-gray-200 text-center italic" colspan="{{ count($columns) }}">
                         {{ $noDataMessage ?? 'No data found.' }}
                     </td>
                 </tr>
-            @else
+            </tbody>
+        @else
+            {{-- UPDATED: Added a fade-in class for a smooth content appearance --}}
+            <tbody class="table-body-fade-in">
                 @foreach ($data as $key => $row)
                     @php
                         $rowId = is_array($row) ? ($row['id'] ?? '') : ($row->id ?? '');
@@ -156,8 +187,8 @@
                         </tr>
                     @endif
                 @endforeach
-            @endif
-        </tbody>
+            </tbody>
+        @endif
     </table>
 </div>
 
@@ -168,7 +199,6 @@
         {{ $data->appends(request()->except('page'))->links() }}
     </div>
 @endif
-
 
 <div id="{{ $modalId }}" tabindex="-1" aria-hidden="true"
      class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
@@ -203,7 +233,6 @@
   </div>
 </div>
 
-
 @push('scripts')
     <script>
         (() => {
@@ -232,7 +261,6 @@
                         });
                     });
 
-                    // Always show action columns
                     document.querySelectorAll(
                         `#${tableId} th[data-column-key='action'], #${tableId} td[data-column-key='action'],` +
                         `#${tableId} th[data-column-key='actions'], #${tableId} td[data-column-key='actions']`
@@ -258,14 +286,6 @@
                             checkbox.checked = true;
                         });
                     }
-
-                    // Always show action columns
-                    document.querySelectorAll(
-                        `#${tableId} th[data-column-key='action'], #${tableId} td[data-column-key='action'],` +
-                        `#${tableId} th[data-column-key='actions'], #${tableId} td[data-column-key='actions']`
-                    ).forEach(el => {
-                        el.style.display = '';
-                    });
                 };
 
                 loadPreferences();
@@ -280,23 +300,15 @@
                     checkbox.addEventListener('change', applyVisibility);
                 });
 
-                document.querySelectorAll(`[data-modal-toggle="${modalId}"]`).forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const modal = document.getElementById(modalId);
-                        if (modal) {
-                            modal.classList.toggle('hidden');
-                        }
+                const modal = document.getElementById(modalId);
+                if(modal) {
+                    document.querySelectorAll(`[data-modal-toggle="${modalId}"]`).forEach(btn => {
+                        btn.addEventListener('click', () => modal.classList.remove('hidden'));
                     });
-                });
-
-                document.querySelectorAll(`[data-modal-hide="${modalId}"]`).forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const modal = document.getElementById(modalId);
-                        if (modal) {
-                            modal.classList.add('hidden');
-                        }
+                    document.querySelectorAll(`[data-modal-hide="${modalId}"]`).forEach(btn => {
+                        btn.addEventListener('click', () => modal.classList.add('hidden'));
                     });
-                });
+                }
             });
         })();
     </script>
