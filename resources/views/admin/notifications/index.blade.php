@@ -118,6 +118,45 @@
                                                 </ul>
                                             </div>
                                         @endif
+
+                                        <div class="bg-gray-50 rounded-lg p-6 border-l-4 border-blue-500">
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Module Details</h3>
+
+                                            <dl class="grid grid-cols-1 gap-x-3 gap-y-3 sm:grid-cols-2">
+                                                <div class="sm:col-span-1">
+                                                    <dt class="text-sm font-medium text-gray-500">Module</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ $module ?? 'N/A' }}</dd>
+                                                </div>
+
+                                                <div class="sm:col-span-1">
+                                                    <dt class="text-sm font-medium text-gray-500">Action</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ $action ?? 'N/A' }}</dd>
+                                                </div>
+
+                                                <div class="sm:col-span-1">
+                                                    <dt class="text-sm font-medium text-gray-500">Delegation ID</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ $delegationId ?? 'N/A' }}
+                                                    </dd>
+                                                </div>
+
+                                                <div class="sm:col-span-1">
+                                                    <dt class="text-sm font-medium text-gray-500">Submodule ID</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ $submoduleId ?? 'N/A' }}</dd>
+                                                </div>
+
+                                                <div class="sm:col-span-1">
+                                                    <dt class="text-sm font-medium text-gray-500">Module Name</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ $moduleName ?? 'N/A' }}</dd>
+                                                </div>
+
+                                                <div class="sm:col-span-1">
+                                                    <dt class="text-sm font-medium text-gray-500">Module Code</dt>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ $moduleCode ?? 'N/A' }}</dd>
+                                                </div>
+                                            </dl>
+                                        </div>
+
+
                                         <p class="text-xs text-neutral-500">
                                             @if (getActiveLanguage() === 'ar')
                                                 {{ $notification->created_at->diffForHumans() }}
