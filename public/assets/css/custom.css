@@ -6051,7 +6051,7 @@ h6, .h6 {
 /* === sidebar css start === */
 .sidebar{
   position: fixed;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   inset-inline-start: -105%;
   top: 0px;
   z-index: 30;
@@ -8380,3 +8380,8 @@ h6, .h6 {
    }
 
 
+
+
+   .select2-container .select2-search--inline .select2-search__field{
+    height: 24px !important;
+   }

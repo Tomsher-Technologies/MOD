@@ -294,6 +294,16 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
+
+
+
 <div id="filter-drawer"
     class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
     tabindex="-1" aria-labelledby="drawer-label">
@@ -317,7 +327,7 @@
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select name="title_en" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                <select name="title_en" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleEns as $titleEn)
                         <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>{{ $titleEn }}</option>
@@ -326,7 +336,7 @@
             </div>
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select name="title_ar" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                <select name="title_ar" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleArs as $titleAr)
                         <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>{{ $titleAr }}</option>
@@ -337,7 +347,7 @@
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle_type') }}</label>
                 <select name="car_type[]" multiple data-placeholder="{{ __db('select_vehicle_types') }}"
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($carTypes as $carType)
                         <option value="{{ $carType }}" @if (is_array(request('car_type', [])) && in_array($carType, request('car_type', []))) selected @endif>
                             {{ $carType }}</option>
@@ -349,7 +359,7 @@
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('car_number') }}</label>
                 <select name="car_number[]" multiple data-placeholder="{{ __db('select_plate_numbers') }}"
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($carNumbers as $carNumber)
                         <option value="{{ $carNumber }}" @if (is_array(request('car_number', [])) && in_array($carNumber, request('car_number', []))) selected @endif>
                             {{ $carNumber }}</option>
@@ -360,7 +370,7 @@
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('capacity') }}</label>
                 <select name="capacity[]" multiple data-placeholder="{{ __db('select_capacities') }}"
-                    class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($capacities as $capacity)
                         <option value="{{ $capacity }}" @if (is_array(request('capacity', [])) && in_array($capacity, request('capacity', []))) selected @endif>
                             {{ $capacity }}</option>
@@ -371,7 +381,7 @@
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation_id') }}</label>
                 <select name="delegation_id[]" multiple data-placeholder="{{ __db('select_delegations') }}"
-                    class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
+                    class="select2 w-full h-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_delegations') }}</option>
                     @foreach ($delegations as $delegation)
                         <option value="{{ $delegation->id }}" @if (is_array(request('delegation_id', [])) && in_array($delegation->id, request('delegation_id', []))) selected @endif>
@@ -390,6 +400,19 @@
         </div>
     </form>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <div id="column-visibility-modal" tabindex="-1" aria-hidden="true"
     class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
