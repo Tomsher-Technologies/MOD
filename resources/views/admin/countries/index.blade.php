@@ -162,7 +162,7 @@
                     {{ $countries->links() }}
                 </div>
 
-            
+
             </div>
         </div>
 
@@ -294,7 +294,7 @@
                                     </label>
                                     <input type="text" name="name" id="name-{{ $country->id }}"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                        value="{{ old('name', $country->name) }}" required>
+                                        value="{{ old('name', $country->getNameEn()) }}" required>
                                 </div>
                                 <div>
                                     <label for="name_ar-{{ $country->id }}"
@@ -303,7 +303,7 @@
                                     </label>
                                     <input type="text" name="name_ar" id="name_ar-{{ $country->id }}"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                                        value="{{ old('name_ar', $country->name_ar) }}">
+                                        value="{{ old('name_ar', $country->getNameAr()) }}">
                                 </div>
                                 <div>
                                     <label for="short_code-{{ $country->id }}"
