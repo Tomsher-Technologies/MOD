@@ -286,6 +286,14 @@
     "upload_new_floor_plan_files_msg": "Select PDF files to add to this floor plan",
     "view": "View",
     "export": "Export",
+    "export_all": "Export All",
+    "context_information": "Context Information",
+    "delegation_id": "Delegation ID",
+    "module": "Module",
+    "submodule": "Submodule",
+    "submodule_id": "Submodule ID",
+    "details": "Details",
+    "action": "Action",
     "inactivate_user_confirm_msg" : "Do you want to inactivate all users assigned to this event?"
 
 }
