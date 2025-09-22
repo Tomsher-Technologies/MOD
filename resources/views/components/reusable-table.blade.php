@@ -92,7 +92,7 @@
         @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
             <tr>
                 <td class="px-4 py-2 border border-gray-200 text-center" colspan="{{ count($columns) }}">
-                    {{ $noDataMessage ?? 'No data found.' }}
+                    {{ $noDataMessage ?? __db('no_data_found') }}
                 </td>
             </tr>
         @else

@@ -50,7 +50,7 @@
                     <label class="form-label">{{ __db('continent') }}: <span class="text-red-600">*</span></label>
                     <select name="continent_id" id="continent-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option value="">{{ __('Select Continent') }}</option>
+                        <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('continents')->options as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('continent_id', $delegation->continent_id) == $option->id ? 'selected' : '' }}>
@@ -67,7 +67,7 @@
                     <label class="form-label">{{ __db('country') }}: <span class="text-red-600">*</span></label>
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option value="">{{ __('Select Country') }}</option>
+                        <option value="">{{ __db('select') }}</option>
                         {{-- @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('country_id', $delegation->country_id) == $option->id ? 'selected' : '' }}>
@@ -85,7 +85,7 @@
                             class="text-red-600">*</span></label>
                     <select name="invitation_status_id" id="invitation_status_select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        <option disabled>{{ __('Select Invitation Status') }}</option>
+                        <option disabled>{{ __db('select') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('invitation_status_id', $delegation->invitation_status_id) == $option->id ? 'selected' : '' }}>
@@ -177,20 +177,20 @@
                 <div class="col-span-12">
                     <div class="flex w-full justify-between gap-5">
                         <div class="w-full">
-                            <label class="form-label">{{ __db('note1') }}:</label>
+                            <label class="form-label">{{ __db('note_1') }}:</label>
                             <textarea name="note1" rows="4"
                                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-300 focus:border-blue-500"
-                                placeholder="Enter Note 1">{{ old('note1', $delegation->note1) }}</textarea>
+                                placeholder="{{ __db('note_1') }}">{{ old('note1', $delegation->note1) }}</textarea>
                             @error('note1')
                                 <div class="text-red-600">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div class="w-full">
-                            <label class="form-label">{{ __db('note2') }}:</label>
+                            <label class="form-label">{{ __db('note_2') }}:</label>
                             <textarea name="note2" rows="4"
                                 class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-neutral-300 focus:border-blue-500"
-                                placeholder="Enter Note 2">{{ old('note2', $delegation->note2) }}</textarea>
+                                placeholder="{{ __db('note_2') }}">{{ old('note2', $delegation->note2) }}</textarea>
                             @error('note2')
                                 <div class="text-red-600">{{ $message }}</div>
                             @enderror
@@ -810,7 +810,7 @@
                                                 <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                                 </svg>
-                                                <span>Assign</span>
+                                                <span>'.__db('assign').'</span>
                                             </a>';
                                     }
                                 }
@@ -994,7 +994,7 @@
                                             $assignUrl .
                                             '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-xs flex items-center gap-2 py-1 rounded-lg me-auto">
                                                 <svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                                                <span>Assign</span>
+                                                <span>'.__db('assign').'</span>
                                             </a>';
                                     }
                                 }
@@ -1050,13 +1050,13 @@
                             'render' => fn($row, $key) => $key + 1,
                         ],
                         [
-                            'label' => 'Date & Time',
+                            'label' => __db('date_time'),
                             'render' => fn($row) => $row->date_time
                                 ? Carbon\Carbon::parse($row->date_time)->format('Y-m-d H:i')
                                 : '-',
                         ],
                         [
-                            'label' => 'Attended By',
+                            'label' => __db('attended_by'),
                             'render' => function ($row) {
                                 $attendees = $row->interviewMembers->where('type', 'from');
                                 $names = $attendees
@@ -1083,7 +1083,7 @@
                                                 'other_interview_member' => base64_encode($row->other_member_id),
                                             ]) .
                                             '" class="!text-[#B68A35]">
-                                    <span class="block">Other Member: ' .
+                                    <span class="block">'.__db('other_member').': ' .
                                             e($row->otherMember->getTranslation('name')) .
                                             '</span>
                                 </a>';
@@ -1115,7 +1115,7 @@
                                                                     $delegate->id,
                                                                 ),
                                                             ]) .
-                                                            '" class="block !text-[#B68A35]">Other Member: ' .
+                                                            '" class="block !text-[#B68A35]">'. __db('other_member').': ' .
                                                             e($delegate->getTranslation('name')) .
                                                             '</a>';
                                                     }
@@ -1132,7 +1132,7 @@
                                                 '<a href="' .
                                                 route('delegations.show', $row->interviewWithDelegation->id ?? '') .
                                                 '" class="!text-[#B68A35]">' .
-                                                'Delegation ID : ' .
+                                                ' '. __db('delegation_id') .' : ' .
                                                 e($row?->interviewWithDelegation?->code ?? '') .
                                                 '</a>';
                                         }
@@ -1141,7 +1141,7 @@
                                             '<a href="' .
                                             route('delegations.show', $row->interviewWithDelegation->id ?? '') .
                                             '" class="!text-[#B68A35]">' .
-                                            'Delegation ID : ' .
+                                            ''. __db('delegation_id') .' : ' .
                                             e(
                                                 ($row->interviewWithDelegation
                                                     ? $row->interviewWithDelegation->code
@@ -1325,13 +1325,13 @@
 
                 if (isUnassignable) {
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This option will unassign all the services that have already been assigned to this delegation.",
+                        title: '{{ __db('are_you_sure') }}',
+                        text: "{{ __db('all_unassign_warning') }}",
                         icon: 'warning',
                         showCancelButton: false,
                         confirmButtonColor: '#B68A35',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'I understand'
+                        confirmButtonText: '{{ __db('i_understand') }}',
                     })
                 }
             });
@@ -1447,13 +1447,14 @@
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This will permanently delete the attachment.",
+                        title: '{{ __db('are_you_sure') }}',
+                        text: "{{ __db('delete_attachment_confirm_msg') }}",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#B68A35',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!'
+                        confirmButtonText: '{{ __db('yes') }}',
+                        cancelButtonText: '{{ __db('cancel') }}'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();
@@ -1466,13 +1467,14 @@
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This will permanently delete the delegate.",
+                        title: '{{ __db('are_you_sure') }}',
+                        text: "{{ __db('delete_delegate_confirm_msg') }}",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#B68A35',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!',
+                        confirmButtonText: '{{ __db('yes') }}',
+                        cancelButtonText: '{{ __db('cancel') }}',
                         customClass: {
                             popup: 'w-full max-w-2xl',
                             confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
@@ -1490,13 +1492,14 @@
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This will permanently delete the interview.",
+                        title: '{{ __db('are_you_sure') }}',
+                        text: "{{ __db('delete_interview_confirm_msg') }}",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#B68A35',
                         cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, delete it!',
+                        confirmButtonText: '{{ __db('yes') }}',
+                        cancelButtonText: '{{ __db('cancel') }}',
                         customClass: {
                             popup: 'w-full max-w-2xl',
                             confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',

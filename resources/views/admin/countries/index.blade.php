@@ -77,7 +77,7 @@
                             },
                         ],
                         ['label' => __db('name'), 'render' => fn($country) => e($country?->getNameEn())],
-                        ['label' => 'Name (Arabic)', 'render' => fn($country) => e($country?->getNameAr() ?? '')],
+                        ['label' => __db('name_ar'), 'render' => fn($country) => e($country?->getNameAr() ?? '')],
                         ['label' => __db('short_code'), 'render' => fn($country) => e($country?->short_code)],
                         [
                             'label' => __db('continent'),

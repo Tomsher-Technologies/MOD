@@ -258,7 +258,8 @@
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: "{{ __db('yes') }}"
+                    confirmButtonText: "{{ __db('yes') }}",
+                    cancelButtonText: '{{ __db('cancel') }}'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -318,13 +319,14 @@
                 e.preventDefault();
 
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Assign selected users to this module?",
+                    title: '{{ __db('are_you_sure') }}',
+                    text: "{{ __db('assign_confirm_text') }}",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, assign!'
+                    confirmButtonText: '{{ __db('yes') }}'
+                    cancelButtonText: '{{ __db('cancel') }}'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let formData = new FormData(form);
@@ -338,12 +340,12 @@
                             body: formData
                         })
                         .then(response => {
-                            if (!response.ok) throw new Error("Failed to assign users.");
+                            if (!response.ok) throw new Error("{{ __db('something_went_wrong') }}");
                             return response.json();
                         })
                         .then(data => {
                     
-                            toastr.success('Users have been assigned successfully.');
+                            toastr.success('{{ __db('user_assigned_success') }}');
                             // Close modal
                             form.closest('.assignUserModal').classList.add('hidden');
                             setTimeout(function() {
