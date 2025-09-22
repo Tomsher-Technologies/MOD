@@ -83,7 +83,7 @@
                                 @enderror
                             </div>
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('Set as Default Event') }}</label>
+                                <label class="form-label">{{ __db('set_as_default_event') }}</label>
                                 
                                 <select name="is_default" id="is_default" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                                     <option value="0" {{ (old('is_default') === 0) ? 'selected' : '' }}>{{ __db('no') }}</option>
