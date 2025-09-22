@@ -3,15 +3,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const isDeparturesPage = document.getElementById('fullDiv1') !== null;
 
     if (!isArrivalsPage && !isDeparturesPage) {
-        return; // Not on the right page, exit
+        return; 
     }
 
     function refreshData() {
         console.log("refreshing");
         
-        const url = isArrivalsPage ?
-            window.location.origin + '/mod-admin/arrivals' :
-            window.location.origin + '/mod-admin/departures';
+        const currentUrl = new URL(window.location.href);
+        const url = currentUrl.toString();
 
         fetch(url, {
             method: 'GET',
@@ -36,7 +35,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         const columnVisibilityModal = tempDiv.querySelector('[id$="-table-column-visibility-modal"]');
 
                         if (newTable) {
-                            // Remove the hidden class from the table
                             newTable.classList.remove('hidden');
                             
                             const currentTable = tableContainer.querySelector('table');
@@ -56,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
                             
-                            // Handle column visibility modal
                             if (columnVisibilityModal) {
                                 const currentModal = document.querySelector('[id$="-table-column-visibility-modal"]');
                                 if (currentModal) {
@@ -76,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                 bindEditButtons();
                                 
-                                // Re-initialize column visibility functionality
                                 initColumnVisibility();
                             }, 100);
                         }
@@ -120,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // Initialize column visibility functionality
     function initColumnVisibility() {
         document.querySelectorAll('.column-toggle-checkbox').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
@@ -129,24 +124,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const table = document.getElementById(tableId);
                 
                 if (table) {
-                    const columnIndex = Array.from(table.querySelectorAll('th[data-column-key]'))
-                        .findIndex(th => th.getAttribute('data-column-key') === columnKey);
-                    
-                    if (columnIndex >= 0) {
-                        // Toggle header visibility
-                        const header = table.querySelectorAll('th')[columnIndex];
-                        if (header) {
-                            header.classList.toggle('hidden', !this.checked);
-                        }
-                        
-                        // Toggle cell visibility in each row
-                        table.querySelectorAll('tbody tr').forEach(row => {
-                            const cell = row.querySelectorAll('td')[columnIndex];
-                            if (cell) {
-                                cell.classList.toggle('hidden', !this.checked);
-                            }
-                        });
-                    }
+                    // Toggle visibility using the display style as in the reusable table component
+                    const isVisible = this.checked;
+                    document.querySelectorAll(
+                        `#${tableId} th[data-column-key='${columnKey}'], #${tableId} td[data-column-key='${columnKey}']`
+                    ).forEach(el => {
+                        el.style.display = isVisible ? '' : 'none';
+                    });
                 }
             });
         });
@@ -182,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
     bindEditButtons();
     initColumnVisibility();
 
-    setInterval(refreshData, 300000);
+    setInterval(refreshData, 5000);
 
     console.log('Auto-refresh initialized for ' + (isArrivalsPage ? 'arrivals' : 'departures') + ' page');
 });

@@ -186,12 +186,27 @@
             const storageKey = @json($storageKey);
             const tableId = @json($tableId);
             const modalId = @json($modalId);
+            const enableColumnListBtn = @json($enableColumnListBtn);
 
             document.addEventListener('DOMContentLoaded', function() {
                 const columnTogglesContainer = document.getElementById(tableId + '-column-toggles');
                 if (!columnTogglesContainer) return;
 
                 const checkboxes = columnTogglesContainer.querySelectorAll('.column-toggle-checkbox');
+
+                if (!enableColumnListBtn) {
+                    const table = document.getElementById(tableId);
+
+                    document.querySelectorAll(`#${tableId} th, #${tableId} td`).forEach(el => {
+                        el.style.display = '';
+                    });
+
+                    if (table) {
+                        table.classList.remove('hidden');
+                    }
+
+                    return;
+                }
 
                 const applyVisibility = () => {
                     let preferences = {};
