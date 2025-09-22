@@ -68,6 +68,8 @@ class DriverController extends Controller
                 $q->where('delegations.id', $delegationId)
                     ->where('delegation_drivers.status', 1);
             });
+
+            $query->where('status', 1);
         }
 
         if ($search = $request->input('search')) {

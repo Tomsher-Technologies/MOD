@@ -24,7 +24,7 @@ class ImportLogService
             'import_type' => $importType,
             'file_name' => $fileName,
             'row_number' => $rowNumber,
-            'error_message' => null,
+            'error_message' => "",
             'row_data' => $rowData,
             'status' => 'success'
         ]);

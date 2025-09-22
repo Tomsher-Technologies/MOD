@@ -113,7 +113,7 @@
                                 return '<button onclick="showErrorDetails(' .
                                     $log->id .
                                     ')" class="text-red-600 hover:text-red-900">' .
-                                    Str::limit($log->error_message, 50) .
+                                    $log->error_message .
                                     '</button>';
                             }
                         },
@@ -122,16 +122,16 @@
                         'label' => __db('created_at'),
                         'render' => fn($log) => e($log->created_at->format('Y-m-d H:i:s')),
                     ],
-                    [
-                        'label' => __db('actions'),
-                        'render' => function ($log) {
-                            return '<button onclick="showRowData(' .
-                                $log->id .
-                                ')" class="text-indigo-600 hover:text-indigo-900">' .
-                                __db('view_data') .
-                                '</button>';
-                        },
-                    ],
+                    // [
+                    //     'label' => __db('actions'),
+                    //     'render' => function ($log) {
+                    //         return '<button onclick="showRowData(' .
+                    //             $log->id .
+                    //             ')" class="text-indigo-600 hover:text-indigo-900">' .
+                    //             __db('view_data') .
+                    //             '</button>';
+                    //     },
+                    // ],
                 ];
             @endphp
 

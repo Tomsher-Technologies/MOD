@@ -66,7 +66,7 @@ class EscortController extends Controller
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->where('delegation_id', null);
+            $query->where('delegation_id', null)->where('status', 1);
         }
 
         if ($search = $request->input('search')) {
@@ -520,7 +520,7 @@ class EscortController extends Controller
         try {
             $fileName = $request->file('file')->getClientOriginalName();
             Excel::import(new EscortImport($fileName), $request->file('file'));
-            
+
             return redirect()->route('admin.import-logs.index', ['import_type' => 'escorts'])
                 ->with('success', __db('escorts_imported_successfully'));
         } catch (\Exception $e) {
