@@ -301,6 +301,12 @@
         }
     </script>
 
+
+
+
+
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchBtn = document.getElementById('search-delegation-btn');
@@ -377,15 +383,15 @@
                             delegationsList.innerHTML = '';
                             data.delegations.forEach(delegation => {
                                 const li = document.createElement('li');
-                                li.className = 'py-2 cursor-pointer hover:bg-gray-100';
+                                li.className = 'py-2 cursor-pointer bg-gray-800 hover:bg-gray-800';
                                 li.textContent =
                                     `${delegation.code} - ${delegation.invitationFrom_value}`;
                                 li.dataset.id = delegation.id;
                                 li.addEventListener('click', function() {
                                     delegationsList.querySelectorAll('li').forEach(el =>
-                                        el.classList.remove('bg-[#B68A35]',
+                                        el.classList.remove('bg-[#222]',
                                             'text-white'));
-                                    this.classList.add('bg-[#B68A35]', 'text-white');
+                                    this.classList.add('bg-[#222]', 'text-black');
                                     selectedDelegationId = delegation.id;
 
                                     document.querySelector(
@@ -459,4 +465,16 @@
             }
         });
     </script>
+
+
+
+
+
+
+
+
+
+
+
+
 @endsection

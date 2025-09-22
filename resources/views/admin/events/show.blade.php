@@ -26,43 +26,43 @@
                 @endif
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <div class="bg-white rounded-lg  p-6 space-y-4 max-w-md">
+             
+          <div class="space-y-2">
+  <div class="bg-white rounded-lg p-6 space-y-4 max-w-md">
+    <div class="space-y-3 text-gray-700">
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('name') }} (EN) :</span>
+        <span>{{ $event->name_en }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('name') }} (AR) :</span>
+        <span>{{ $event->name_ar }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('code') }} :</span>
+        <span>{{ $event->code }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('start_date') }} :</span>
+        <span>{{ $event->start_date }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('end_date') }} :</span>
+        <span>{{ $event->end_date }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="font-semibold">{{ __db('status') }} :</span>
+        @if ($event->status)
+          <span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">{{ __db('completed') }}</span>
+        @else
+          <span class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded">{{ __db('not_completed') }}</span>
+        @endif
+      </div>
+    </div>
+  </div>
+</div>
 
-                        <div class="space-y-3 text-gray-700">
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('name') }} (EN) :</span>
-                                <span>{{ $event->name_en }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('name') }} (AR) :</span>
-                                <span>{{ $event->name_ar }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('code') }} :</span>
-                                <span>{{ $event->code }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('start_date') }} :</span>
-                                <span>{{ $event->start_date }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('end_date') }} :</span>
-                                <span>{{ $event->end_date }}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="font-semibold">{{ __db('status') }} :</span>
-                                @if ($event->status)
-                                <span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">{{
-                                    __db('completed') }}</span>
-                                @else
-                                <span class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded">{{
-                                    __db('not_completed') }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="space-y-2">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -258,7 +258,8 @@
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: "{{ __db('yes') }}"
+                    confirmButtonText: "{{ __db('yes') }}",
+                    cancelButtonText: '{{ __db('cancel') }}'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
@@ -318,13 +319,14 @@
                 e.preventDefault();
 
                 Swal.fire({
-                    title: 'Are you sure?',
-                    text: "Assign selected users to this module?",
+                    title: '{{ __db('are_you_sure') }}',
+                    text: "{{ __db('assign_confirm_text') }}",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, assign!'
+                    confirmButtonText: '{{ __db('yes') }}'
+                    cancelButtonText: '{{ __db('cancel') }}'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         let formData = new FormData(form);
@@ -338,12 +340,12 @@
                             body: formData
                         })
                         .then(response => {
-                            if (!response.ok) throw new Error("Failed to assign users.");
+                            if (!response.ok) throw new Error("{{ __db('something_went_wrong') }}");
                             return response.json();
                         })
                         .then(data => {
                     
-                            toastr.success('Users have been assigned successfully.');
+                            toastr.success('{{ __db('user_assigned_success') }}');
                             // Close modal
                             form.closest('.assignUserModal').classList.add('hidden');
                             setTimeout(function() {

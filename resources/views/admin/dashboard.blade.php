@@ -1,3 +1,6 @@
+
+
+
 @extends('layouts.admin_account', ['title' => __db('dashboard')])
 
 @section('content')
@@ -6,102 +9,98 @@
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[16px]">{{ __db('dashboard') }}</h2>
         </div>
-        <div class="grid grid-cols-12 gap-3 text-sm">
-            <div
-                class=" shadow-none border !border-[#e6d7a2] rounded-lg h-full bg-gradient-to-r from-cyan-600/10 bg-[#F2ECCF] col-span-3">
-                <div class="card-body p-5">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <p class="font-medium text-neutral-900  mb-1">{{ __db('total') }} {{ __db('delegates') }}</p>
-                            <h6 class="mb-0 ">{{ $data['totalDelegates'] ?? 0 }}</h6>
-                        </div>
-                        <div class="w-[50px] h-[50px] bg-[#B68A35] rounded-full flex justify-center items-center">
-                            <svg class="text-white" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- card end -->
-            <div
-                class=" shadow-none border !border-[#e6d7a2]  rounded-lg h-full bg-gradient-to-r from-purple-600/10 bg-[#F2ECCF] col-span-3">
-                <div class="card-body p-5">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <p class="font-medium text-neutral-900  mb-1">{{ __db('total') }} {{ __db('escorts') }} {{ __db('assigned') }} </p>
-                            <h6 class="mb-0 ">{{ $data['totalEscortsAssigned'] ?? 0 }}</h6>
-                        </div>
-                        <div class="w-[50px] h-[50px] bg-[#B68A35] rounded-full flex justify-center items-center">
-                            <svg class="text-white" width="36" height="30" viewBox="0 0 29 29" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M20.5249 24.7773H8.55908C3.77275 24.7773 2.57617 23.6107 2.57617 18.944V9.61068C2.57617 4.94401 3.77275 3.77734 8.55908 3.77734H20.5249C25.3112 3.77734 26.5078 4.94401 26.5078 9.61068V18.944C26.5078 23.6107 25.3112 24.7773 20.5249 24.7773Z"
-                                    stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M16.9355 9.61084H22.9185" stroke="#fff" stroke-width="1.75" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M18.1328 14.2773H22.9191" stroke="#fff" stroke-width="1.75" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path d="M20.5254 18.9438H22.9186" stroke="#fff" stroke-width="1.75" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                                <path
-                                    d="M10.3553 13.4489C11.5514 13.4489 12.5211 12.5035 12.5211 11.3373C12.5211 10.171 11.5514 9.22559 10.3553 9.22559C9.15912 9.22559 8.18945 10.171 8.18945 11.3373C8.18945 12.5035 9.15912 13.4489 10.3553 13.4489Z"
-                                    stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                                <path
-                                    d="M14.5421 19.3289C14.3746 17.6372 12.9985 16.3072 11.2635 16.1556C10.6652 16.0972 10.0549 16.0972 9.44465 16.1556C7.70961 16.3189 6.33354 17.6372 6.16602 19.3289"
-                                    stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- card end -->
-            <div class="shadow-none border !border-[#e6d7a2] rounded-lg h-full bg-gradient-to-r from-blue-600/10 bg-[#F2ECCF] col-span-3">
-                <div class="card-body p-5">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <p class="font-medium text-neutral-900  mb-1">{{ __db('total') }} {{ __db('drivers') }} {{ __db('assigned') }}</p>
-                            <h6 class="mb-0 ">{{ $data['totalDriversAssigned'] ?? 0 }}</h6>
-                        </div>
-                        <div class="w-[50px] h-[50px] bg-[#B68A35] rounded-full flex justify-center items-center">
-                            <svg class="text-white" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-car-front-icon lucide-car-front">
-                                <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
-                                <path d="M7 14h.01" />
-                                <path d="M17 14h.01" />
-                                <rect width="18" height="8" x="3" y="10" rx="2" />
-                                <path d="M5 18v2" />
-                                <path d="M19 18v2" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- card end -->
-            <div
-                class=" shadow-none border !border-[#e6d7a2] rounded-lg h-full bg-gradient-to-r from-success-600/10 bg-[#F2ECCF] col-span-3">
-                <div class="card-body p-5">
-                    <div class="flex  items-center justify-between gap-3">
-                        <div>
-                            <p class="font-medium text-neutral-900  mb-1">{{ __db('total') }} {{ __db('hotels') }}</p>
-                            <h6 class="mb-0 ">{{ $data['totalHotels'] ?? 0 }}</h6>
-                        </div>
-                        <div class="w-[50px] h-[50px] bg-[#B68A35] rounded-full flex justify-center items-center">
-                            <svg class="text-white" width="36" height="30" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- card end -->
-        </div>
+      
+      
+      
+      
+      {{-- Your main view file, e.g., dashboard.blade.php --}}
+
+<div class="grid grid-cols-1 gap-5 text-sm sm:grid-cols-2 xl:grid-cols-4">
+
+    {{-- Card 1: Total Delegates --}}
+    <x-dashboard-stat-card title="{{ __db('total') }} {{ __db('delegates') }}" value="{{ $data['totalDelegates'] ?? 0 }}" color="cyan">
+        <svg class="h-7 w-7 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+        </svg>
+    </x-dashboard-stat-card>
+
+    {{-- Card 2: Escorts Assigned --}}
+    <x-dashboard-stat-card title="{{ __db('total') }} {{ __db('escorts') }} {{ __db('assigned') }}" value="{{ $data['totalEscortsAssigned'] ?? 0 }}" color="purple">
+        <svg class="h-7 w-7 text-white" viewBox="0 0 29 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.5249 24.7773H8.55908C3.77275 24.7773 2.57617 23.6107 2.57617 18.944V9.61068C2.57617 4.94401 3.77275 3.77734 8.55908 3.77734H20.5249C25.3112 3.77734 26.5078 4.94401 26.5078 9.61068V18.944C26.5078 23.6107 25.3112 24.7773 20.5249 24.7773Z" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M16.9355 9.61084H22.9185" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M18.1328 14.2773H22.9191" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M20.5254 18.9438H22.9186" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M10.3553 13.4489C11.5514 13.4489 12.5211 12.5035 12.5211 11.3373C12.5211 10.171 11.5514 9.22559 10.3553 9.22559C9.15912 9.22559 8.18945 10.171 8.18945 11.3373C8.18945 12.5035 9.15912 13.4489 10.3553 13.4489Z" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M14.5421 19.3289C14.3746 17.6372 12.9985 16.3072 11.2635 16.1556C10.6652 16.0972 10.0549 16.0972 9.44465 16.1556C7.70961 16.3189 6.33354 17.6372 6.16602 19.3289" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </x-dashboard-stat-card>
+
+    {{-- Card 3: Drivers Assigned --}}
+    <x-dashboard-stat-card title="{{ __db('total') }} {{ __db('drivers') }} {{ __db('assigned') }}" value="{{ $data['totalDriversAssigned'] ?? 0 }}" color="blue">
+        <svg class="h-7 w-7 text-white" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8" />
+            <path d="M7 14h.01" />
+            <path d="M17 14h.01" />
+            <rect width="18" height="8" x="3" y="10" rx="2" />
+            <path d="M5 18v2" />
+            <path d="M19 18v2" />
+        </svg>
+    </x-dashboard-stat-card>
+
+    {{-- Card 4: Total Hotels --}}
+    <x-dashboard-stat-card title="{{ __db('total') }} {{ __db('hotels') }}" value="{{ $data['totalHotels'] ?? 0 }}" color="green">
+        <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+        </svg>
+    </x-dashboard-stat-card>
+
+</div>
+
+
+@push('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const animateValue = (obj, start, end, duration) => {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const currentValue = Math.floor(progress * (end - start) + start);
+                // Format number with commas
+                obj.innerHTML = currentValue.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const targetValue = parseInt(el.dataset.value, 10);
+                    animateValue(el, 0, targetValue, 1500); // Animate over 1.5 seconds
+                    observer.unobserve(el); // Stop observing after animation
+                }
+            });
+        }, {
+            threshold: 0.5 // Trigger when 50% of the element is visible
+        });
+
+        document.querySelectorAll('.animate-number').forEach((el) => {
+            observer.observe(el);
+        });
+    });
+</script>
+@endpush
+
+
+
+
+
+
         <!-- Notification -->
         <div class="grid grid-cols-12 xl:grid-cols-12 gap-3 mt-6">
             <div class="col-span-8 sm:col-span-8 xl:col-span-8">

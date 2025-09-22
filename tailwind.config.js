@@ -18,6 +18,7 @@ export default {
                 'silk-serif': ['"Silk Serif TRIAL"', 'serif'],
                 'sora': ['Sora', 'sans-serif'],
                 'tajawal': ['Tajawal', 'sans-serif'],
+                'public-sans': ['"Public Sans"', 'sans-serif'], // Add the new font
             },
             colors: {
                 primary: '#F8B26A',

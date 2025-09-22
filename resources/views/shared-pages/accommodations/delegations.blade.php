@@ -27,13 +27,13 @@
                             </div>
                             <input type="search" id="default-search" name="search" value="{{ request('search') }}"
                                 class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                                placeholder="Search by ID, Escorts, Drivers, Team Head" />
+                                placeholder="{{ __db('delegation_search_placeholder') }}" />
 
                             <a href="{{ route('accommodation-delegations') }}"
                                 class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                 {{ __db('reset') }}</a>
                             <button type="submit"
-                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">Search</button>
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
                         </div>
                     </form>
 

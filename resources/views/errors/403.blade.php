@@ -13,12 +13,12 @@
                  class="w-24 h-24 mx-auto opacity-80">
         </div>
         <h1 class="text-5xl font-bold text-red-600 mb-4">403</h1>
-        <h2 class="text-xl font-semibold mb-2">Access Denied</h2>
-        <p class="text-gray-600 mb-6">You don't have permission to access this page. Please check your credentials or contact the administrator.</p>
+        <h2 class="text-xl font-semibold mb-2">{{ __db('access_denied') }}</h2>
+        <p class="text-gray-600 mb-6">{{ __db('access_denied_message') }}</p>
 
         <button onclick="history.back()"
                 class="px-6 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition font-medium">
-            ← Go Back
+            ← {{ __db('back') }}
         </button>
     </div>
 </body>
