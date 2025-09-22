@@ -9,7 +9,7 @@
         <div class="grid grid-cols-12 gap-5">
             <div class="col-span-12 md:col-span-6">
                 <label class="form-label font-medium">{{ __db('event') }}:</label>
-                <p class="text-gray-700">{{ $floorPlan->event->name ?? '-' }}</p>
+                <p class="text-gray-700">{{ $floorPlan->event->getTranslation('name') ?? '-' }}</p>
             </div>
 
             <div class="col-span-12 md:col-span-6">
