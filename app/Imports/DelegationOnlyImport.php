@@ -10,11 +10,17 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\DelegationStatusService;
 
 class DelegationOnlyImport implements ToCollection, WithHeadingRow
 {
 
+    protected $delegationStatusService;
 
+    public function __construct()
+    {
+        $this->delegationStatusService = new DelegationStatusService();
+    }
     public function collection(Collection $rows)
     {
 
@@ -36,6 +42,8 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
                 //     $delegation = $existingDelegation;
                 // } else {
                 $delegation = Delegation::create($delegationData);
+
+                $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
                 // }
             }
 
@@ -94,17 +102,19 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
             if ($invitationStatus) {
                 $delegationData['invitation_status_id'] = $invitationStatus->id;
-            }
-        }
+            } else {
+                $defaultInvitationStatus = DropdownOption::whereHas('dropdown', function ($q) {
+                    $q->where('code', 'invitation_status');
+                })->where('code', '1')->first();
 
-        if (!empty($row['participation_status_id'])) {
-            $participationStatus = DropdownOption::whereHas('dropdown', function ($q) {
-                $q->where('code', 'participation_status');
-            })->where('id', trim($row['participation_status_id']))->first();
-
-            if ($participationStatus) {
-                $delegationData['participation_status_id'] = $participationStatus->id;
+                $delegationData['invitation_status_id'] = $defaultInvitationStatus->id;
             }
+        } else {
+            $defaultInvitationStatus = DropdownOption::whereHas('dropdown', function ($q) {
+                $q->where('code', 'invitation_status');
+            })->where('code', '1')->first();
+
+            $delegationData['invitation_status_id'] = $defaultInvitationStatus->id;
         }
 
         return $delegationData;

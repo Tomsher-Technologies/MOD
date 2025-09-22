@@ -8,14 +8,10 @@ use App\Models\Delegate;
 use App\Models\DelegateTransport;
 use App\Models\Delegation;
 use App\Models\DelegationAttachment;
-use App\Models\Dropdown;
 use App\Models\Interview;
-use App\Models\InterviewMember;
 use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
 use App\Services\DelegationStatusService;
-use App\Exports\BadgePrintedDelegatesExport;
-use App\Exports\NonBadgePrintedDelegatesExport;
 use App\Exports\DelegationExport;
 use App\Exports\DelegateExport;
 use App\Imports\DelegateImport;
@@ -37,6 +33,8 @@ class DelegationController extends Controller
 
     const UNASSIGNABLE_STATUS_CODES = [3, 9];
     const ASSIGNABLE_STATUS_CODES = [2, 10];
+
+    protected $delegationStatusService;
 
     public function __construct()
     {
@@ -102,6 +100,8 @@ class DelegationController extends Controller
         $this->middleware('permission:badge_print_export', [
             'only' => ['badgePrintedIndex', 'exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
         ]);
+
+        $this->delegationStatusService = new DelegationStatusService();
     }
 
     public function index(Request $request)
@@ -696,14 +696,11 @@ class DelegationController extends Controller
             foreach ($transports as $t) {
                 $t->update($dataToSave);
 
-                $service = new DelegationStatusService();
-                $service->updateTransportStatuses($t->delegate);
-
-                $this->updateParticipationStatus($t->delegate);
+                $this->delegationStatusService->updateAllStatus($t->delegate);
             }
 
             if ($transports->isNotEmpty()) {
-                $this->updateDelegationParticipationStatus($transports->first()->delegate->delegation);
+                $this->delegationStatusService->updateDelegationParticipationStatus($transports->first()->delegate->delegation);
             }
 
             if ($request->has('_is_confirmed') && $request->has('changed_fields_json')) {
@@ -764,16 +761,6 @@ class DelegationController extends Controller
         }
 
         $delegates = $delegation->delegates;
-
-        // if ($showArrival && !$showDeparture) {
-        //     $delegates = $delegates->filter(function ($delegate) {
-        //         return !$delegate->delegateTransports->contains('type', 'arrival');
-        //     });
-        // } elseif ($showDeparture && !$showArrival) {
-        //     $delegates = $delegates->filter(function ($delegate) {
-        //         return !$delegate->delegateTransports->contains('type', 'departure');
-        //     });
-        // }
 
         return view('admin.delegations.add-travel', compact('delegation', 'delegates', 'showArrival', 'showDeparture'));
     }
@@ -851,7 +838,6 @@ class DelegationController extends Controller
 
     public function store(Request $request)
     {
-
         $validated = $request->validate([
             'invitation_from_id' => 'required|exists:dropdown_options,id',
             'continent_id' => 'required|exists:dropdown_options,id',
@@ -917,6 +903,7 @@ class DelegationController extends Controller
             ]);
 
             if (!empty($validated['delegates'])) {
+
                 foreach ($validated['delegates'] as $delegateData) {
                     $tmpId = $delegateData['tmp_id'];
 
@@ -928,7 +915,7 @@ class DelegationController extends Controller
                     $delegateData['accommodation'] = !empty($delegateData['accommodation']);
 
                     $createdDelegate = $delegation->delegates()->create($delegateData);
-                    $this->updateParticipationStatus($createdDelegate);
+                    $this->delegationStatusService->updateAllStatus($createdDelegate);
 
                     $tmpIdToDbId[$tmpId] = $createdDelegate->id;
                 }
@@ -970,8 +957,6 @@ class DelegationController extends Controller
                 model: $delegation,
                 delegationId: $delegation->id
             );
-
-            // if()
 
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.index')->with('success', __db('delegation_created'));
@@ -1080,6 +1065,7 @@ class DelegationController extends Controller
             ]);
 
             if ($delegation->shouldUnassignServices()) {
+
                 $delegation->escorts()->updateExistingPivot($delegation->escorts->pluck('id')->toArray(), ['status' => 0]);
 
                 $delegation->drivers()->updateExistingPivot($delegation->drivers->pluck('id')->toArray(), ['status' => 0]);
@@ -1272,62 +1258,19 @@ class DelegationController extends Controller
         DB::beginTransaction();
 
         try {
+
             foreach ($validated['delegate_ids'] as $delegateId) {
                 $delegate = $delegation->delegates()->findOrFail($delegateId);
 
                 if (isset($validated['arrival']['date_time']) && $validated['arrival']['date_time']) {
-                    $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->first();
-                    if ($arrivalTransport) {
-                        $arrivalTransport->update([
-                            'mode' => $validated['arrival']['mode'],
-                            'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
-                            'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
-                            'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
-                            'date_time' => $validated['arrival']['date_time'] ?? null,
-                            'status' => $validated['arrival']['status'] ?? null,
-                            'comment' => $validated['arrival']['comment'] ?? null,
-                        ]);
-                    } else {
-                        $delegate->delegateTransports()->create([
-                            'type' => 'arrival',
-                            'mode' => $validated['arrival']['mode'],
-                            'airport_id' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['airport_id'] ?? null) : null,
-                            'flight_no' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_no'] ?? null) : null,
-                            'flight_name' => ($validated['arrival']['mode'] ?? null) === 'flight' ? ($validated['arrival']['flight_name'] ?? null) : null,
-                            'date_time' => $validated['arrival']['date_time'] ?? null,
-                            'status' => $validated['arrival']['status'] ?? null,
-                            'comment' => $validated['arrival']['comment'] ?? null,
-                        ]);
-                    }
+                    $this->delegationStatusService->syncTransportInfo($delegate, $validated['arrival'], 'arrival');
                 }
 
                 if (isset($validated['departure']['date_time']) && $validated['departure']['date_time']) {
-                    $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->first();
-                    if ($departureTransport) {
-                        $departureTransport->update([
-                            'mode' => $validated['departure']['mode'],
-                            'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
-                            'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
-                            'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
-                            'date_time' => $validated['departure']['date_time'] ?? null,
-                            'status' => $validated['departure']['status'] ?? null,
-                            'comment' => $validated['departure']['comment'] ?? null,
-                        ]);
-                    } else {
-                        $delegate->delegateTransports()->create([
-                            'type' => 'departure',
-                            'mode' => $validated['departure']['mode'],
-                            'airport_id' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['airport_id'] ?? null) : null,
-                            'flight_no' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_no'] ?? null) : null,
-                            'flight_name' => ($validated['departure']['mode'] ?? null) === 'flight' ? ($validated['departure']['flight_name'] ?? null) : null,
-                            'date_time' => $validated['departure']['date_time'] ?? null,
-                            'status' => $validated['departure']['status'] ?? null,
-                            'comment' => $validated['departure']['comment'] ?? null,
-                        ]);
-                    }
+                    $this->delegationStatusService->syncTransportInfo($delegate, $validated['departure'], 'departure');
                 }
 
-                $this->updateParticipationStatus($delegate);
+                $this->delegationStatusService->updateAllStatus($delegate);
             }
 
             DB::commit();
@@ -1340,7 +1283,6 @@ class DelegationController extends Controller
                 submoduleId: $delegation->id,
                 delegationId: $delegation->id
             );
-
 
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.edit', ['id' => $delegation->id])->with('success', __db('travel') . " " . __db("created_successfully"));
@@ -1666,14 +1608,10 @@ class DelegationController extends Controller
                 $delegateDataForCreate = Arr::except($dataToProcess, ['arrival', 'departure']);
                 $newDelegate = $delegation->delegates()->create($delegateDataForCreate);
 
-                $this->syncTransportInfo($newDelegate, $dataToProcess['arrival'] ?? null, 'arrival');
-                $this->syncTransportInfo($newDelegate, $dataToProcess['departure'] ?? null, 'departure');
+                $this->delegationStatusService->syncTransportInfo($newDelegate, $dataToProcess['arrival'] ?? null, 'arrival');
+                $this->delegationStatusService->syncTransportInfo($newDelegate, $dataToProcess['departure'] ?? null, 'departure');
 
-                $service = new DelegationStatusService();
-                $service->updateTransportStatuses($newDelegate);
-                $this->updateParticipationStatus($newDelegate);
-
-                $this->updateDelegationParticipationStatus($delegation);
+                $this->delegationStatusService->updateAllStatus($newDelegate);
 
                 DB::commit();
 
@@ -1800,14 +1738,10 @@ class DelegationController extends Controller
             $finalDelegateData = Arr::except($dataToSave, ['arrival', 'departure']);
             $delegate->update($finalDelegateData);
 
-            $this->syncTransportInfo($delegate, $dataToSave['arrival'] ?? null, 'arrival');
-            $this->syncTransportInfo($delegate, $dataToSave['departure'] ?? null, 'departure');
+            $this->delegationStatusService->syncTransportInfo($delegate, $dataToSave['arrival'] ?? null, 'arrival');
+            $this->delegationStatusService->syncTransportInfo($delegate, $dataToSave['departure'] ?? null, 'departure');
 
-            $service = new DelegationStatusService();
-            $service->updateTransportStatuses($delegate);
-            $this->updateParticipationStatus($delegate);
-
-            $this->updateDelegationParticipationStatus($delegation);
+            $this->delegationStatusService->updateAllStatus($delegate);
 
             DB::commit();
 
@@ -1848,7 +1782,6 @@ class DelegationController extends Controller
     public function destroyDelegate(Delegation $delegation, Delegate $delegate)
     {
         try {
-            // Log delegate deletion activity before deletion
             $this->logActivity(
                 module: 'Delegation',
                 submodule: 'delegate',
@@ -1875,7 +1808,7 @@ class DelegationController extends Controller
 
             $delegate->delete();
 
-            $this->updateDelegationParticipationStatus($delegation);
+            $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
 
             return redirect()
                 ->route('delegations.edit', $delegation->id)
@@ -2026,51 +1959,6 @@ class DelegationController extends Controller
 
         return response()->json(['success' => true, 'members' => $members]);
     }
-
-    private function syncTransportInfo(Delegate $delegate, ?array $transportData, string $type): void
-    {
-        if (empty($transportData) || (empty($transportData['date_time']) || empty($transportData['mode']))) {
-            return;
-        }
-
-        $data = [
-            'mode' => $transportData['mode'] ?? null,
-            'airport_id' => ($transportData['mode'] ?? null) === 'flight' ? ($transportData['airport_id'] ?? null) : null,
-            'flight_no' => ($transportData['mode'] ?? null) === 'flight' ? ($transportData['flight_no'] ?? null) : null,
-            'flight_name' => ($transportData['mode'] ?? null) === 'flight' ? ($transportData['flight_name'] ?? null) : null,
-            'date_time' => $transportData['date_time'] ?? null,
-            'status' => $transportData['status'] ?? null,
-            'comment' => $transportData['comment'] ?? null,
-        ];
-
-        $delegate->delegateTransports()->updateOrCreate(['type' => $type], $data);
-    }
-
-    protected function updateParticipationStatus(Delegate $delegate)
-    {
-        $service = new DelegationStatusService();
-
-        if (!$delegate->exists) {
-            $delegate->participation_status = 'to_be_arrived';
-            $delegate->save();
-
-            $service->updateDelegationParticipationStatus($delegate->delegation);
-            return;
-        }
-
-        $service->updateTransportStatuses($delegate);
-
-        $service->updateDelegateParticipationStatus($delegate);
-
-        $service->updateDelegationParticipationStatus($delegate->delegation);
-    }
-
-    protected function updateDelegationParticipationStatus(Delegation $delegation)
-    {
-        $service = new DelegationStatusService();
-        $service->updateDelegationParticipationStatus($delegation);
-    }
-
 
     private function groupTransports($transports)
     {
