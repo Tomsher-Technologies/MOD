@@ -84,7 +84,7 @@
             <div class="grid grid-cols-12 md:grid-cols-12 gap-4 items-end">
                 <input type="hidden" name="hotel_id" value="{{ $hotel->id }}">
                 <div class="col-span-12 md:col-span-3">
-                    <label class="block text-sm text-gray-700 mb-1">{{ __db('name') }}</label>
+                    <label class="block text-sm text-gray-700 mb-1">{{ __db('name') }} <span class="text-red-600">*</span></label>
                     <input type="text" placeholder="{{ __db('enter') }}"  name="name"  value="{{ old('name', $externalMember->name ?? '') }}"
                         class="w-full text-secondary-light p-3 text-sm !border-[#d1d5db] rounded-lg" />
                      @error('name')
@@ -102,7 +102,7 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-3">
-                    <label class="block text-sm text-gray-700 mb-1">{{ __db('room_type') }}</label>
+                    <label class="block text-sm text-gray-700 mb-1">{{ __db('room_type') }} <span class="text-red-600">*</span></label>
                     <select name="room_type" id="room_type" class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __db('select') }}</option>
                         @foreach ($roomTypes as $roomType)
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-3">
-                    <label class="block text-sm text-gray-700 mb-1">Room</label>
+                    <label class="block text-sm text-gray-700 mb-1">{{ __db('room_number') }} <span class="text-red-600">*</span></label>
                     <input type="text"  name="room_number" id="room_number" placeholder="{{ __db('enter') }}" class="w-full text-secondary-light p-3 text-sm !border-[#d1d5db] rounded-lg" value="{{ old('room_number', $externalMember->room_number ?? '') }}"/>
                     @error('room_number')
                         <div class="text-red-600 text-sm mt-2">{{ $message }}</div>

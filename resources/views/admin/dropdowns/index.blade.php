@@ -12,7 +12,7 @@
                 </a>
 
                 <a href="{{ route('dropdowns.bulk.import') }}"
-                    class="btn me-8 text-sm mb-[-10px] bg-[#a57d30] text-white rounded-lg ">
+                    class="btn me-4 text-sm mb-[-10px] bg-[#a57d30] text-white rounded-lg ">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="white" stroke-width="2"
                         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -20,6 +20,11 @@
                     </svg>
 
                     <span class="mr-2">{{ __db('bulk_import_options') }}</span>
+                </a>
+                
+                <a href="{{ route('dropdowns.export') }}"
+                    class="btn text-sm mb-[-10px] bg-[#a57d30] text-white rounded-lg ">
+                    <span class="mr-2">{{ __db('export') . " " . __db('dropdown_options') }}</span>
                 </a>
             @enddirectCan
         </div>

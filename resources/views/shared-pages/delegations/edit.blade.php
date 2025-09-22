@@ -68,12 +68,12 @@
                     <select name="country_id" id="country-select"
                         class="select2 p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option value="">{{ __('Select Country') }}</option>
-                        @foreach (getAllCountries() as $option)
+                        {{-- @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}"
                                 {{ old('country_id', $delegation->country_id) == $option->id ? 'selected' : '' }}>
                                 {{ $option->name }}
                             </option>
-                        @endforeach
+                        @endforeach --}}
                     </select>
                     @error('country_id')
                         <div class="text-red-600">{{ $message }}</div>
@@ -131,36 +131,48 @@
                     <select name="participation_status_id" disabled
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
 
-                        @if ($participationStatusDefaultOption)
-                            <option value="{{ $participationStatusDefaultOption->id }}"
-                                {{ $selectedValue == $participationStatusDefaultOption->id ? 'selected' : '' }}>
+                        @if ($selectedValue && $participationStatusOptions)
+                            @foreach ($participationStatusOptions->options as $option)
+                                <option value="{{ $option->id }}"
+                                    {{ $selectedValue == $option->id ? 'selected' : '' }}>
+                                    {{ $option->value }}
+                                </option>
+                            @endforeach
+                        @elseif ($participationStatusDefaultOption)
+                            <option value="{{ $participationStatusDefaultOption->id }}" selected>
                                 {{ $participationStatusDefaultOption->value }}
                             </option>
+                            @if ($participationStatusOptions)
+                                @foreach ($participationStatusOptions->options as $option)
+                                    @if ($option->id != $participationStatusDefaultOption->id)
+                                        <option value="{{ $option->id }}">
+                                            {{ $option->value }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            @endif
                         @else
-                            <option value="" {{ !$selectedValue ? 'selected' : '' }}>
+                            <option value="" selected>
                                 {{ __db('not_yet_arrived') }}
                             </option>
-                        @endif
-
-                        @if ($participationStatusOptions)
-                            @foreach ($participationStatusOptions->options as $option)
-                                @if (!$participationStatusDefaultOption || $option->id != $participationStatusDefaultOption->id)
-                                    <option value="{{ $option->id }}"
-                                        {{ $selectedValue == $option->id ? 'selected' : '' }}>
+                            @if ($participationStatusOptions)
+                                @foreach ($participationStatusOptions->options as $option)
+                                    <option value="{{ $option->id }}">
                                         {{ $option->value }}
                                     </option>
-                                @endif
-                            @endforeach
+                                @endforeach
+                            @endif
                         @endif
                     </select>
 
                     <input type="hidden" name="participation_status_id"
-                        value="{{ $participationStatusDefaultOption->id ?? '' }}">
+                        value="{{ $selectedValue ?? ($participationStatusDefaultOption->id ?? '') }}">
 
                     @error('participation_status_id')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
                 </div>
+
 
                 <div class="col-span-12">
                     <div class="flex w-full justify-between gap-5">
@@ -418,6 +430,10 @@
                         [
                             'label' => __db('sl_no'),
                             'render' => fn($row, $key) => $key + 1,
+                        ],
+                        [
+                            'label' => __db('delegate_code'),
+                            'render' => fn($row) => $row->code ?? '-',
                         ],
                         [
                             'label' => __db('name_en'),
@@ -1312,21 +1328,21 @@
             const invitationDropdowns = @json($invitationDropdowns);
             const unassignableStatusCodes = @json($unassignableStatuses);
 
-            console.log("unassignableStatusCodes",unassignableStatusCodes);
-            
+
             $('#invitation_status_select').on('change', function() {
                 let selectedValue = parseInt($(this).val(), 10);
-                const selectOptionSettings = invitationDropdowns?.options?.find((val) => val.id === selectedValue);
+                const selectOptionSettings = invitationDropdowns?.options?.find((val) => val.id ===
+                    selectedValue);
 
                 if (!selectOptionSettings) {
                     console.log("No settings found for selected value:", selectedValue);
-                    return; 
+                    return;
                 }
 
-              const isUnassignable = unassignableStatusCodes.includes(Number(selectOptionSettings?.code));
+                const isUnassignable = unassignableStatusCodes.includes(Number(selectOptionSettings?.code));
 
-                  if (isUnassignable) {
-                Swal.fire({
+                if (isUnassignable) {
+                    Swal.fire({
                         title: 'Are you sure?',
                         text: "This option will unassign all the services that have already been assigned to this delegation.",
                         icon: 'warning',
@@ -1335,7 +1351,7 @@
                         cancelButtonColor: '#d33',
                         confirmButtonText: 'I understand'
                     })
-            }
+                }
             });
 
             document.querySelectorAll('.edit-attachment-btn').forEach(btn => {
@@ -1619,14 +1635,14 @@
                 }
             });
         }
-        
+
         // Handle delegation delete button
         document.querySelectorAll('.delete-delegation-btn').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const delegationId = this.getAttribute('data-delegation-id');
                 const delegationCode = this.getAttribute('data-delegation-code');
-                
+
                 Swal.fire({
                     title: '{{ __db('are_you_sure') }}',
                     text: "{{ __db('delete_delegation_confirm_msg') }} " + delegationCode + "?",
@@ -1647,19 +1663,19 @@
                         const form = document.createElement('form');
                         form.method = 'POST';
                         form.action = '{{ url('/mod-admin/delegations') }}/' + delegationId;
-                        
+
                         const tokenInput = document.createElement('input');
                         tokenInput.type = 'hidden';
                         tokenInput.name = '_token';
                         tokenInput.value = '{{ csrf_token() }}';
                         form.appendChild(tokenInput);
-                        
+
                         const methodInput = document.createElement('input');
                         methodInput.type = 'hidden';
                         methodInput.name = '_method';
                         methodInput.value = 'DELETE';
                         form.appendChild(methodInput);
-                        
+
                         document.body.appendChild(form);
                         form.submit();
                     }

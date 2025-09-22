@@ -181,7 +181,7 @@
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                <label class="form-label block text-gray-700 font-medium">{{ __db('continents') }}</label>
                 <select multiple name="continent_id[]" id="continent-select" data-placeholder="{{ __db('select') }}"
                     class="select2 w-full rounded-lg border border-gray-300 text-sm">
                     <option value="">{{ __db('select') }}</option>
@@ -195,7 +195,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                <label class="form-label block text-gray-700 font-medium">{{ __db('countries') }}</label>
                 <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full rounded-lg border border-gray-300 text-sm">
                     <option value="">{{ __db('select') }}</option>
@@ -208,15 +208,20 @@
                 </select>
             </div>
 
-            <select name="status_id"
-                class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light"
-                data-placeholder="{{ __db('select') }}" multiple>
-                @foreach (getDropDown('interview_status')->options as $status)
-                    <option value="{{ $status->id }}" {{ request('status_id') == $status->id ? 'selected' : '' }}>
-                        {{ $status->value }}
-                    </option>
-                @endforeach
-            </select>
+            <div class="flex flex-col">
+                <label class="form-label block text-gray-700 font-medium">{{ __db('status') }}</label>
+                <select name="status_id"
+                    class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light"
+                    data-placeholder="{{ __db('select') }}" multiple data-placeholder="{{ __db('select') }}">
+                    @foreach (getDropDown('interview_status')->options as $status)
+                        <option value="{{ $status->id }}"
+                            {{ request('status_id') == $status->id ? 'selected' : '' }}>
+                            {{ $status->value }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('delegations.interviewsIndex') }}"

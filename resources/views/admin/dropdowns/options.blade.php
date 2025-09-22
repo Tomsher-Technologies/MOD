@@ -35,7 +35,7 @@
     <div class="xl:col-span-12 h-full">
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
            <div class="flex items-center justify-between gap-12 mb-4">
-                <form class="w-[50%]" action="{{ route('dropdowns.options.show', $dropdown) }}" method="GET">
+                <form class="w-[80%]" action="{{ route('dropdowns.options.show', $dropdown) }}" method="GET">
                     <div class="relative">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +46,7 @@
                         </div>
                         <div class="flex">
                             <input type="text" name="search"
-                                class="block w-[35%] p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg"
+                                class="block w-[40%] p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg"
                                 placeholder="{{ __db('search') }}" value="{{ request('search') }}">
                             
                             <select name="status" class="block w-[35%] mr-2 p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg">
@@ -56,14 +56,15 @@
                                 <option value="2" {{ request()->status == 2 ? 'selected' : '' }}>{{ __db('inactive') }}
                                 </option>
                             </select>
+
+                            <div class="w-[25%] mr-2">
+                                <a href="{{ route('dropdowns.options.show', $dropdown) }}"  class="float-right   bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2">
+                                    {{ __db('reset') }}</a>
+                        
+                                <button type="submit" class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+                            </div>
                         </div>
 
-                        <div class="flex">
-                            <a href="{{ route('dropdowns.options.show', $dropdown) }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
-                                {{ __db('reset') }}</a>
-                       
-                            <button type="submit" class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
-                        </div>
                     </div>
                 </form>
             </div>
