@@ -1,23 +1,10 @@
-<div class="navbar-header sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 py-4 flex items-center justify-between">
-  <!-- Left: Logo and Sidebar Toggle -->
-  <div class="flex items-center space-x-4">
-    <button id="sidebarToggleBtn" class="md:hidden p-2 rounded-md hover:bg-gray-200" aria-expanded="false" aria-label="Toggle sidebar menu">
-      <!-- Always hamburger menu icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
+<div class="navbar-header border-b border-neutral-200 pe-0 !py-[31px]">
+    <div class="flex items-center justify-between">
+        <div class="col-auto me-auto">
+            <img src="{{ getAdminEventLogo() }}" alt="" width="150">
+        </div>
 
-    <div class="flex items-center">
-      <img src="{{ getAdminEventLogo() }}" alt="Event Logo" width="150" class="object-contain">
-    </div>
-  </div>
-
-  <!-- Right: Navbar Items -->
-   <!-- Right: Navbar Items -->
-    <div class="flex items-center space-x-4">
-
- <div class="col-auto ms-auto flex items-center gap-4">
+        <div class="col-auto ms-auto flex items-center gap-4">
             @php
                 $events = getAllEvents();
                 $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
@@ -547,159 +534,99 @@
                 </div>
             </div>
         </div>
-
-
-    
     </div>
-
-
-
 </div>
 
 @section('script')
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  const toggleBtn = document.getElementById('sidebarToggleBtn');
-  const closeBtn = document.getElementById('sidebarCloseBtn');
+    <script>
+        function showLatestAlertModal() {
+            fetch('/mod-admin/alerts/latest', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.alert) {
+                        document.getElementById('alertModalTitle').textContent = data.alert.title;
+                        document.getElementById('alertModalMessage').textContent = data.alert.message;
 
-  function openSidebar() {
-    sidebar.classList.remove('-translate-x-full');
-    overlay.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-  }
+                        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
 
-  function closeSidebar() {
-    sidebar.classList.add('-translate-x-full');
-    overlay.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-  }
+                        document.getElementById('alertModal').classList.remove('hidden');
+                        document.getElementById('alertModal').classList.add('flex');
 
-  if (toggleBtn) toggleBtn.addEventListener('click', () => {
-    if (sidebar.classList.contains('-translate-x-full')) {
-      openSidebar();
-    } else {
-      closeSidebar();
-    }
-  });
-  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-  if (overlay) overlay.addEventListener('click', closeSidebar);
-
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) {
-      closeSidebar();
-    }
-  });
-});
-</script>
-@endsection
-
-
-<!-- Alert Modal -->
-<div id="alertModal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-    <div class="flex justify-between items-center border-b pb-2">
-      <h3 id="alertModalTitle" class="text-lg font-semibold"></h3>
-      <button onclick="closeAlertModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close alert modal">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-    <div class="mt-4">
-      <p id="alertModalMessage" class="text-gray-700"></p>
-    </div>
-    <div class="mt-6 flex justify-end space-x-3">
-      <a id="viewAllAlertsBtn" href="#" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-        View Alert
-      </a>
-      <button onclick="closeAlertModal()" class="px-4 py-2 border rounded-md">
-        Close
-      </button>
-    </div>
-  </div>
-</div>
-
-@section('script')
-<script>
-  function showLatestAlertModal() {
-    fetch('/mod-admin/alerts/latest', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && data.alert) {
-        document.getElementById('alertModalTitle').textContent = data.alert.title;
-        document.getElementById('alertModalMessage').textContent = data.alert.message;
-        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
-
-        document.getElementById('alertModal').classList.remove('hidden');
-        document.getElementById('alertModal').classList.add('flex');
-
-        if (data.alert.id > 0) {
-          markAlertAsRead(data.alert.id);
+                        if (data.alert.id > 0) {
+                            fetch('/mod-admin/alerts/' + data.alert.id + '/mark-as-read', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                            .getAttribute('content')
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    const alertCountElement = document.querySelector('#dropdownAlert .badge');
+                                    if (alertCountElement) {
+                                        let count = parseInt(alertCountElement.textContent) || 0;
+                                        if (count > 0) {
+                                            alertCountElement.textContent = count - 1;
+                                        }
+                                    }
+                                });
+                        }
+                    } else {
+                        document.getElementById('dropdownAlert').classList.toggle('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching latest alert:', error);
+                    document.getElementById('dropdownAlert').classList.toggle('hidden');
+                });
         }
-      } else {
-        toggleDropdown();
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching latest alert:', error);
-      toggleDropdown();
-    });
-  }
 
-  function showAlertModal(alertId, title, message) {
-    document.getElementById('alertModalTitle').textContent = title;
-    document.getElementById('alertModalMessage').textContent = message;
-    document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + alertId;
+        function showAlertModal(alertId, title, message) {
+            document.getElementById('alertModalTitle').textContent = title;
+            document.getElementById('alertModalMessage').textContent = message;
 
-    document.getElementById('alertModal').classList.remove('hidden');
-    document.getElementById('alertModal').classList.add('flex');
+            document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + alertId;
 
-    if (alertId > 0) {
-      markAlertAsRead(alertId);
-    }
-  }
+            document.getElementById('alertModal').classList.remove('hidden');
+            document.getElementById('alertModal').classList.add('flex');
 
-  function markAlertAsRead(alertId) {
-    fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      const alertCountElement = document.querySelector('#dropdownAlert .badge');
-      if (alertCountElement) {
-        let count = parseInt(alertCountElement.textContent) || 0;
-        if (count > 0) {
-          alertCountElement.textContent = count - 1;
+            if (alertId > 0) {
+                fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const alertCountElement = document.querySelector('#dropdownAlert .badge');
+                        if (alertCountElement) {
+                            let count = parseInt(alertCountElement.textContent) || 0;
+                            if (count > 0) {
+                                alertCountElement.textContent = count - 1;
+                            }
+                        }
+                    });
+            }
         }
-      }
-    });
-  }
 
-  function closeAlertModal() {
-    document.getElementById('alertModal').classList.add('hidden');
-    document.getElementById('alertModal').classList.remove('flex');
-  }
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.add('hidden');
+            document.getElementById('alertModal').classList.remove('flex');
+        }
 
-  function toggleDropdown() {
-    document.getElementById('dropdownAlert').classList.toggle('hidden');
-  }
-
-  document.getElementById('alertModal').addEventListener('click', function(event) {
-    if (event.target === this) {
-      closeAlertModal();
-    }
-  });
-</script>
+        document.getElementById('alertModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeAlertModal();
+            }
+        });
+    </script>
 @endsection

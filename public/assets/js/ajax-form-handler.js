@@ -75,7 +75,7 @@ function promptForConfirmation(form, changedFields) {
             <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0">
                 <label class="flex items-center flex-grow cursor-pointer">
                     <input type="checkbox" name="_notify_fields[]" value="${key}" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked>
-                    <span class="ml-3 mr-2 text-gray-800 font-medium">${change.label}</span>
+                    <span class="ml-3 mr-2 text-gray-800 font-medium !whitespace-nowrap">${change.label}</span>
                 </label>
                 <div class="flex items-center text-xs sm:text-sm ml-4 flex-shrink-0">
                     <span class="px-2 py-1 bg-green-100 text-green-800 rounded-md font-mono">${change.new}</span>
