@@ -51,7 +51,7 @@
                                 <input type="search" id="default-search" name="search_key"
                                     value="{{ request('search_key') }}"
                                     class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                                    placeholder="{{ __db('Search by Delegate Name, Code, Delegation Code') }}" />
+                                    placeholder="{{ __db('badge_printed_search_placeholder') }}" />
                             </div>
                         </div>
 
@@ -60,9 +60,9 @@
                                 class="p-2.5 rounded-lg border text-sm !border-[#d1d5db]">
                                 <option value="">{{ __db('All Delegates') }}</option>
                                 <option value="1" {{ request('badge_printed') == '1' ? 'selected' : '' }}>
-                                    {{ __db('Badge Printed') }}</option>
+                                    {{ __db('badge_printed') }}</option>
                                 <option value="0" {{ request('badge_printed') == '0' ? 'selected' : '' }}>
-                                    {{ __db('Not Badge Printed') }}</option>
+                                    {{ __db('not_badge_printed') }}</option>
                             </select>
                         </div>
 
