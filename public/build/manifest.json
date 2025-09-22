@@ -1,6 +1,6 @@
 {
-  "_daterangepicker-R0oV6qgw.js": {
-    "file": "assets/daterangepicker-R0oV6qgw.js",
+  "_daterangepicker-CaXJHp6o.js": {
+    "file": "assets/daterangepicker-CaXJHp6o.js",
     "name": "daterangepicker",
     "isDynamicEntry": true,
     "imports": [
@@ -13,15 +13,24 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-NWNxwqfc.js",
+    "file": "assets/app-DBrSCbWM.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "resources/js/refresh-arrivals-departures.js"
+    ],
     "dynamicImports": [
-      "_daterangepicker-R0oV6qgw.js"
+      "_daterangepicker-CaXJHp6o.js"
     ],
     "css": [
       "assets/app-jUewB0vx.css"
     ]
+  },
+  "resources/js/refresh-arrivals-departures.js": {
+    "file": "assets/refresh-arrivals-departures-B7q2f9HE.js",
+    "name": "refresh-arrivals-departures",
+    "src": "resources/js/refresh-arrivals-departures.js",
+    "isEntry": true
   }
 }
