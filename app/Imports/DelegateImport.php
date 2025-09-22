@@ -7,6 +7,7 @@ use App\Models\Delegation;
 use App\Models\Delegate;
 use App\Models\DelegateTransport;
 use App\Models\DropdownOption;
+use App\Services\DelegationStatusService;
 use Error;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -17,16 +18,23 @@ use Illuminate\Support\Facades\Log;
 class DelegateImport implements ToCollection, WithHeadingRow
 {
 
+    protected $delegationStatusService;
+
+    public function __construct()
+    {
+        $this->delegationStatusService = new DelegationStatusService();
+    }
+
     use HandlesUpdateConfirmation;
 
     public function collection(Collection $rows)
     {
         DB::beginTransaction();
 
-
         try {
-            foreach ($rows as $row) {
+            $processedDelegations = [];
 
+            foreach ($rows as $row) {
 
                 $delegationCode = trim($row['delegation_code'] ?? '');
 
@@ -42,40 +50,26 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
                 $delegateData = $this->processDelegateData($row, $delegation->id);
 
-                // $delegateCode = trim($row['delegate_code'] ?? '');
-                $existingDelegate = null;
+                $arrivalData = $this->processTransportData($row, 'arrival');
+                $departureData = $this->processTransportData($row, 'departure');
 
-                // if (!empty($delegateCode)) {
-                //     $existingDelegate = Delegate::where('delegation_id', $delegation->id)
-                //         ->where('code', $delegateCode)
-                //         ->first();
-                // }
+                $delegate = Delegate::create($delegateData);
 
-                if ($existingDelegate) {
-                    $existingDelegate->update($delegateData);
-                    $delegate = $existingDelegate;
-                } else {
-                    $delegate = Delegate::create($delegateData);
+                $this->delegationStatusService->syncTransportInfo($delegate, $arrivalData, 'arrival');
+                $this->delegationStatusService->syncTransportInfo($delegate, $departureData, 'departure');
 
-                    $this->logActivity(
-                        module: 'Delegation',
-                        submodule: 'delegate',
-                        action: 'create-excel',
-                        model: $delegate,
-                        submoduleId: $delegate->id,
-                        delegationId: $delegation->id
-                    );
-                }
+                $this->delegationStatusService->updateAllStatus($delegate);
 
-                if (!empty($row['arrival_date_time'])) {
-                    $this->processTransport($delegate, $row, 'arrival');
-                }
+                $processedDelegations[$delegation->id] = $delegation;
 
-                if (!empty($row['departure_date_time'])) {
-                    $this->processTransport($delegate, $row, 'departure');
-                }
-
-                $this->updateParticipationStatus($delegate);
+                $this->logActivity(
+                    module: 'Delegation',
+                    submodule: 'delegate',
+                    action: 'create-excel',
+                    model: $delegate,
+                    submoduleId: $delegate->id,
+                    delegationId: $delegation->id
+                );
             }
 
             DB::commit();
@@ -90,7 +84,6 @@ class DelegateImport implements ToCollection, WithHeadingRow
     {
         $delegateData = [
             'delegation_id' => $delegationId,
-            'code' => trim($row['delegate_code']) ?? null,
             'title_en' => trim($row['delegate_title_en']) ?? null,
             'title_ar' => trim($row['delegate_title_ar']) ?? null,
             'name_en' => trim($row['delegate_name_en']) ?? null,
@@ -151,20 +144,29 @@ class DelegateImport implements ToCollection, WithHeadingRow
         return $delegateData;
     }
 
-    private function processTransport($delegate, $row, $type)
+    private function processTransportData($row, $type)
     {
-        $fieldPrefix = $type === 'arrival' ? 'arrival_' : 'departure_';
+        $fieldPrefix = $type . '_';
+
+        $hasData = false;
+        foreach (['mode', 'airport_id', 'flight_no', 'flight_name', 'date_time', 'comment'] as $field) {
+            if (!empty($row[$fieldPrefix . $field])) {
+                $hasData = true;
+                break;
+            }
+        }
+
+        if (!$hasData) {
+            return null;
+        }
 
         $transportData = [
-            'delegate_id' => $delegate->id,
-            'type' => $type,
-            'mode' => trim($row[$fieldPrefix . 'mode']) ?? null,
-            'airport_id' => null,
-            'flight_no' => trim($row[$fieldPrefix . 'flight_no']) ?? null,
-            'flight_name' => trim($row[$fieldPrefix . 'flight_name']) ?? null,
+            'mode' => trim($row[$fieldPrefix . 'mode'] ?? '') ?: null,
+            'airport_id' => !empty($row[$fieldPrefix . 'airport_id']) ? trim($row[$fieldPrefix . 'airport_id']) : null,
+            'flight_no' => trim($row[$fieldPrefix . 'flight_no'] ?? '') ?: null,
+            'flight_name' => trim($row[$fieldPrefix . 'flight_name'] ?? '') ?: null,
             'date_time' => null,
-            'status' => trim($row[$fieldPrefix . 'status']) ?? null,
-            'comment' => trim($row[$fieldPrefix . 'comment']) ?? null,
+            'comment' => trim($row[$fieldPrefix . 'comment'] ?? '') ?: null,
         ];
 
         if (!empty($row[$fieldPrefix . 'date_time'])) {
@@ -185,50 +187,18 @@ class DelegateImport implements ToCollection, WithHeadingRow
             }
         }
 
-        if (!empty($row[$fieldPrefix . 'airport_id']) && $transportData['mode'] === 'flight') {
+        if (!empty($transportData['mode']) && $transportData['mode'] === 'flight' && !empty($transportData['airport_id'])) {
             $airport = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'airports');
-            })->where('id', trim($row[$fieldPrefix . 'airport_id']))->first();
+            })->where('id', trim($transportData['airport_id']))->first();
 
-            if ($airport) {
-                $transportData['airport_id'] = $airport->id;
+            if (!$airport) {
+                $transportData['airport_id'] = null;
             }
+        } elseif ($transportData['mode'] !== 'flight') {
+            $transportData['airport_id'] = null;
         }
 
-        $delegate->delegateTransports()->updateOrCreate(
-            ['type' => $type],
-            $transportData
-        );
-    }
-
-    protected function updateParticipationStatus($delegate)
-    {
-        if (!$delegate->exists) {
-            $delegate->participation_status = 'to_be_arrived';
-            $delegate->save();
-            return;
-        }
-
-        $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->latest('date_time')->first();
-        $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->latest('date_time')->first();
-
-        $newStatus = $delegate->participation_status ?? 'to_be_arrived';
-
-        if ($departureTransport && $departureTransport->status) {
-            if ($departureTransport->status === 'to_be_departed' || $departureTransport->status === 'departed') {
-                $newStatus = $departureTransport->status;
-            } elseif ($arrivalTransport && $arrivalTransport->status) {
-                $newStatus = $arrivalTransport->status;
-            }
-        } elseif ($arrivalTransport && $arrivalTransport->status) {
-            $newStatus = $arrivalTransport->status;
-        } else {
-            $newStatus = 'to_be_arrived';
-        }
-
-        if ($delegate->participation_status !== $newStatus) {
-            $delegate->participation_status = $newStatus;
-            $delegate->save();
-        }
+        return $transportData;
     }
 }
