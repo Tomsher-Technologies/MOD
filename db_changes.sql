@@ -639,3 +639,5 @@
 -- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', 149, 'delete_floor_plans', 'Delete Floor Plans', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- Done in live
+
+alter table delegation_activities add column delegation_code text after delegation_id;

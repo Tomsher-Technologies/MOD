@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\EventPageController;
 use App\Http\Controllers\Admin\FloorPlanController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\LogController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -191,6 +192,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}/redirect', [NotificationController::class, 'redirectToModule'])->name('notifications.redirect');
 
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
@@ -230,6 +232,9 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
     Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
     Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
+
+    // Log Viewer
+    Route::get('/logs', [LogController::class, 'showLog'])->name('admin.logs');
 
 });
 

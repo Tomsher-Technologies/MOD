@@ -21,6 +21,11 @@ class CountryController extends Controller
      */
     public function index(Request $request)
     {
+        // Check if export is requested
+        if ($request->has('export') && $request->export == 'all') {
+            return $this->exportAllCountries();
+        }
+
         $query = Country::query();
 
         if ($request->filled('search')) {
@@ -48,6 +53,53 @@ class CountryController extends Controller
         // return response()->json(['ddd' => $countries]);
 
         return view('admin.countries.index', compact('countries'));
+    }
+
+    /**
+     * Export all countries to CSV
+     */
+    public function exportAllCountries()
+    {
+        $countries = Country::with('continent')->orderBy('sort_order')->get();
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="countries.csv"',
+        ];
+
+        $callback = function () use ($countries) {
+            $file = fopen('php://output', 'w');
+            
+            // Add CSV headers
+            fputcsv($file, [
+                'ID', 
+                'Name (English)', 
+                'Name (Arabic)', 
+                'Short Code', 
+                'Continent', 
+                'Sort Order', 
+                'Status', 
+                'Created At'
+            ]);
+            
+            // Add data rows
+            foreach ($countries as $country) {
+                fputcsv($file, [
+                    $country->id,
+                    $country->getNameEn(),
+                    $country->getNameAr() ?? '',
+                    $country->short_code,
+                    $country->continent->value ?? '',
+                    $country->sort_order ?? 0,
+                    $country->status ? 'Active' : 'Inactive',
+                    $country->created_at->format('Y-m-d H:i:s')
+                ]);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

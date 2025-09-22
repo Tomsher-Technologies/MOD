@@ -15,6 +15,7 @@ class DelegationActivity extends Model
         'action',
         'submodule_id',
         'delegation_id',
+        'delegation_code',
         'user_id',
         'changes',
         'message',

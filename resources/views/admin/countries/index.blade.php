@@ -6,10 +6,20 @@
             <h2 class="font-semiboldadd_dropdown_options mb-0 !text-[22px]">{{ __db('countries') }}</h2>
         </div>
 
-        <div>
+        <div class="flex gap-2">
             @directCan('add_dropdown_options')
+                <a href="{{ route('countries.index', ['export' => 'all']) }}" 
+                   class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg flex items-center">
+                    <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                        height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h3a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3m4-9h2m-2 3h2m-6 0h.01M12 17v.01"/>
+                    </svg>
+                    <span>{{ __db('export_all') }}</span>
+                </a>
+                
                 <button data-modal-target="add-country" data-modal-toggle="add-country"
-                    class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg ">
+                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg flex items-center">
                     <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                         height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
