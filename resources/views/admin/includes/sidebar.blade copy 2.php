@@ -1,23 +1,22 @@
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-56 lg:w-56 xl:w-56 2xl:w-64 3xl:w-64 bg-white shadow-lg z-50 flex flex-col transition-transform transform -translate-x-full md:translate-x-0" aria-label="Sidebar navigation">
-  <!-- Sidebar Close Button -->
-  <button id="sidebarCloseBtn" type="button" class="sidebar-close-btn !mt-4 ms-auto me-4 md:hidden" aria-label="Close sidebar menu">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  </button>
+<aside class="sidebar fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 flex flex-col">
+    <!-- Sidebar Close Button -->
+    <button type="button" class="sidebar-close-btn !mt-4 ms-auto me-4">
+        <iconify-icon icon="radix-icons:cross-2"></iconify-icon>
+    </button>
 
-  <!-- Logo -->
-  <div class="p-3 border-b min-h-[80px] flex items-center justify-center">
-    <a href="{{ route('admin.dashboard') }}">
-      <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[58px]" alt="Logo">
-    </a>
-  </div>
+    <!-- Logo -->
+    <div class="p-3 border-b min-h-[80px] flex items-center justify-center">
+        <a href="{{ route('admin.dashboard') }}">
+            <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[58px]" alt="Logo">
+        </a>
+    </div>
 
-  <!-- Sidebar Menu -->
-  <div class="sidebar-menu-area flex-1 overflow-y-auto !p-0">
-    <!-- Sidebar menu content goes here -->
-
-     <ul class="sidebar-menu flex flex-col gap-2 py-4 px-2 bg-white rounded-md shadow" id="sidebar-menu">
+    <!-- Sidebar Menu -->
+    <div class="sidebar-menu-area flex-1 overflow-y-auto !p-0">
+      
+    
+    
+    <ul class="sidebar-menu flex flex-col gap-2 py-4 px-2 bg-white rounded-md shadow" id="sidebar-menu">
           
     
     
@@ -648,9 +647,11 @@
 
 
 
-        
-  </div>
-</aside>
 
-<!-- Overlay for small screens -->
-<div id="sidebarOverlay" class="fixed inset-0 bg-black/40 hidden z-40 md:hidden" aria-hidden="true"></div>
+
+
+
+
+        
+    </div>
+</aside>

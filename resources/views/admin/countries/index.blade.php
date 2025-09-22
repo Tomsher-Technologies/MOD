@@ -152,95 +152,111 @@
                     {{ $countries->links() }}
                 </div>
 
-                <div id="add-country" tabindex="-1" aria-hidden="true"
-                    class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-                    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-                        <button type="button"
-                            class="close-modal absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+     <div id="add-country" tabindex="-1" aria-hidden="true"
+     class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+    <button type="button"
+            class="close-modal absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
-                        <h2 class="text-xl font-semibold mb-4">{{ __db('add_new_country') }}</h2>
+    <h2 class="text-xl font-semibold mb-4">{{ __db('add_new_country') }}</h2>
 
-                        <form method="POST" action="{{ route('countries.store') }}" enctype="multipart/form-data">
-                            @csrf
+    <form method="POST" action="{{ route('countries.store') }}" enctype="multipart/form-data">
+      @csrf
 
-                            <div class="mb-4">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name_en') }}<span class="text-red-600">*</span></label>
-                                <input type="text" name="name" value="{{ old('name') }}" required
-                                    class="w-full border border-gray-300 rounded p-2">
-                            </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 ">
+            {{ __db('name_en') }}<span class="text-red-600">*</span>
+          </label>
+          <input type="text" name="name" value="{{ old('name') }}" required
+                 class="w-full border border-gray-300 rounded p-2">
+        </div>
 
-                            <div class="mb-4">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('name_ar') }}</label>
-                                <input type="text" name="name_ar" value="{{ old('name_ar') }}"
-                                    class="w-full border border-gray-300 rounded p-2">
-                            </div>
-                            <div class="mb-4">
-                                <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('short_code') }}<span class="text-red-600">*</span></label>
-                                <input type="text" name="short_code" value="{{ old('short_code') }}" required
-                                    class="w-full border border-gray-300 rounded p-2">
-                            </div>
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 ">
+            {{ __db('name_ar') }}
+          </label>
+          <input type="text" name="name_ar" value="{{ old('name_ar') }}"
+                 class="w-full border border-gray-300 rounded p-2">
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 ">
+            {{ __db('short_code') }}<span class="text-red-600">*</span>
+          </label>
+          <input type="text" name="short_code" value="{{ old('short_code') }}" required
+                 class="w-full border border-gray-300 rounded p-2">
+        </div>
+
+        <div>
+          <label class="form-label">
+            {{ __db('continent') }}:<span class="text-red-600">*</span>
+          </label>
+          <select name="continent_id" required
+                  class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+            <option value="">{{ __db('select_continent') }}</option>
+            @foreach (getDropDown('continents')->options as $option)
+              <option value="{{ $option->id }}"
+                      {{ old('continent_id', request('continent_id')) == $option->id ? 'selected' : '' }}>
+                {{ $option->value }}
+              </option>
+            @endforeach
+          </select>
+          @error('continent_id')
+          <div class="text-red-600">{{ $message }}</div>
+          @enderror
+        </div>
+
+        <div>
+          <label class="block mb-2 text-sm font-medium text-gray-900 ">
+            {{ __db('sort_order') }}
+          </label>
+          <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}"
+                 class="w-full border border-gray-300 rounded p-2">
+        </div>
+      </div>
+
+      <div class="mb-4 mt-6">
+        <label class="form-label flex flex-row items-center gap-1">
+          {{ __db('flag') }} <span
+            class="text-xs text-gray-500 block mt-1">({{ __db('recommended') . ' ' . __db('resolution') }}:
+            {{ __db('100x100') }} px)</span>
+        </label>
+        <input type="file" name="flag" id="image"
+               class="rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+        @error('flag')
+        <div class="text-red-600">{{ $message }}</div>
+        @enderror
+      </div>
+
+      <div class="mb-4">
+        <label class="block mb-2 text-sm font-medium text-gray-900 ">
+          {{ __db('status') }}
+        </label>
+        <select name="status" class="w-full border border-gray-300 rounded p-2">
+          <option value="1" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('active') }}</option>
+          <option value="0" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('inactive') }}</option>
+        </select>
+      </div>
+
+      <div class="flex justify-start space-x-2 pt-4">
+        <button type="submit"
+                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12 ml-2">
+          {{ __db('add') }}
+        </button>
+        <button type="button"
+                class="close-modal btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">
+          {{ __db('cancel') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 
-                            <div class="mb-4">
-                                <label class="form-label">{{ __db('continent') }}:<span class="text-red-600">*</span></label>
-                                <select name="continent_id" required
-                                    class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                    <option value="">{{ __db('select_continent') }}</option>
-                                    @foreach (getDropDown('continents')->options as $option)
-                                        <option value="{{ $option->id }}"
-                                            {{ old('continent_id', request('continent_id')) == $option->id ? 'selected' : '' }}>
-                                            {{ $option->value }}
-                                        </option>
-                                    @endforeach
-                                </select>
 
-                                @error('continent_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
 
-                            </div>
 
-                            <div class="mb-4">
-                                <label
-                                    class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
-                                <input type="number" name="sort_order" value="{{ old('sort_order', 0) }}"
-                                    class="w-full border border-gray-300 rounded p-2">
-                            </div>
-
-                            <div class="col-span-3 mb-4">
-                                  <label class="form-label flex flex-row items-center gap-1">{{ __db('flag') }} <span
-                                    class="text-xs text-gray-500 block mt-1">({{ __db('recommended') . ' ' . __db('resolution') }}:
-                                    {{ __db('100x100') }}
-                                    px)</span></label>
-                                <input type="file" name="flag" id="image"
-                                    class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                @error('flag')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
-                                <select name="status" class="w-full border border-gray-300 rounded p-2">
-                                    <option value="1" {{ old('status', 1) ? 'selected' : '' }}>{{ __db('active') }}
-                                    </option>
-                                    <option value="0" {{ old('status', 1) ? 'selected' : '' }}>
-                                        {{ __db('inactive') }}</option>
-                                </select>
-                            </div>
-
-                            <div class="flex justify-start space-x-2 pt-4">
-                                <button type="submit"
-                                    class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12 ml-2">
-                                    {{ __db('add') }}
-                                </button>
-                                <button type="button"
-                                    class="close-modal btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">{{ __db('cancel') }}</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
             </div>
         </div>
 

@@ -9,16 +9,20 @@
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $title ?? env('APP_NAME') }}</title>
    
+    <!-- Custom CSS for Public Sans -->
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
-
     <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
 
+    <!-- Importing Public Sans font -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS and other assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @yield('style')
 </head>
 
-<body dir="rtl">
+<body dir="rtl" class="font-public-sans">
 
     @include('frontend.includes.header')
 
@@ -56,8 +60,8 @@
                 toastr.warning("{{ session('warning') }}");
             @endif
         });
-
     </script>
+
     @yield('script')
 </body>
 

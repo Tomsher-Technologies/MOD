@@ -119,7 +119,7 @@
                     </div>
                 </div>
 
-                <div class="flex col-span-2 items-end gap-3" id="delegation-input" @class(['hidden' => $oldInterviewType !== 'delegation'])>
+                <div class="flex col-span-2 gap-3 items-center" id="delegation-input" @class(['hidden' => $oldInterviewType !== 'delegation'])>
                     <div class="w-full">
                         <label class="form-label block text-gray-700 font-semibold">{{ __db('interview_with') }}
                             ({{ __db('delegate_id') }}):</label>
@@ -132,7 +132,7 @@
                         @enderror
                     </div>
                     <button type="button" id="search-delegation-btn"
-                        class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                        class="btn text-md mb-[-10px] !bg-[#B68A35] mt-[22px] text-white rounded-lg h-12">
                         <svg class="pe-1 text-[#FFF]" width="25" height="25" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
                                 d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
@@ -446,25 +446,38 @@
                                     .id) !== Number(window.currentDelegationId));
 
                             delegationsList.innerHTML = '';
-                            filteredDelegations.forEach(delegation => {
-                                const li = document.createElement('li');
-                                li.className = 'py-2 cursor-pointer hover:bg-gray-100';
-                                li.textContent =
-                                    `${delegation.code} - ${delegation.invitationFrom_value}`;
-                                li.dataset.id = delegation.id;
-                                li.addEventListener('click', function() {
-                                    delegationsList.querySelectorAll('li').forEach(el =>
-                                        el.classList.remove('bg-[#B68A35]',
-                                            'text-white'));
-                                    this.classList.add('bg-[#B68A35]', 'text-white');
-                                    selectedDelegationId = delegation.id;
-                                    selectedDelegationCode = delegation.code;
 
-                                    modalSelectBtn.disabled = false;
-                                    modalSelectBtn.classList.remove('hidden');
-                                });
-                                delegationsList.appendChild(li);
-                            });
+
+ filteredDelegations.forEach(delegation => {
+    const li = document.createElement('li');
+    li.className = 'py-2 cursor-pointer hover:bg-gray-100 text-gray-700'; // default inactive state
+    li.textContent = `${delegation.code} - ${delegation.invitationFrom_value}`;
+    li.dataset.id = delegation.id;
+
+    li.addEventListener('click', function() {
+        // Reset all li elements
+        delegationsList.querySelectorAll('li').forEach(el => {
+            el.classList.remove('bg-[#B68A35]', 'text-black', 'text-white');
+            el.classList.add('text-gray-700'); // inactive text
+        });
+
+        // Active styles
+        this.classList.add('bg-[#B68A35]', 'text-black');
+        this.classList.remove('text-gray-700');
+
+        selectedDelegationId = delegation.id;
+        selectedDelegationCode = delegation.code;
+
+        modalSelectBtn.disabled = false;
+        modalSelectBtn.classList.remove('hidden');
+    });
+
+    delegationsList.appendChild(li);
+});
+
+
+
+
 
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");

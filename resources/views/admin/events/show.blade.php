@@ -26,43 +26,43 @@
                 @endif
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <div class="bg-white rounded-lg  p-6 space-y-4 max-w-md">
+             
+          <div class="space-y-2">
+  <div class="bg-white rounded-lg p-6 space-y-4 max-w-md">
+    <div class="space-y-3 text-gray-700">
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('name') }} (EN) :</span>
+        <span>{{ $event->name_en }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('name') }} (AR) :</span>
+        <span>{{ $event->name_ar }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('code') }} :</span>
+        <span>{{ $event->code }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('start_date') }} :</span>
+        <span>{{ $event->start_date }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-semibold">{{ __db('end_date') }} :</span>
+        <span>{{ $event->end_date }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="font-semibold">{{ __db('status') }} :</span>
+        @if ($event->status)
+          <span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">{{ __db('completed') }}</span>
+        @else
+          <span class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded">{{ __db('not_completed') }}</span>
+        @endif
+      </div>
+    </div>
+  </div>
+</div>
 
-                        <div class="space-y-3 text-gray-700">
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('name') }} (EN) :</span>
-                                <span>{{ $event->name_en }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('name') }} (AR) :</span>
-                                <span>{{ $event->name_ar }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('code') }} :</span>
-                                <span>{{ $event->code }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('start_date') }} :</span>
-                                <span>{{ $event->start_date }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="font-semibold">{{ __db('end_date') }} :</span>
-                                <span>{{ $event->end_date }}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="font-semibold">{{ __db('status') }} :</span>
-                                @if ($event->status)
-                                <span class="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">{{
-                                    __db('completed') }}</span>
-                                @else
-                                <span class="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded">{{
-                                    __db('not_completed') }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="space-y-2">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
