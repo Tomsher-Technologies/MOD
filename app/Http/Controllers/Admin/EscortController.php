@@ -59,8 +59,12 @@ class EscortController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
+            ->select('escorts.*')
             ->where('event_id', $currentEventId)
-            ->latest();
+            ->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
+            ->orderBy('military_number')
+            ->orderBy('rankings.sort_order');
+
 
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
