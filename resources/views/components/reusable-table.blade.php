@@ -7,6 +7,7 @@
     'enableColumnListBtn' => false,
     'tableId' => 'table',
     'defaultVisibleKeys' => [],
+    'loading' => false, 
 ])
 
 @php
@@ -22,6 +23,7 @@
     $storageKey = $tableId . '_column_visibility';
     $modalId = $tableId . '-column-visibility-modal';
 @endphp
+
 
 @if ($enableColumnListBtn || $enableRowLimit)
     <div class="mb-2 flex items-center justify-between">
@@ -66,74 +68,88 @@
     </div>
 @endif
 
+
 <div class="overflow-x-auto w-full rounded-lg border border-[#e5e4b2]">
-  <table class="table-auto w-full border-collapse mb-0 border border-[#e5e4b2]" id="{{ $tableId }}">
-    <thead class="bg-[#B68A35] sticky top-0 z-10 shadow-md">
-      <tr class="text-[13px] text-white select-none">
-        @foreach ($columns as $column)
-          @php
-            $permissionKey = $column['permission'] ?? null;
-            $colPermissions = $permissionKey
-                ? (is_array($permissionKey) ? $permissionKey : [$permissionKey])
-                : null;
-          @endphp
-          @if (!$colPermissions || can($colPermissions))
-            <th scope="col"
-                class="p-3 border border-[#cbac71] text-start font-semibold tracking-wide {{ $column['class'] ?? '' }}"
-                data-column-key="{{ $column['key'] }}">
-              {{ $column['label'] }}
-            </th>
-          @endif
-        @endforeach
-      </tr>
-    </thead>
-    <tbody>
-      @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
-        <tr>
-          <td class="px-4 py-2 border border-gray-200 text-center italic" colspan="{{ count($columns) }}">
-            {{ $noDataMessage ?? __db('no_data_found') }}
-          </td>
-        </tr>
-      @else
-        @foreach ($data as $key => $row)
-          @php
-            $rowId = is_array($row) ? ($row['id'] ?? '') : ($row->id ?? '');
-            $rowPermissionsKey = is_array($row) ? ($row['permission'] ?? null) : ($row->permission ?? null);
-            $rowPermissions = $rowPermissionsKey
-                ? (is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey])
-                : null;
-          @endphp
-          @if (!$rowPermissions || can($rowPermissions))
-            <tr class="text-[12px] align-middle odd:bg-white even:bg-[#faf7e1] hover:bg-[#f1e9a2] cursor-pointer"
-                data-id="{{ $rowId }}">
-              @foreach ($columns as $column)
-                @php
-                  $colPermissionKey = $column['permission'] ?? null;
-                  $colPermissions = $colPermissionKey
-                      ? (is_array($colPermissionKey) ? $colPermissionKey : [$colPermissionKey])
-                      : null;
-                @endphp
-                @if (!$colPermissions || can($colPermissions))
-                  <td class="px-4 py-2 border border-gray-200 break-words whitespace-normal max-w-[200px]"
-                      data-column-key="{{ $column['key'] }}"
-                      style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                    {!! $column['render']($row, $key) !!}
-                  </td>
-                @endif
-              @endforeach
+    <table class="table-auto w-full border-collapse mb-0 border border-[#e5e4b2]" id="{{ $tableId }}">
+        <thead class="bg-[#B68A35] sticky top-0 z-10 shadow-md">
+            <tr class="text-[13px] text-white select-none">
+                @foreach ($columns as $column)
+                    @php
+                        $permissionKey = $column['permission'] ?? null;
+                        $colPermissions = $permissionKey
+                            ? (is_array($permissionKey) ? $permissionKey : [$permissionKey])
+                            : null;
+                    @endphp
+                    @if (!$colPermissions || can($colPermissions))
+                        <th scope="col"
+                            class="p-3 border border-[#cbac71] text-start font-semibold tracking-wide {{ $column['class'] ?? '' }}"
+                            data-column-key="{{ $column['key'] }}">
+                            {{ $column['label'] }}
+                        </th>
+                    @endif
+                @endforeach
             </tr>
-          @endif
-        @endforeach
-      @endif
-    </tbody>
-  </table>
+        </thead>
+        <tbody>
+            @if($loading)
+                {{-- Skeleton Loading Rows --}}
+                @foreach(range(1, request('limit', 10)) as $i)
+                    <tr class="animate-pulse">
+                        @foreach($columns as $column)
+                          @php
+                              $permissionKey = $column['permission'] ?? null;
+                              $colPermissions = $permissionKey
+                                  ? (is_array($permissionKey) ? $permissionKey : [$permissionKey])
+                                  : null;
+                          @endphp
+                          @if (!$colPermissions || can($colPermissions))
+                            <td class="px-4 py-2 border border-gray-200">
+                              <div class="h-4 bg-gray-300 rounded"></div>
+                            </td>
+                          @endif
+                        @endforeach
+                    </tr>
+                @endforeach
+            @elseif ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+                <tr>
+                    <td class="px-4 py-2 border border-gray-200 text-center italic" colspan="{{ count($columns) }}">
+                        {{ $noDataMessage ?? 'No data found.' }}
+                    </td>
+                </tr>
+            @else
+                @foreach ($data as $key => $row)
+                    @php
+                        $rowId = is_array($row) ? ($row['id'] ?? '') : ($row->id ?? '');
+                        $rowPermissionsKey = is_array($row) ? ($row['permission'] ?? null) : ($row->permission ?? null);
+                        $rowPermissions = $rowPermissionsKey
+                            ? (is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey])
+                            : null;
+                    @endphp
+                    @if (!$rowPermissions || can($rowPermissions))
+                        <tr class="text-[12px] align-middle hover:bg-[#f1e9a2] cursor-pointer"
+                            data-id="{{ $rowId }}">
+                            @foreach ($columns as $column)
+                                @php
+                                    $colPermissionKey = $column['permission'] ?? null;
+                                    $colPermissions = $colPermissionKey
+                                        ? (is_array($colPermissionKey) ? $colPermissionKey : [$colPermissionKey])
+                                        : null;
+                                @endphp
+                                @if (!$colPermissions || can($colPermissions))
+                                    <td class="px-4 py-2 border border-gray-200 break-words whitespace-normal max-w-[200px]"
+                                        data-column-key="{{ $column['key'] }}"
+                                        style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                        {!! $column['render']($row, $key) !!}
+                                    </td>
+                                @endif
+                            @endforeach
+                        </tr>
+                    @endif
+                @endforeach
+            @endif
+        </tbody>
+    </table>
 </div>
-
-
-
-
-
-
 
 @if (
     $data instanceof \Illuminate\Contracts\Pagination\Paginator ||
@@ -142,9 +158,6 @@
         {{ $data->appends(request()->except('page'))->links() }}
     </div>
 @endif
-
-
-
 
 
 <div id="{{ $modalId }}" tabindex="-1" aria-hidden="true"
@@ -169,10 +182,8 @@
           @endphp
           @if (!$isActionColumn)
             <label class="flex items-center space-x-3 cursor-pointer select-none">
-              <input type="checkbox"
-                     class="form-checkbox text-blue-600 column-toggle-checkbox"
-                     value="{{ $column['key'] }}"
-                     checked>
+              <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox"
+                     value="{{ $column['key'] }}" checked>
               <span class="text-gray-800">{{ $column['label'] }}</span>
             </label>
           @endif
@@ -181,9 +192,6 @@
     </div>
   </div>
 </div>
-
-
-
 
 
 @push('scripts')
@@ -240,7 +248,6 @@
                             checkbox.checked = true;
                         });
                     }
-
 
                     // Always show action columns
                     document.querySelectorAll(
