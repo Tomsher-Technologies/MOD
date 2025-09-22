@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('delegation_details')])
 
 @section('content')
-    @if (!$delegation->canAssignServices() && $delegation->invitationStatus->code !== '1')
+    @if (!$delegation->canAssignServices() && $delegation?->invitationStatus?->code !== '1')
         <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
             <p><strong>{{ __db('Note') }}:</strong> {{ __db('delegation_cannot_assign_services') }}.
                 {{ __db('delegation_has_status') }} "{{ $delegation->invitationStatus?->value }}"

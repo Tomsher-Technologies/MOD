@@ -89,11 +89,13 @@ class DriverController extends Controller
         }
 
         if ($request->has('title_en') && !empty($request->title_en)) {
-            $query->where('title_en', 'like', '%' . $request->title_en . '%');
+            $titleEns = is_array($request->title_en) ? $request->title_en : [$request->title_en];
+            $query->whereIn('title_en', $titleEns);
         }
 
         if ($request->has('title_ar') && !empty($request->title_ar)) {
-            $query->where('title_ar', 'like', '%' . $request->title_ar . '%');
+            $titleArs = is_array($request->title_ar) ? $request->title_ar : [$request->title_ar];
+            $query->whereIn('title_ar', $titleArs);
         }
 
         if ($request->has('title_id') && !empty($request->title_id)) {
@@ -540,7 +542,7 @@ class DriverController extends Controller
         try {
             $fileName = $request->file('file')->getClientOriginalName();
             Excel::import(new DriverImport($fileName), $request->file('file'));
-            
+
             return redirect()->route('admin.import-logs.index', ['import_type' => 'drivers'])
                 ->with('success', __db('drivers_imported_successfully'));
         } catch (\Exception $e) {

@@ -11,17 +11,20 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort')
+                @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort')
                     <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
                         <h3 class="font-semibold text-lg">{{ __db('assigning_escort_to_delegation') }}</h3>
-                        @if(isset($assignmentDelegation))
+                        @if (isset($assignmentDelegation))
                             <div class="mt-2 pt-2 ">
-                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong> {{ $assignmentDelegation->code }}</p>
-                                @if($assignmentDelegation->country)
-                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong> {{ $assignmentDelegation->country->name }}</p>
+                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong>
+                                    {{ $assignmentDelegation->code }}</p>
+                                @if ($assignmentDelegation->country)
+                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong>
+                                        {{ $assignmentDelegation->country->name }}</p>
                                 @endif
-                                @if($assignmentDelegation->continent)
-                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong> {{ $assignmentDelegation->continent->value }}</p>
+                                @if ($assignmentDelegation->continent)
+                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong>
+                                        {{ $assignmentDelegation->continent->value }}</p>
                                 @endif
                             </div>
                         @endif
@@ -262,29 +265,37 @@
     </button>
 
     <form action="{{ route('escorts.index') }}" method="GET">
-        @if(isset($delegationId) && isset($assignmentMode))
+        @if (isset($delegationId) && isset($assignmentMode))
             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
         @endif
         <div class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select name="title_en" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                <select multiple name="title_en[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select_title_en') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleEns as $titleEn)
-                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>{{ $titleEn }}</option>
+                        <option value="{{ $titleEn }}" @if (is_array(request('title_en', [])) && in_array($titleEn, request('title_en', []))) selected @endif>
+                            {{ $titleEn }}</option>
                     @endforeach
                 </select>
             </div>
+
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select name="title_ar" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                <select multiple name="title_ar[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select_title_ar') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleArs as $titleAr)
-                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>{{ $titleAr }}</option>
+                        <option value="{{ $titleAr }}" @if (is_array(request('title_ar', [])) && in_array($titleAr, request('title_ar', []))) selected @endif>
+                            {{ $titleAr }}</option>
                     @endforeach
                 </select>
             </div>
+            
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('gender') }}</label>
                 <select name="gender_id[]" multiple data-placeholder="{{ __db('select_genders') }}"

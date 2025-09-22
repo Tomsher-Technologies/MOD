@@ -83,9 +83,14 @@ class EscortController extends Controller
             });
         }
 
-        if ($request->has('title_id') && !empty($request->title_id)) {
-            $titles = is_array($request->title_id) ? $request->title_id : [$request->title_id];
-            $query->whereIn('title_id', $titles);
+        if ($request->has('title_en') && !empty($request->title_en)) {
+            $titleEns = is_array($request->title_en) ? $request->title_en : [$request->title_en];
+            $query->whereIn('title_en', $titleEns);
+        }
+
+        if ($request->has('title_ar') && !empty($request->title_ar)) {
+            $titleArs = is_array($request->title_ar) ? $request->title_ar : [$request->title_ar];
+            $query->whereIn('title_ar', $titleArs);
         }
 
         if ($request->has('gender_id') && !empty($request->gender_id)) {
@@ -100,14 +105,6 @@ class EscortController extends Controller
                     $q->orWhere('spoken_languages', 'like', '%' . $language . '%');
                 }
             });
-        }
-
-        if ($request->has('title_en') && !empty($request->title_en)) {
-            $query->where('title_en', 'like', '%' . $request->title_en . '%');
-        }
-
-        if ($request->has('title_ar') && !empty($request->title_ar)) {
-            $query->where('title_ar', 'like', '%' . $request->title_ar . '%');
         }
 
         if ($request->has('delegation_id') && !empty($request->delegation_id) && $assignmentMode !== 'escort') {

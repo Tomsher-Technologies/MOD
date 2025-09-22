@@ -166,44 +166,25 @@ class DelegationController extends Controller
 
 
         if ($invitationFrom = $request->input('invitation_from')) {
-            if (is_array($invitationFrom)) {
-                $query->whereIn('delegations.invitation_from_id', $invitationFrom);
-            } else {
-                $query->where('delegations.invitation_from_id', $invitationFrom);
-            }
+            $query->whereIn('delegations.invitation_from_id', $invitationFrom);
         }
 
         if ($continentId = $request->input('continent_id')) {
-            if (is_array($continentId)) {
-                $query->whereIn('delegations.continent_id', $continentId);
-            } else {
-                $query->where('delegations.continent_id', $continentId);
-            }
+            $query->whereIn('delegations.continent_id', $continentId);
         }
 
         if ($countryId = $request->input('country_id')) {
-            if (is_array($countryId)) {
-                $query->whereIn('delegations.country_id', $countryId);
-            } else {
-                $query->where('delegations.country_id', $countryId);
-            }
+            $query->whereIn('delegations.country_id', $countryId);
         }
 
         if ($invitationStatusId = $request->input('invitation_status_id')) {
-            if (is_array($invitationStatusId)) {
-                $query->whereIn('delegations.invitation_status_id', $invitationStatusId);
-            } else {
-                $query->where('delegations.invitation_status_id', $invitationStatusId);
-            }
+            $query->whereIn('delegations.invitation_status_id', $invitationStatusId);
         }
 
         if ($participationStatusId = $request->input('participation_status_id')) {
-            if (is_array($participationStatusId)) {
-                $query->whereIn('delegations.participation_status_id', $participationStatusId);
-            } else {
-                $query->where('delegations.participation_status_id', $participationStatusId);
-            }
+            $query->whereIn('delegations.participation_status_id', $participationStatusId);
         }
+
 
         $limit = $request->limit ? $request->limit : 20;
 
@@ -585,7 +566,7 @@ class DelegationController extends Controller
                 if (preg_match('/^\d{2}-\d{2}-\d{4}/', $fromDate)) {
                     $fromDate = \Carbon\Carbon::createFromFormat('d-m-Y', substr($fromDate, 0, 10))->format('Y-m-d');
                 }
-                
+
                 if (preg_match('/^\d{2}-\d{2}-\d{4}/', $toDate)) {
                     $toDate = \Carbon\Carbon::createFromFormat('d-m-Y', substr($toDate, 0, 10))->format('Y-m-d');
                 }
@@ -2441,7 +2422,7 @@ class DelegationController extends Controller
         try {
             $fileName = $request->file('file')->getClientOriginalName();
             Excel::import(new DelegationOnlyImport($fileName), $request->file('file'));
-            
+
             return redirect()->route('admin.import-logs.index', ['import_type' => 'delegations'])
                 ->with('success', __db('delegations_only_imported_successfully'));
         } catch (\Exception $e) {
@@ -2460,7 +2441,7 @@ class DelegationController extends Controller
         try {
             $fileName = $request->file('file')->getClientOriginalName();
             Excel::import(new DelegateImport($fileName), $request->file('file'));
-            
+
             return redirect()->route('admin.import-logs.index', ['import_type' => 'delegates'])
                 ->with('success', __db('delegates_imported_successfully'));
         } catch (\Exception $e) {
