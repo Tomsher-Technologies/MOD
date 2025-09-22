@@ -156,13 +156,14 @@ class EventController extends Controller
             $data['is_default'] = false;
         }
 
-        if($request->active_status == 1){
+        if ($request->active_status == 1) {
             $event->assignedUsers()->update(['status' => 0]);
         }
 
         $event->update($data);
-
-        return redirect()->route('events.index')->with('success', __db('event') . __db('updated_successfully'));
+        
+        return redirect()->route('events.edit', ['id' => base64_encode($event->id)])
+            ->with('success', __db('event') . __db('updated_successfully'));
     }
 
     public function setDefault(Event $event)
@@ -219,7 +220,8 @@ class EventController extends Controller
         return redirect()->back();
     }
 
-    public function updateEventUserStatus(Request $request){
+    public function updateEventUserStatus(Request $request)
+    {
         $id = $request->id;
         $status = $request->status;
         $eventUser = EventUserRole::find($id);

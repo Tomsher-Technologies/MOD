@@ -5,6 +5,8 @@ window.$ = window.jQuery = jQuery;
 window.moment = moment;
 window.jQuery.moment = moment;
 
+import "./refresh-arrivals-departures.js";
+
 import "daterangepicker/daterangepicker.css";
 
 import "jquery-validation";
