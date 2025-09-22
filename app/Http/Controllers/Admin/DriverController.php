@@ -57,7 +57,7 @@ class DriverController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Driver::with('delegations')
-            ->where('event_id', $currentEventId)
+            ->where('drivers.event_id', $currentEventId)
             ->latest();
 
         $delegationId = $request->input('delegation_id');
@@ -69,19 +69,19 @@ class DriverController extends Controller
                     ->where('delegation_drivers.status', 1);
             });
 
-            $query->where('status', 1);
+            $query->where('drivers.status', 1);
         }
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('name_en', 'like', "%{$search}%")
-                    ->orWhere('name_ar', 'like', "%{$search}%")
-                    ->orWhere('military_number', 'like', "%{$search}%")
-                    ->orWhere('phone_number', 'like', "%{$search}%")
-                    ->orWhere('driver_id', 'like', "%{$search}%")
-                    ->orWhere('car_type', 'like', "%{$search}%")
-                    ->orWhere('car_number', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
+                $q->where('drivers.name_en', 'like', "%{$search}%")
+                    ->orWhere('drivers.name_ar', 'like', "%{$search}%")
+                    ->orWhere('drivers.military_number', 'like', "%{$search}%")
+                    ->orWhere('drivers.phone_number', 'like', "%{$search}%")
+                    ->orWhere('drivers.driver_id', 'like', "%{$search}%")
+                    ->orWhere('drivers.car_type', 'like', "%{$search}%")
+                    ->orWhere('drivers.car_number', 'like', "%{$search}%")
+                    ->orWhere('drivers.code', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });

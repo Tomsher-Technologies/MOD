@@ -60,9 +60,9 @@ class EscortController extends Controller
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
             ->select('escorts.*')
-            ->where('event_id', $currentEventId)
+            ->where('escorts.event_id', $currentEventId)
             ->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
-            ->orderBy('military_number')
+            ->orderBy('escorts.military_number')
             ->orderBy('rankings.sort_order');
 
 
@@ -70,17 +70,17 @@ class EscortController extends Controller
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->where('delegation_id', null)->where('status', 1);
+            $query->where('escorts.delegation_id', null)->where('escorts.status', 1);
         }
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('name_en', 'like', "%{$search}%")
-                    ->orWhere('name_ar', 'like', "%{$search}%")
-                    ->orWhere('military_number', 'like', "%{$search}%")
-                    ->orWhere('phone_number', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
+                $q->where('escorts.name_en', 'like', "%{$search}%")
+                    ->orWhere('escorts.name_ar', 'like', "%{$search}%")
+                    ->orWhere('escorts.military_number', 'like', "%{$search}%")
+                    ->orWhere('escorts.phone_number', 'like', "%{$search}%")
+                    ->orWhere('escorts.code', 'like', "%{$search}%")
+                    ->orWhere('escorts.email', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
@@ -89,24 +89,24 @@ class EscortController extends Controller
 
         if ($request->has('title_en') && !empty($request->title_en)) {
             $titleEns = is_array($request->title_en) ? $request->title_en : [$request->title_en];
-            $query->whereIn('title_en', $titleEns);
+            $query->whereIn('escorts.title_en', $titleEns);
         }
 
         if ($request->has('title_ar') && !empty($request->title_ar)) {
             $titleArs = is_array($request->title_ar) ? $request->title_ar : [$request->title_ar];
-            $query->whereIn('title_ar', $titleArs);
+            $query->whereIn('escorts.title_ar', $titleArs);
         }
 
         if ($request->has('gender_id') && !empty($request->gender_id)) {
             $genders = is_array($request->gender_id) ? $request->gender_id : [$request->gender_id];
-            $query->whereIn('gender_id', $genders);
+            $query->whereIn('escorts.gender_id', $genders);
         }
 
         if ($request->has('language_id') && !empty($request->language_id)) {
             $languages = is_array($request->language_id) ? $request->language_id : [$request->language_id];
             $query->where(function ($q) use ($languages) {
                 foreach ($languages as $language) {
-                    $q->orWhere('spoken_languages', 'like', '%' . $language . '%');
+                    $q->orWhere('escorts.spoken_languages', 'like', '%' . $language . '%');
                 }
             });
         }
@@ -121,7 +121,7 @@ class EscortController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         if ($request->id) {
-            $query->where('id', $request->id);
+            $query->where('escorts.id', $request->id);
         }
 
         $escorts = $query->paginate($limit);

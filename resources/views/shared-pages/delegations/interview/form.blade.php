@@ -27,7 +27,7 @@
             : route('delegations.storeOrUpdateInterview', $delegation);
     @endphp
 
-    <x-back-btn :title="$title" back-url="{{ route('delegations.show', $delegation->id) }}" />
+    <x-back-btn :title="$title" back-url="{{ url()->previous() ?: route('delegations.show', $delegation->id) }}" />
 
     {{-- <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
         <div class="xl:col-span-12">
@@ -71,7 +71,10 @@
                             ],
                             ['label' => __db('title'), 'render' => fn($row) => $row?->getTranslation('title') ?? ''],
                             ['label' => __db('name'), 'render' => fn($row) => e($row->getTranslation('name') ?? '-')],
-                            ['label' => __db('designation'), 'render' => fn($row) => $row->getTranslation('designation') ?? ''],
+                            [
+                                'label' => __db('designation'),
+                                'render' => fn($row) => $row->getTranslation('designation') ?? '',
+                            ],
                             [
                                 'label' => __db('internal_ranking'),
                                 'render' => fn($row) => $row->internalRanking->value ?? '',
@@ -90,8 +93,10 @@
             <div class="bg-white grid grid-cols-4 gap-5 mt-6 mb-4">
 
                 <div>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:<span class="text-red-600">*</span></label>
-                    <input type="text" id="interview_datetime" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm datetimepicker-input"
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:<span
+                            class="text-red-600">*</span></label>
+                    <input type="text" id="interview_datetime"
+                        class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm datetimepicker-input"
                         name="date_time"
                         value="{{ old('date_time', $isEditMode ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d H:i') : '') }}"
                         placeholder="{{ __db('select_date_time') }}">
@@ -271,19 +276,19 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dateTimeInput = document.getElementById('interview_datetime');
-        if (dateTimeInput) {
-            $(dateTimeInput).datetimepicker({
-                format: 'Y-m-d H:i',  
-                step: 5,             
-                inline: false,       
-                todayButton: true,   
-                hours24: true,       
-                mask: true,    
-            });
-        }
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateTimeInput = document.getElementById('interview_datetime');
+            if (dateTimeInput) {
+                $(dateTimeInput).datetimepicker({
+                    format: 'Y-m-d H:i',
+                    step: 5,
+                    inline: false,
+                    todayButton: true,
+                    hours24: true,
+                    mask: true,
+                });
+            }
+        });
     </script>
 
     <script>
@@ -311,8 +316,8 @@
         function toggleInterviewInput(el) {
             const delegationInput = document.getElementById('delegation-input');
             const otherInput = document.getElementById('other-input');
-            const membersBox = document.getElementById('membersbox'); 
-            const statusBox = document.getElementById('statusbox'); 
+            const membersBox = document.getElementById('membersbox');
+            const statusBox = document.getElementById('statusbox');
 
             if (el.value === 'delegation') {
                 delegationInput.classList.remove('hidden');
@@ -448,32 +453,37 @@
                             delegationsList.innerHTML = '';
 
 
- filteredDelegations.forEach(delegation => {
-    const li = document.createElement('li');
-    li.className = 'py-2 cursor-pointer hover:bg-gray-100 text-gray-700'; // default inactive state
-    li.textContent = `${delegation.code} - ${delegation.invitationFrom_value}`;
-    li.dataset.id = delegation.id;
+                            filteredDelegations.forEach(delegation => {
+                                const li = document.createElement('li');
+                                li.className =
+                                    'py-2 cursor-pointer hover:bg-gray-100 text-gray-700'; // default inactive state
+                                li.textContent =
+                                    `${delegation.code} - ${delegation.invitationFrom_value}`;
+                                li.dataset.id = delegation.id;
 
-    li.addEventListener('click', function() {
-        // Reset all li elements
-        delegationsList.querySelectorAll('li').forEach(el => {
-            el.classList.remove('bg-[#B68A35]', 'text-black', 'text-white');
-            el.classList.add('text-gray-700'); // inactive text
-        });
+                                li.addEventListener('click', function() {
+                                    // Reset all li elements
+                                    delegationsList.querySelectorAll('li').forEach(
+                                    el => {
+                                        el.classList.remove('bg-[#B68A35]',
+                                            'text-black', 'text-white');
+                                        el.classList.add(
+                                        'text-gray-700'); // inactive text
+                                    });
 
-        // Active styles
-        this.classList.add('bg-[#B68A35]', 'text-black');
-        this.classList.remove('text-gray-700');
+                                    // Active styles
+                                    this.classList.add('bg-[#B68A35]', 'text-black');
+                                    this.classList.remove('text-gray-700');
 
-        selectedDelegationId = delegation.id;
-        selectedDelegationCode = delegation.code;
+                                    selectedDelegationId = delegation.id;
+                                    selectedDelegationCode = delegation.code;
 
-        modalSelectBtn.disabled = false;
-        modalSelectBtn.classList.remove('hidden');
-    });
+                                    modalSelectBtn.disabled = false;
+                                    modalSelectBtn.classList.remove('hidden');
+                                });
 
-    delegationsList.appendChild(li);
-});
+                                delegationsList.appendChild(li);
+                            });
 
 
 

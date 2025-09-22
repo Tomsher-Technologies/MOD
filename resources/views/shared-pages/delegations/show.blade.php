@@ -19,12 +19,7 @@
                 </a>
             @enddirectCanany
 
-            <x-back-btn title="" class=""
-                back-url="{{ Session::has('delegations_last_url')
-                    ? Session::get('delegations_last_url')
-                    : (Session::has('interview_member_last_url')
-                        ? Session::get('interview_member_last_url')
-                        : route('delegations.index')) }}" />
+            <x-back-btn title="" class="" back-url="{{ url()->previous() ?: route('delegations.index') }}" />
         </div>
     </div>
 
