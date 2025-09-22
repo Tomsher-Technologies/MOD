@@ -6,6 +6,8 @@ use App\Models\Country;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Exports\CountriesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CountryController extends Controller
 {
@@ -56,50 +58,11 @@ class CountryController extends Controller
     }
 
     /**
-     * Export all countries to CSV
+     * Export all countries to XLSX
      */
     public function exportAllCountries()
     {
-        $countries = Country::with('continent')->orderBy('sort_order')->get();
-
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="countries.csv"',
-        ];
-
-        $callback = function () use ($countries) {
-            $file = fopen('php://output', 'w');
-            
-            // Add CSV headers
-            fputcsv($file, [
-                'ID', 
-                'Name (English)', 
-                'Name (Arabic)', 
-                'Short Code', 
-                'Continent', 
-                'Sort Order', 
-                'Status', 
-                'Created At'
-            ]);
-            
-            // Add data rows
-            foreach ($countries as $country) {
-                fputcsv($file, [
-                    $country->id,
-                    $country->getNameEn(),
-                    $country->getNameAr() ?? '',
-                    $country->short_code,
-                    $country->continent->value ?? '',
-                    $country->sort_order ?? 0,
-                    $country->status ? 'Active' : 'Inactive',
-                    $country->created_at->format('Y-m-d H:i:s')
-                ]);
-            }
-            
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(new CountriesExport, 'countries_export_' . date('Y-m-d_H-i-s') . '.xlsx');
     }
 
     /**

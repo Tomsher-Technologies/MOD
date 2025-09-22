@@ -28,7 +28,7 @@ class EscortImport implements ToCollection, WithHeadingRow
                 'email' => trim($row['email']) ?? null,
                 'title_en' => trim($row['title_en']) ?? null,
                 'title_ar' => trim($row['title_ar']) ?? null,
-                'status' => $row['status'] ?? 1,
+                'status' => 1,
             ];
 
             if (!empty($row['gender_id'])) {
@@ -38,16 +38,6 @@ class EscortImport implements ToCollection, WithHeadingRow
 
                 if ($gender) {
                     $escortData['gender_id'] = $gender->id;
-                }
-            }
-
-            if (!empty($row['nationality_id'])) {
-                $nationality = DropdownOption::whereHas('dropdown', function ($q) {
-                    $q->where('code', 'nationality');
-                })->where('id', trim($row['nationality_id']))->first();
-
-                if ($nationality) {
-                    $escortData['nationality_id'] = $nationality->id;
                 }
             }
 
@@ -98,10 +88,7 @@ class EscortImport implements ToCollection, WithHeadingRow
             }
 
             if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
-                $phoneNumber = preg_replace('/[^0-9]/', '', $escortData['phone_number']);
-                if (strlen($phoneNumber) === 9) {
-                    $escortData['phone_number'] = '971' . $phoneNumber;
-                }
+                $escortData['phone_number'] = $escortData['phone_number'];
             }
 
             // if ($existingEscort) {

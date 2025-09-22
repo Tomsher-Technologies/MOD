@@ -15,7 +15,7 @@
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M15 17h3a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3m4-9h2m-2 3h2m-6 0h.01M12 17v.01" />
                     </svg>
-                    <span>{{ __db('export_all') }}</span>
+                    <span>{{ __db('export_all') }} (XLSX)</span>
                 </a>
 
                 <button data-modal-target="add-country" data-modal-toggle="add-country"
