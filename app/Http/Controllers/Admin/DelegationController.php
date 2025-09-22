@@ -385,9 +385,6 @@ class DelegationController extends Controller
         }
 
         $arrivalsQuery = DelegateTransport::where('type', 'arrival')
-            ->where(function ($query) use ($now, $oneHourAgo, $oneHourFromNow) {
-                $query->whereDate('date_time', $now->toDateString());
-            })
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -472,15 +469,13 @@ class DelegationController extends Controller
         $oneHourAgo = $now->copy()->subHour();
         $oneHourFromNow = $now->copy()->addHours(1);
 
+        // Set default date range to today if not provided
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
             $request->merge(['date_range' => $today . ' - ' . $today]);
         }
 
         $departuresQuery = DelegateTransport::where('type', 'departure')
-            ->where(function ($query) use ($now, $oneHourAgo, $oneHourFromNow) {
-                $query->whereDate('date_time', $now->toDateString());
-            })
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -587,15 +582,29 @@ class DelegationController extends Controller
                 $fromDate = trim($dates[0]);
                 $toDate   = trim($dates[1]);
 
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $fromDate)) {
+                    $fromDate = \Carbon\Carbon::createFromFormat('d-m-Y', substr($fromDate, 0, 10))->format('Y-m-d');
+                }
+                
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $toDate)) {
+                    $toDate = \Carbon\Carbon::createFromFormat('d-m-Y', substr($toDate, 0, 10))->format('Y-m-d');
+                }
+
                 $query->whereDate('date_time', '>=', $fromDate)
                     ->whereDate('date_time', '<=', $toDate);
             }
         } else {
             if ($fromDate = $request->input('from_date')) {
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $fromDate)) {
+                    $fromDate = \Carbon\Carbon::createFromFormat('d-m-Y', $fromDate)->format('Y-m-d');
+                }
                 $query->whereDate('date_time', '>=', $fromDate);
             }
 
             if ($toDate = $request->input('to_date')) {
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $toDate)) {
+                    $toDate = \Carbon\Carbon::createFromFormat('d-m-Y', $toDate)->format('Y-m-d');
+                }
                 $query->whereDate('date_time', '<=', $toDate);
             }
         }
