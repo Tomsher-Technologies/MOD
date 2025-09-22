@@ -174,7 +174,7 @@
                             {{ __db('notifications') }}
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 ">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 ">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
@@ -317,7 +317,7 @@
                                     }
                                 @endphp
                                 <a href="{{ $url }}"
-                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100">
                                     <div class="flex items-center gap-3">
                                         <div>
                                             <h6 class="fw-semibold mb-1 text-sm">{{ $module ?? __db('notification') }}
@@ -390,7 +390,7 @@
                             {{ __db('alerts') }}
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600 dark:bg-neutral-600 ">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
                     </div>
 
                     <div class="scroll-sm !border-t-0">
@@ -451,7 +451,7 @@
                                 @endphp
                                 <a href="#"
                                     onclick="showAlertModal({{ $data['alert_id'] ?? 0 }}, '{{ addslashes($title) }}', '{{ addslashes($message) }}'); return false;"
-                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100">
                                     <div class="flex items-center gap-3">
                                         <div>
                                             <h6 class="fw-semibold mb-1 text-sm">{{ $title ?: __db('alert') }}</h6>
@@ -543,7 +543,7 @@
     </div>
 
 
-    
+
 </div>
 
 

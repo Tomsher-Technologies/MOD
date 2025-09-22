@@ -6,6 +6,11 @@
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
 2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
 */
+
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+
 *,
 ::before,
 ::after {
@@ -36,6 +41,11 @@ html {
   font-feature-settings: normal; /* 5 */
   font-variation-settings: normal; /* 6 */
 }
+body {
+    font-family: 'Public Sans', sans-serif;
+
+}
+
 /*
 1. Remove the margin in all browsers.
 2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
@@ -6056,7 +6066,7 @@ h6, .h6 {
   top: 0px;
   z-index: 30;
   height: 100vh;
-  width: 250px;
+  width: 240px;
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
@@ -6072,7 +6082,7 @@ h6, .h6 {
 }
 @media (min-width: 1400px){
   .sidebar{
-    width: 240px;
+    width: 230px;
   }
 }
 @media (min-width: 1650px){

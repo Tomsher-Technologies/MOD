@@ -143,40 +143,48 @@
     </div>
 @endif
 
+
+
+
+
 <div id="{{ $modalId }}" tabindex="-1" aria-hidden="true"
-    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-2xl mx-auto">
-        <div class="bg-white rounded-lg shadow">
-            <div class="flex items-start justify-between p-4 border-b rounded-t">
-                <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
-                <button type="button"
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
-                    data-modal-hide="{{ $modalId }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-            <div class="p-6 space-y-6">
-                <div class="space-y-3 grid grid-cols-3" id="{{ $tableId }}-column-toggles">
-                    @foreach ($columns as $column)
-                        @php
-                            $isActionColumn = in_array($column['key'], ['action', 'actions']);
-                        @endphp
-                        @if (!$isActionColumn)
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox me-2"
-                                    value="{{ $column['key'] }}" checked>
-                                <span>{{ $column['label'] }}</span>
-                            </label>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-        </div>
+     class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
+  <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+    <div class="flex items-center justify-between p-4 border-b rounded-t bg-gray-50">
+      <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
+      <button type="button"
+              class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+              data-modal-hide="{{ $modalId }}" aria-label="Close modal">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
     </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="{{ $tableId }}-column-toggles">
+        @foreach ($columns as $column)
+          @php
+            $isActionColumn = in_array($column['key'], ['action', 'actions']);
+          @endphp
+          @if (!$isActionColumn)
+            <label class="flex items-center space-x-3 cursor-pointer select-none">
+              <input type="checkbox"
+                     class="form-checkbox text-blue-600 column-toggle-checkbox"
+                     value="{{ $column['key'] }}"
+                     checked>
+              <span class="text-gray-800">{{ $column['label'] }}</span>
+            </label>
+          @endif
+        @endforeach
+      </div>
+    </div>
+  </div>
 </div>
+
+
+
+
 
 @push('scripts')
     <script>

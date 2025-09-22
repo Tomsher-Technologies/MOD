@@ -4,6 +4,11 @@
 
 @import "flowbite";
 
+body {
+    font-family: 'Public Sans', sans-serif;
+
+}
+
 .select2-container {
     width: 100% !important;
 }

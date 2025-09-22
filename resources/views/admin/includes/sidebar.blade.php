@@ -1,4 +1,4 @@
-<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 flex flex-col transition-transform transform -translate-x-full md:translate-x-0" aria-label="Sidebar navigation">
+<aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-56 lg:w-56 xl:w-56 2xl:w-64 3xl:w-64 bg-white shadow-lg z-50 flex flex-col transition-transform transform -translate-x-full md:translate-x-0" aria-label="Sidebar navigation">
   <!-- Sidebar Close Button -->
   <button id="sidebarCloseBtn" type="button" class="sidebar-close-btn !mt-4 ms-auto me-4 md:hidden" aria-label="Close sidebar menu">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700 hover:text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">

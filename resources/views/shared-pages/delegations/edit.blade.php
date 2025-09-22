@@ -553,84 +553,98 @@
                 <x-reusable-table :data="$delegation->delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true" :columns="$columns"
                     :no-data-message="__db('no_data_found')" />
 
-                @foreach ($delegation->delegates as $delegate)
-                    <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
-                        class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                        <div class="relative w-full max-w-2xl mx-auto">
-                            <div class="bg-white rounded-lg shadow ">
-                                <div class="flex items-start justify-between p-4 border-b rounded-t">
-                                    <h3 class="text-xl font-semibold text-gray-900">
-                                        {{ __db('transport_information_for') }}
-                                        {{ $delegate->name_en ?? '-' }}</h3>
-                                    <button type="button"
-                                        class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
-                                        data-modal-hide="delegate-transport-modal-{{ $delegate->id }}">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="p-6 space-y-6">
-                                    <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h3>
-                                    @php
-                                        $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
-                                    @endphp
-                                    <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                                        @if ($arrival)
-                                            <div class="border-b py-4">
-                                                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                                                <p class="text-base">{{ $arrival->airport->value ?? '-' }}</p>
-                                            </div>
-                                            <div class="border-b py-4">
-                                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                                <p class="text-base">{{ $arrival->flight_no ?? '-' }}</p>
-                                            </div>
-                                            <div class="py-4 border-b md:border-b-0">
-                                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                                <p class="text-base">{{ $arrival->flight_name ?? '-' }}</p>
-                                            </div>
-                                            <div class="py-4 !pb-0">
-                                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                                <p class="text-base">{{ $arrival->date_time ?? '-' }}</p>
-                                            </div>
-                                        @else
-                                            <p class="col-span-2 text-gray-500">No arrival information available.</p>
-                                        @endif
-                                    </div>
+             
+             
+             
+             @foreach ($delegation->delegates as $delegate)
+  <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
+       class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
+    <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="flex items-start justify-between p-4 border-b rounded-t">
+        <h3 class="text-xl font-semibold text-gray-900">
+          {{ __db('transport_information_for') }} {{ $delegate->name_en ?? '-' }}
+        </h3>
+        <button type="button"
+                class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                data-modal-hide="delegate-transport-modal-{{ $delegate->id }}" aria-label="Close modal">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
 
-                                    <h3 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h3>
-                                    @php
-                                        $departure = $delegate->delegateTransports->where('type', 'departure')->first();
-                                    @endphp
-                                    <div class="border rounded-lg p-6 grid grid-cols-2 gap-x-8">
-                                        @if ($departure)
-                                            <div class="border-b py-4">
-                                                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                                                <p class="text-base">{{ $departure->airport->value ?? '-' }}</p>
-                                            </div>
-                                            <div class="border-b py-4">
-                                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                                <p class="text-base">{{ $departure->flight_no ?? '-' }}</p>
-                                            </div>
-                                            <div class="py-4 border-b md:border-b-0">
-                                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                                <p class="text-base">{{ $departure->flight_name ?? '-' }}</p>
-                                            </div>
-                                            <div class="py-4 !pb-0">
-                                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                                <p class="text-base">{{ $departure->date_time ?? '-' }}</p>
-                                            </div>
-                                        @else
-                                            <p class="col-span-2 text-gray-500">No departure information available.</p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+      <div class="p-6 space-y-6">
+        {{-- Arrival --}}
+        <section>
+          <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h4>
+          @php $arrival = $delegate->delegateTransports->where('type', 'arrival')->first(); @endphp
+          <div class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
+            @if ($arrival)
+              <div class="border-b md:border-b-0 md:border-r border-gray-300 pb-4 pr-4">
+                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                <p class="text-base text-gray-900">{{ $arrival->airport?->value ?? '-' }}</p>
+              </div>
+              <div class="border-b md:border-b-0 border-gray-300 pb-4">
+                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                <p class="text-base text-gray-900">{{ $arrival->flight_no ?? '-' }}</p>
+              </div>
+              <div class="py-4 pr-4 md:border-r md:border-gray-300">
+                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                <p class="text-base text-gray-900">{{ $arrival->flight_name ?? '-' }}</p>
+              </div>
+              <div class="py-4 !pb-0">
+                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                <p class="text-base text-gray-900">{{ $arrival->date_time ?? '-' }}</p>
+              </div>
+            @else
+              <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
+            @endif
+          </div>
+        </section>
+
+        {{-- Departure --}}
+        <section>
+          <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h4>
+          @php $departure = $delegate->delegateTransports->where('type', 'departure')->first(); @endphp
+          <div class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
+            @if ($departure)
+              <div class="border-b md:border-b-0 md:border-r border-gray-300 pb-4 pr-4">
+                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                <p class="text-base text-gray-900">{{ $departure->airport?->value ?? '-' }}</p>
+              </div>
+              <div class="border-b md:border-b-0 border-gray-300 pb-4">
+                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                <p class="text-base text-gray-900">{{ $departure->flight_no ?? '-' }}</p>
+              </div>
+              <div class="py-4 pr-4 md:border-r md:border-gray-300">
+                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                <p class="text-base text-gray-900">{{ $departure->flight_name ?? '-' }}</p>
+              </div>
+              <div class="py-4 !pb-0">
+                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                <p class="text-base text-gray-900">{{ $departure->date_time ?? '-' }}</p>
+              </div>
+            @else
+              <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
+            @endif
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+@endforeach
+
+
+
+
+
+
+
+
+
+
+
             </div>
         </div>
     </div>
