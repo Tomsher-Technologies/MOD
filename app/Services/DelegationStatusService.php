@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Delegation;
 use App\Models\Delegate;
-use App\Models\DelegateTransport;
 use Carbon\Carbon;
 
 class DelegationStatusService
@@ -117,10 +116,9 @@ class DelegationStatusService
 
             if ($toBeArrivedCount > 0) {
                 $newStatus = 'Partially Arrived';
-            } elseif($departedCount > 0) {
+            } elseif ($departedCount > 0) {
                 $newStatus = 'Partially Departured';
             }
-            
         } elseif ($toBeArrivedCount > 0) {
 
             if ($arrivedCount > 0 || $departedCount > 0) {
@@ -128,7 +126,6 @@ class DelegationStatusService
             } else {
                 $newStatus = 'Not Yet Arrived';
             }
-
         } elseif ($departedCount > 0) {
             $newStatus = 'Partially Departured';
         }
@@ -155,5 +152,33 @@ class DelegationStatusService
 
             $this->updateDelegationParticipationStatus($delegation);
         }
+    }
+
+    public function syncTransportInfo(Delegate $delegate, ?array $transportData, string $type): void
+    {
+        if (empty($transportData) || (empty($transportData['date_time']) || empty($transportData['mode']))) {
+            return;
+        }
+
+        $data = [
+            'mode' => $transportData['mode'] ?? null,
+            'airport_id' => ($transportData['mode'] ?? null) === 'flight' ? ($transportData['airport_id'] ?? null) : null,
+            'flight_no' => ($transportData['mode'] ?? null) === 'flight' ? ($transportData['flight_no'] ?? null) : null,
+            'flight_name' => ($transportData['mode'] ?? null) === 'flight' ? ($transportData['flight_name'] ?? null) : null,
+            'date_time' => $transportData['date_time'] ?? null,
+            'status' => $transportData['status'] ?? null,
+            'comment' => $transportData['comment'] ?? null,
+        ];
+
+        $delegate->delegateTransports()->updateOrCreate(['type' => $type], $data);
+    }
+
+    public function updateAllStatus(Delegate $delegate)
+    {
+        $this->updateTransportStatuses($delegate);
+
+        $this->updateDelegateParticipationStatus($delegate);
+
+        $this->updateDelegationParticipationStatus($delegate->delegation);
     }
 }
