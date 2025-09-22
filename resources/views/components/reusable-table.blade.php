@@ -166,7 +166,7 @@
                         $rowClassValue = $rowClass ? $rowClass($row) : '';
                     @endphp
                     @if (!$rowPermissions || can($rowPermissions))
-                        <tr class="text-[12px] align-middle hover:bg-[#f1e9a2] cursor-pointer {{ $rowClassValue }}"
+                        <tr class="text-[12px] align-middle {{ $rowClassValue }}"
                             data-id="{{ $rowId }}">
                             @foreach ($columns as $column)
                                 @php

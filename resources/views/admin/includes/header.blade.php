@@ -111,7 +111,7 @@
                     @foreach ($config as $button)
                         @if (can($button['permission']))
                             <a href="{{ $button['link'] }}"
-                                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                                class="btn me-8 text-md  !bg-[#B68A35] text-white rounded-lg h-12">
                                 <svg class="w-6 h-6 text-white me-2" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                     viewBox="0 0 24 24">
@@ -126,7 +126,7 @@
                     {{-- Single button --}}
                     @if (can($config['permission']))
                         <a href="{{ $config['link'] }}"
-                            class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                            class="btn me-8 text-md !bg-[#B68A35] text-white rounded-lg h-12">
                             <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
