@@ -83,14 +83,14 @@
                     $columns = [
                         [
                             'label' => '',
-                            'permission' =>['assign_accommodations', 'hotel_assign_accommodations'],
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row) {
-
-                                if ($row->accommodation == 1){
+                                if ($row->accommodation == 1) {
                                     return '<input type="checkbox" class="assign-hotel-checkbox"
-                                        data-delegate-id="' . e($row->id) . '" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">';
+                                        data-delegate-id="' .
+                                        e($row->id) .
+                                        '" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">';
                                 }
-                                 
                             },
                         ],
                         [
@@ -146,10 +146,10 @@
                         [
                             'label' => __db('participation_status'),
                             'render' => function ($row) {
-                                return $row->participation_status ?? '-';
+                                return $row->participation_status ? __db($row->participation_status) : '-';
                             },
                         ],
-                       
+
                         [
                             'label' => __db('arrival_status'),
                             'render' => function ($row) {
@@ -166,10 +166,18 @@
                             'label' => __db('hotel'),
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
-                                return '<span class="hotel_name">'.$room?->hotel?->hotel_name.'</span>
-                                    <input type="hidden" name="hotel_id" id="hotel_id'. $row->id.'"
-                                        class="hotel-id-input" data-delegate-id="'. $row->id.'"
-                                        value="'.$room?->hotel_id.'">';
+                                return '<span class="hotel_name">' .
+                                    $room?->hotel?->hotel_name .
+                                    '</span>
+                                    <input type="hidden" name="hotel_id" id="hotel_id' .
+                                    $row->id .
+                                    '"
+                                        class="hotel-id-input" data-delegate-id="' .
+                                    $row->id .
+                                    '"
+                                        value="' .
+                                    $room?->hotel_id .
+                                    '">';
                             },
                         ],
 
@@ -178,8 +186,8 @@
                             'class' => 'w-[175px]',
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
-                                if(can(['assign_accommodations', 'hotel_assign_accommodations'])){
-                                    if ($row->accommodation == 1){
+                                if (can(['assign_accommodations', 'hotel_assign_accommodations'])) {
+                                    if ($row->accommodation == 1) {
                                         $options = '';
                                         if ($room) {
                                             $hotelid = $room->hotel_id;
@@ -198,16 +206,21 @@
                                             }
                                         }
 
-                                        return '<select name="room_type" id="room_type'. $row->id.'"
+                                        return '<select name="room_type" id="room_type' .
+                                            $row->id .
+                                            '"
                                             class="room-type-dropdown p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                            <option value="">' . __db('select') . '</option>
-                                            ' . $options . '
+                                            <option value="">' .
+                                            __db('select') .
+                                            '</option>
+                                            ' .
+                                            $options .
+                                            '
                                         </select>';
                                     }
-                                }else{
+                                } else {
                                     return $room?->roomType?->roomType?->value;
                                 }
-                                
                             },
                         ],
 
@@ -216,55 +229,67 @@
                             'class' => 'w-[115px]',
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
-                                if(can(['assign_accommodations', 'hotel_assign_accommodations'])){
-                                    if ($row->accommodation == 1){
-                                        
-                                        return '<input type="text" name="room_number" id="room_number'. $row->id.'"
+                                if (can(['assign_accommodations', 'hotel_assign_accommodations'])) {
+                                    if ($row->accommodation == 1) {
+                                        return '<input type="text" name="room_number" id="room_number' .
+                                            $row->id .
+                                            '"
                                             class="room-number-input w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                                            value="'.$room?->room_number.'">';
-                                    } 
-                                }else{
+                                            value="' .
+                                            $room?->room_number .
+                                            '">';
+                                    }
+                                } else {
                                     return $room?->room_number;
-                                }                           },
+                                }
+                            },
                         ],
                         [
                             'label' => __db('action'),
-                            'permission' =>['assign_accommodations', 'hotel_assign_accommodations'],
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
 
                                 $action = '<div class="flex items-center gap-1">';
-                                if ($row->accommodation == 1){
-                                    $action .= '<a href="#" id="add-attachment-btn"
+                                if ($row->accommodation == 1) {
+                                    $action .=
+                                        '<a href="#" id="add-attachment-btn"
                                                     class="save-room-assignment text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
-                                                    <span>'.__db('save').' </span>
+                                                    <span>' .
+                                        __db('save') .
+                                        ' </span>
                                                 </a>
                                             ';
                                 }
-                                if($room){
-                                    $action .= '<a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="'.$room->id.'">
-                                                '.__db('remove').'
+                                if ($room) {
+                                    $action .=
+                                        '<a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="' .
+                                        $room->id .
+                                        '">
+                                                ' .
+                                        __db('remove') .
+                                        '
                                                 </a>';
                                 }
-                                 $action .= '</div>';
-                                 return $action;
+                                $action .= '</div>';
+                                return $action;
                             },
                         ],
                     ];
                     $data = $delegation->delegates;
-                    
+
                     $noDataMessage = __db('no_delegates_found');
                 @endphp
 
                 <x-reusable-table :columns="$columns" table-id="delegatesTable" :enableColumnListBtn="true" :data="$data"
-                    :noDataMessage="$noDataMessage" :rowClass="function ($row)  {
+                    :noDataMessage="$noDataMessage" :rowClass="function ($row) {
                         $room = $row->currentRoomAssignment ?? null;
-
-                        if ($row->accommodation == 0){
+                    
+                        if ($row->accommodation == 0) {
                             return 'bg-[#e5e5e5]';
-                        }elseif($room){
+                        } elseif ($room) {
                             return 'bg-[#acf3bc]';
-                        } 
+                        }
                     }" />
 
 
@@ -329,32 +354,24 @@
                     <thead>
                         <tr class="text-[13px]">
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
-                                <th scope="col"
-                                    class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 </th>
                             @enddirectCanany
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('military_number') }}</th>
 
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('name') }}
                             </th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('mobile') }}</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('gender') }}</th>
-                            <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('hotel') }}</th>
-                            <th scope="col"
-                                class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
@@ -403,7 +420,7 @@
                                 </td>
 
                                 <td class="px-1 border border-gray-200 py-3">
-                                    @if(can(['assign_accommodations', 'hotel_assign_accommodations']))
+                                    @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <span
                                             class="hotel_name_escort">{{ $roomEscort?->hotel?->hotel_name ?? '' }}</span>
                                         <input type="hidden" name="hotel_id_escort"
@@ -415,7 +432,7 @@
                                     @endif
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
-                                    @if(can(['assign_accommodations', 'hotel_assign_accommodations']))
+                                    @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         @php
                                             $optionsEscort = '';
                                             if ($roomEscort) {
@@ -449,10 +466,10 @@
                                 </td>
 
                                 <td class="px-1 border border-gray-200 py-3">
-                                    @if(can(['assign_accommodations', 'hotel_assign_accommodations']))
+                                    @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <input type="text" name="room_number_escort" id="room_number_escort"
-                                        class="room-number-input-escort w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                                        value="{{ $roomEscort?->room_number ?? '' }}">
+                                            class="room-number-input-escort w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                            value="{{ $roomEscort?->room_number ?? '' }}">
                                     @else
                                         {{ $roomEscort?->room_number ?? '' }}
                                     @endif
@@ -466,9 +483,11 @@
                                                 <span>{{ __db('save') }} </span>
                                             </a>
 
-                                            @if($roomEscort)
-                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="{{ $roomEscort->id }}">
-                                                {{ __db('remove') }}
+                                            @if ($roomEscort)
+                                                <a href="#"
+                                                    class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2"
+                                                    data-assignment-id="{{ $roomEscort->id }}">
+                                                    {{ __db('remove') }}
                                                 </a>
                                             @endif
                                         </div>
@@ -609,7 +628,7 @@
                                 </td>
 
                                 <td class="px-1 border border-gray-200 py-3">
-                                    @if(can(['assign_accommodations', 'hotel_assign_accommodations']))
+                                    @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <span
                                             class="hotel_name_driver">{{ $roomDriver?->hotel?->hotel_name ?? '' }}</span>
                                         <input type="hidden" name="hotel_id_driver"
@@ -621,7 +640,7 @@
                                     @endif
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
-                                    @if(can(['assign_accommodations', 'hotel_assign_accommodations']))
+                                    @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         @php
                                             $optionsDriver = '';
                                             if ($roomDriver) {
@@ -655,10 +674,10 @@
                                 </td>
 
                                 <td class="px-1 border border-gray-200 py-3">
-                                    @if(can(['assign_accommodations', 'hotel_assign_accommodations']))
+                                    @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <input type="text" name="room_number_driver" id="room_number_driver"
-                                        class="room-number-input-driver w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                                        value="{{ $roomDriver?->room_number ?? '' }}">
+                                            class="room-number-input-driver w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                            value="{{ $roomDriver?->room_number ?? '' }}">
                                     @else
                                         {{ $roomDriver?->room_number ?? '' }}
                                     @endif
@@ -672,9 +691,11 @@
                                                 <span>{{ __db('save') }} </span>
                                             </a>
 
-                                            @if($roomDriver)
-                                                <a href="#"  class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2" data-assignment-id="{{ $roomDriver->id }}">
-                                                {{ __db('remove') }}
+                                            @if ($roomDriver)
+                                                <a href="#"
+                                                    class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2"
+                                                    data-assignment-id="{{ $roomDriver->id }}">
+                                                    {{ __db('remove') }}
                                                 </a>
                                             @endif
                                         </div>
@@ -705,7 +726,8 @@
 
 
     <hr class="mx-6 border-neutral-200 h-10">
-    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }} ({{ $delegation->interviews->count() }})</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }} ({{ $delegation->interviews->count() }})
+    </h2>
 
     @php
         $columns = [
@@ -743,7 +765,9 @@
                                     'other_interview_member' => base64_encode($otherMemberId),
                                 ]) .
                                 '" class="!text-[#B68A35]">
-                                    <span class="block">' . __db('other_member') . ': ' .
+                                    <span class="block">' .
+                                __db('other_member') .
+                                ': ' .
                                 e($otherMemberId) .
                                 '</span>
                                 </a>';
@@ -753,7 +777,9 @@
                             '<a href="' .
                             route('delegations.show', $row->interviewWithDelegation->id ?? '') .
                             '" class="!text-[#B68A35]">' .
-                            ''. __db('delegation_id') .' : ' .
+                            '' .
+                            __db('delegation_id') .
+                            ' : ' .
                             e($row->interviewWithDelegation->code ?? '') .
                             '</a>';
                     }
@@ -774,7 +800,8 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                <x-reusable-table :columns="$columns" table-id="interviewsTable" :data="$data" :noDataMessage="$noDataMessage" />
+                <x-reusable-table :columns="$columns" table-id="interviewsTable" :data="$data"
+                    :noDataMessage="$noDataMessage" />
             </div>
         </div>
     </div>
@@ -838,82 +865,83 @@
 
 
 @foreach ($delegation->delegates as $delegate)
-  <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
-       class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
-    <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-      <div class="flex items-start justify-between p-4 border-b rounded-t">
-        <h3 class="text-xl font-semibold text-gray-900">
-          {{ __db('transport_information_for') }} {{ $delegate->name_en ?? '-' }}
-        </h3>
-        <button type="button"
-                class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-                data-modal-hide="delegate-transport-modal-{{ $delegate->id }}" aria-label="Close modal">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
+    <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
+        <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="flex items-start justify-between p-4 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">
+                    {{ __db('transport_information_for') }} {{ $delegate->name_en ?? '-' }}
+                </h3>
+                <button type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                    data-modal-hide="delegate-transport-modal-{{ $delegate->id }}" aria-label="Close modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
-      <div class="p-6 space-y-6">
-        {{-- Arrival Section --}}
-        <section>
-          <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h4>
-          @php $arrival = $delegate->delegateTransports->where('type', 'arrival')->first(); @endphp
-          <div class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
-            @if ($arrival)
-              <div class="border-b md:border-b-0 md:border-r border-gray-300 pb-4 pr-4">
-                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                <p class="text-base text-gray-900">{{ $arrival->airport?->value ?? '-' }}</p>
-              </div>
-              <div class="border-b md:border-b-0 border-gray-300 pb-4">
-                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                <p class="text-base text-gray-900">{{ $arrival->flight_no ?? '-' }}</p>
-              </div>
-              <div class="py-4 pr-4 md:border-r md:border-gray-300">
-                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                <p class="text-base text-gray-900">{{ $arrival->flight_name ?? '-' }}</p>
-              </div>
-              <div class="py-4 !pb-0">
-                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                <p class="text-base text-gray-900">{{ $arrival->date_time ?? '-' }}</p>
-              </div>
-            @else
-              <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
-            @endif
-          </div>
-        </section>
+            <div class="p-6 space-y-6">
+                {{-- Arrival Section --}}
+                <section>
+                    <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h4>
+                    @php $arrival = $delegate->delegateTransports->where('type', 'arrival')->first(); @endphp
+                    <div class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
+                        @if ($arrival)
+                            <div class="border-b md:border-b-0 md:border-r border-gray-300 pb-4 pr-4">
+                                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                                <p class="text-base text-gray-900">{{ $arrival->airport?->value ?? '-' }}</p>
+                            </div>
+                            <div class="border-b md:border-b-0 border-gray-300 pb-4">
+                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                <p class="text-base text-gray-900">{{ $arrival->flight_no ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 pr-4 md:border-r md:border-gray-300">
+                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                <p class="text-base text-gray-900">{{ $arrival->flight_name ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 !pb-0">
+                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                <p class="text-base text-gray-900">{{ $arrival->date_time ?? '-' }}</p>
+                            </div>
+                        @else
+                            <p class="col-span-2 text-gray-500">{{ __db('no_arrival_information') }}.</p>
+                        @endif
+                    </div>
+                </section>
 
-        {{-- Departure Section --}}
-        <section>
-          <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h4>
-          @php $departure = $delegate->delegateTransports->where('type', 'departure')->first(); @endphp
-          <div class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
-            @if ($departure)
-              <div class="border-b md:border-b-0 md:border-r border-gray-300 pb-4 pr-4">
-                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                <p class="text-base text-gray-900">{{ $departure->airport?->value ?? '-' }}</p>
-              </div>
-              <div class="border-b md:border-b-0 border-gray-300 pb-4">
-                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                <p class="text-base text-gray-900">{{ $departure->flight_no ?? '-' }}</p>
-              </div>
-              <div class="py-4 pr-4 md:border-r md:border-gray-300">
-                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                <p class="text-base text-gray-900">{{ $departure->flight_name ?? '-' }}</p>
-              </div>
-              <div class="py-4 !pb-0">
-                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                <p class="text-base text-gray-900">{{ $departure->date_time ?? '-' }}</p>
-              </div>
-            @else
-              <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
-            @endif
-          </div>
-        </section>
-      </div>
+                {{-- Departure Section --}}
+                <section>
+                    <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h4>
+                    @php $departure = $delegate->delegateTransports->where('type', 'departure')->first(); @endphp
+                    <div class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
+                        @if ($departure)
+                            <div class="border-b md:border-b-0 md:border-r border-gray-300 pb-4 pr-4">
+                                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                <p class="text-base text-gray-900">{{ $departure->airport?->value ?? '-' }}</p>
+                            </div>
+                            <div class="border-b md:border-b-0 border-gray-300 pb-4">
+                                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                <p class="text-base text-gray-900">{{ $departure->flight_no ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 pr-4 md:border-r md:border-gray-300">
+                                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                <p class="text-base text-gray-900">{{ $departure->flight_name ?? '-' }}</p>
+                            </div>
+                            <div class="py-4 !pb-0">
+                                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                <p class="text-base text-gray-900">{{ $departure->date_time ?? '-' }}</p>
+                            </div>
+                        @else
+                            <p class="col-span-2 text-gray-500">{{ __db('no_departure_information') }}.</p>
+                        @endif
+                    </div>
+                </section>
+            </div>
+        </div>
     </div>
-  </div>
 @endforeach
 
 
@@ -928,16 +956,17 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
-            $(document).on("change", ".room-type-dropdown-escort", function () {
-                $(this).closest("tr").find(".room-number-input-escort").val(""); 
+            $(document).on("change", ".room-type-dropdown-escort", function() {
+                $(this).closest("tr").find(".room-number-input-escort").val("");
             });
 
-            $(document).on("change", ".room-type-dropdown", function () {
-                $(this).closest("tr").find(".room-number-input").val(""); 
+            $(document).on("change", ".room-type-dropdown", function() {
+                $(this).closest("tr").find(".room-number-input").val("");
             });
-             $(document).on("change", ".room-type-dropdown-driver", function () {
-                $(this).closest("tr").find(".room-number-input-driver").val(""); 
+            $(document).on("change", ".room-type-dropdown-driver", function() {
+                $(this).closest("tr").find(".room-number-input-driver").val("");
             });
+
             function hotelData(hotelId, section) {
                 $('.assign-hotel-checkbox').prop('checked', false);
                 $('.assign-hotel-checkbox-escort').prop('checked', false);
@@ -945,7 +974,7 @@
                 let url = "{{ route('accommodation.rooms', ':id') }}";
                 url = url.replace(':id', hotelId);
 
-                if(hotelId){
+                if (hotelId) {
                     $.get(url, function(data) {
                         let html = '';
                         let hotelName = '';
@@ -981,7 +1010,7 @@
                             $('#roomDetailsDriver').html('');
                             $('#HotelInfoDriver').hide();
                             $('#hotelDriver').val('').trigger('change');
-                        }else if (section == 'Escort') {
+                        } else if (section == 'Escort') {
                             $('#hotelNameEscort').html(hotelName);
                             $('#roomDetailsEscort').html(html);
                             $('#HotelInfoEscort').show();
@@ -995,7 +1024,7 @@
                             $('#roomDetailsDriver').html('');
                             $('#HotelInfoDriver').hide();
                             $('#hotelDriver').val('').trigger('change');
-                        }else if (section == 'Driver') {
+                        } else if (section == 'Driver') {
                             $('#hotelNameDriver').html(hotelName);
                             $('#roomDetailsDriver').html(html);
                             $('#HotelInfoDriver').show();
@@ -1010,14 +1039,14 @@
                             $('#HotelInfoEscort').hide();
                             $('#hotelEscort').val('').trigger('change');
                         }
-                        
+
                     });
                 }
-                
+
             }
             $(document).on('change', '#hotelDelegate', function() {
                 let hotelId = this.value;
-                hotelData(hotelId,'Delegate');
+                hotelData(hotelId, 'Delegate');
             });
 
             $('.assign-hotel-checkbox').on('click', function() {
@@ -1083,7 +1112,7 @@
                     if (res.success === 1) {
                         row.css('background-color', '#acf3bc');
                         toastr.success('{{ __db('room_assigned') }}');
-                        
+
                         let actionCellDel = row.find('td').last(); // assuming last cell is action
                         if (actionCellDel.find('.remove-room-assignment').length === 0) {
                             let removeBtnHtml = `
@@ -1102,9 +1131,9 @@
                         toastr.error('{{ __db('room_already_booked_by_external_member') }}');
                     }
                     checkboxDel.prop('checked', false);
-                    
-                    if($('#hotelDelegate').val() == hotelId) {
-                        hotelData(hotelId,'Delegate');
+
+                    if ($('#hotelDelegate').val() == hotelId) {
+                        hotelData(hotelId, 'Delegate');
                     }
                 });
             });
@@ -1112,7 +1141,7 @@
             // Escort Section
             $(document).on('change', '#hotelEscort', function() {
                 let hotelId = this.value;
-                hotelData(hotelId,'Escort');
+                hotelData(hotelId, 'Escort');
             });
 
             $('.assign-hotel-checkbox-escort').on('click', function() {
@@ -1179,9 +1208,9 @@
                     if (res.success === 1) {
                         escortrow.css('background-color', '#acf3bc');
                         toastr.success('{{ __db('room_assigned') }}');
-                        
 
-                        let actionCellEsc = escortrow.find('td').last(); 
+
+                        let actionCellEsc = escortrow.find('td').last();
                         if (actionCellEsc.find('.remove-room-assignment').length === 0) {
                             let removeBtnHtml = `
                                 <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res.assignment_id}">
@@ -1200,8 +1229,8 @@
                         toastr.error('{{ __db('room_already_booked_by_external_member') }}');
                     }
                     checkboxEscort.prop('checked', false);
-                    if($('#hotelEscort').val() == hotelIdEscort) {
-                        hotelData(hotelIdEscort,'Escort');
+                    if ($('#hotelEscort').val() == hotelIdEscort) {
+                        hotelData(hotelIdEscort, 'Escort');
                     }
                 });
             });
@@ -1209,7 +1238,7 @@
             // Drivers Section
             $(document).on('change', '#hotelDriver', function() {
                 let hotelId = this.value;
-                hotelData(hotelId,'Driver');
+                hotelData(hotelId, 'Driver');
             });
 
             $('.assign-hotel-checkbox-driver').on('click', function() {
@@ -1277,8 +1306,9 @@
                     if (res.success === 1) {
                         driverrow.css('background-color', '#acf3bc');
                         toastr.success('{{ __db('room_assigned') }}');
-                        
-                        let actionCell = driverrow.find('td').last(); // assuming last cell is action
+
+                        let actionCell = driverrow.find('td')
+                    .last(); // assuming last cell is action
                         if (actionCell.find('.remove-room-assignment').length === 0) {
                             let removeBtnHtml = `
                                 <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-driver-id="${idDriver}" data-assignment-id="${res.assignment_id}">
@@ -1297,13 +1327,13 @@
                     }
                     checkboxDriver.prop('checked', false);
 
-                    if($('#hotelDriver').val() == hotelIdDriver) {
-                        hotelData(hotelIdDriver,'Driver');
+                    if ($('#hotelDriver').val() == hotelIdDriver) {
+                        hotelData(hotelIdDriver, 'Driver');
                     }
                 });
             });
 
-            $(document).on('click', '.remove-room-assignment', function(e){
+            $(document).on('click', '.remove-room-assignment', function(e) {
                 e.preventDefault();
                 let assignmentId = $(this).data('assignment-id');
 
@@ -1326,8 +1356,8 @@
                         $.post("{{ route('accommodation.remove-rooms') }}", {
                             _token: '{{ csrf_token() }}',
                             assignable_id: assignmentId
-                        }, function(res){
-                            if(res.success){
+                        }, function(res) {
+                            if (res.success) {
                                 toastr.success('{{ __db('room_removed') }}');
                                 window.location.reload();
                             } else {
@@ -1336,7 +1366,7 @@
                         });
                     }
                 });
-                
+
             });
 
         });

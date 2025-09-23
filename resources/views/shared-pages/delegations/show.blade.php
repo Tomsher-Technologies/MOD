@@ -19,7 +19,8 @@
                 </a>
             @enddirectCanany
 
-            <x-back-btn title="" class="" back-url="{{ url()->previous() ?: route('delegations.index') }}" />
+            <x-back-btn title="" class=""
+                back-url="{{ Session::has('show_delegations_last_url') ? Session::get('show_delegations_last_url') : route('delegations.index') }}" />
         </div>
     </div>
 
@@ -147,7 +148,7 @@
                         [
                             'label' => __db('participation_status'),
                             'render' => function ($row) {
-                                return $row->participation_status ? __db($participation_status) : '-';
+                                return $row->participation_status ? __db($row->participation_status) : '-';
                             },
                         ],
                         [

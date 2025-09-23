@@ -9,7 +9,7 @@
     @endif
 
     <x-back-btn title=""
-        back-url="{{ Session::has('delegations_last_url') ? Session::get('delegations_last_url') : route('delegations.index') }}" />
+        back-url="{{ Session::has('edit_delegations_last_url') ? Session::get('edit_delegations_last_url') : route('delegations.index') }}" />
 
     <div class="bg-white h-full w-full rounded-lg border-0 p-6">
 
@@ -481,7 +481,7 @@
                          [
                             'label' => __db('participation_status'),
                             'render' => function ($row) {
-                                return $row->participation_status ? __db($participation_status) : '-';
+                                return $row->participation_status ? __db($row->participation_status) : '-';
                             },
                         ],
                         [

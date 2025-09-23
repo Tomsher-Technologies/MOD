@@ -1,4 +1,4 @@
-<div class="dashboard-main-body">
+<div  >
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('create_new_interview_member') }}</h2>
         <a href="{{ route('other-interview-members.index') }}" id="add-attachment-btn"

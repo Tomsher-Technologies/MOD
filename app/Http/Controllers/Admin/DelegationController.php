@@ -17,6 +17,7 @@ use App\Exports\DelegateExport;
 use App\Imports\DelegateImport;
 use App\Imports\DelegationAttachmentImport;
 use App\Imports\DelegationOnlyImport;
+use App\Models\Escort;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -190,7 +191,11 @@ class DelegationController extends Controller
 
         $delegations = $query->paginate($limit);
 
-        $request->session()->put('delegations_last_url', url()->full());
+        $request->session()->put('show_delegations_last_url', url()->full());
+        $request->session()->put('edit_delegations_last_url', url()->full());
+        $request->session()->put('escorts_index_last_url', url()->full());
+        $request->session()->put('drivers_index_last_url', url()->full());
+        $request->session()->put('import_delegations_last_url', url()->full());
 
         return view('admin.delegations.index', compact('delegations'));
     }
@@ -263,6 +268,11 @@ class DelegationController extends Controller
         $limit = $request->limit ? $request->limit : 20;
         $interviews = $query->orderBy('id', 'desc')->paginate($limit);
 
+        $request->session()->put('show_delegations_last_url', url()->full());
+        $request->session()->put('other_interview_member_show_last_url', url()->full());
+        $request->session()->put('add_interview_last_url', url()->full());
+        $request->session()->put('other_interview_member_show_last_url', url()->full());
+
         return view('admin.delegations.interviews', compact('interviews'));
     }
 
@@ -273,7 +283,7 @@ class DelegationController extends Controller
         ]));
     }
 
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $delegation = \App\Models\Delegation::with([
             'invitationFrom',
@@ -299,6 +309,11 @@ class DelegationController extends Controller
         // return response()->json([
         //     'delegation' => $delegation,
         // ]);
+
+        $request->session()->put('escorts_index_last_url', url()->full());
+        $request->session()->put('drivers_index_last_url', url()->full());
+        $request->session()->put('add_interview_last_url', url()->full());
+        $request->session()->put('other_interview_member_show_last_url', url()->full());
 
         return view('admin.delegations.edit', [
             'delegation' => $delegation,
@@ -347,7 +362,10 @@ class DelegationController extends Controller
             ->get();
 
         $request->session()->put('interview_member_last_url', url()->full());
-
+        $request->session()->put('edit_delegations_last_url', url()->full());
+        $request->session()->put('escorts_index_last_url', url()->full());
+        $request->session()->put('drivers_index_last_url', url()->full());
+        $request->session()->put('other_interview_member_show_last_url', url()->full());
 
         return view('admin.delegations.show', compact('delegation', 'hotels'));
     }
@@ -437,6 +455,8 @@ class DelegationController extends Controller
                 'data' => view('shared-pages.arrivals.table', compact('paginator', 'groupedArrivals'))->render()
             ]);
         }
+
+        $request->session()->put('show_delegations_last_url', url()->full());
 
         return view('admin.arrivals.index', compact('paginator', 'groupedArrivals'));
     }
@@ -529,6 +549,8 @@ class DelegationController extends Controller
                 'data' => view('shared-pages.departures.table', compact('paginator', 'groupedDepartures'))->render()
             ]);
         }
+
+        $request->session()->put('show_delegations_last_url', url()->full());
 
         return view('admin.departures.index', compact('paginator', 'groupedDepartures'));
     }
@@ -1928,6 +1950,13 @@ class DelegationController extends Controller
                     'id' => $d->id,
                     'code' => $d->code,
                     'invitationFrom_value' => $d->invitationFrom->value ?? '',
+                    'delegates' => $d->delegates->map(function ($delegate) {
+                        $delegateArray = $delegate->toArray();
+                        $delegateArray['participation_status'] = $delegate->participation_status
+                            ? __db($delegate->participation_status)
+                            : null;
+                        return $delegateArray;
+                    })->toArray()
                 ]
             )),
         ]);
@@ -2074,6 +2103,8 @@ class DelegationController extends Controller
         }
 
         $limit = $request->limit ? $request->limit : 20;
+
+        $request->session()->put('show_delegations_last_url', url()->full());
 
         $delegates = $query->orderBy('country_sort.sort_order', 'asc')
             ->orderBy('invitation_from_sort.sort_order', 'asc')
@@ -2341,11 +2372,19 @@ class DelegationController extends Controller
         return Excel::download(new DelegateExport, 'delegates.xlsx');
     }
 
+
+
     public function destroy(Delegation $delegation)
     {
         try {
             $delegation->interviews()->delete();
             $delegation->attachments()->delete();
+            $escorts = $delegation->escorts()->pluck('escorts.id');
+
+            if ($escorts->count() > 0) {
+                $delegation->escorts()->detach();
+                Escort::whereIn('id', $escorts)->update(['delegation_id' => null]);
+            }
 
             foreach ($delegation->delegates as $delegate) {
                 if ($delegate->current_room_assignment_id) {

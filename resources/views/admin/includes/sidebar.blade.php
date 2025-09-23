@@ -284,13 +284,6 @@
                 </li>
             @enddirectCanany
 
-
-
-
-
-
-
-
             @directCanany([
                 'manage_escorts',
                 'delegate_manage_escorts',
@@ -303,7 +296,7 @@
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 
             hover:text-[#b68a35] focus:text-[#b68a35]
-            {{ areActiveRoutes(['escorts.index', 'escorts.create', 'escorts.edit']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
+            {{ areActiveRoutes(['escorts.index', 'escorts.create', 'escorts.edit', 'escorts.assignIndex']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
                         <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['escorts.index', 'escorts.create', 'escorts.edit']) ? 'stroke-[#b68a35]' : '' }}"
                             width="30" height="30" viewBox="0 0 29 29" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -364,7 +357,7 @@
                     <a href="{{ route('drivers.index') }}"
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35]
-            {{ areActiveRoutes(['drivers.index', 'drivers.create', 'drivers.edit']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
+            {{ areActiveRoutes(['drivers.index', 'drivers.create', 'drivers.edit', 'drivers.assignIndex']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
                         <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['drivers.index', 'drivers.create', 'drivers.edit']) ? 'stroke-[#b68a35]' : '' }}"
                             width="30" height="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                             fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -598,7 +591,7 @@
                     <a href="{{ route('other-interview-members.index') }}"
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35]
-            {{ areActiveRoutes(['other-interview-members.create', 'otherInterviewMembers.edit', 'other-interview-members.index']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
+            {{ areActiveRoutes(['other-interview-members.create', 'otherInterviewMembers.edit', 'other-interview-members.index', 'other-interview-members.show']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
                         <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['other-interview-members.create', 'otherInterviewMembers.edit', 'other-interview-members.index']) ? 'stroke-[#b68a35]' : '' }}"
                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30"
                             fill="none" viewBox="0 0 24 24" stroke-width="1.6">

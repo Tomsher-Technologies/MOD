@@ -1,16 +1,8 @@
-<div class="dashboard-main-body">
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('edit') . ' ' . __db('escort') }}</h2>
-        <a href="{{ route('escorts.index') }}"
-            class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-            <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
-                height="24" fill="none" viewBox="0 0 24 24">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 12H5m14 0-4 4m4-4-4-4" />
-            </svg>
-            <span>{{ __db('back') }}</span>
-        </a>
-    </div>
+<div  >
+    
+    <x-back-btn title="{{ __db('edit') . ' ' . __db('escort') }}"
+                back-url="{{ Session::has('edit_escorts_last_url') ? Session::get('edit_escorts_last_url') : route('escorts.index') }}" />
+     
 
     @if ($errors->any())
         <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">

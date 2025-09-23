@@ -150,6 +150,10 @@ class DriverController extends Controller
             $assignmentDelegation = Delegation::find($delegationId);
         }
 
+        $request->session()->put('show_delegations_last_url', url()->full());
+        $request->session()->put('edit_drivers_last_url', url()->full());
+        $request->session()->put('assign_drivers_last_url', url()->full());
+
         return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities'));
     }
 

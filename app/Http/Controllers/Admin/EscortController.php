@@ -141,6 +141,11 @@ class EscortController extends Controller
             $assignmentDelegation = Delegation::find($delegationId);
         }
 
+        $request->session()->put('show_delegations_last_url', url()->full());
+        $request->session()->put('edit_escorts_last_url', url()->full());
+        $request->session()->put('assign_escorts_last_url', url()->full());
+        $request->session()->put('import_escorts_last_url', url()->full());
+
         return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs'));
     }
 

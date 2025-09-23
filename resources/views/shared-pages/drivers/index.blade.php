@@ -1,12 +1,20 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('drivers') }}</h2>
-        @directCanany(['import_drivers'])
-            <a href="{{ route('drivers.import.form') }}"
-                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
-                {{ __db('import') . ' ' . __db('driver') }}
-            </a>
-        @enddirectCanany
+        <div class="flex gap-3">
+
+            @directCanany(['import_drivers'])
+                <a href="{{ route('drivers.import.form') }}"
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg " type="button">
+                    {{ __db('import') . ' ' . __db('driver') }}
+                </a>
+            @enddirectCanany
+
+           @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver' && Session::has('drivers_index_last_url'))
+                <x-back-btn title="" class="" back-url="{{ Session::get('drivers_index_last_url') }}" />
+            @endif
+
+        </div>
     </div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
 

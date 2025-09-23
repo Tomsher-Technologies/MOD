@@ -1,12 +1,19 @@
 <div class="">
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px] ">{{ __db('escorts') }}</h2>
-        @directCanany(['import_escorts'])
-            <a href="{{ route('escorts.import.form') }}"
-                class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12" type="button">
-                {{ __db('import') . ' ' . __db('escorts') }}
-            </a>
-        @enddirectCanany
+        <div class="flex gap-3">
+
+            @directCanany(['import_escorts'])
+                <a href="{{ route('escorts.import.form') }}"
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg " type="button">
+                    {{ __db('import') . ' ' . __db('escorts') }}
+                </a>
+            @enddirectCanany
+
+            @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort' && Session::has('escorts_index_last_url'))
+                <x-back-btn title="" class="" back-url="{{ Session::get('escorts_index_last_url') }}" />
+            @endif
+        </div>
     </div>
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
@@ -295,7 +302,7 @@
                     @endforeach
                 </select>
             </div>
-            
+
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('gender') }}</label>
                 <select name="gender_id[]" multiple data-placeholder="{{ __db('select_genders') }}"

@@ -1,3 +1,4 @@
+
 <div class="bg-white h-full w-full rounded-lg border-0 p-6">
     @props(['driver'])
 
@@ -136,7 +137,8 @@
                 class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
                 {{ __db('reassign') }}
             </button>
-            <button type="button" id="replaceBtn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
+            <button type="button" id="replaceBtn"
+                class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
                 {{ __db('replace') }}
             </button>
         </div>

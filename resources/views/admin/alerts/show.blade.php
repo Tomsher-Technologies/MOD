@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('alert_details')])
 
 @section('content')
-    <div class="dashboard-main-body">
+    <div  >
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('alert_details') }}</h2>
             <a href="{{ route('alerts.index') }}"

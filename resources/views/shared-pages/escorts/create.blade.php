@@ -1,4 +1,4 @@
-<div class="dashboard-main-body ">
+<div   >
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('add') . ' ' . __db('escorts') }}</h2>
         <a href="{{ route('escorts.index') }}"

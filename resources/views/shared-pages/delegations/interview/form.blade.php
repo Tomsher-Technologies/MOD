@@ -27,23 +27,9 @@
             : route('delegations.storeOrUpdateInterview', $delegation);
     @endphp
 
-    <x-back-btn :title="$title" back-url="{{ url()->previous() ?: route('delegations.show', $delegation->id) }}" />
+    <x-back-btn :title="$title" 
+        back-url="{{ Session::has('add_interview_last_url') ? Session::get('add_interview_last_url') : route('delegations.show', $delegation->id) }}" />
 
-    {{-- <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-4">
-        <div class="xl:col-span-12">
-            <div class="bg-white h-full w-full rounded-lg border-0 p-10">
-                @php
-                    $columns = [
-                        ['label' => __db('delegation_id'), 'render' => fn($row) => $row->code ?? ''],
-                        ['label' => __db('invitation_from'), 'render' => fn($row) => $row->invitationFrom->value ?? ''],
-                        ['label' => __db('continent'), 'render' => fn($row) => $row->continent->value ?? ''],
-                        ['label' => __db('country'), 'render' => fn($row) => $row->country->value ?? ''],
-                    ];
-                @endphp
-                <x-reusable-table :columns="$columns" :data="[$delegation]" />
-            </div>
-        </div>
-    </div> --}}
 
     <form method="POST" action="{{ $formAction ?? '#' }}" enctype="multipart/form-data" data-ajax-form="true">
         @csrf
@@ -464,12 +450,12 @@
                                 li.addEventListener('click', function() {
                                     // Reset all li elements
                                     delegationsList.querySelectorAll('li').forEach(
-                                    el => {
-                                        el.classList.remove('bg-[#B68A35]',
-                                            'text-black', 'text-white');
-                                        el.classList.add(
-                                        'text-gray-700'); // inactive text
-                                    });
+                                        el => {
+                                            el.classList.remove('bg-[#B68A35]',
+                                                'text-black', 'text-white');
+                                            el.classList.add(
+                                                'text-gray-700'); // inactive text
+                                        });
 
                                     // Active styles
                                     this.classList.add('bg-[#B68A35]', 'text-black');
