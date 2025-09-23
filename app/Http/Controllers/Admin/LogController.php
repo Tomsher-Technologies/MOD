@@ -24,53 +24,88 @@ class LogController extends Controller
     private function getLastLines($filepath, $linesCount)
     {
         $lines = [];
-        try {
-            $output = shell_exec("tail -n {$linesCount} " . escapeshellarg($filepath));
-            $lines = explode("\n", rtrim($output));
-        } catch (\Exception $e) {
+        
+        if ($this->isWindows()) {
             $lines = $this->getLastLinesFallback($filepath, $linesCount);
+        } else {
+            try {
+                $output = shell_exec("tail -n {$linesCount} " . escapeshellarg($filepath));
+                if ($output !== null) {
+                    $lines = explode("\n", rtrim($output));
+                } else {
+                    $lines = $this->getLastLinesFallback($filepath, $linesCount);
+                }
+            } catch (\Exception $e) {
+                $lines = $this->getLastLinesFallback($filepath, $linesCount);
+            }
         }
         
         return $lines;
     }
     
+    private function isWindows()
+    {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    }
+    
+    private function getOSInfo()
+    {
+        return [
+            'php_os' => PHP_OS,
+            'is_windows' => $this->isWindows(),
+            'uname' => php_uname(),
+        ];
+    }
+    
     private function getLastLinesFallback($filepath, $linesCount)
     {
         $lines = [];
-        $file = fopen($filepath, 'r');
         
-        if ($file) {
-            fseek($file, 0, SEEK_END);
-            $pos = ftell($file);
-            $lineCount = 0;
-            $buffer = '';
-            
-            while ($pos > 0 && $lineCount < $linesCount) {
-                $pos--;
-                fseek($file, $pos, SEEK_SET);
-                $char = fgetc($file);
-                
-                if ($char == "\n") {
-                    if (!empty($buffer)) {
-                        $lines[] = $buffer;
-                        $buffer = '';
-                        $lineCount++;
-                    }
-                } else {
-                    $buffer = $char . $buffer;
-                }
-                
-                if ($pos == 0 && !empty($buffer)) {
-                    $lines[] = $buffer;
-                    break;
-                }
-            }
-            
-            fclose($file);
-            
-            $lines = array_reverse($lines);
+        if (!is_readable($filepath)) {
+            return ['Error: Cannot read log file. Check permissions.'];
         }
         
-        return $lines;
+        $file = fopen($filepath, 'r');
+        
+        if (!$file) {
+            return ['Error: Cannot open log file.'];
+        }
+        
+        fseek($file, 0, SEEK_END);
+        $fileSize = ftell($file);
+        
+        if ($fileSize == 0) {
+            fclose($file);
+            return ['Log file is empty.'];
+        }
+        
+        $pos = $fileSize;
+        $lineCount = 0;
+        $buffer = '';
+        $result = [];
+        
+        while ($pos > 0 && $lineCount < $linesCount) {
+            $pos--;
+            fseek($file, $pos, SEEK_SET);
+            $char = fgetc($file);
+            
+            if ($char == "\n") {
+                if (!empty(trim($buffer))) {
+                    $result[] = $buffer;
+                    $lineCount++;
+                }
+                $buffer = '';
+            } else {
+                $buffer = $char . $buffer;
+            }
+        }
+        
+        if (!empty(trim($buffer))) {
+            $result[] = $buffer;
+        }
+        
+        fclose($file);
+        
+        return array_reverse($result);
     }
 }
