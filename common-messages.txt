@@ -1,0 +1,8 @@
+__db('created_successfully')
+__db('updated_successfully')
+__db('deleted_successfully')
+__db('failed_to_update')
+__db('failed_to_create')
+__db('failed_to_delete')
+__db('imported_successfully')
+__db('import_failed')
