@@ -2485,8 +2485,6 @@ class DelegationController extends Controller
 
             $this->removeDelegationAllAccommodation($delegation);
 
-           
-
             $this->logActivity(
                 module: 'Delegation',
                 action: 'delete-delegation',
