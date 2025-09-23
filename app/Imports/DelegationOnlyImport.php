@@ -44,8 +44,13 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
                         $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing invitation_from_id', $row->toArray());
                         continue;
                     }
+                    
+                    if (empty($row['country_id'])) {
+                        $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing country_id', $row->toArray());
+                        continue;
+                    }
 
-                    $delegationData = $this->processDelegationData($row);
+                    $delegationData = $this->processDelegationData($row, $rowNumber);
 
                     // $existingDelegation = Delegation::where('code', trim($row['code']))->first();
 
@@ -76,7 +81,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
         }
     }
 
-    private function processDelegationData($row)
+    private function processDelegationData($row, $rowNumber)
     {
         $delegationData = [
             'invitation_from_id' => null,
@@ -96,7 +101,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($invitationFrom) {
                 $delegationData['invitation_from_id'] = $invitationFrom->id;
             } else {
-                throw new \Exception('Invalid invitation_from_id: ' . $row['invitation_from_id']);
+                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid invitation_from_id: ' . $row['invitation_from_id'], $row->toArray());
             }
         }
 
@@ -108,7 +113,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($continent) {
                 $delegationData['continent_id'] = $continent->id;
             } else {
-                throw new \Exception('Invalid continent_id: ' . $row['continent_id']);
+                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid continent_id: ' . $row['continent_id'], $row->toArray());
             }
         }
 
@@ -118,7 +123,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($country) {
                 $delegationData['country_id'] = $country->id;
             } else {
-                throw new \Exception('Invalid country_id: ' . $row['country_id']);
+                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid country_id: ' . $row['country_id'], $row->toArray());
             }
         }
 
