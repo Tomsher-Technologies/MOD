@@ -39,11 +39,11 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
         try {
             $processedDelegations = [];
-            $rowNumber = 1; 
+            $rowNumber = 1;
 
             foreach ($rows as $row) {
                 $rowNumber++;
-                
+
                 try {
                     $delegationCode = trim($row['delegation_code'] ?? '');
 
@@ -61,8 +61,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
                     $delegateData = $this->processDelegateData($row, $delegation->id, $rowNumber);
 
-                    $arrivalData = $this->processTransportData($row, 'arrival');
-                    $departureData = $this->processTransportData($row, 'departure');
+                    $arrivalData = $this->processTransportData($row, 'arrival', $rowNumber);
+                    $departureData = $this->processTransportData($row, 'departure', $rowNumber);
 
                     $delegate = Delegate::create($delegateData);
 
@@ -81,12 +81,11 @@ class DelegateImport implements ToCollection, WithHeadingRow
                         submoduleId: $delegate->id,
                         delegationId: $delegation->id
                     );
-                    
+
                     $this->importLogService->logSuccess('delegates', $this->fileName, $rowNumber, $row->toArray());
                 } catch (\Exception $e) {
                     Log::error('Delegate Import Error: ' . $e->getMessage());
                     $this->importLogService->logError('delegates', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
-
                 }
             }
 
@@ -170,7 +169,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
         return $delegateData;
     }
 
-    private function processTransportData($row, $type)
+    private function processTransportData($row, $type, $rowNumber)
     {
         $fieldPrefix = $type . '_';
 
