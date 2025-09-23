@@ -58,7 +58,7 @@
                         <div class="flex items-end">
                             <select name="badge_printed" x-model="badgePrintedFilter"
                                 class="p-2.5 rounded-lg border text-sm !border-[#d1d5db]">
-                                <option value="">{{ __db('All Delegates') }}</option>
+                                <option value="">{{ __db('all_delegates') }}</option>
                                 <option value="1" {{ request('badge_printed') == '1' ? 'selected' : '' }}>
                                     {{ __db('badge_printed') }}</option>
                                 <option value="0" {{ request('badge_printed') == '0' ? 'selected' : '' }}>

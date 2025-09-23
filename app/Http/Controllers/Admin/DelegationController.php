@@ -1072,7 +1072,7 @@ class DelegationController extends Controller
 
                 $delegation->interviews()->delete();
 
-                \App\Models\RoomAssignment::where('delegation_id', $delegation->id)->update(['active_status' => 0]);
+                $this->removeDelegationAllAccommodation($delegation);
             }
 
             DB::commit();
@@ -1182,6 +1182,86 @@ class DelegationController extends Controller
         return redirect()
             ->route('delegations.edit', $delegationId)
             ->with('success', __db('attachments_updated_successfully'));
+    }
+
+    public function removeDelegationAllAccommodation(Delegation $delegation){
+        foreach ($delegation->delegates as $delegate) {
+            if ($delegate->current_room_assignment_id) {
+                $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
+                if ($oldAssignment) {
+                    
+                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                                ->where('room_number', $oldAssignment->room_number)
+                                                ->where('active_status', 1)
+                                                ->count();
+                        if ($alreadyAssignedCount <= 1) {
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
+                    }
+
+                    $oldAssignment->active_status = 0;
+                    $oldAssignment->save();
+                }
+                $delegate->current_room_assignment_id = null;
+                $delegate->save();
+            }
+        }
+
+        foreach ($delegation->escorts as $escorts) {
+            if ($escorts->current_room_assignment_id) {
+                $oldAssignment = \App\Models\RoomAssignment::find($escorts->current_room_assignment_id);
+                if ($oldAssignment) {
+                    
+                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                                ->where('room_number', $oldAssignment->room_number)
+                                                ->where('active_status', 1)
+                                                ->count();
+                        if ($alreadyAssignedCount <= 1) {
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
+                    }
+
+                    $oldAssignment->active_status = 0;
+                    $oldAssignment->save();
+                }
+                $escorts->current_room_assignment_id = null;
+                $escorts->save();
+            }
+        }
+
+        foreach ($delegation->drivers as $drivers) {
+            if ($drivers->current_room_assignment_id) {
+                $oldAssignment = \App\Models\RoomAssignment::find($drivers->current_room_assignment_id);
+                if ($oldAssignment) {
+                    
+                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                                ->where('room_number', $oldAssignment->room_number)
+                                                ->where('active_status', 1)
+                                                ->count();
+                        if ($alreadyAssignedCount <= 1) {
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
+                    }
+
+                    $oldAssignment->active_status = 0;
+                    $oldAssignment->save();
+                }
+                $drivers->current_room_assignment_id = null;
+                $drivers->save();
+            }
+        }
     }
 
     public function destroyAttachment($id)
@@ -1721,8 +1801,15 @@ class DelegationController extends Controller
                         if ($oldAssignment) {
                             $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
                             if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                                $oldRoom->save();
+                                $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                    ->where('room_type_id', $oldAssignment->room_type_id)
+                                    ->where('room_number', $oldAssignment->room_number)
+                                    ->where('active_status', 1)
+                                    ->count();
+                                if ($alreadyAssignedCount <= 1) {
+                                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                    $oldRoom->save();
+                                }
                             }
 
                             $oldAssignment->active_status = 0;
@@ -1796,16 +1883,26 @@ class DelegationController extends Controller
 
                 if ($oldAssignment) {
                     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+              
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                        $oldRoom->save();
+                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                            ->where('room_type_id', $oldAssignment->room_type_id)
+                            ->where('room_number', $oldAssignment->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                    
+                        if ($alreadyAssignedCount <= 1 ) {
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
                     }
-
+  
                     $oldAssignment->active_status = 0;
                     $oldAssignment->save();
                 }
             }
-
+              
+              
             $delegate->delete();
 
             $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
@@ -2360,23 +2457,9 @@ class DelegationController extends Controller
             $delegation->interviews()->delete();
             $delegation->attachments()->delete();
 
-            foreach ($delegation->delegates as $delegate) {
-                if ($delegate->current_room_assignment_id) {
-                    $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
-                    // if ($oldAssignment) {
-                    //     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                    //     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                    //         $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                    //         $oldRoom->save();
-                    //     }
-                    //     $oldAssignment->active_status = 0;
-                    //     $oldAssignment->save();
-                    // }
-                }
-                $delegate->delete();
-            }
+            $this->removeDelegationAllAccommodation($delegation);
 
-            $delegation->delete();
+           
 
             $this->logActivity(
                 module: 'Delegation',
@@ -2388,6 +2471,8 @@ class DelegationController extends Controller
                     'ar' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
                 ]
             );
+            $delegation->delegates()->delete();
+            $delegation->delete();
 
             return redirect()
                 ->route('delegations.index')

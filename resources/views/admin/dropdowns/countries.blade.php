@@ -45,13 +45,13 @@
                         <div class="flex">
                             <input type="text" name="search"
                                 class="block w-[35%] p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg"
-                                placeholder="Search" value="{{ request('search') }}">
+                                placeholder="{{ __db('search') }}" value="{{ request('search') }}">
                             
                             <select name="status" class="block w-[35%] mr-2 p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg">
-                                <option value="">Select Status</option>
-                                <option value="1" {{ request()->status == 1 ? 'selected' : '' }}>Active
+                                <option value="">{{ __db('select') }}</option>
+                                <option value="1" {{ request()->status == 1 ? 'selected' : '' }}>{{ __db('active') }}
                                 </option>
-                                <option value="2" {{ request()->status == 2 ? 'selected' : '' }}>Inactive
+                                <option value="2" {{ request()->status == 2 ? 'selected' : '' }}>{{ __db('inactive') }}
                                 </option>
                             </select>
                         </div>
@@ -60,7 +60,7 @@
                             <a href="{{ route('dropdowns.countries') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                 Reset</a>
                        
-                            <button type="submit" class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+                            <button type="submit" class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
                         </div>
                     </div>
                 </form>
@@ -68,12 +68,12 @@
             <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                 <thead>
                     <tr class="text-[13px]">
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Name</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Name (Arabic)</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Sort Order</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Status</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">Action</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('sl_no') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name_ar') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('sort_order') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('status') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -117,45 +117,45 @@
                                 <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
                                  
 
-                                    <h2 class="text-xl font-semibold mb-4">Edit Country</h2>
+                                    <h2 class="text-xl font-semibold mb-4">{{ __db('edit') }} {{ __db('country') }}</h2>
 
                                     <form class="" method="POST" action="{{ route('dropdowns.options.update', $country) }}">
                                         @csrf
                                         @method('PUT')
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Value</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value') }}</label>
                                             <input type="text" name="value" value="{{ $country->value }}" required
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Value (Arabic)</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('value_ar') }}</label>
                                             <input type="text" name="value_ar" value="{{ $country->value_ar }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Code</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('code') }}</label>
                                             <input type="text" name="code" value="{{ $country->code }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Sort Order</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('sort_order') }}</label>
                                             <input type="number" name="sort_order" value="{{ $country->sort_order ?? 0 }}"
                                                 class="w-full border border-gray-300 rounded p-2">
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">Status</label>
+                                            <label class="block mb-2 text-sm font-medium text-gray-900 ">{{ __db('status') }}</label>
                                             <select name="status" class="w-full border border-gray-300 rounded p-2">
-                                                <option value="1" {{ $country->status ? 'selected' : '' }}>Active</option>
-                                                <option value="0" {{ !$country->status ? 'selected' : '' }}>Inactive</option>
+                                                <option value="1" {{ $country->status ? 'selected' : '' }}>{{ __db('active') }}</option>
+                                                <option value="0" {{ !$country->status ? 'selected' : '' }}>{{ __db('inactive') }}</option>
                                             </select>
                                         </div>
 
                                         <div class="flex justify-start space-x-2 pt-4">
                                             <button type="submit"
                                                 class="btn text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12 ml-2">
-                                                Update
+                                                {{ __db('update') }}
                                             </button>
-                                            <button type="button" data-modal-hide="edit-country-{{ $country->id }}" class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">Cancel</button>
+                                            <button type="button" data-modal-hide="edit-country-{{ $country->id }}" class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">{{ __db('cancel') }}</button>
                                         </div>
                                     </form>
                                 </div>
@@ -165,7 +165,7 @@
                     @empty
                         <tr class="odd:bg-[#F9F7ED] text-sm align-[middle]">
                             <td class="px-4 py-3 text-center " colspan="7" dir="ltr">
-                                No data found
+                                {{ __db('no_data_found') }}
                             </td>
                         </tr>
                     @endforelse
@@ -182,23 +182,23 @@
                     <button type="button" data-modal-hide="add-country"
                         class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
-                    <h2 class="text-xl font-semibold mb-4">Add New Country</h2>
+                    <h2 class="text-xl font-semibold mb-4">{{ __db('add_new_country') }}</h2>
 
                     <form method="POST" action="{{ route('dropdowns.countries.store') }}">
                         @csrf
 
-                        <label class="block mb-2 font-medium">Value</label>
+                        <label class="block mb-2 font-medium">{{ __db('value') }}</label>
                         <input type="text" name="value" required class="w-full border p-2 rounded mb-4">
 
-                        <label class="block mb-2 font-medium">Value (Arabic)</label>
+                        <label class="block mb-2 font-medium">{{ __db('value_ar') }}</label>
                         <input type="text" name="value_ar" class="w-full border p-2 rounded mb-4">
 
-                        <label class="block mb-2 font-medium">Code</label>
+                        <label class="block mb-2 font-medium">{{ __db('code') }}</label>
                         <input type="text" name="code" class="w-full border p-2 rounded mb-4">
 
                         <div class="text-right">
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                Add Country
+                                {{ __db('add') }} {{ __db('country') }}
                             </button>
                         </div>
                     </form>

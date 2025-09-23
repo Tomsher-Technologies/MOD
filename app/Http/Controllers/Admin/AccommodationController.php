@@ -492,7 +492,7 @@ class AccommodationController extends Controller
                             ->where('room_number', $oldAssignment->room_number)
                             ->where('active_status', 1)
                             ->count();
-                        if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number))) {
+                        if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
                             $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                             $oldRoom->save();
                         }
@@ -760,23 +760,22 @@ class AccommodationController extends Controller
                     $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
                     $newRoom->save();
                 }
-            } else {
-                if ($externalMember) {
-                    $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
-                            ->where('room_type_id', $externalMember->room_type_id)
-                            ->where('room_number', $externalMember->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1 && ((strtolower($externalMember->hotel_id) != strtolower($request->hotel_id)) || (strtolower($externalMember->room_type_id) != strtolower($request->room_type)) || (strtolower($externalMember->room_number) != strtolower($request->room_number)))) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                            $oldRoom->save();
-                        }
+            }
+
+            if ($externalMember && ((($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id == $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) == strtolower($request->room_number))) )  ) {
+                $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
+                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                        ->where('room_type_id', $externalMember->room_type_id)
+                        ->where('room_number', $externalMember->room_number)
+                        ->where('active_status', 1)
+                        ->count();
+                    if ($alreadyAssignedCount <= 1 && ((strtolower($externalMember->hotel_id) != strtolower($request->hotel_id)) || (strtolower($externalMember->room_type_id) != strtolower($request->room_type)) || (strtolower($externalMember->room_number) != strtolower($request->room_number)))) {
+                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        $oldRoom->save();
                     }
                 }
             }
-
             $externalMember->active_status = 0;
             $externalMember->save();
 

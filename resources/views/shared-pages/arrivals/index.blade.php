@@ -301,7 +301,7 @@
 
                     <div class="flex items-center gap-2">
                         <div class="h-5 w-5 bg-[#ffc5c5] rounded border"></div>
-                        <span class="text-gray-800 text-sm">{{ __db('to_be_arrived_within_1_hour)') }}</span>
+                        <span class="text-gray-800 text-sm">{{ __db('to_be_arrived_within_1_hour') }}</span>
                     </div>
                 </div>
             </div>
