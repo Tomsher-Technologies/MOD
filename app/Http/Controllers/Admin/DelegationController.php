@@ -705,7 +705,7 @@ class DelegationController extends Controller
                 }
             }
 
-            return response()->json(['status' => 'success', 'message' => 'Record updated successfully.', 'redirect_url' => route('delegations.edit', $transports->first()->delegate->delegation_id ?? $transport->delegate->delegation_id)]);
+            return response()->json(['status' => 'success', 'message' => __db('updated_successfully'), 'redirect_url' => route('delegations.edit', $transports->first()->delegate->delegation_id ?? $transport->delegate->delegation_id)]);
         } catch (\Throwable $e) {
             Log::error('Travel update failed: ' . $e->getMessage(), [
                 'user_id' => auth()->id(),
@@ -714,7 +714,7 @@ class DelegationController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
-            return response()->json(['success' => false, 'message' => 'Failed to update record.'], 500);
+            return response()->json(['success' => false, 'message' => __db('failed_to_update')], 500);
         }
     }
 
@@ -806,7 +806,7 @@ class DelegationController extends Controller
     public function editInterview(Delegation $delegation, Interview $interview)
     {
         if ($interview->delegation_id !== $delegation->id) {
-            abort(404, 'Interview not found for this delegation.');
+            abort(404, __db('interview_not_found'));
         }
 
         $currentEventId = session('current_event_id', getDefaultEventId());
@@ -965,7 +965,7 @@ class DelegationController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
-            return back()->withErrors(['error' => 'Failed to create delegation. Please check all required fields and try again.'])->withInput();
+            return back()->withErrors(['error' => __db('failed_to_update')])->withInput();
         }
     }
 
@@ -1087,7 +1087,7 @@ class DelegationController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Delegation updated successfully.',
+                'message' => __db('updated_successfully'),
                 'redirect_url' => route('delegations.edit', $delegation->id),
             ]);
         } catch (\Throwable $e) {
@@ -1100,7 +1100,7 @@ class DelegationController extends Controller
                 'line' => $e->getLine()
             ]);
 
-            return back()->withErrors(['error' => 'Failed to update delegation. Please check all required fields and try again.'])->withInput();
+            return back()->withErrors(['error' => __db('failed_to_update')])->withInput();
         }
     }
 
@@ -1171,7 +1171,7 @@ class DelegationController extends Controller
 
         return redirect()
             ->route('delegations.edit', $delegationId)
-            ->with('success', __db('attachments_updated_successfully'));
+            ->with('success', __db('updated_successfully'));
     }
 
     public function destroyAttachment($id)
@@ -1194,7 +1194,7 @@ class DelegationController extends Controller
 
         $attachment->delete();
 
-        return redirect()->back()->with('success', __db('attachment_deleted_successfully'));
+        return redirect()->back()->with('success', __db('deleted_successfully'));
     }
 
     public function storeTravel(Request $request, $delegationId)
@@ -1288,20 +1288,18 @@ class DelegationController extends Controller
 
             return redirect()
                 ->route('delegations.show', $delegationId)
-                ->with('success', __db('travel_details_assigned_successfully'));
+                ->with('success', __db('updated_successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
 
             return back()
-                ->withErrors(['error' => 'Failed to save travel details: ' . $e->getMessage()])
+                ->withErrors(['error' => __db('failed_to_update') . $e->getMessage()])
                 ->withInput();
         }
     }
 
     public function storeOrUpdateInterview(Request $request, Delegation $delegation, Interview $interview = null)
     {
-
-
         $isEditMode = $interview && $interview->exists;
 
         $validator = Validator::make($request->all(), [
@@ -1335,7 +1333,7 @@ class DelegationController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'The given data was invalid.', 'errors' => $validator->errors()], 422);
+            return response()->json(['message' => __db('failed_to_update'), 'errors' => $validator->errors()], 422);
         }
 
         $validated = $validator->validated();
@@ -1396,13 +1394,13 @@ class DelegationController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => __db('interview_created_successfully'),
+                    'message' => __db('created_successfully'),
                     'redirect_url' => route('delegations.edit', $delegation->id)
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Interview Create Failed: ' . $e->getMessage());
-                return response()->json(['message' => 'Error creating interview.', 'errors' => [$e->getMessage()]], 500);
+                return response()->json(['message' => __db('failed_to_update'), 'errors' => [$e->getMessage()]], 500);
             }
         }
 
@@ -1581,7 +1579,7 @@ class DelegationController extends Controller
         });
 
         if ($validator->fails()) {
-            return response()->json(['message' => 'The given data was invalid.', 'errors' => $validator->errors()], 422);
+            return response()->json(['message' => __db('failed_to_update'), 'errors' => $validator->errors()], 422);
         }
 
         $validated = $validator->validated();
@@ -1616,13 +1614,13 @@ class DelegationController extends Controller
 
                 return response()->json([
                     'status' => 'success',
-                    'message' => __db('delegate_created_successfully'),
+                    'message' => __db('created_successfully'),
                     'redirect_url' => route('delegations.edit', $delegation->id)
                 ]);
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Delegate Create Failed: ' . $e->getMessage() . ' on line ' . $e->getLine());
-                return response()->json(['message' => 'A critical error occurred while creating the delegate.'], 500);
+                return response()->json(['message' => __db('failed_to_create')], 500);
             }
         }
 
@@ -1757,14 +1755,14 @@ class DelegationController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Delegate updated successfully.',
+                'message' => __db('updated_successfully'),
                 'redirect_url' => route('delegations.edit', $delegation->id),
                 'fields_to_notify' => $fieldsToNotify
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Delegate Save/Update Failed: ' . $e->getMessage() . ' on line ' . $e->getLine());
-            return response()->json(['message' => 'A critical error occurred while saving.'], 500);
+            return response()->json(['message' => __db('failed_to_update')], 500);
         }
     }
 
@@ -1802,11 +1800,10 @@ class DelegationController extends Controller
 
             return redirect()
                 ->route('delegations.edit', $delegation->id)
-                ->with('success', 'Delegate has been deleted successfully.');
+                ->with('success', __db('deleted_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegate Deletion Failed: ' . $e->getMessage());
-
-            return back()->with('error', 'An error occurred while deleting the delegate.');
+            return back()->with('error', __db('failed_to_update'));
         }
     }
 
@@ -1829,13 +1826,13 @@ class DelegationController extends Controller
 
             return redirect()
                 ->route('delegations.show', $delegationId)
-                ->with('success', 'Interview deleted successfully.');
+                ->with('success', __db('deleted_successfully'));
         } catch (\Exception $e) {
             Log::error('Interview Delete Failed: ' . $e->getMessage());
 
             return redirect()
                 ->route('delegations.show', $interview->delegation_id)
-                ->with('error', 'Failed to delete interview.');
+                ->with('error', __db('failed_to_delete'));
         }
     }
 
@@ -2102,13 +2099,13 @@ class DelegationController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => __db('badge_printed_status_updated_successfully')
+                'message' => __db('updated_successfully')
             ]);
         } catch (\Exception $e) {
             Log::error('Badge Printed Status Update Failed: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => __db('badge_printed_status_update_failed')
+                'message' => __db('failed_to_update')
             ], 500);
         }
     }
@@ -2381,11 +2378,11 @@ class DelegationController extends Controller
 
             return redirect()
                 ->route('delegations.index')
-                ->with('success', __db('delegation_deleted_successfully'));
+                ->with('success', __db('deleted_successfully'));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Delegation Deletion Failed: ' . $e->getMessage());
 
-            return back()->with('error', 'An error occurred while deleting the delegation.');
+            return back()->with('error', __db('failed_to_delete'));
         }
     }
     public function importAttachments(Request $request)
@@ -2398,12 +2395,12 @@ class DelegationController extends Controller
             Excel::import(new DelegationAttachmentImport, $request->file('file'));
 
             return redirect()->route('delegations.index')
-                ->with('success', __db('attachments_imported_successfully'));
+                ->with('success', __db('imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Attachment Import Error: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', __db('attachment_import_failed') . ': ' . $e->getMessage())
+                ->with('error', __db('import_failed') . ': ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -2424,11 +2421,11 @@ class DelegationController extends Controller
             Excel::import(new DelegationOnlyImport($fileName), $request->file('file'));
 
             return redirect()->route('admin.import-logs.index', ['import_type' => 'delegations'])
-                ->with('success', __db('delegations_only_imported_successfully'));
+                ->with('success', __db('imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
             return back()
-                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage());
+                ->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
     }
 
