@@ -427,6 +427,11 @@ trait HandlesUpdateConfirmation
             ->pluck('user')
             ->unique('id');
 
+        $adminOrStaffUsers = \App\Models\User::whereIn('user_type', ['admin', 'staff'])
+            ->get();
+
+        $users = $users->merge($adminOrStaffUsers)->unique('id');
+
         foreach ($users as $user) {
             $user->notify(new \App\Notifications\CommonNotification($notificationData));
         }

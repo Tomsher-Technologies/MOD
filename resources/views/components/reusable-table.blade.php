@@ -7,20 +7,13 @@
     'enableColumnListBtn' => false,
     'tableId' => 'table',
     'defaultVisibleKeys' => [],
-    'loading' => false,
 ])
 
 @php
     $columns = collect($columns)
-        ->map(function ($column, $index) {
-            // Reduce first column width (index 0) to narrow fixed width if desired
+        ->map(function ($column) {
             if (!isset($column['key'])) {
                 $column['key'] = \Illuminate\Support\Str::slug($column['label']);
-            }
-            if ($index === 0) {
-                $column['narrow'] = true;
-            } else {
-                $column['narrow'] = false;
             }
             return $column;
         })
@@ -30,12 +23,11 @@
     $modalId = $tableId . '-column-visibility-modal';
 @endphp
 
-
 @if ($enableColumnListBtn || $enableRowLimit)
-    <div class="mb-2 flex items-center justify-between flex-wrap gap-2">
+    <div class="mb-2 flex items-center justify-between">
         @if ($enableColumnListBtn)
             <button data-modal-target="{{ $modalId }}" data-modal-toggle="{{ $modalId }}" type="button"
-                class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg whitespace-nowrap">
+                class="!bg-[#E6D7A2] !text-[#5D471D] px-3 flex items-center gap-2 py-2 text-sm rounded-lg">
                 <svg class="w-6 h-6 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                     height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -49,7 +41,7 @@
             ($data instanceof \Illuminate\Contracts\Pagination\Paginator ||
                 $data instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) &&
                 $enableRowLimit)
-            <form method="GET" class="flex items-center gap-2">
+            <form method="GET">
                 @foreach (request()->except('limit', 'page') as $key => $value)
                     @if (is_array($value))
                         @foreach ($value as $subKey => $subValue)
@@ -61,105 +53,88 @@
                     @endif
                 @endforeach
                 <select id="limit" name="limit" onchange="this.form.submit()"
-                    class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-3 py-1 !pe-7">
+                    class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
                     @foreach ([10, 25, 50, 100] as $size)
                         <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
                             {{ $size }}
                         </option>
                     @endforeach
                 </select>
-                <span class="mr-2 text-sm whitespace-nowrap">{{ __db('rows') }}</span>
+                <span class="mr-2 text-sm">{{ __db('rows') }}</span>
             </form>
         @endif
     </div>
 @endif
 
-
-<div class="overflow-x-auto w-full rounded-lg border border-[#e5e4b2]">
-    <table class="table-auto w-full border-collapse mb-0 border border-[#e5e4b2]" id="{{ $tableId }}">
-        <thead class="bg-[#B68A35] sticky top-0 z-10 shadow-md">
-            <tr class="text-[13px] text-white select-none">
-                @foreach ($columns as $column)
-                    @php
-                        $permissionKey = $column['permission'] ?? null;
-                        $colPermissions = $permissionKey
-                            ? (is_array($permissionKey) ? $permissionKey : [$permissionKey])
-                            : null;
-                        $thClasses = $column['narrow'] ? 'w-14 max-w-[56px]' : '';
-                    @endphp
-                    @if (!$colPermissions || can($colPermissions))
-                        <th scope="col"
-                            class="p-3 border border-[#cbac71] text-start font-semibold tracking-wide {{ $column['class'] ?? '' }} {{ $thClasses }}"
-                            data-column-key="{{ $column['key'] }}">
-                            {{ $column['label'] }}
-                        </th>
-                    @endif
-                @endforeach
+<table class="table-auto mb-0 !border-[#F9F7ED] w-full hidden" id="{{ $tableId }}">
+    <thead>
+        <tr class="text-[13px]">
+            @foreach ($columns as $column)
+                @php
+                    $permissionKey = $column['permission'] ?? null;
+                    $colPermissions = $permissionKey
+                        ? (is_array($permissionKey)
+                            ? $permissionKey
+                            : [$permissionKey])
+                        : null;
+                @endphp
+                @if (!$colPermissions || can($colPermissions))
+                    <th scope="col"
+                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
+                        data-column-key="{{ $column['key'] }}">
+                        {{ $column['label'] }}
+                    </th>
+                @endif
+            @endforeach
+        </tr>
+    </thead>
+    <tbody>
+        @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+            <tr>
+                <td class="px-4 py-2 border border-gray-200 text-center" colspan="{{ count($columns) }}">
+                    {{ $noDataMessage ?? 'No data found.' }}
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @if($loading)
-                {{-- Skeleton loading rows --}}
-                @foreach(range(1, request('limit', 10)) as $i)
-                    <tr class="animate-pulse">
+        @else
+            @foreach ($data as $key => $row)
+                @php
+                    $rowId = is_array($row) ? $row['id'] ?? '' : $row->id ?? '';
+
+                    $rowPermissionsKey = is_array($row) ? $row['permission'] ?? null : $row->permission ?? null;
+                    $rowPermissions = $rowPermissionsKey
+                        ? (is_array($rowPermissionsKey)
+                            ? $rowPermissionsKey
+                            : [$rowPermissionsKey])
+                        : null;
+                @endphp
+                @if (!$rowPermissions || can($rowPermissions))
+                    <tr class="text-[12px] align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                        data-id="{{ $rowId }}">
                         @foreach ($columns as $column)
                             @php
-                                $permissionKey = $column['permission'] ?? null;
-                                $colPermissions = $permissionKey
-                                    ? (is_array($permissionKey) ? $permissionKey : [$permissionKey])
+                                $colPermissionKey = $column['permission'] ?? null;
+                                $colPermissions = $colPermissionKey
+                                    ? (is_array($colPermissionKey)
+                                        ? $colPermissionKey
+                                        : [$colPermissionKey])
                                     : null;
-                                $tdClasses = $column['narrow'] ? 'w-14 max-w-[56px]' : '';
                             @endphp
                             @if (!$colPermissions || can($colPermissions))
-                                <td class="px-4 py-2 border border-gray-200 {{ $tdClasses }}">
-                                    <div class="h-4 bg-gray-300 rounded"></div>
+                                <td class="px-4 py-2 border {{ $rowClass ? $rowClass($row) : 'border-gray-200' }}"
+                                    data-column-key="{{ $column['key'] }}">
+                                    {!! $column['render']($row, $key) !!}
                                 </td>
                             @endif
                         @endforeach
                     </tr>
-                @endforeach
-            @elseif ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
-                <tr>
-                    <td class="px-4 py-2 border border-gray-200 text-center italic" colspan="{{ count($columns) }}">
-                        {{ $noDataMessage ?? 'No data found.' }}
-                    </td>
-                </tr>
-            @else
-                @foreach ($data as $key => $row)
-                    @php
-                        $rowId = is_array($row) ? ($row['id'] ?? '') : ($row->id ?? '');
-                        $rowPermissionsKey = is_array($row) ? ($row['permission'] ?? null) : ($row->permission ?? null);
-                        $rowPermissions = $rowPermissionsKey
-                            ? (is_array($rowPermissionsKey) ? $rowPermissionsKey : [$rowPermissionsKey])
-                            : null;
-                        $rowClassValue = $rowClass ? $rowClass($row) : '';
-                    @endphp
-                    @if (!$rowPermissions || can($rowPermissions))
-                        <tr class="text-[12px] align-middle hover:bg-[#f1e9a2] cursor-pointer {{ $rowClassValue }}"
-                            data-id="{{ $rowId }}">
-                            @foreach ($columns as $column)
-                                @php
-                                    $colPermissionKey = $column['permission'] ?? null;
-                                    $colPermissions = $colPermissionKey
-                                        ? (is_array($colPermissionKey) ? $colPermissionKey : [$colPermissionKey])
-                                        : null;
-                                    $tdClasses = $column['narrow'] ? 'w-14 max-w-[56px]' : '';
-                                @endphp
-                                @if (!$colPermissions || can($colPermissions))
-                                    <td class="px-4 py-2 border border-gray-200 break-words whitespace-normal max-w-[200px] {{ $tdClasses }}"
-                                        data-column-key="{{ $column['key'] }}"
-                                        style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                        {!! $column['render']($row, $key) !!}
-                                    </td>
-                                @endif
-                            @endforeach
-                        </tr>
-                    @endif
-                @endforeach
-            @endif
-        </tbody>
-    </table>
-</div>
+                @endif
+            @endforeach
+        @endif
+    </tbody>
+
+
+
+</table>
 
 @if (
     $data instanceof \Illuminate\Contracts\Pagination\Paginator ||
@@ -169,40 +144,40 @@
     </div>
 @endif
 
-
 <div id="{{ $modalId }}" tabindex="-1" aria-hidden="true"
-     class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
-  <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
-    <div class="flex items-center justify-between p-4 border-b rounded-t bg-gray-50">
-      <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
-      <button type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-              data-modal-hide="{{ $modalId }}" aria-label="Close modal">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-2xl mx-auto">
+        <div class="bg-white rounded-lg shadow">
+            <div class="flex items-start justify-between p-4 border-b rounded-t">
+                <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
+                <button type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
+                    data-modal-hide="{{ $modalId }}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="space-y-3 grid grid-cols-3" id="{{ $tableId }}-column-toggles">
+                    @foreach ($columns as $column)
+                        @php
+                            $isActionColumn = in_array($column['key'], ['action', 'actions']);
+                        @endphp
+                        @if (!$isActionColumn)
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox me-2"
+                                    value="{{ $column['key'] }}" checked>
+                                <span>{{ $column['label'] }}</span>
+                            </label>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="p-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="{{ $tableId }}-column-toggles">
-        @foreach ($columns as $column)
-          @php
-            $isActionColumn = in_array($column['key'], ['action', 'actions']);
-          @endphp
-          @if (!$isActionColumn)
-            <label class="flex items-center space-x-3 cursor-pointer select-none">
-              <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox"
-                     value="{{ $column['key'] }}" checked>
-              <span class="text-gray-800">{{ $column['label'] }}</span>
-            </label>
-          @endif
-        @endforeach
-      </div>
-    </div>
-  </div>
 </div>
-
 
 @push('scripts')
     <script>
@@ -211,12 +186,27 @@
             const storageKey = @json($storageKey);
             const tableId = @json($tableId);
             const modalId = @json($modalId);
+            const enableColumnListBtn = @json($enableColumnListBtn);
 
             document.addEventListener('DOMContentLoaded', function() {
                 const columnTogglesContainer = document.getElementById(tableId + '-column-toggles');
                 if (!columnTogglesContainer) return;
 
                 const checkboxes = columnTogglesContainer.querySelectorAll('.column-toggle-checkbox');
+
+                if (!enableColumnListBtn) {
+                    const table = document.getElementById(tableId);
+
+                    document.querySelectorAll(`#${tableId} th, #${tableId} td`).forEach(el => {
+                        el.style.display = '';
+                    });
+
+                    if (table) {
+                        table.classList.remove('hidden');
+                    }
+
+                    return;
+                }
 
                 const applyVisibility = () => {
                     let preferences = {};
@@ -258,6 +248,7 @@
                             checkbox.checked = true;
                         });
                     }
+
 
                     // Always show action columns
                     document.querySelectorAll(

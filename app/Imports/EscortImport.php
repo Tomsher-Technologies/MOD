@@ -9,122 +9,136 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use App\Http\Traits\HandlesUpdateConfirmation;
+use App\Services\ImportLogService;
+use Illuminate\Support\Facades\Log;
 
 class EscortImport implements ToCollection, WithHeadingRow
 {
     use HandlesUpdateConfirmation;
 
+    protected $importLogService;
+    protected $fileName;
+
+    public function __construct($fileName = 'escorts.xlsx')
+    {
+        $this->importLogService = new ImportLogService();
+        $this->fileName = $fileName;
+        $this->importLogService->clearLogs('escorts');
+    }
+
     public function collection(Collection $rows)
     {
+        $rowNumber = 1; 
+        
         foreach ($rows as $row) {
-            // $existingEscort = Escort::where('code', trim($row['code']))
-            //                     ->first();
+            $rowNumber++;
+            
+            try {
+                // $existingEscort = Escort::where('code', trim($row['code']))
+                //                     ->first();
 
-            $escortData = [
-                'name_en' => trim($row['name_en']) ?? null,
-                'name_ar' => trim($row['name_ar']) ?? null,
-                'military_number' => trim($row['military_number']) ?? null,
-                'phone_number' => trim($row['phone_number']) ?? null,
-                'email' => trim($row['email']) ?? null,
-                'title_en' => trim($row['title_en']) ?? null,
-                'title_ar' => trim($row['title_ar']) ?? null,
-                'status' => $row['status'] ?? 1,
-            ];
+                $escortData = [
+                    'name_en' => trim($row['name_en']) ?? null,
+                    'name_ar' => trim($row['name_ar']) ?? null,
+                    'military_number' => trim($row['military_number']) ?? null,
+                    'phone_number' => trim($row['phone_number']) ?? null,
+                    'email' => trim($row['email']) ?? null,
+                    'title_en' => trim($row['title_en']) ?? null,
+                    'title_ar' => trim($row['title_ar']) ?? null,
+                    'status' => 1,
+                ];
 
-            if (!empty($row['gender_id'])) {
-                $gender = DropdownOption::whereHas('dropdown', function ($q) {
-                    $q->where('code', 'gender');
-                })->where('id', trim($row['gender_id']))->first();
+                if (!empty($row['gender_id'])) {
+                    $gender = DropdownOption::whereHas('dropdown', function ($q) {
+                        $q->where('code', 'gender');
+                    })->where('id', trim($row['gender_id']))->first();
 
-                if ($gender) {
-                    $escortData['gender_id'] = $gender->id;
-                }
-            }
-
-            if (!empty($row['nationality_id'])) {
-                $nationality = DropdownOption::whereHas('dropdown', function ($q) {
-                    $q->where('code', 'nationality');
-                })->where('id', trim($row['nationality_id']))->first();
-
-                if ($nationality) {
-                    $escortData['nationality_id'] = $nationality->id;
-                }
-            }
-
-            if (!empty($row['internal_ranking_id'])) {
-                $ranking = DropdownOption::whereHas('dropdown', function ($q) {
-                    $q->where('code', 'internal_ranking');
-                })->where('id', trim($row['internal_ranking_id']))->first();
-
-                if ($ranking) {
-                    $escortData['internal_ranking_id'] = $ranking->id;
-                }
-            }
-
-            if (!empty($row['unit_id'])) {
-                $unit = DropdownOption::whereHas('dropdown', function ($q) {
-                    $q->where('code', 'unit');
-                })->where('id', trim($row['unit_id']))->first();
-
-                if ($unit) {
-                    $escortData['unit_id'] = $unit->id;
-                }
-            }
-
-            // if (!empty($row['delegation_id'])) {
-            //     $delegation = Delegation::where('id', trim($row['delegation_id']))->first();
-            //     if ($delegation) {
-            //         $escortData['delegation_id'] = $delegation->id;
-            //     }
-            // }
-
-            if (!empty($row['spoken_languages_ids'])) {
-                $languageIds = explode(',', trim($row['spoken_languages_ids']));
-                $validLanguageIds = [];
-
-                foreach ($languageIds as $languageId) {
-                    $lang = DropdownOption::whereHas('dropdown', function ($q) {
-                        $q->where('code', 'language');
-                    })->where('id', trim($languageId))->first();
-
-                    if ($lang) {
-                        $validLanguageIds[] = $lang->id;
+                    if ($gender) {
+                        $escortData['gender_id'] = $gender->id;
+                    } else {
+                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid gender_id: ' . $row['gender_id'], $row->toArray());
+                        continue;
                     }
                 }
 
-                if (!empty($validLanguageIds)) {
-                    $escortData['spoken_languages'] = implode(',', $validLanguageIds);
+                if (!empty($row['internal_ranking_id'])) {
+                    $ranking = DropdownOption::whereHas('dropdown', function ($q) {
+                        $q->where('code', 'internal_ranking');
+                    })->where('id', trim($row['internal_ranking_id']))->first();
+
+                    if ($ranking) {
+                        $escortData['internal_ranking_id'] = $ranking->id;
+                    } else {
+                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid internal_ranking_id: ' . $row['internal_ranking_id'], $row->toArray());
+                        continue;
+                    }
                 }
-            }
 
-            if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
-                $phoneNumber = preg_replace('/[^0-9]/', '', $escortData['phone_number']);
-                if (strlen($phoneNumber) === 9) {
-                    $escortData['phone_number'] = '971' . $phoneNumber;
+                if (!empty($row['unit_id'])) {
+                    $unit = DropdownOption::whereHas('dropdown', function ($q) {
+                        $q->where('code', 'unit');
+                    })->where('id', trim($row['unit_id']))->first();
+
+                    if ($unit) {
+                        $escortData['unit_id'] = $unit->id;
+                    } else {
+                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid unit_id: ' . $row['unit_id'], $row->toArray());
+                        continue;
+                    }
                 }
+
+                if (!empty($row['spoken_languages_ids'])) {
+                    $languageIds = explode(',', trim($row['spoken_languages_ids']));
+                    $validLanguageIds = [];
+
+                    foreach ($languageIds as $languageId) {
+                        $lang = DropdownOption::whereHas('dropdown', function ($q) {
+                            $q->where('code', 'language');
+                        })->where('id', trim($languageId))->first();
+
+                        if ($lang) {
+                            $validLanguageIds[] = $lang->id;
+                        }
+                    }
+
+                    if (!empty($validLanguageIds)) {
+                        $escortData['spoken_languages'] = implode(',', $validLanguageIds);
+                    }
+                }
+
+                if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
+                    $escortData['phone_number'] = $escortData['phone_number'];
+                }
+
+                // if ($existingEscort) {
+                //     $existingEscort->update($escortData);
+
+                //     $this->logActivity(
+                //         module: 'Escorts',
+                //         action: 'update-excel',
+                //         model: $existingEscort,
+                //         submodule: 'managing_members',
+                //         submoduleId: $existingEscort->id
+                //     );
+                //     
+                //     $this->importLogService->logSuccess('escorts', $this->fileName, $rowNumber, $row->toArray());
+                // } else {
+                $escort = Escort::create($escortData);
+
+                $this->logActivity(
+                    module: 'Escorts',
+                    action: 'create-excel',
+                    model: $escort,
+                    submodule: 'managing_members',
+                    submoduleId: $escort->id
+                );
+                
+                $this->importLogService->logSuccess('escorts', $this->fileName, $rowNumber, $row->toArray());
+                // }
+            } catch (\Exception $e) {
+                Log::error('Escort Import Error: ' . $e->getMessage());
+                $this->importLogService->logError('escorts', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
             }
-
-            // if ($existingEscort) {
-            //     $existingEscort->update($escortData);
-
-            //     $this->logActivity(
-            //         module: 'Escorts',
-            //         action: 'update-excel',
-            //         model: $existingEscort,
-            //         submodule: 'managing_members',
-            //         submoduleId: $existingEscort->id
-            //     );
-            // } else {
-            $escort = Escort::create($escortData);
-
-            $this->logActivity(
-                module: 'Escorts',
-                action: 'create-excel',
-                model: $escort,
-                submodule: 'managing_members',
-                submoduleId: $escort->id
-            );
-            // }
         }
     }
 }

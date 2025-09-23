@@ -11,17 +11,20 @@
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-                @if(isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort')
+                @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort')
                     <div class="mb-4 p-4 bg-[#E6D7A2] rounded-lg">
                         <h3 class="font-semibold text-lg">{{ __db('assigning_escort_to_delegation') }}</h3>
-                        @if(isset($assignmentDelegation))
+                        @if (isset($assignmentDelegation))
                             <div class="mt-2 pt-2 ">
-                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong> {{ $assignmentDelegation->code }}</p>
-                                @if($assignmentDelegation->country)
-                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong> {{ $assignmentDelegation->country->name }}</p>
+                                <p class="text-sm"><strong>{{ __db('delegation') }}:</strong>
+                                    {{ $assignmentDelegation->code }}</p>
+                                @if ($assignmentDelegation->country)
+                                    <p class="text-sm"><strong>{{ __db('country') }}:</strong>
+                                        {{ $assignmentDelegation->country->name }}</p>
                                 @endif
-                                @if($assignmentDelegation->continent)
-                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong> {{ $assignmentDelegation->continent->value }}</p>
+                                @if ($assignmentDelegation->continent)
+                                    <p class="text-sm"><strong>{{ __db('continent') }}:</strong>
+                                        {{ $assignmentDelegation->continent->value }}</p>
                                 @endif
                             </div>
                         @endif
@@ -44,10 +47,10 @@
                             </div>
                             <input type="search" id="default-search" name="search"
                                 class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
-                                placeholder="{{ __db('escort_search_placeholder') }}"
+                                placeholder="Search by Military Number, Name, Mobile Number"
                                 value="{{ request('search') }}" />
                             <button type="submit"
-                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
+                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
                         </div>
                     </form>
 
@@ -162,7 +165,7 @@
                             'key' => 'actions',
                             'render' => function ($escort) use ($delegationId, $assignmentMode) {
                                 $editUrl = route('escorts.edit', $escort->id);
-                                 $output = '<div class="flex items-center gap-4 flex-wrap justify-start">';
+                                $output = '<div class="flex align-center gap-4">';
                                 if (can(['edit_escorts', 'escort_edit_escorts'])) {
                                     $output .=
                                         '<a href="' .
@@ -210,7 +213,7 @@
                                                         csrf_field() .
                                                         '<input type="hidden" name="delegation_id" value="' .
                                                         $delegation->id .
-                                                        '" /><button type="submit" class="unassign-btn !bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> '.__db('unassign_form').' ' .
+                                                        '" /><button type="submit" class="unassign-btn !bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Unassign from ' .
                                                         e($delegation->code) .
                                                         '</span></button></form>';
                                                 }
@@ -221,7 +224,7 @@
                                                 $output .=
                                                     '<a href="' .
                                                     $assignUrl .
-                                                    '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> '.__db('assign').'</span></a>';
+                                                    '" class="!bg-[#E6D7A2] !text-[#5D471D] px-3 text-[10px] flex items-center gap-2 py-1 rounded-lg me-auto"><svg class="w-5 h-5 !text-[#5D471D]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg><span> Assign</span></a>';
                                             }
                                         }
                                     }
@@ -262,29 +265,37 @@
     </button>
 
     <form action="{{ route('escorts.index') }}" method="GET">
-        @if(isset($delegationId) && isset($assignmentMode))
+        @if (isset($delegationId) && isset($assignmentMode))
             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
         @endif
         <div class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select name="title_en" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('choose_option') }}">
+                <select multiple name="title_en[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select_title_en') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleEns as $titleEn)
-                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>{{ $titleEn }}</option>
+                        <option value="{{ $titleEn }}" @if (is_array(request('title_en', [])) && in_array($titleEn, request('title_en', []))) selected @endif>
+                            {{ $titleEn }}</option>
                     @endforeach
                 </select>
             </div>
+
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select name="title_ar" class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('choose_option') }}">
+                <select multiple name="title_ar[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select_title_ar') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleArs as $titleAr)
-                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>{{ $titleAr }}</option>
+                        <option value="{{ $titleAr }}" @if (is_array(request('title_ar', [])) && in_array($titleAr, request('title_ar', []))) selected @endif>
+                            {{ $titleAr }}</option>
                     @endforeach
                 </select>
             </div>
+            
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('gender') }}</label>
                 <select name="gender_id[]" multiple data-placeholder="{{ __db('select_genders') }}"
@@ -319,9 +330,9 @@
         </div>
         <div class="grid grid-cols-2 gap-4 mt-6">
             <a href="{{ route('escorts.index', isset($delegationId) && isset($assignmentMode) ? ['delegation_id' => $delegationId, 'assignment_mode' => $assignmentMode] : []) }}"
-                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">{{ __db('reset') }}</a>
+                class="px-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100">Reset</a>
             <button type="submit"
-                class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">{{ __db('filter') }}</button>
+                class="justify-center inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]">Filter</button>
         </div>
     </form>
 </div>
@@ -355,6 +366,9 @@
         </div>
     </div>
 </div>
+
+
+
 
 @push('scripts')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

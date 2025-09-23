@@ -35,10 +35,11 @@
                     @endforelse
                 </div>
 
+
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-lg font-bold mb-4">{{ __db('change_password') }}</h2>
 
-                    @if(session('success'))
+                    @if (session('success'))
                         <div class="bg-green-100 text-green-800 p-3 rounded mb-4">{{ session('success') }}</div>
                     @endif
 
@@ -55,27 +56,25 @@
                                         value="{{ old('current_password') }}">
 
                                     <!-- Eye Toggle -->
-                                    <button type="button" onclick="togglePassword('current_password')" 
+                                    <button type="button" onclick="togglePassword('current_password')"
                                         class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-primary-600">
                                         <!-- Default (Eye) -->
-                                        <svg id="eye_open_current_password" xmlns="http://www.w3.org/2000/svg" 
+                                        <svg id="eye_open_current_password" xmlns="http://www.w3.org/2000/svg"
                                             class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
-                                                4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274
+                                                        4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
 
                                         <!-- Hidden (Eye Slash) -->
-                                        <svg id="eye_closed_current_password" xmlns="http://www.w3.org/2000/svg" 
+                                        <svg id="eye_closed_current_password" xmlns="http://www.w3.org/2000/svg"
                                             class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 
-                                                0-8.268-2.943-9.542-7a9.956 9.956 0 012.807-4.419M6.18 
-                                                6.18A9.956 9.956 0 0112 5c4.477 0 8.268 
-                                                2.943 9.542 7a9.956 9.956 0 01-4.038 5.223M15 
-                                                12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477
+                                                        0-8.268-2.943-9.542-7a9.956 9.956 0 012.807-4.419M6.18
+                                                        6.18A9.956 9.956 0 0112 5c4.477 0 8.268
+                                                        2.943 9.542 7a9.956 9.956 0 01-4.038 5.223M15
+                                                        12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18" />
                                         </svg>
                                     </button>
                                 </div>
@@ -88,26 +87,26 @@
                             <div class="col-span-3 relative">
                                 <label class="form-label">{{ __db('password') }} </label>
                                 <div class="relative">
-                                    <input type="password" id="password" name="password" autocomplete="new-password" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('password') }}">
+                                    <input type="password" id="password" name="password" autocomplete="new-password"
+                                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                        value="{{ old('password') }}">
 
-                                    <button type="button" onclick="togglePassword('password')" 
+                                    <button type="button" onclick="togglePassword('password')"
                                         class="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-primary-600">
-                                        <svg id="eye_open_password" xmlns="http://www.w3.org/2000/svg" 
-                                            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg id="eye_open_password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 
-                                                4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274
+                                                        4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                         </svg>
-                                        <svg id="eye_closed_password" xmlns="http://www.w3.org/2000/svg" 
+                                        <svg id="eye_closed_password" xmlns="http://www.w3.org/2000/svg"
                                             class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 
-                                                0-8.268-2.943-9.542-7a9.956 9.956 0 012.807-4.419M6.18 
-                                                6.18A9.956 9.956 0 0112 5c4.477 0 8.268 
-                                                2.943 9.542 7a9.956 9.956 0 01-4.038 5.223M15 
-                                                12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477
+                                                        0-8.268-2.943-9.542-7a9.956 9.956 0 012.807-4.419M6.18
+                                                        6.18A9.956 9.956 0 0112 5c4.477 0 8.268
+                                                        2.943 9.542 7a9.956 9.956 0 01-4.038 5.223M15
+                                                        12a3 3 0 11-6 0 3 3 0 016 0zM3 3l18 18" />
                                         </svg>
                                     </button>
 
@@ -119,7 +118,9 @@
 
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('confirm_password') }} </label>
-                                <input type="text" id="password_confirmation" name="password_confirmation" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('password_confirmation') }}">
+                                <input type="text" id="password_confirmation" name="password_confirmation"
+                                    class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                    value="{{ old('password_confirmation') }}">
                                 @error('password_confirmation')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
@@ -132,28 +133,53 @@
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
 
+    @if (isset($showSystemTools) && $showSystemTools)
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-lg font-bold mb-4">{{ __db('system_tools') }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="{{ route('admin.logs') }}"
+                    class="border rounded p-4 hover:bg-gray-50 transition flex gap-2 items-center">
+                    <svg class="h-6 w-6 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>{{ __db('system_logs') }}</span>
+                </a>
+                <a href="{{ route('admin.import-logs.index') }}"
+                    class="border rounded p-4 hover:bg-gray-50 transition flex gap-2 items-center">
+                    <svg class="h-6 w-6 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                    <span>{{ __db('import_logs') }}</span>
+                </a>
+            </div>
+        </div>
+    @endif
+
 @endsection
 
 @section('script')
-<script>
-    function togglePassword(id) {
-        const input = document.getElementById(id);
-        const eyeOpen = document.getElementById("eye_open_" + id);
-        const eyeClosed = document.getElementById("eye_closed_" + id);
+    <script>
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            const eyeOpen = document.getElementById("eye_open_" + id);
+            const eyeClosed = document.getElementById("eye_closed_" + id);
 
-        if (input.type === "password") {
-            input.type = "text";
-            eyeOpen.classList.add("hidden");
-            eyeClosed.classList.remove("hidden");
-        } else {
-            input.type = "password";
-            eyeOpen.classList.remove("hidden");
-            eyeClosed.classList.add("hidden");
+            if (input.type === "password") {
+                input.type = "text";
+                eyeOpen.classList.add("hidden");
+                eyeClosed.classList.remove("hidden");
+            } else {
+                input.type = "password";
+                eyeOpen.classList.remove("hidden");
+                eyeClosed.classList.add("hidden");
+            }
         }
-    }
-</script>
+    </script>
 @endsection

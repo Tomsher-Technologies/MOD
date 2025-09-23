@@ -6,6 +6,8 @@ use App\Models\Country;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Exports\CountriesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CountryController extends Controller
 {
@@ -21,6 +23,11 @@ class CountryController extends Controller
      */
     public function index(Request $request)
     {
+        // Check if export is requested
+        if ($request->has('export') && $request->export == 'all') {
+            return $this->exportAllCountries();
+        }
+
         $query = Country::query();
 
         if ($request->filled('search')) {
@@ -48,6 +55,14 @@ class CountryController extends Controller
         // return response()->json(['ddd' => $countries]);
 
         return view('admin.countries.index', compact('countries'));
+    }
+
+    /**
+     * Export all countries to XLSX
+     */
+    public function exportAllCountries()
+    {
+        return Excel::download(new CountriesExport, 'countries_export_' . date('Y-m-d_H-i-s') . '.xlsx');
     }
 
     /**

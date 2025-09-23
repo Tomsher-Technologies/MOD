@@ -14,15 +14,21 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\ImportLogService;
 
 class DelegateImport implements ToCollection, WithHeadingRow
 {
 
     protected $delegationStatusService;
+    protected $importLogService;
+    protected $fileName;
 
-    public function __construct()
+    public function __construct($fileName = 'delegates.xlsx')
     {
         $this->delegationStatusService = new DelegationStatusService();
+        $this->importLogService = new ImportLogService();
+        $this->fileName = $fileName;
+        $this->importLogService->clearLogs('delegates');
     }
 
     use HandlesUpdateConfirmation;
@@ -33,43 +39,55 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
         try {
             $processedDelegations = [];
+            $rowNumber = 1; 
 
             foreach ($rows as $row) {
+                $rowNumber++;
+                
+                try {
+                    $delegationCode = trim($row['delegation_code'] ?? '');
 
-                $delegationCode = trim($row['delegation_code'] ?? '');
+                    if (empty($delegationCode)) {
+                        $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Missing delegation_code', $row->toArray());
+                        continue;
+                    }
 
-                if (empty($delegationCode)) {
-                    continue;
+                    $delegation = Delegation::where('code', $delegationCode)->first();
+
+                    if (!$delegation) {
+                        $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Delegation not found with code: ' . $delegationCode, $row->toArray());
+                        continue;
+                    }
+
+                    $delegateData = $this->processDelegateData($row, $delegation->id);
+
+                    $arrivalData = $this->processTransportData($row, 'arrival');
+                    $departureData = $this->processTransportData($row, 'departure');
+
+                    $delegate = Delegate::create($delegateData);
+
+                    $this->delegationStatusService->syncTransportInfo($delegate, $arrivalData, 'arrival');
+                    $this->delegationStatusService->syncTransportInfo($delegate, $departureData, 'departure');
+
+                    $this->delegationStatusService->updateAllStatus($delegate);
+
+                    $processedDelegations[$delegation->id] = $delegation;
+
+                    $this->logActivity(
+                        module: 'Delegation',
+                        submodule: 'delegate',
+                        action: 'create-excel',
+                        model: $delegate,
+                        submoduleId: $delegate->id,
+                        delegationId: $delegation->id
+                    );
+                    
+                    $this->importLogService->logSuccess('delegates', $this->fileName, $rowNumber, $row->toArray());
+                } catch (\Exception $e) {
+                    Log::error('Delegate Import Error: ' . $e->getMessage());
+                    $this->importLogService->logError('delegates', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
+
                 }
-
-                $delegation = Delegation::where('code', $delegationCode)->first();
-
-                if (!$delegation) {
-                    continue;
-                }
-
-                $delegateData = $this->processDelegateData($row, $delegation->id);
-
-                $arrivalData = $this->processTransportData($row, 'arrival');
-                $departureData = $this->processTransportData($row, 'departure');
-
-                $delegate = Delegate::create($delegateData);
-
-                $this->delegationStatusService->syncTransportInfo($delegate, $arrivalData, 'arrival');
-                $this->delegationStatusService->syncTransportInfo($delegate, $departureData, 'departure');
-
-                $this->delegationStatusService->updateAllStatus($delegate);
-
-                $processedDelegations[$delegation->id] = $delegation;
-
-                $this->logActivity(
-                    module: 'Delegation',
-                    submodule: 'delegate',
-                    action: 'create-excel',
-                    model: $delegate,
-                    submoduleId: $delegate->id,
-                    delegationId: $delegation->id
-                );
             }
 
             DB::commit();
@@ -108,6 +126,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
             if ($gender) {
                 $delegateData['gender_id'] = $gender->id;
+            } else {
+                throw new \Exception('Invalid delegate_gender_id: ' . $row['delegate_gender_id']);
             }
         }
 
@@ -118,6 +138,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
             if ($relationship) {
                 $delegateData['relationship_id'] = $relationship->id;
+            } else {
+                throw new \Exception('Invalid delegate_relationship_id: ' . $row['delegate_relationship_id']);
             }
         }
 
@@ -128,6 +150,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
             if ($ranking) {
                 $delegateData['internal_ranking_id'] = $ranking->id;
+            } else {
+                throw new \Exception('Invalid delegate_internal_ranking_id: ' . $row['delegate_internal_ranking_id']);
             }
         }
 
@@ -138,6 +162,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
             if ($parentDelegate) {
                 $delegateData['parent_id'] = $parentDelegate->id;
+            } else {
+                throw new \Exception('Parent delegate not found with code: ' . $row['delegate_parent_code']);
             }
         }
 
@@ -193,7 +219,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             })->where('id', trim($transportData['airport_id']))->first();
 
             if (!$airport) {
-                $transportData['airport_id'] = null;
+                throw new \Exception('Invalid ' . $type . ' airport_id: ' . $transportData['airport_id']);
             }
         } elseif ($transportData['mode'] !== 'flight') {
             $transportData['airport_id'] = null;

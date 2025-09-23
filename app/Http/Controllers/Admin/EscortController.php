@@ -55,58 +55,60 @@ class EscortController extends Controller
 
     public function index(Request $request)
     {
+
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
-            ->where('event_id', $currentEventId)
-            ->latest();
+            ->select('escorts.*')
+            ->where('escorts.event_id', $currentEventId)
+            ->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
+            ->orderBy('escorts.military_number')
+            ->orderBy('rankings.sort_order');
+
 
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->where('delegation_id', null);
+            $query->where('escorts.delegation_id', null)->where('escorts.status', 1);
         }
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('name_en', 'like', "%{$search}%")
-                    ->orWhere('name_ar', 'like', "%{$search}%")
-                    ->orWhere('military_number', 'like', "%{$search}%")
-                    ->orWhere('phone_number', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
+                $q->where('escorts.name_en', 'like', "%{$search}%")
+                    ->orWhere('escorts.name_ar', 'like', "%{$search}%")
+                    ->orWhere('escorts.military_number', 'like', "%{$search}%")
+                    ->orWhere('escorts.phone_number', 'like', "%{$search}%")
+                    ->orWhere('escorts.code', 'like', "%{$search}%")
+                    ->orWhere('escorts.email', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
             });
         }
 
-        if ($request->has('title_id') && !empty($request->title_id)) {
-            $titles = is_array($request->title_id) ? $request->title_id : [$request->title_id];
-            $query->whereIn('title_id', $titles);
+        if ($request->has('title_en') && !empty($request->title_en)) {
+            $titleEns = is_array($request->title_en) ? $request->title_en : [$request->title_en];
+            $query->whereIn('escorts.title_en', $titleEns);
+        }
+
+        if ($request->has('title_ar') && !empty($request->title_ar)) {
+            $titleArs = is_array($request->title_ar) ? $request->title_ar : [$request->title_ar];
+            $query->whereIn('escorts.title_ar', $titleArs);
         }
 
         if ($request->has('gender_id') && !empty($request->gender_id)) {
             $genders = is_array($request->gender_id) ? $request->gender_id : [$request->gender_id];
-            $query->whereIn('gender_id', $genders);
+            $query->whereIn('escorts.gender_id', $genders);
         }
 
         if ($request->has('language_id') && !empty($request->language_id)) {
             $languages = is_array($request->language_id) ? $request->language_id : [$request->language_id];
             $query->where(function ($q) use ($languages) {
                 foreach ($languages as $language) {
-                    $q->orWhere('spoken_languages', 'like', '%' . $language . '%');
+                    $q->orWhere('escorts.spoken_languages', 'like', '%' . $language . '%');
                 }
             });
-        }
-
-        if ($request->has('title_en') && !empty($request->title_en)) {
-            $query->where('title_en', 'like', '%' . $request->title_en . '%');
-        }
-
-        if ($request->has('title_ar') && !empty($request->title_ar)) {
-            $query->where('title_ar', 'like', '%' . $request->title_ar . '%');
         }
 
         if ($request->has('delegation_id') && !empty($request->delegation_id) && $assignmentMode !== 'escort') {
@@ -118,7 +120,12 @@ class EscortController extends Controller
 
         $limit = $request->limit ? $request->limit : 20;
 
+        if ($request->id) {
+            $query->where('escorts.id', $request->id);
+        }
+
         $escorts = $query->paginate($limit);
+
         $delegations = Delegation::where('event_id', $currentEventId)
             ->whereHas('invitationStatus', function ($q) {
                 $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
@@ -129,6 +136,7 @@ class EscortController extends Controller
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
 
         $assignmentDelegation = null;
+
         if ($delegationId && $assignmentMode === 'escort') {
             $assignmentDelegation = Delegation::find($delegationId);
         }
@@ -150,7 +158,7 @@ class EscortController extends Controller
     {
         $delegations = Delegation::all();
 
-        return view('admin.escorts.create', compact('delegations', ));
+        return view('admin.escorts.create', compact('delegations',));
     }
 
     public function store(Request $request)
@@ -231,7 +239,7 @@ class EscortController extends Controller
         $escort = Escort::findOrFail($id);
         $delegations = Delegation::all();
 
-        return view('admin.escorts.edit', compact('escort', 'delegations', ));
+        return view('admin.escorts.edit', compact('escort', 'delegations',));
     }
 
     public function assignIndex(Request $request, Escort $escort)
@@ -517,10 +525,15 @@ class EscortController extends Controller
             'file' => 'required|mimes:xlsx,csv',
         ]);
 
-        Excel::import(new EscortImport, $request->file('file'));
+        try {
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new EscortImport($fileName), $request->file('file'));
 
-        return redirect()->route('escorts.index')
-            ->with('success',  __db('escort') . __db('created_successfully'));
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'escorts'])
+                ->with('success', __db('escorts_imported_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Escort Import Error: ' . $e->getMessage());
+            return back()->with('error', __db('escort_import_failed') . ': ' . $e->getMessage());
+        }
     }
-
 }

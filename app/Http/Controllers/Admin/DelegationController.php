@@ -166,44 +166,25 @@ class DelegationController extends Controller
 
 
         if ($invitationFrom = $request->input('invitation_from')) {
-            if (is_array($invitationFrom)) {
-                $query->whereIn('delegations.invitation_from_id', $invitationFrom);
-            } else {
-                $query->where('delegations.invitation_from_id', $invitationFrom);
-            }
+            $query->whereIn('delegations.invitation_from_id', $invitationFrom);
         }
 
         if ($continentId = $request->input('continent_id')) {
-            if (is_array($continentId)) {
-                $query->whereIn('delegations.continent_id', $continentId);
-            } else {
-                $query->where('delegations.continent_id', $continentId);
-            }
+            $query->whereIn('delegations.continent_id', $continentId);
         }
 
         if ($countryId = $request->input('country_id')) {
-            if (is_array($countryId)) {
-                $query->whereIn('delegations.country_id', $countryId);
-            } else {
-                $query->where('delegations.country_id', $countryId);
-            }
+            $query->whereIn('delegations.country_id', $countryId);
         }
 
         if ($invitationStatusId = $request->input('invitation_status_id')) {
-            if (is_array($invitationStatusId)) {
-                $query->whereIn('delegations.invitation_status_id', $invitationStatusId);
-            } else {
-                $query->where('delegations.invitation_status_id', $invitationStatusId);
-            }
+            $query->whereIn('delegations.invitation_status_id', $invitationStatusId);
         }
 
         if ($participationStatusId = $request->input('participation_status_id')) {
-            if (is_array($participationStatusId)) {
-                $query->whereIn('delegations.participation_status_id', $participationStatusId);
-            } else {
-                $query->where('delegations.participation_status_id', $participationStatusId);
-            }
+            $query->whereIn('delegations.participation_status_id', $participationStatusId);
         }
+
 
         $limit = $request->limit ? $request->limit : 20;
 
@@ -385,9 +366,6 @@ class DelegationController extends Controller
         }
 
         $arrivalsQuery = DelegateTransport::where('type', 'arrival')
-            ->where(function ($query) use ($now, $oneHourAgo, $oneHourFromNow) {
-                $query->whereDate('date_time', $now->toDateString());
-            })
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -472,15 +450,13 @@ class DelegationController extends Controller
         $oneHourAgo = $now->copy()->subHour();
         $oneHourFromNow = $now->copy()->addHours(1);
 
+        // Set default date range to today if not provided
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
             $today = now()->format('Y-m-d');
             $request->merge(['date_range' => $today . ' - ' . $today]);
         }
 
         $departuresQuery = DelegateTransport::where('type', 'departure')
-            ->where(function ($query) use ($now, $oneHourAgo, $oneHourFromNow) {
-                $query->whereDate('date_time', $now->toDateString());
-            })
             ->with([
                 'delegate.delegation.country',
                 'delegate.delegation.continent',
@@ -587,15 +563,29 @@ class DelegationController extends Controller
                 $fromDate = trim($dates[0]);
                 $toDate   = trim($dates[1]);
 
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $fromDate)) {
+                    $fromDate = \Carbon\Carbon::createFromFormat('d-m-Y', substr($fromDate, 0, 10))->format('Y-m-d');
+                }
+
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $toDate)) {
+                    $toDate = \Carbon\Carbon::createFromFormat('d-m-Y', substr($toDate, 0, 10))->format('Y-m-d');
+                }
+
                 $query->whereDate('date_time', '>=', $fromDate)
                     ->whereDate('date_time', '<=', $toDate);
             }
         } else {
             if ($fromDate = $request->input('from_date')) {
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $fromDate)) {
+                    $fromDate = \Carbon\Carbon::createFromFormat('d-m-Y', $fromDate)->format('Y-m-d');
+                }
                 $query->whereDate('date_time', '>=', $fromDate);
             }
 
             if ($toDate = $request->input('to_date')) {
+                if (preg_match('/^\d{2}-\d{2}-\d{4}/', $toDate)) {
+                    $toDate = \Carbon\Carbon::createFromFormat('d-m-Y', $toDate)->format('Y-m-d');
+                }
                 $query->whereDate('date_time', '<=', $toDate);
             }
         }
@@ -2511,40 +2501,37 @@ class DelegationController extends Controller
     public function importDelegations(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-            Excel::import(new DelegationOnlyImport, $request->file('file'));
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DelegationOnlyImport($fileName), $request->file('file'));
 
-            return redirect()->route('delegations.index')
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'delegations'])
                 ->with('success', __db('delegations_only_imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage())
-                ->withInput();
+            return back()
+                ->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage());
         }
     }
 
     public function importDelegatesWithTravels(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-            Excel::import(new DelegateImport, $request->file('file'));
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DelegateImport($fileName), $request->file('file'));
 
-            return redirect()->route('delegations.index')
-                ->with('success', __db('delegate') . ' ' . __db('created_successfully'));
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'delegates'])
+                ->with('success', __db('delegates_imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-
-            return redirect()->back()
-                ->with('error', __db('delegate_import_failed') . ': ' . $e->getMessage())
-                ->withInput();
+            return back()->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage());
         }
     }
 }

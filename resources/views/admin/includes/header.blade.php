@@ -1,23 +1,26 @@
-<div class="navbar-header sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 py-4 flex items-center justify-between">
-  <!-- Left: Logo and Sidebar Toggle -->
-  <div class="flex items-center space-x-4">
-    <button id="sidebarToggleBtn" class="md:hidden p-2 rounded-md hover:bg-gray-200" aria-expanded="false" aria-label="Toggle sidebar menu">
-      <!-- Always hamburger menu icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
+<div
+    class="navbar-header sticky top-0 z-40 bg-white border-b border-neutral-200 px-4 py-4 flex items-center justify-between">
+    <!-- Left: Logo and Sidebar Toggle -->
+    <div class="flex items-center space-x-4">
+        <button id="sidebarToggleBtn" class="md:hidden p-2 rounded-md hover:bg-gray-200" aria-expanded="false"
+            aria-label="Toggle sidebar menu">
+            <!-- Always hamburger menu icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
 
-    <div class="flex items-center">
-      <img src="{{ getAdminEventLogo() }}" alt="Event Logo" width="150" class="object-contain">
+        <div class="flex items-center">
+            <img src="{{ getAdminEventLogo() }}" alt="Event Logo" width="150" class="object-contain">
+        </div>
     </div>
-  </div>
 
-  <!-- Right: Navbar Items -->
-   <!-- Right: Navbar Items -->
+    <!-- Right: Navbar Items -->
+    <!-- Right: Navbar Items -->
     <div class="flex items-center space-x-4">
 
- <div class="col-auto ms-auto flex items-center gap-4">
+        <div class="col-auto ms-auto flex items-center gap-4">
             @php
                 $events = getAllEvents();
                 $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
@@ -111,7 +114,7 @@
                     @foreach ($config as $button)
                         @if (can($button['permission']))
                             <a href="{{ $button['link'] }}"
-                                class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                                class="btn me-8 text-md  !bg-[#B68A35] text-white rounded-lg h-12">
                                 <svg class="w-6 h-6 text-white me-2" aria-hidden="true"
                                     xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                     viewBox="0 0 24 24">
@@ -126,7 +129,7 @@
                     {{-- Single button --}}
                     @if (can($config['permission']))
                         <a href="{{ $config['link'] }}"
-                            class="btn me-8 text-md mb-[-10px] !bg-[#B68A35] text-white rounded-lg h-12">
+                            class="btn me-8 text-md !bg-[#B68A35] text-white rounded-lg h-12">
                             <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -184,12 +187,17 @@
                             {{ __db('notifications') }}
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ auth()->user()->unreadNonAlertNotifications()->whereNull('alert_id')->count() }}</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
                             @php
-                                $unreadNotifications = auth()->user()->unreadNonAlertNotifications()->take(5)->get();
+                                $unreadNotifications = auth()
+                                    ->user()
+                                    ->unreadNonAlertNotifications()
+                                    ->whereNull('alert_id')
+                                    ->take(5)
+                                    ->get();
                             @endphp
                             @forelse($unreadNotifications as $notification)
                                 @php
@@ -213,11 +221,11 @@
                                     $action = $data['action'] ?? null;
                                     $delegationId = $data['delegation_id'] ?? null;
                                     $submoduleId = $data['submodule_id'] ?? null;
-                                    
+
                                     $moduleName = null;
                                     $moduleCode = null;
                                     $moduleDetails = [];
-                                    
+
                                     if (isset($data['changes'])) {
                                         if (isset($data['changes']['escort_name'])) {
                                             $moduleName = $data['changes']['escort_name'];
@@ -230,25 +238,37 @@
                                         } elseif (isset($data['changes']['code'])) {
                                             $moduleCode = $data['changes']['code'];
                                         }
-                                        
+
                                         foreach ($data['changes'] as $key => $value) {
-                                            if (in_array($key, ['escort_name', 'driver_name', 'member_name', 'delegation_code', 'code', 'title'])) {
+                                            if (
+                                                in_array($key, [
+                                                    'escort_name',
+                                                    'driver_name',
+                                                    'member_name',
+                                                    'delegation_code',
+                                                    'code',
+                                                    'title',
+                                                ])
+                                            ) {
                                                 continue;
                                             }
-                                            
-                                            $displayValue = is_array($value) ? (isset($value['new']) ? $value['new'] : json_encode($value)) : $value;
+
+                                            $displayValue = is_array($value)
+                                                ? (isset($value['new'])
+                                                    ? $value['new']
+                                                    : json_encode($value))
+                                                : $value;
                                             if (!empty($displayValue) && $displayValue !== 'N/A') {
                                                 $moduleDetails[$key] = $displayValue;
                                             }
                                         }
                                     }
-                                    
+
                                     $url = '#';
 
                                     if ($delegationId) {
                                         $url = route('delegations.show', $delegationId);
-                                    } 
-                                    elseif ($module && $submoduleId) {
+                                    } elseif ($module && $submoduleId) {
                                         switch (strtolower($module)) {
                                             case 'escorts':
                                                 $url = route('escorts.edit', $submoduleId);
@@ -265,7 +285,7 @@
                                                         } elseif (isset($data['changes']['member_name'])) {
                                                             $escortName = $data['changes']['member_name'];
                                                         }
-                                                        
+
                                                         if ($escortName) {
                                                             $url = route('escorts.index', ['search' => $escortName]);
                                                         } else {
@@ -279,7 +299,7 @@
                                                         } elseif (isset($data['changes']['member_name'])) {
                                                             $driverName = $data['changes']['member_name'];
                                                         }
-                                                        
+
                                                         if ($driverName) {
                                                             $url = route('drivers.index', ['search' => $driverName]);
                                                         } else {
@@ -290,8 +310,7 @@
                                                         $url = '#';
                                                 }
                                         }
-                                    }
-                                    elseif ($module) {
+                                    } elseif ($module) {
                                         switch (strtolower($module)) {
                                             case 'escorts':
                                                 $escortName = null;
@@ -300,7 +319,7 @@
                                                 } elseif (isset($data['changes']['member_name'])) {
                                                     $escortName = $data['changes']['member_name'];
                                                 }
-                                                
+
                                                 if ($escortName) {
                                                     $url = route('escorts.index', ['search' => $escortName]);
                                                 } else {
@@ -314,7 +333,7 @@
                                                 } elseif (isset($data['changes']['member_name'])) {
                                                     $driverName = $data['changes']['member_name'];
                                                 }
-                                                
+
                                                 if ($driverName) {
                                                     $url = route('drivers.index', ['search' => $driverName]);
                                                 } else {
@@ -335,28 +354,32 @@
                                             <p class="mb-0 line-clamp-1 text-sm">
                                                 {{ $message }}
                                             </p>
-                                            @if($moduleName || $moduleCode || !empty($moduleDetails))
-                                            <div class="text-xs text-neutral-500 mt-1">
-                                                @if($moduleName)
-                                                <div><span class="font-medium">{{ __db('name') }}:</span> {{ $moduleName }}</div>
-                                                @endif
-                                                @if($moduleCode)
-                                                <div><span class="font-medium">{{ __db('code') }}:</span> {{ $moduleCode }}</div>
-                                                @endif
-                                                @if(!empty($moduleDetails))
-                                                <div class="mt-1">
-                                                    @foreach(array_slice($moduleDetails, 0, 2) as $key => $value)
-                                                    <div>
-                                                        <span class="font-medium">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span> 
-                                                        {{ is_array($value) ? json_encode($value) : $value }}
-                                                    </div>
-                                                    @endforeach
-                                                    @if(count($moduleDetails) > 2)
-                                                    <div>... {{ count($moduleDetails) - 2 }} {{ __db('more_details') }}</div>
+                                            @if ($moduleName || $moduleCode || !empty($moduleDetails))
+                                                <div class="text-xs text-neutral-500 mt-1">
+                                                    @if ($moduleName)
+                                                        <div><span class="font-medium">{{ __db('name') }}:</span>
+                                                            {{ $moduleName }}</div>
+                                                    @endif
+                                                    @if ($moduleCode)
+                                                        <div><span class="font-medium">{{ __db('code') }}:</span>
+                                                            {{ $moduleCode }}</div>
+                                                    @endif
+                                                    @if (!empty($moduleDetails))
+                                                        <div class="mt-1">
+                                                            @foreach (array_slice($moduleDetails, 0, 2) as $key => $value)
+                                                                <div>
+                                                                    <span
+                                                                        class="font-medium">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span>
+                                                                    {{ is_array($value) ? json_encode($value) : $value }}
+                                                                </div>
+                                                            @endforeach
+                                                            @if (count($moduleDetails) > 2)
+                                                                <div>... {{ count($moduleDetails) - 2 }}
+                                                                    {{ __db('more_details') }}</div>
+                                                            @endif
+                                                        </div>
                                                     @endif
                                                 </div>
-                                                @endif
-                                            </div>
                                             @endif
                                         </div>
                                     </div>
@@ -549,7 +572,7 @@
         </div>
 
 
-    
+
     </div>
 
 
@@ -557,149 +580,152 @@
 </div>
 
 @section('script')
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  const toggleBtn = document.getElementById('sidebarToggleBtn');
-  const closeBtn = document.getElementById('sidebarCloseBtn');
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('sidebarToggleBtn');
+            const closeBtn = document.getElementById('sidebarCloseBtn');
 
-  function openSidebar() {
-    sidebar.classList.remove('-translate-x-full');
-    overlay.classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-  }
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
 
-  function closeSidebar() {
-    sidebar.classList.add('-translate-x-full');
-    overlay.classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-  }
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
 
-  if (toggleBtn) toggleBtn.addEventListener('click', () => {
-    if (sidebar.classList.contains('-translate-x-full')) {
-      openSidebar();
-    } else {
-      closeSidebar();
-    }
-  });
-  if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-  if (overlay) overlay.addEventListener('click', closeSidebar);
+            if (toggleBtn) toggleBtn.addEventListener('click', () => {
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            });
+            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
 
-  window.addEventListener('resize', () => {
-    if (window.innerWidth >= 768) {
-      closeSidebar();
-    }
-  });
-});
-</script>
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 @endsection
 
 
 <!-- Alert Modal -->
 <div id="alertModal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center">
-  <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-    <div class="flex justify-between items-center border-b pb-2">
-      <h3 id="alertModalTitle" class="text-lg font-semibold"></h3>
-      <button onclick="closeAlertModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close alert modal">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
+        <div class="flex justify-between items-center border-b pb-2">
+            <h3 id="alertModalTitle" class="text-lg font-semibold"></h3>
+            <button onclick="closeAlertModal()" class="text-gray-500 hover:text-gray-700"
+                aria-label="Close alert modal">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="mt-4">
+            <p id="alertModalMessage" class="text-gray-700"></p>
+        </div>
+        <div class="mt-6 flex justify-end space-x-3">
+            <a id="viewAllAlertsBtn" href="#"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                View Alert
+            </a>
+            <button onclick="closeAlertModal()" class="px-4 py-2 border rounded-md">
+                Close
+            </button>
+        </div>
     </div>
-    <div class="mt-4">
-      <p id="alertModalMessage" class="text-gray-700"></p>
-    </div>
-    <div class="mt-6 flex justify-end space-x-3">
-      <a id="viewAllAlertsBtn" href="#" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-        View Alert
-      </a>
-      <button onclick="closeAlertModal()" class="px-4 py-2 border rounded-md">
-        Close
-      </button>
-    </div>
-  </div>
 </div>
 
 @section('script')
-<script>
-  function showLatestAlertModal() {
-    fetch('/mod-admin/alerts/latest', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && data.alert) {
-        document.getElementById('alertModalTitle').textContent = data.alert.title;
-        document.getElementById('alertModalMessage').textContent = data.alert.message;
-        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
+    <script>
+        function showLatestAlertModal() {
+            fetch('/mod-admin/alerts/latest', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.alert) {
+                        document.getElementById('alertModalTitle').textContent = data.alert.title;
+                        document.getElementById('alertModalMessage').textContent = data.alert.message;
+                        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
 
-        document.getElementById('alertModal').classList.remove('hidden');
-        document.getElementById('alertModal').classList.add('flex');
+                        document.getElementById('alertModal').classList.remove('hidden');
+                        document.getElementById('alertModal').classList.add('flex');
 
-        if (data.alert.id > 0) {
-          markAlertAsRead(data.alert.id);
+                        if (data.alert.id > 0) {
+                            markAlertAsRead(data.alert.id);
+                        }
+                    } else {
+                        toggleDropdown();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching latest alert:', error);
+                    toggleDropdown();
+                });
         }
-      } else {
-        toggleDropdown();
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching latest alert:', error);
-      toggleDropdown();
-    });
-  }
 
-  function showAlertModal(alertId, title, message) {
-    document.getElementById('alertModalTitle').textContent = title;
-    document.getElementById('alertModalMessage').textContent = message;
-    document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + alertId;
+        function showAlertModal(alertId, title, message) {
+            document.getElementById('alertModalTitle').textContent = title;
+            document.getElementById('alertModalMessage').textContent = message;
+            document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + alertId;
 
-    document.getElementById('alertModal').classList.remove('hidden');
-    document.getElementById('alertModal').classList.add('flex');
+            document.getElementById('alertModal').classList.remove('hidden');
+            document.getElementById('alertModal').classList.add('flex');
 
-    if (alertId > 0) {
-      markAlertAsRead(alertId);
-    }
-  }
-
-  function markAlertAsRead(alertId) {
-    fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      const alertCountElement = document.querySelector('#dropdownAlert .badge');
-      if (alertCountElement) {
-        let count = parseInt(alertCountElement.textContent) || 0;
-        if (count > 0) {
-          alertCountElement.textContent = count - 1;
+            if (alertId > 0) {
+                markAlertAsRead(alertId);
+            }
         }
-      }
-    });
-  }
 
-  function closeAlertModal() {
-    document.getElementById('alertModal').classList.add('hidden');
-    document.getElementById('alertModal').classList.remove('flex');
-  }
+        function markAlertAsRead(alertId) {
+            fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const alertCountElement = document.querySelector('#dropdownAlert .badge');
+                    if (alertCountElement) {
+                        let count = parseInt(alertCountElement.textContent) || 0;
+                        if (count > 0) {
+                            alertCountElement.textContent = count - 1;
+                        }
+                    }
+                });
+        }
 
-  function toggleDropdown() {
-    document.getElementById('dropdownAlert').classList.toggle('hidden');
-  }
+        function closeAlertModal() {
+            document.getElementById('alertModal').classList.add('hidden');
+            document.getElementById('alertModal').classList.remove('flex');
+        }
 
-  document.getElementById('alertModal').addEventListener('click', function(event) {
-    if (event.target === this) {
-      closeAlertModal();
-    }
-  });
-</script>
+        function toggleDropdown() {
+            document.getElementById('dropdownAlert').classList.toggle('hidden');
+        }
+
+        document.getElementById('alertModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeAlertModal();
+            }
+        });
+    </script>
 @endsection

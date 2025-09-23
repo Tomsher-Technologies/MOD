@@ -57,7 +57,7 @@ class DriverController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Driver::with('delegations')
-            ->where('event_id', $currentEventId)
+            ->where('drivers.event_id', $currentEventId)
             ->latest();
 
         $delegationId = $request->input('delegation_id');
@@ -68,18 +68,20 @@ class DriverController extends Controller
                 $q->where('delegations.id', $delegationId)
                     ->where('delegation_drivers.status', 1);
             });
+
+            $query->where('drivers.status', 1);
         }
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('name_en', 'like', "%{$search}%")
-                    ->orWhere('name_ar', 'like', "%{$search}%")
-                    ->orWhere('military_number', 'like', "%{$search}%")
-                    ->orWhere('phone_number', 'like', "%{$search}%")
-                    ->orWhere('driver_id', 'like', "%{$search}%")
-                    ->orWhere('car_type', 'like', "%{$search}%")
-                    ->orWhere('car_number', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
+                $q->where('drivers.name_en', 'like', "%{$search}%")
+                    ->orWhere('drivers.name_ar', 'like', "%{$search}%")
+                    ->orWhere('drivers.military_number', 'like', "%{$search}%")
+                    ->orWhere('drivers.phone_number', 'like', "%{$search}%")
+                    ->orWhere('drivers.driver_id', 'like', "%{$search}%")
+                    ->orWhere('drivers.car_type', 'like', "%{$search}%")
+                    ->orWhere('drivers.car_number', 'like', "%{$search}%")
+                    ->orWhere('drivers.code', 'like', "%{$search}%")
                     ->orWhereHas('delegations', function ($delegationQuery) use ($search) {
                         $delegationQuery->where('code', 'like', "%{$search}%");
                     });
@@ -87,11 +89,13 @@ class DriverController extends Controller
         }
 
         if ($request->has('title_en') && !empty($request->title_en)) {
-            $query->where('title_en', 'like', '%' . $request->title_en . '%');
+            $titleEns = is_array($request->title_en) ? $request->title_en : [$request->title_en];
+            $query->whereIn('title_en', $titleEns);
         }
 
         if ($request->has('title_ar') && !empty($request->title_ar)) {
-            $query->where('title_ar', 'like', '%' . $request->title_ar . '%');
+            $titleArs = is_array($request->title_ar) ? $request->title_ar : [$request->title_ar];
+            $query->whereIn('title_ar', $titleArs);
         }
 
         if ($request->has('title_id') && !empty($request->title_id)) {
@@ -122,6 +126,10 @@ class DriverController extends Controller
         }
 
         $limit = $request->limit ?: 20;
+
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
 
         $drivers = $query->paginate($limit);
 
@@ -538,12 +546,15 @@ class DriverController extends Controller
             'file' => 'required|mimes:xlsx,csv',
         ]);
 
+        try {
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DriverImport($fileName), $request->file('file'));
 
-        $excel = Excel::import(new DriverImport, $request->file('file'));
-
-        return redirect()->route('drivers.index')
-            ->with('success',  __db('driver') . __db('created_successfully'));
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'drivers'])
+                ->with('success', __db('drivers_imported_successfully'));
+        } catch (\Exception $e) {
+            Log::error('Driver Import Error: ' . $e->getMessage());
+            return back()->with('error', __db('driver_import_failed') . ': ' . $e->getMessage());
+        }
     }
-
- 
 }

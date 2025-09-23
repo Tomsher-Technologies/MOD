@@ -20,7 +20,9 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\CommitteeController;
 use App\Http\Controllers\Admin\EventPageController;
 use App\Http\Controllers\Admin\FloorPlanController;
+use App\Http\Controllers\Admin\ImportLogController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\LogController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('mod-admin')->group(function () {
@@ -191,6 +193,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}/redirect', [NotificationController::class, 'redirectToModule'])->name('notifications.redirect');
 
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
@@ -218,12 +221,12 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::post('/committees/status', [CommitteeController::class, 'updateStatus'])->name('committees.status');
 
     //Manage Page Contents
-    Route::get('event-pages', [EventPageController::class,'index'])->name('event_pages.index');
-    Route::get('event-pages/edit/{id}', [EventPageController::class,'edit'])->name('event_pages.edit');
-    Route::post('event-pages/{id}/update', [EventPageController::class,'update'])->name('event_pages.update');
+    Route::get('event-pages', [EventPageController::class, 'index'])->name('event_pages.index');
+    Route::get('event-pages/edit/{id}', [EventPageController::class, 'edit'])->name('event_pages.edit');
+    Route::post('event-pages/{id}/update', [EventPageController::class, 'update'])->name('event_pages.update');
 
     // Account
-    Route::get('/profile',[AdminDashboardController::class, 'account'])->name('account');
+    Route::get('/profile', [AdminDashboardController::class, 'account'])->name('account');
     Route::post('/profile/change-password', [AdminDashboardController::class, 'changePassword'])->name('staffs.change-password');
 
     // Report Section
@@ -231,6 +234,11 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
     Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
 
+    Route::get('/logs', [LogController::class, 'showLog'])->name('admin.logs');
+
+    // Import Logs
+    Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
+    Route::post('/import-logs/clear', [ImportLogController::class, 'clearLogs'])->name('admin.import-logs.clear');
 });
 
 Route::get('/lang/{lang}', function ($lang) {

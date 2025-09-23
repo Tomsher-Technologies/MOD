@@ -4,7 +4,8 @@
             <div class="flex flex-col">
                 <input type="text" class="form-control date-range" id="date_range" name="date_range"
                     placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
-                    data-separator=" to " autocomplete="off" value="{{ request('date_range') ?? '' }}">
+                    data-separator=" to " autocomplete="off"
+                    value="{{ request('date_range') ?? now()->format('d-m-Y') . ' to ' . now()->format('d-m-Y') }}">
             </div>
             <div class="flex-1">
                 <div class="relative">
@@ -273,7 +274,7 @@
                 @endphp
 
                 <div id="departures-table-container">
-                    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="departures-table" :enableColumnListBtn="true"
+                    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="departures-table" 
                         :data="$paginator" :row-class="$rowClass" />
                 </div>
 

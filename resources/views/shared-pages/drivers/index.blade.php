@@ -329,21 +329,22 @@
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select name="title_en" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
+                <select multiple name="title_en[]" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleEns as $titleEn)
-                        <option value="{{ $titleEn }}" @if (request('title_en') == $titleEn) selected @endif>
+                        <option value="{{ $titleEn }}" @if (is_array(request('title_en', [])) && in_array($titleEn, request('title_en', []))) selected @endif>
                             {{ $titleEn }}</option>
                     @endforeach
                 </select>
             </div>
+
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select name="title_ar" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                <select multiple name="title_ar[]" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleArs as $titleAr)
-                        <option value="{{ $titleAr }}" @if (request('title_ar') == $titleAr) selected @endif>
+                        <option value="{{ $titleAr }}"  @if (is_array(request('title_ar', [])) && in_array($titleAr, request('title_ar', []))) selected @endif>
                             {{ $titleAr }}</option>
                     @endforeach
                 </select>
