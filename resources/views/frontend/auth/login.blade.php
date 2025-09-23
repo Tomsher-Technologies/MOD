@@ -114,7 +114,7 @@
             if (step === 1) {
                 const username = usernameInput.value.trim();
                 if (!username) {
-                    usernameError.textContent = "⚠️ {{ __db('username_required') }}";
+                    usernameError.textContent = "{{ __db('username_required') }}";
                     usernameError.classList.remove("hidden");
                     return;
                 }
@@ -123,7 +123,7 @@
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
                     },
                     body: JSON.stringify({ username })
                 })

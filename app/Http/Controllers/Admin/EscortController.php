@@ -491,8 +491,15 @@ class EscortController extends Controller
             if ($oldAssignment) {
                 $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
                 if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                    $oldRoom->save();
+                    $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                        ->where('room_type_id', $oldAssignment->room_type_id)
+                        ->where('room_number', $oldAssignment->room_number)
+                        ->where('active_status', 1)
+                        ->count();
+                    if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
+                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        $oldRoom->save();
+                    }
                 }
 
                 $oldAssignment->active_status = 0;

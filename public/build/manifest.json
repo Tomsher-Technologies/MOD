@@ -1,6 +1,6 @@
 {
-  "_daterangepicker-hC2mBD6H.js": {
-    "file": "assets/daterangepicker-hC2mBD6H.js",
+  "_daterangepicker-vUVSHV45.js": {
+    "file": "assets/daterangepicker-vUVSHV45.js",
     "name": "daterangepicker",
     "isDynamicEntry": true,
     "imports": [
@@ -8,20 +8,17 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-D6ZVoLmI.css",
+    "file": "assets/app-Dwi4IKzv.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DevmV5RQ.js",
+    "file": "assets/app-DkdBPPJI.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
-    "imports": [
-      "resources/js/refresh-arrivals-departures.js"
-    ],
     "dynamicImports": [
-      "_daterangepicker-hC2mBD6H.js"
+      "_daterangepicker-vUVSHV45.js"
     ],
     "css": [
       "assets/app-jUewB0vx.css"
