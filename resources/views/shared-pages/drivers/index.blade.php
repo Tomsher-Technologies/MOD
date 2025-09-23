@@ -147,7 +147,9 @@
                                                     $delegation->id .
                                                     '" />
                                                     <button type="submit" class="!bg-[#E6D7A2] !text-[#5D471D] px-2 py-1 rounded-lg text-sm flex items-center gap-1">
-                                                        '. __db('unassign') .'
+                                                        ' .
+                                                    __db('unassign') .
+                                                    '
                                                     </button>
                                                 </form>';
                                             }
@@ -268,7 +270,9 @@
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                     </svg>
-                                    <span>'.__db('assign').'</span>
+                                    <span>' .
+                                            __db('assign') .
+                                            '</span>
                                 </a>';
                                     }
                                 }
@@ -297,16 +301,6 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
 <div id="filter-drawer"
     class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
     tabindex="-1" aria-labelledby="drawer-label">
@@ -329,8 +323,10 @@
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
-                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select multiple name="title_en[]" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_en') }}">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
+                <select multiple name="title_en[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleEns as $titleEn)
                         <option value="{{ $titleEn }}" @if (is_array(request('title_en', [])) && in_array($titleEn, request('title_en', []))) selected @endif>
@@ -341,18 +337,21 @@
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select multiple name="title_ar[]" class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm" data-placeholder="{{ __db('select_title_ar') }}">
+                <select multiple name="title_ar[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select') }}">
                     <option value="">{{ __db('all') }}</option>
                     @foreach ($titleArs as $titleAr)
-                        <option value="{{ $titleAr }}"  @if (is_array(request('title_ar', [])) && in_array($titleAr, request('title_ar', []))) selected @endif>
+                        <option value="{{ $titleAr }}" @if (is_array(request('title_ar', [])) && in_array($titleAr, request('title_ar', []))) selected @endif>
                             {{ $titleAr }}</option>
                     @endforeach
                 </select>
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle_type') }}</label>
-                <select name="car_type[]" multiple data-placeholder="{{ __db('select_vehicle_types') }}"
+                <label
+                    class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle') . ' ' . __db('type') }}</label>
+                <select name="car_type[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($carTypes as $carType)
                         <option value="{{ $carType }}" @if (is_array(request('car_type', [])) && in_array($carType, request('car_type', []))) selected @endif>
@@ -364,7 +363,7 @@
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('car_number') }}</label>
-                <select name="car_number[]" multiple data-placeholder="{{ __db('select_plate_numbers') }}"
+                <select name="car_number[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($carNumbers as $carNumber)
                         <option value="{{ $carNumber }}" @if (is_array(request('car_number', [])) && in_array($carNumber, request('car_number', []))) selected @endif>
@@ -375,7 +374,7 @@
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('capacity') }}</label>
-                <select name="capacity[]" multiple data-placeholder="{{ __db('select_capacities') }}"
+                <select name="capacity[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($capacities as $capacity)
                         <option value="{{ $capacity }}" @if (is_array(request('capacity', [])) && in_array($capacity, request('capacity', []))) selected @endif>
@@ -386,7 +385,7 @@
 
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation_id') }}</label>
-                <select name="delegation_id[]" multiple data-placeholder="{{ __db('select_delegations') }}"
+                <select name="delegation_id[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_delegations') }}</option>
                     @foreach ($delegations as $delegation)
@@ -421,31 +420,31 @@
 
 
 <div id="column-visibility-modal" tabindex="-1" aria-hidden="true"
-     class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
-  <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
-    <div class="flex items-start justify-between p-4 border-b rounded-t bg-gray-50">
-      <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
-      <button type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
-              data-modal-hide="column-visibility-modal" aria-label="Close modal">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
+    class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:p-6">
+    <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg">
+        <div class="flex items-start justify-between p-4 border-b rounded-t bg-gray-50">
+            <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
+            <button type="button"
+                class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+                data-modal-hide="column-visibility-modal" aria-label="Close modal">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <div class="p-6 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="column-toggles">
+                @foreach ($columns as $column)
+                    <label class="flex items-center space-x-3 cursor-pointer select-none">
+                        <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox"
+                            value="{{ $column['key'] }}" checked>
+                        <span class="text-gray-800">{{ $column['label'] }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
     </div>
-    <div class="p-6 space-y-6">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="column-toggles">
-        @foreach ($columns as $column)
-          <label class="flex items-center space-x-3 cursor-pointer select-none">
-            <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox"
-                   value="{{ $column['key'] }}" checked>
-            <span class="text-gray-800">{{ $column['label'] }}</span>
-          </label>
-        @endforeach
-      </div>
-    </div>
-  </div>
 </div>
 
 
@@ -594,7 +593,7 @@
                                     title: '{{ __db('start_date_for_reassignment') }}',
                                     input: 'date',
                                     inputLabel: '{{ __db('start_date') }}',
-                                    inputPlaceholder: '{{ __db('select_date') }}',
+                                    inputPlaceholder: '{{ __db('select') }}',
                                     inputValidator: (value) => {
                                         if (!value)
                                             return '{{ __db('start_date_required') }}';

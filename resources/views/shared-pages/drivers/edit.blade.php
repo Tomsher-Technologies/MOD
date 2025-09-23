@@ -86,13 +86,13 @@
                         value="{{ old('driver_id', $driver->driver_id) }}">
                 </div> --}}
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('vehicle_type') }}:</label>
+                    <label class="form-label">{{ __db('vehicle') . ' ' . __db('type') }}:</label>
                     <input type="text" name="car_type"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('car_type', $driver->car_type) }}">
                 </div>
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('vehicle_number') }}:</label>
+                    <label class="form-label">{{ __db('vehicle') . ' ' . _db('number') }}:</label>
                     <input type="text" name="car_number"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('car_number', $driver->car_number) }}">

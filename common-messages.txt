@@ -6,3 +6,9 @@ __db('failed_to_create')
 __db('failed_to_delete')
 __db('imported_successfully')
 __db('import_failed')
+
+
+
+
+
+ __db('vehicle') . " " . __db('type')

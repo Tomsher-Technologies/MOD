@@ -219,7 +219,7 @@
                                               <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('name') }}</th>
                                               <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('phone') }}</th>
                                               <th class="border-2 border-black p-2 text-left rtl:text-right">
-                                                {{ __db('car_type') }}</th>
+                                                {{  __db('vehicle') . " " . __db('type') }}</th>
                                               <th class="border-2 border-black p-2 text-left rtl:text-right">{{ __db('car_number') }}</th>
                                           </tr>
                                       </thead>

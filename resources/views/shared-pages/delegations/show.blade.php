@@ -147,7 +147,7 @@
                         [
                             'label' => __db('participation_status'),
                             'render' => function ($row) {
-                                return $row->participation_status ?? '-';
+                                return $row->participation_status ? __db($participation_status) : '-';
                             },
                         ],
                         [
@@ -393,12 +393,12 @@
                             'render' => fn($driver) => '<span dir="ltr">' . e($driver->phone_number) . '</span>',
                         ],
                         [
-                            'label' => __db('car') . ' ' . __db('type'),
+                            'label' => __db('vehicle') . ' ' . __db('type'),
                             'key' => 'car_type',
                             'render' => fn($driver) => e($driver->car_type),
                         ],
                         [
-                            'label' => __db('car') . ' ' . __db('number'),
+                            'label' => __db('vehicle') . ' ' . __db('number'),
                             'key' => 'car_number',
                             'render' => fn($driver) => e($driver->car_number),
                         ],

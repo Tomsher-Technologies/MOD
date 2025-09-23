@@ -264,7 +264,7 @@
                     <th>{{ __db('sl_no') }}</th>
                     <th>{{ __db('name') }}</th>
                     <th>{{ __db('phone') }}</th>
-                    <th>{{ __db('car_type') }}</th>
+                    <th>{{ __db('vehicle') . " " . __db('type') }}</th>
                     <th>{{ __db('car_number') }}</th>
                 </tr>
             </thead>
