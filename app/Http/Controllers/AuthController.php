@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         $events = Event::orderByDesc('is_default')->get();
-        return view('frontend.auth.login', compact('events'))->header('Cache-Control','no-cache, no-store, must-revalidate');;
+        return view('frontend.auth.login', compact('events'));
     }
 
     public function login(Request $request)
