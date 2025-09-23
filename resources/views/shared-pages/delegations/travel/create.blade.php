@@ -94,7 +94,7 @@
                 [
                     'label' => __db('sl_no'),
                     'render' => function ($row, $key) {
-                        return $key;
+                        return $key + 1;
                     },
                 ],
 

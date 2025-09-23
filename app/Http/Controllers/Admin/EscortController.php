@@ -225,7 +225,7 @@ class EscortController extends Controller
             delegationId: $escort->delegation_id
         );
 
-        return redirect()->route('escorts.index')->with('success', __db('Escort created successfully.'));
+        return redirect()->route('escorts.index')->with('success', __db('created_successfully'));
     }
 
     public function show(string $id)
@@ -386,7 +386,7 @@ class EscortController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => __db('Escort updated successfully.'),
+            'message' => __db('updated_successfully'),
             'redirect_url' => route('escorts.edit', $escort->id),
         ]);
     }
@@ -405,7 +405,7 @@ class EscortController extends Controller
             delegationId: $escort->delegation_id
         );
 
-        return redirect()->route('escorts.index')->with('success', __db('Escort deleted successfully.'));
+        return redirect()->route('escorts.index')->with('success', __db('deleted_successfully'));
     }
 
     public function assign(Request $request, Escort $escort)
@@ -418,7 +418,7 @@ class EscortController extends Controller
         $delegation = \App\Models\Delegation::find($delegationId);
 
         if (!$delegation->canAssignServices()) {
-            return back()->withErrors(['error' => ' Escorts can only be assigned to delegations with status Accepted or Accepted with Secretary.'])->withInput();
+            return back()->withErrors(['error' => __db('services_can_only_be_assigned_to_delegations_with_assignable_status')])->withInput();
         }
 
         $escort->delegations()->update([
@@ -449,10 +449,10 @@ class EscortController extends Controller
         );
 
         if ($request->has('assignment_mode') && $request->assignment_mode === 'escort') {
-            return redirect()->route('delegations.show', $delegationId)->with('success', __db('Escort assigned successfully.'));
+            return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
         }
 
-        return redirect()->route('delegations.show', $delegationId)->with('success', __db('Escort assigned successfully.'));
+        return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
     }
 
 
@@ -504,7 +504,7 @@ class EscortController extends Controller
 
         $escort->save();
 
-        return redirect()->back()->with('success', __db('Escort unassigned successfully.'));
+        return redirect()->back()->with('success', __db('updated_successfully'));
     }
 
     public function showImportForm()
@@ -523,10 +523,10 @@ class EscortController extends Controller
             Excel::import(new EscortImport($fileName), $request->file('file'));
 
             return redirect()->route('admin.import-logs.index', ['import_type' => 'escorts'])
-                ->with('success', __db('escorts_imported_successfully'));
+                ->with('success', __db('imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Escort Import Error: ' . $e->getMessage());
-            return back()->with('error', __db('escort_import_failed') . ': ' . $e->getMessage());
+            return back()->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
     }
 }

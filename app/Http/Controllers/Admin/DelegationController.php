@@ -1500,13 +1500,13 @@ class DelegationController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Interview updated successfully.',
+                'message' => __db('updated_successfully'),
                 'redirect_url' => route('delegations.show', $delegation->id),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Interview Update Failed: ' . $e->getMessage());
-            return response()->json(['message' => 'Error updating interview.'], 500);
+            return response()->json(['message' => __db('failed_to_update')], 500);
         }
     }
 
@@ -2440,10 +2440,10 @@ class DelegationController extends Controller
             Excel::import(new DelegateImport($fileName), $request->file('file'));
 
             return redirect()->route('admin.import-logs.index', ['import_type' => 'delegates'])
-                ->with('success', __db('delegates_imported_successfully'));
+                ->with('success', __db('imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
-            return back()->with('error', __db('delegation_import_failed') . ': ' . $e->getMessage());
+            return back()->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
     }
 }

@@ -224,7 +224,7 @@ class DriverController extends Controller
             delegationId: $driver->delegation_id
         );
 
-        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver created successfully.'));
+        return redirect(getRouteForPage('drivers.index'))->with('success', __db('created_successfully'));
     }
 
     public function show(string $id)
@@ -357,7 +357,7 @@ class DriverController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => __db('Driver updated successfully.'),
+            'message' => __db('updated_successfully'),
             'redirect_url' => getRouteForPage('drivers.edit', $driver->id),
         ]);
     }
@@ -376,7 +376,7 @@ class DriverController extends Controller
             delegationId: $driver->delegation_id
         );
 
-        return redirect(getRouteForPage('drivers.index'))->with('success', __db('Driver deleted successfully.'));
+        return redirect(getRouteForPage('drivers.index'))->with('success', __db('deleted_successfully'));
     }
 
     public function assign(Request $request, Driver $driver)
@@ -391,7 +391,7 @@ class DriverController extends Controller
         $delegation = \App\Models\Delegation::find($delegationId);
 
         if (!$delegation->canAssignServices()) {
-            return back()->withErrors(['error' => ' Drivers can only be assigned to delegations with status Accepted or Accepted with Secretary.'])->withInput();
+            return back()->withErrors(['error' => __db('services_can_only_be_assigned_to_delegations_with_assignable_status')])->withInput();
         }
 
         $action = $request->action;
@@ -404,7 +404,7 @@ class DriverController extends Controller
             if ($activeAssignments->isEmpty()) {
                 $action = 'reassign';
             } else {
-                return redirect()->back()->with('error', 'Action is required for drivers with existing assignments.');
+                return redirect()->back()->with('error', __db('action_required_for_existing_assignments'));
             }
         }
 
@@ -465,7 +465,7 @@ class DriverController extends Controller
             ]
         );
 
-        return redirect()->route('delegations.show', $delegationId)->with('success', __db('Driver assigned successfully.'));
+        return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
     }
 
 
@@ -525,7 +525,7 @@ class DriverController extends Controller
             $driver->save();
         }
 
-        return redirect()->back()->with('success', __db('Driver unassigned successfully.'));
+        return redirect()->back()->with('success', __db('updated_successfully'));
     }
 
     public function showImportForm()
@@ -544,10 +544,10 @@ class DriverController extends Controller
             Excel::import(new DriverImport($fileName), $request->file('file'));
 
             return redirect()->route('admin.import-logs.index', ['import_type' => 'drivers'])
-                ->with('success', __db('drivers_imported_successfully'));
+                ->with('success', __db('imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Driver Import Error: ' . $e->getMessage());
-            return back()->with('error', __db('driver_import_failed') . ': ' . $e->getMessage());
+            return back()->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
     }
 }
