@@ -59,7 +59,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
                         continue;
                     }
 
-                    $delegateData = $this->processDelegateData($row, $delegation->id);
+                    $delegateData = $this->processDelegateData($row, $delegation->id, $rowNumber);
 
                     $arrivalData = $this->processTransportData($row, 'arrival');
                     $departureData = $this->processTransportData($row, 'departure');
@@ -98,7 +98,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
         }
     }
 
-    private function processDelegateData($row, $delegationId)
+    private function processDelegateData($row, $delegationId, $rowNumber)
     {
         $delegateData = [
             'delegation_id' => $delegationId,
@@ -127,7 +127,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($gender) {
                 $delegateData['gender_id'] = $gender->id;
             } else {
-                throw new \Exception('Invalid delegate_gender_id: ' . $row['delegate_gender_id']);
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_gender_id: ' . $row['delegate_gender_id'], $row->toArray());
             }
         }
 
@@ -139,7 +139,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($relationship) {
                 $delegateData['relationship_id'] = $relationship->id;
             } else {
-                throw new \Exception('Invalid delegate_relationship_id: ' . $row['delegate_relationship_id']);
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_relationship_id: ' . $row['delegate_relationship_id'], $row->toArray());
             }
         }
 
@@ -151,7 +151,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($ranking) {
                 $delegateData['internal_ranking_id'] = $ranking->id;
             } else {
-                throw new \Exception('Invalid delegate_internal_ranking_id: ' . $row['delegate_internal_ranking_id']);
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_internal_ranking_id: ' . $row['delegate_internal_ranking_id'], $row->toArray());
             }
         }
 
@@ -163,7 +163,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($parentDelegate) {
                 $delegateData['parent_id'] = $parentDelegate->id;
             } else {
-                throw new \Exception('Parent delegate not found with code: ' . $row['delegate_parent_code']);
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Parent delegate not found with code: ' . $row['delegate_parent_code'], $row->toArray());
             }
         }
 
@@ -219,7 +219,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
             })->where('id', trim($transportData['airport_id']))->first();
 
             if (!$airport) {
-                throw new \Exception('Invalid ' . $type . ' airport_id: ' . $transportData['airport_id']);
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid ' . $type . ' airport_id: ' . $transportData['airport_id'], $row->toArray());
+                $transportData['airport_id'] = null;
             }
         } elseif ($transportData['mode'] !== 'flight') {
             $transportData['airport_id'] = null;
