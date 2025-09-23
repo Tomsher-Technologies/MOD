@@ -1,5 +1,5 @@
 <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all__other_interview_members') }}</h2>
+    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all_other_interview_members') }}</h2>
 </div>
 
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
