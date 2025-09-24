@@ -534,11 +534,6 @@
         async function fetchAlertCount() {
             console.log("Fetching alert count");
 
-            const now = Date.now();
-            if (alertsCache.count !== null && (now - alertsCache.timestamp) < CACHE_DURATION) {
-                return alertsCache.count;
-            }
-
             try {
                 const response = await fetch('/mod-events/alerts/count', {
                     method: 'GET',
