@@ -248,15 +248,14 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
     Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
 
-    Route::get('/logs', [LogController::class, 'showLog'])->name('admin.logs');
-
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
     Route::post('/import-logs/clear', [ImportLogController::class, 'clearLogs'])->name('admin.import-logs.clear');
     
     // Developer routes
+    Route::get('/logs', [DeveloperController::class, 'showLog'])->name('admin.logs');
     Route::get('/developer/tables', [DeveloperController::class, 'getAllTables'])->name('developer.tables');
-    Route::get('/developer/{model}', [DeveloperController::class, 'getModelData'])->name('developer.model');
+    Route::get('/developer/tables/{model}', [DeveloperController::class, 'getModelData'])->name('developer.model');
 });
 
 Route::get('/lang/{lang}', function ($lang) {
