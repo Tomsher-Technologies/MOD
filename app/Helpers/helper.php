@@ -472,8 +472,8 @@ if (!function_exists('getRouteForPage')) {
 
             //Members
             'delegation.members' => [
-                'add_interviews' => '/mod-admin/delegations/members',
-                'del_add_interviews' => '/mod-admin/delegations/members',
+                'add_interviews' => '/mod-events/delegations/members',
+                'del_add_interviews' => '/mod-events/delegations/members',
             ],
 
             //Attachments

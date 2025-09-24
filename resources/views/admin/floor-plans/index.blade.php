@@ -148,7 +148,7 @@
                         if (result.isConfirmed) {
                             const form = document.createElement('form');
                             form.method = 'POST';
-                            form.action = "{{ url('/mod-admin/floor-plans') }}/" + floorPlanId;
+                            form.action = "{{ url('/mod-events/floor-plans') }}/" + floorPlanId;
                             
                             const csrfInput = document.createElement('input');
                             csrfInput.type = 'hidden';

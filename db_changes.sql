@@ -640,4 +640,4 @@
 
 -- Done in live
 
-alter table delegation_activities add column delegation_code text after delegation_id;
+-- alter table delegation_activities add column delegation_code text after delegation_id;

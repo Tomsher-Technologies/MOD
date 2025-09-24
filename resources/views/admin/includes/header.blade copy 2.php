@@ -579,7 +579,7 @@
 @section('script')
 <script>
     function showLatestAlertModal() {
-        fetch('/mod-admin/alerts/latest', {
+        fetch('/mod-events/alerts/latest', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -591,7 +591,7 @@
             if (data.success && data.alert) {
                 document.getElementById('alertModalTitle').textContent = data.alert.title;
                 document.getElementById('alertModalMessage').textContent = data.alert.message;
-                document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
+                document.getElementById('viewAllAlertsBtn').href = '/mod-events/alerts/' + data.alert.id;
 
                 document.getElementById('alertModal').classList.remove('hidden');
                 document.getElementById('alertModal').classList.add('flex');
@@ -612,7 +612,7 @@
     function showAlertModal(alertId, title, message) {
         document.getElementById('alertModalTitle').textContent = title;
         document.getElementById('alertModalMessage').textContent = message;
-        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + alertId;
+        document.getElementById('viewAllAlertsBtn').href = '/mod-events/alerts/' + alertId;
 
         document.getElementById('alertModal').classList.remove('hidden');
         document.getElementById('alertModal').classList.add('flex');
@@ -623,7 +623,7 @@
     }
 
     function markAlertAsRead(alertId) {
-        fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
+        fetch('/mod-events/alerts/' + alertId + '/mark-as-read', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
