@@ -105,7 +105,7 @@
                     <select name="internal_ranking_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('select') . ' ' . __db('rank') }}</option>
-                        @foreach (getDropDown('internal_ranking')->options as $rank)
+                        @foreach (getDropDown('rank')->options as $rank)
                             <option value="{{ $rank->id }}"
                                 {{ old('internal_ranking_id', $escort->internal_ranking_id) == $rank->id ? 'selected' : '' }}>
                                 {{ $rank->value }}</option>

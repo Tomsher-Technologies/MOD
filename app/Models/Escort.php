@@ -127,7 +127,7 @@ class Escort extends Model
     {
         return $this->belongsTo(DropdownOption::class, 'internal_ranking_id')
             ->whereHas('dropdown', function ($q) {
-                $q->where('code', 'internal_ranking');
+                $q->where('code', 'rank');
             });
     }
 
