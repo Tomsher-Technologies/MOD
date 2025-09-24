@@ -207,17 +207,17 @@ class AccommodationController extends Controller
                 });
             })
             ->when($delegationId, function ($q) use ($delegationId) {
-                $q->where('room_assignments.delegation_id', $delegationId)
-                    ->leftJoin('delegations', 'room_assignments.delegation_id', '=', 'delegations.id')
-
-                    ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
-                    ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
-
-                    ->orderBy('country_sort.sort_order', 'asc')
-                    ->orderBy('invitation_from_sort.sort_order', 'asc');
+                $q->where('room_assignments.delegation_id', $delegationId);
+                   
             })
-            ->get();
+            ->leftJoin('delegations', 'room_assignments.delegation_id', '=', 'delegations.id')
 
+            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+
+            ->orderBy('country_sort.sort_order', 'asc')
+            ->orderBy('invitation_from_sort.sort_order', 'asc')
+            ->get();
 
         // Escorts
         $escorts = RoomAssignment::with(['assignable', 'roomType.roomType'])

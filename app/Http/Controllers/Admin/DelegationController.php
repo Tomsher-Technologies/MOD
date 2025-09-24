@@ -1215,8 +1215,7 @@ class DelegationController extends Controller
                         }
                     }
 
-                    $oldAssignment->active_status = 0;
-                    $oldAssignment->save();
+                    $oldAssignment->delete();
                 }
                 $delegate->current_room_assignment_id = null;
                 $delegate->save();
@@ -1241,8 +1240,7 @@ class DelegationController extends Controller
                         }
                     }
 
-                    $oldAssignment->active_status = 0;
-                    $oldAssignment->save();
+                    $oldAssignment->delete();
                 }
                 $escorts->current_room_assignment_id = null;
                 $escorts->save();
@@ -1267,8 +1265,7 @@ class DelegationController extends Controller
                         }
                     }
 
-                    $oldAssignment->active_status = 0;
-                    $oldAssignment->save();
+                    $oldAssignment->delete();
                 }
                 $drivers->current_room_assignment_id = null;
                 $drivers->save();
@@ -1907,8 +1904,7 @@ class DelegationController extends Controller
                         }
                     }
   
-                    $oldAssignment->active_status = 0;
-                    $oldAssignment->save();
+                    $oldAssignment->delete();
                 }
             }
               
