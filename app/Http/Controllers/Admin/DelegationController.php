@@ -9,6 +9,7 @@ use App\Models\DelegateTransport;
 use App\Models\Delegation;
 use App\Models\DelegationAttachment;
 use App\Models\Interview;
+use App\Models\InterviewMember;
 use App\Models\Accommodation;
 use App\Models\OtherInterviewMember;
 use App\Services\DelegationStatusService;
@@ -1913,6 +1914,27 @@ class DelegationController extends Controller
                 }
             }
 
+            $relatedInterviews = [];
+            $relatedInterviewMembers = InterviewMember::where('member_id', $delegate->id)->get();
+
+            foreach ($relatedInterviewMembers as $interviewMember) {
+                $interview = $interviewMember->interview;
+
+                if (!isset($relatedInterviews[$interview->id])) {
+                    $relatedInterviews[$interview->id] = $interview;
+                }
+
+                $interviewMember->delete();
+            }
+
+            foreach ($relatedInterviews as $interview) {
+                $interview->refresh();
+
+                if ($interview->fromMembers()->count() == 0) {
+                    Log::info("Interview {$interview->id} has no 'interview with' members after delegate {$delegate->id} deletion, deleting interview");
+                    $interview->delete();
+                }
+            }
 
             $delegate->delete();
 
@@ -1945,13 +1967,13 @@ class DelegationController extends Controller
             $interview->delete();
 
             return redirect()
-                ->route('delegations.show', $delegationId)
+                ->route('delegations.edit', $delegationId)
                 ->with('success', __db('deleted_successfully'));
         } catch (\Exception $e) {
             Log::error('Interview Delete Failed: ' . $e->getMessage());
 
             return redirect()
-                ->route('delegations.show', $interview->delegation_id)
+                ->route('delegations.edit', $interview->delegation_id)
                 ->with('error', __db('failed_to_delete'));
         }
     }
