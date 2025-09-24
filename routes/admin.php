@@ -13,11 +13,11 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ArrivalController;
 use App\Http\Controllers\Admin\AccommodationController;
-use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\AlertController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\CommitteeController;
+use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\EventPageController;
 use App\Http\Controllers\Admin\FloorPlanController;
 use App\Http\Controllers\Admin\ImportLogController;
@@ -41,6 +41,8 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::resource('countries', CountryController::class);
     Route::post('/countries/status', [CountryController::class, 'updateStatus'])->name('countries.status');
     Route::get('/get-countries', [CountryController::class, 'getByContinents'])->name('countries.by-continent');
+    Route::get('/countries/import', [CountryController::class, 'showImportForm'])->name('countries.import.form');
+    Route::post('/countries/import', [CountryController::class, 'import'])->name('countries.import');
 
     // Manage staffs
     Route::resource('staffs', StaffController::class);
