@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Exports\CountriesExport;
+use App\Imports\CountryImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CountryController extends Controller
@@ -173,15 +174,36 @@ class CountryController extends Controller
         return response()->json($countries);
     }
 
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Country $country)
     {
         $country->delete();
 
         return back()->with('success', __db('deleted_successfully'));
+    }
+
+    public function showImportForm()
+    {
+        return view('admin.countries.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        try {
+            $fileName = $request->file('file')->getClientOriginalName();
+            $import = new CountryImport($fileName);
+            Excel::import($import, $request->file('file'));
+
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'countries'])
+                ->with('success', __db('imported_successfully'));
+        } catch (\Exception $e) {
+            \Log::error('Country Import Error: ' . $e->getMessage());
+            return back()
+                ->with('error', __db('import_failed') . $e->getMessage())
+                ->withInput();
+        }
     }
 }

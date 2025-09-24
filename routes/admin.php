@@ -38,10 +38,10 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard/tables/{table}', [AdminDashboardController::class, 'dashboardTables'])->name('admin.dashboard.tables');
 
     // Manage countries
+    Route::get('/countries/import', [CountryController::class, 'showImportForm'])->name('countries.import.form');
     Route::resource('countries', CountryController::class);
     Route::post('/countries/status', [CountryController::class, 'updateStatus'])->name('countries.status');
     Route::get('/get-countries', [CountryController::class, 'getByContinents'])->name('countries.by-continent');
-    Route::get('/countries/import', [CountryController::class, 'showImportForm'])->name('countries.import.form');
     Route::post('/countries/import', [CountryController::class, 'import'])->name('countries.import');
 
     // Manage staffs
