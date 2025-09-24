@@ -61,7 +61,7 @@ class User extends Authenticatable
      */
     public function notifications()
     {
-        return $this->morphMany(Notification::class, 'notifiable')->orderBy('created_at', 'desc');
+        return $this->morphMany(Notification::class, 'notifiable')->whereNull('alert_id')->orderBy('created_at', 'desc');
     }
 
     /**
@@ -71,7 +71,7 @@ class User extends Authenticatable
      */
     public function unreadNotifications()
     {
-        return $this->notifications()->whereNull('read_at');
+        return $this->notifications()->whereNull('read_at')->whereNull('alert_id');
     }
     
     /**
@@ -79,9 +79,9 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function nonAlertNotifications()
+    public function alertNotifications()
     {
-        return $this->notifications()->whereNull('alert_id');
+        return $this->notifications()->whereNotNull('alert_id');
     }
     
     /**
@@ -89,9 +89,9 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function unreadNonAlertNotifications()
+    public function unreadAlertNotifications()
     {
-        return $this->notifications()->whereNull('read_at')->whereNull('alert_id');
+        return $this->notifications()->whereNull('read_at')->whereNotNull('alert_id');
     }
 
     public function eventUserRoles()

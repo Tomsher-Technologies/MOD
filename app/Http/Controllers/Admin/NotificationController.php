@@ -53,18 +53,15 @@ class NotificationController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
 
-        $notifications = auth()->user()->notifications()
+        $notifications = [];
+
+        $notifications  = auth()->user()->unreadNotifications()
             ->where('event_id', $currentEventId)
-            ->whereNull('alert_id')
             ->latest()
-            ->limit(10)
+            ->limit(5)
             ->get();
 
         $currentEventId = session('current_event_id', getDefaultEventId());
-        $unreadCount = auth()->user()->unreadNonAlertNotifications()
-            ->whereNull('alert_id')
-            ->where('event_id', $currentEventId)
-            ->count();
 
         $formattedNotifications = $notifications->map(function ($notification) {
             $data = is_string($notification->data)
@@ -141,9 +138,34 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'notifications' => $formattedNotifications,
-            'unread_count' => $unreadCount,
+            'unread_count' => auth()->user()->unreadNotifications()->count(),
         ]);
     }
+
+
+    public function getUnreadCount(Request $request)
+    {
+        try {
+            $currentEventId = session('current_event_id', getDefaultEventId());
+
+            $unreadCount = auth()->user()
+                ->unreadNotifications()
+                ->where('event_id', $currentEventId)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching notification count',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     private function getNotificationRedirectLink($delegationId, $module, $submoduleId, $data = [])
     {

@@ -5,12 +5,16 @@
 
             @directCanany(['import_escorts'])
                 <a href="{{ route('escorts.import.form') }}"
-                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg " type="button">
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg "
+                    type="button">
                     {{ __db('import') . ' ' . __db('escorts') }}
                 </a>
             @enddirectCanany
 
-            @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort' && Session::has('escorts_index_last_url'))
+            @if (isset($delegationId) &&
+                    isset($assignmentMode) &&
+                    $assignmentMode === 'escort' &&
+                    Session::has('escorts_index_last_url'))
                 <x-back-btn title="" class="" back-url="{{ Session::get('escorts_index_last_url') }}" />
             @endif
         </div>
@@ -96,10 +100,15 @@
                             'render' => fn($escort) => e($escort->military_number),
                         ],
                         [
-                            'label' => __db('title'),
-                            'key' => 'title',
-                            'render' => fn($escort) => e($escort->getTranslation('title') ?? ''),
+                            'label' => __db('rank'),
+                            'key' => 'rank',
+                            'render' => fn($escort) => e(optional($escort->internalRanking)->value),
                         ],
+                        // [
+                        //     'label' => __db('title'),
+                        //     'key' => 'title',
+                        //     'render' => fn($escort) => e($escort->getTranslation('title') ?? ''),
+                        // ],
                         [
                             'label' => __db('name'),
                             'key' => 'name',

@@ -166,78 +166,77 @@ class AlertController extends Controller
         return view('admin.alerts.show', compact('alert'));
     }
 
-    public function getLatestAlert(Request $request)
+    public function getLatest(Request $request)
     {
-        $currentEventId = session('current_event_id', getDefaultEventId());
+        try {
+            $currentEventId = session('current_event_id', getDefaultEventId());
 
-        $latestAlertNotification = auth()->user()->notifications()
-            ->where('event_id', $currentEventId)
-            ->whereNotNull('alert_id')
-            ->latest()
-            ->first();
+            $alerts = auth()->user()->unreadAlertNotifications()
+                ->where('event_id', $currentEventId)
+                ->latest()
+                ->limit(5)
+                ->get();
 
-        if ($latestAlertNotification) {
-            $data = $latestAlertNotification->data;
-            $message = '';
-            $title = '';
+            $unreadCount = auth()->user()->unreadAlertNotifications()
+                ->where('event_id', $currentEventId)
+                ->count();
 
-            if (isset($data['message'])) {
-                if (is_array($data['message'])) {
-                    $lang = getActiveLanguage();
-                    if ($lang !== 'en' && isset($data['message']['ar'])) {
-                        $message = $data['message']['ar'];
-                    } else {
-                        $message = $data['message']['en'] ?? '';
-                    }
-                } else {
-                    $message = $data['message'];
-                }
-            }
+            if ($alerts && $alerts->count() > 0) {
+                $alertsData = [];
 
-            if (isset($data['title'])) {
-                if (is_array($data['title'])) {
-                    $lang = getActiveLanguage();
-                    if ($lang !== 'en' && isset($data['title']['ar'])) {
-                        $title = $data['title']['ar'];
-                    } else {
-                        $title = $data['title']['en'] ?? '';
-                    }
-                } else {
-                    $title = $data['title'];
-                }
-            } else {
-                if (isset($data['changes']['title'])) {
-                    if (is_array($data['changes']['title'])) {
-                        $lang = getActiveLanguage();
-                        if ($lang !== 'en' && isset($data['changes']['title']['ar'])) {
-                            $title = $data['changes']['title']['ar'];
-                        } else {
-                            $title = $data['changes']['title']['en'] ?? '';
+                foreach ($alerts as $notification) {
+                    $alertId = $notification->alert_id ?? null;
+
+                    if ($alertId) {
+                        $alert = Alert::find($alertId);
+
+                        if ($alert) {
+                            $alertData = [
+                                'id' => $alert->id,
+                                'title' => is_array($alert->title)
+                                    ? ($alert->title[app()->getLocale()] ?? $alert->title['en'] ?? '')
+                                    : $alert->title,
+                                'message' => is_array($alert->message)
+                                    ? ($alert->message[app()->getLocale()] ?? $alert->message['en'] ?? '')
+                                    : $alert->message,
+                                'created_at' => $alert->created_at->format('Y-m-d H:i:s'),
+                                'notification_id' => $notification->id
+                            ];
+
+                            $alertsData[] = $alertData;
+
+                            $this->markAsRead($request, $notification->id);
                         }
-                    } else {
-                        $title = $data['changes']['title'];
                     }
+                }
+
+                if (!empty($alertsData)) {
+                    return response()->json([
+                        'success' => true,
+                        'alerts' => $alertsData,
+                        'unread_count' => $unreadCount
+                    ]);
                 }
             }
 
             return response()->json([
-                'success' => true,
-                'alert' => [
-                    'id' => $data['alert_id'] ?? 0,
-                    'title' => $title,
-                    'message' => $message
-                ]
+                'success' => false,
+                'message' => 'No alerts found'
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching latest alerts',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'success' => false,
-            'alert' => null
-        ]);
     }
+
+
 
     public function markAsRead(Request $request, $id)
     {
+
         $alertRecipient = AlertRecipient::where('alert_id', $id)
             ->where('user_id', auth()->id())
             ->first();
@@ -257,5 +256,28 @@ class AlertController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function getUnreadCount(Request $request)
+    {
+        try {
+            $currentEventId = session('current_event_id', getDefaultEventId());
+
+            $unreadCount = auth()->user()
+                ->unreadAlertNotifications()
+                ->where('event_id', $currentEventId)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching alert count',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
