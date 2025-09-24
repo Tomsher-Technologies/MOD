@@ -48,8 +48,8 @@
                     <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('arrivals') }}</h2>
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
-                        <img src="{{ getAdminEventLogo() }}" alt="">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
+                        <img src="{{ getAdminEventLogo() }}" alt="" class="max-h-[100px]">
+                        <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[100px]" alt="Logo">
                     </div>
 
                     <a href="#" id="fullscreenToggleBtn"
