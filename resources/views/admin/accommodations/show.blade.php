@@ -143,268 +143,266 @@
         </div>
 
 
-        
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
-    <div class="xl:col-span-12 h-full">
-        <div class="bg-white h-full  max-h-full rounded-lg border-0 p-4 sm:p-2 md:p-6 overflow-x-auto">
 
-            @php
-                $columns = [
-                    [
-                        'label' => __db('sl_no'),
-                        'render' => fn($row, $key) => $key + 1,
-                    ],
-                    [
-                        'label' => __db('country'),
-                        'render' => fn($row) => e($row->delegation?->country->name ?? ''),
-                    ],
-                    [
-                        'label' => __db('invitation_from'),
-                        'render' => fn($row) => $row->delegation->invitationFrom->value ?? '-',
-                    ],
-                    [
-                        'label' => __db('delegation'),
-                        'render' => function ($row) {
-                            if (!$row->delegation?->id) {
-                                return '<span class="text-muted">N/A</span>';
-                            }
-                            $url = route('accommodation-delegation-view', base64_encode($row->delegation->id));
-                            return '<a class="text-[#B68A35]" href="' . $url . '">' . $row->delegation->code . '</a>';
-                        },
-                    ],
-                    [
-                        'label' => __db('name_en'),
-                        'render' => function ($row) {
-                            $teamHeadBadge = $row->assignable?->team_head
-                                ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
-                                : '';
-                            $name = $row->assignable?->name_en ?: '';
-                            return $teamHeadBadge .
-                                '<div class="block">' .
-                                $row->assignable?->title_en .
-                                ' ' .
-                                e($name) .
-                                '</div>';
-                        },
-                    ],
-                    [
-                        'label' => __db('name_ar'),
-                        'render' => function ($row) {
-                            $teamHeadBadge = $row->assignable?->team_head
-                                ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
-                                : '';
-                            $name = $row->assignable?->name_ar ?: '';
-                            return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
-                        },
-                    ],
-                    [
-                        'label' => __db('designation_en'),
-                        'render' => fn($row) => $row->assignable?->designation_en ?: $row->assignable?->designation_ar ?: '-',
-                    ],
-                    [
-                        'label' => __db('designation_ar'),
-                        'render' => fn($row) => $row->assignable?->designation_ar ?: '-',
-                    ],
-                    [
-                        'label' => __db('internal_ranking'),
-                        'render' => fn($row) => $row->assignable?->internalRanking?->value ?? '-',
-                    ],
-                    [
-                        'label' => __db('gender'),
-                        'render' => fn($row) => $row->assignable?->gender?->value ?? '-',
-                    ],
-                    [
-                        'label' => __db('parent_id'),
-                        'render' => fn($row) => $row->assignable?->parent
-                            ? ($row->assignable?->parent->name_en ?: $row->assignable?->parent->name_ar ?: '-')
-                            : '-',
-                    ],
-                    [
-                        'label' => __db('relationship'),
-                        'render' => fn($row) => $row->assignable?->relationship?->value ?? '-',
-                    ],
-                    [
-                        'label' => __db('participation_status'),
-                        'render' => function ($row) {
-                            return $row->assignable?->participation_status ?? '-';
-                        },
-                    ],
-                    [
-                        'label' => __db('accommodation'),
-                        'render' => function ($row) {
-                            if (!$row->assignable?->accommodation) {
-                                return 'Not Required';
-                            }
-                            $room = $row->assignable?->currentRoomAssignment ?? null;
-                            $accommodation = $row->assignable?->current_room_assignment_id
-                                ? $room->roomType?->roomType?->value . ' - ' . $room?->room_number ?? '-'
-                                : '-';
-                            return $accommodation ?? '-';
-                        },
-                    ],
-                    [
-                        'label' => __db('arrival_status'),
-                        'render' => function ($row) {
-                            $id = $row->assignable?->id ?? uniqid();
-                            return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
-                                $id .
-                                '" data-modal-toggle="delegate-transport-modal-' .
-                                $id .
-                                '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect><path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path></g></svg>';
-                        },
-                    ],
-                    [
-                        'label' => __db('action'),
-                        'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
-                        'render' => function ($row) {
-                            $buttons =
-                                '<a href="' .
-                                route(
-                                    'accommodation-delegation-view',
-                                    base64_encode($row->delegation?->id ?? uniqid()),
-                                ) .
-                                '" class="">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
-                                                                <path
-                                                                    d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                                    fill="#B68A35"></path>
-                                                            </svg>
-                                                        </a>';
-                            return $buttons;
-                        },
-                    ],
-                ];
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-3 h-full">
+            <div class="xl:col-span-12 h-full">
+                <div class="bg-white h-full  max-h-full rounded-lg border-0 p-4 sm:p-2 md:p-6 overflow-x-auto">
 
-                $noDataMessage = __db('no_data_found');
-                $delegates = $delegates ?? collect();
-            @endphp
+                    @php
+                        $columns = [
+                            [
+                                'label' => __db('sl_no'),
+                                'render' => fn($row, $key) => $key + 1,
+                            ],
+                            [
+                                'label' => __db('country'),
+                                'render' => fn($row) => e($row->delegation?->country->name ?? ''),
+                            ],
+                            [
+                                'label' => __db('invitation_from'),
+                                'render' => fn($row) => $row->delegation->invitationFrom->value ?? '-',
+                            ],
+                            [
+                                'label' => __db('delegation'),
+                                'render' => function ($row) {
+                                    if (!$row->delegation?->id) {
+                                        return '<span class="text-muted">N/A</span>';
+                                    }
+                                    $url = route('accommodation-delegation-view', base64_encode($row->delegation->id ?? 0));
+                                    return '<a class="text-[#B68A35]" href="' .
+                                        $url .
+                                        '">' .
+                                        $row->delegation->code .
+                                        '</a>';
+                                },
+                            ],
+                            [
+                                'label' => __db('name_en'),
+                                'render' => function ($row) {
+                                    $teamHeadBadge = $row->assignable?->team_head
+                                        ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
+                                        : '';
+                                    $name = $row->assignable?->name_en ?: '';
+                                    return $teamHeadBadge .
+                                        '<div class="block">' .
+                                        $row->assignable?->title_en .
+                                        ' ' .
+                                        e($name) .
+                                        '</div>';
+                                },
+                            ],
+                            [
+                                'label' => __db('name_ar'),
+                                'render' => function ($row) {
+                                    $teamHeadBadge = $row->assignable?->team_head
+                                        ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span>'
+                                        : '';
+                                    $name = $row->assignable?->name_ar ?: '';
+                                    return $teamHeadBadge . '<div class="block">' . e($name) . '</div>';
+                                },
+                            ],
+                            [
+                                'label' => __db('designation_en'),
+                                'render' => fn($row) => $row->assignable?->designation_en ?:
+                                $row->assignable?->designation_ar ?:
+                                '-',
+                            ],
+                            [
+                                'label' => __db('designation_ar'),
+                                'render' => fn($row) => $row->assignable?->designation_ar ?: '-',
+                            ],
+                            [
+                                'label' => __db('internal_ranking'),
+                                'render' => fn($row) => $row->assignable?->internalRanking?->value ?? '-',
+                            ],
+                            [
+                                'label' => __db('gender'),
+                                'render' => fn($row) => $row->assignable?->gender?->value ?? '-',
+                            ],
+                            [
+                                'label' => __db('parent_id'),
+                                'render' => fn($row) => $row->assignable?->parent
+                                    ? ($row->assignable?->parent->name_en ?:
+                                    $row->assignable?->parent->name_ar ?:
+                                    '-')
+                                    : '-',
+                            ],
+                            [
+                                'label' => __db('relationship'),
+                                'render' => fn($row) => $row->assignable?->relationship?->value ?? '-',
+                            ],
+                            [
+                                'label' => __db('participation_status'),
+                                'render' => function ($row) {
+                                    return $row->assignable?->participation_status ?? '-';
+                                },
+                            ],
+                            [
+                                'label' => __db('accommodation'),
+                                'render' => function ($row) {
+                                    if (!$row->assignable?->accommodation) {
+                                        return 'Not Required';
+                                    }
+                                    $room = $row->assignable?->currentRoomAssignment ?? null;
+                                    $accommodation = $row->assignable?->current_room_assignment_id
+                                        ? $room->roomType?->roomType?->value . ' - ' . $room?->room_number ?? '-'
+                                        : '-';
+                                    return $accommodation ?? '-';
+                                },
+                            ],
+                            [
+                                'label' => __db('arrival_status'),
+                                'render' => function ($row) {
+                                    $id = $row->assignable?->id ?? uniqid();
+                                    return '<svg class="cursor-pointer" width="36" height="30" data-modal-target="delegate-transport-modal-' .
+                                        $id .
+                                        '" data-modal-toggle="delegate-transport-modal-' .
+                                        $id .
+                                        '" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="#B68A35">
+                                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                            <g id="SVGRepo_iconCarrier">
+                                                <rect width="480" height="32" x="16" y="464" fill="var(--ci-primary-color, #B68A35)" class="ci-primary"></rect>
+                                                <path fill="var(--ci-primary-color, #B68A35)" d="M455.688,152.164c-23.388-6.515-48.252-6.053-70.008,1.3l-.894.3-65.1,30.94L129.705,109.176a47.719,47.719,0,0,0-49.771,8.862L54.5,140.836a24,24,0,0,0,2.145,37.452l117.767,83.458-45.173,23.663L93.464,252.722a48.067,48.067,0,0,0-51.47-8.6l-19.455,8.435a24,24,0,0,0-11.642,33.3L83.718,422.684,480.3,227.21c23.746-11.177,26.641-29.045,21.419-42.059C495.931,170.723,479.151,158.7,455.688,152.164Zm10.9,46.133-.149.07L97.394,380.267l-54.176-101.8,11.5-4.987a16.021,16.021,0,0,1,17.157,2.867l52.336,47.819,111.329-58.318L83.322,157.974l17.971-16.108a15.908,15.908,0,0,1,16.59-2.954l202.943,80.681,75.95-36.095c15.456-5.009,33.863-5.165,50.662-.413,13.834,3.914,21.182,9.6,23.672,12.582A24.211,24.211,0,0,1,466.59,198.3Z" class="ci-primary"></path>
+                                            </g>
+                                        </svg>';
+                                },
+                            ],
+                            [
+                                'label' => __db('action'),
+                                'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
+                                'render' => function ($row) {
+                                    $buttons =
+                                        '<a href="' .
+                                        route(
+                                            'accommodation-delegation-view',
+                                            base64_encode($row->delegation?->id ?? 0),
+                                        ) .
+                                        '" class="">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                                                <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
+                                            </svg>
+                                        </a>';
+                                    return $buttons;
+                                },
+                            ],
+                        ];
 
-            <x-reusable-table
-                :data="$delegates"
-                table-id="delegatesTableEdit"
-                :enableColumnListBtn="true"
-                :columns="$columns"
-                :no-data-message="$noDataMessage"
-                class="w-full overflow-x-auto"
-            />
+                        $noDataMessage = __db('no_data_found');
+                        $delegates = $delegates ?? collect();
+                    @endphp
 
+                    <x-reusable-table :data="$delegates" table-id="delegatesTableEdit" :enableColumnListBtn="true" :columns="$columns"
+                        :no-data-message="$noDataMessage" class="w-full overflow-x-auto" />
 
+                    @foreach ($delegates as $delegate)
+                        @php
+                            $delegate = $delegate->assignable;
+                        @endphp
+                        @if($delegate)
+                            <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
+                                class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-30 p-4 md:p-5">
+                                <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+                                    <div class="flex items-center justify-between p-3 border-b border-gray-200">
+                                        <h3 class="text-lg font-semibold text-gray-900 truncate">
+                                            {{ __db('transport_information_for') }} {{ $delegate->name_en ?? '-' }}
+                                        </h3>
+                                        <button type="button"
+                                            class="text-gray-400 hover:text-gray-700 rounded focus:outline-none focus:ring focus:ring-gray-300 p-1"
+                                            data-modal-hide="delegate-transport-modal-{{ $delegate->id }}"
+                                            aria-label="Close modal">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </div>
 
+                                    <div class="p-4 space-y-6">
+                                        {{-- Arrival Section --}}
+                                        <section>
+                                            <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('arrival') }}</h4>
+                                            @php
+                                            $arrival = $delegate->delegateTransports
+                                                    ->where('type', 'arrival')
+                                                    ->first();
+                                            @endphp
 
+                                            <div
+                                                class="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-6 bg-gray-50">
+                                                @if ($arrival)
+                                                    <div class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
+                                                        <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
+                                                        <p class="text-sm text-gray-800">
+                                                            {{ $arrival->airport?->value ?? '-' }}</p>
+                                                    </div>
+                                                    <div class="border-b md:border-b-0 border-gray-200 pb-2">
+                                                        <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $arrival->flight_no ?? '-' }}</p>
+                                                    </div>
+                                                    <div class="pt-2 pr-3 md:border-r md:border-gray-200">
+                                                        <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $arrival->flight_name ?? '-' }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="pt-2">
+                                                        <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $arrival->date_time ?? '-' }}</p>
+                                                    </div>
+                                                @else
+                                                    <p class="col-span-2 text-gray-500 italic">
+                                                        {{ __db('no_arrival_information') }}.</p>
+                                                @endif
+                                            </div>
+                                        </section>
 
+                                        {{-- Departure Section --}}
+                                        <section>
+                                            <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('departure') }}</h4>
+                                            @php
+                                            $departure = $delegate->delegateTransports
+                                                    ->where('type', 'departure')
+                                                    ->first();
+                                            @endphp
 
-
-
-
-@foreach ($delegates as $delegate)
-  @php
-    $delegate = $delegate->assignable;
-  @endphp
-  <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
-       class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-30 p-4 md:p-5">
-    <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-      <div class="flex items-center justify-between p-3 border-b border-gray-200">
-        <h3 class="text-lg font-semibold text-gray-900 truncate">
-          {{ __db('transport_information_for') }} {{ $delegate->name_en ?? '-' }}
-        </h3>
-        <button type="button"
-                class="text-gray-400 hover:text-gray-700 rounded focus:outline-none focus:ring focus:ring-gray-300 p-1"
-                data-modal-hide="delegate-transport-modal-{{ $delegate->id }}" aria-label="Close modal">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="p-4 space-y-6">
-        {{-- Arrival Section --}}
-        <section>
-          <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('arrival') }}</h4>
-          @php $arrival = $delegate->delegateTransports->where('type', 'arrival')->first(); @endphp
-
-          <div class="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-6 bg-gray-50">
-            @if ($arrival)
-              <div class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
-                <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
-                <p class="text-sm text-gray-800">{{ $arrival->airport?->value ?? '-' }}</p>
-              </div>
-              <div class="border-b md:border-b-0 border-gray-200 pb-2">
-                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                <p class="text-sm text-gray-800">{{ $arrival->flight_no ?? '-' }}</p>
-              </div>
-              <div class="pt-2 pr-3 md:border-r md:border-gray-200">
-                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                <p class="text-sm text-gray-800">{{ $arrival->flight_name ?? '-' }}</p>
-              </div>
-              <div class="pt-2">
-                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                <p class="text-sm text-gray-800">{{ $arrival->date_time ?? '-' }}</p>
-              </div>
-            @else
-              <p class="col-span-2 text-gray-500 italic">{{ __db('no_arrival_information') }}.</p>
-            @endif
-          </div>
-        </section>
-
-        {{-- Departure Section --}}
-        <section>
-          <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('departure') }}</h4>
-          @php $departure = $delegate->delegateTransports->where('type', 'departure')->first(); @endphp
-
-          <div class="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-6 bg-gray-50">
-            @if ($departure)
-              <div class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
-                <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
-                <p class="text-sm text-gray-800">{{ $departure->airport?->value ?? '-' }}</p>
-              </div>
-              <div class="border-b md:border-b-0 border-gray-200 pb-2">
-                <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                <p class="text-sm text-gray-800">{{ $departure->flight_no ?? '-' }}</p>
-              </div>
-              <div class="pt-2 pr-3 md:border-r md:border-gray-200">
-                <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                <p class="text-sm text-gray-800">{{ $departure->flight_name ?? '-' }}</p>
-              </div>
-              <div class="pt-2">
-                <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                <p class="text-sm text-gray-800">{{ $departure->date_time ?? '-' }}</p>
-              </div>
-            @else
-              <p class="col-span-2 text-gray-500 italic">{{ __db('no_departure_information') }}.</p>
-            @endif
-          </div>
-        </section>
-      </div>
-    </div>
-  </div>
-@endforeach
-
-
-
-
-
-
-
-
+                                            <div
+                                                class="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-6 bg-gray-50">
+                                                @if ($departure)
+                                                    <div class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
+                                                        <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                                        <p class="text-sm text-gray-800">
+                                                            {{ $departure->airport?->value ?? '-' }}</p>
+                                                    </div>
+                                                    <div class="border-b md:border-b-0 border-gray-200 pb-2">
+                                                        <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $departure->flight_no ?? '-' }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="pt-2 pr-3 md:border-r md:border-gray-200">
+                                                        <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $departure->flight_name ?? '-' }}
+                                                        </p>
+                                                    </div>
+                                                    <div class="pt-2">
+                                                        <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $departure->date_time ?? '-' }}
+                                                        </p>
+                                                    </div>
+                                                @else
+                                                    <p class="col-span-2 text-gray-500 italic">
+                                                        {{ __db('no_departure_information') }}.
+                                                    </p>
+                                                @endif
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         <hr class="mx-6 border-neutral-200 h-10">
@@ -509,15 +507,13 @@
                                         '<a href="' .
                                         route(
                                             'accommodation-delegation-view',
-                                            base64_encode($escort->delegation?->id),
+                                            base64_encode($escort->delegation?->id ?? 0),
                                         ) .
                                         '" class="">
-                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>';
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                                                <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
+                                            </svg>
+                                        </a>';
                                     return $buttons;
                                 },
                             ],
@@ -630,15 +626,13 @@
                                         '<a href="' .
                                         route(
                                             'accommodation-delegation-view',
-                                            base64_encode($driver->delegation?->id),
+                                            base64_encode($driver->delegation?->id ?? 0),
                                         ) .
                                         '" class="">
-                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>';
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                                                <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
+                                            </svg>
+                                        </a>';
                                     return $buttons;
                                 },
                             ],
@@ -672,6 +666,11 @@
                                     'key' => 'title',
                                     'render' => fn($external) => e($external->name ?? ''),
                                 ],
+                                [
+                                    'label' => __db('coming_from'),
+                                    'key' => 'title',
+                                    'render' => fn($external) => e($external->coming_from ?? ''),
+                                ],
 
                                 [
                                     'label' => __db('accommodation'),
@@ -691,12 +690,10 @@
                                             '<a href="' .
                                             route('external-members.edit', $external->id) .
                                             '" class="">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
-                                            <path
-                                                d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"
-                                                fill="#B68A35"></path>
-                                        </svg>
-                                    </a>';
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512">
+                                                    <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" fill="#B68A35"></path>
+                                                </svg>
+                                            </a>';
                                         return $buttons;
                                     },
                                 ],
