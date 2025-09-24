@@ -61,7 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 401);
             }
 
-            if ($request->is('mod-admin/*')) {
+            if ($request->is('mod-events/*')) {
                 return redirect()->route('login')->with('error', 'Unauthorized access.');
             }
 

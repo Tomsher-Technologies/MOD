@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\User;
+use App\Models\EventPage;
 use App\Models\EventUserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -84,7 +85,29 @@ class EventController extends Controller
         }
         $data['code'] =  generateEventCode();
 
-        Event::create($data);
+        $event = Event::create($data);
+        $defaultSlugs = ['home','about-us','committee'];
+
+        $pages = [];
+        if ($event) {
+            foreach ($defaultSlugs as $slug) {
+                $page = EventPage::firstOrCreate(
+                    ['event_id' => $event->id, 'slug' => $slug],
+                    ['status' => 1]
+                );
+
+                foreach(['en','ar'] as $lang){
+                    if(!$page->translations()->where('lang',$lang)->exists()){
+                        $page->translations()->create([
+                            'lang' => $lang,
+                            'title1' => '',
+                            'content1' => '',
+                        ]);
+                    }
+                }
+                $pages[] = $page;
+            }
+        }
 
         return redirect()->route('events.index')->with('success',  __db('event') . __db('created_successfully'));
     }

@@ -40,6 +40,11 @@ class AuthController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        if ($user && in_array($user->user_type, ['admin', 'staff'])) {
+            Auth::logout();
+            return back()->withErrors(['username' => __db('not_allowed_to_login')])->withInput();
+        }
+
         $credentials = $request->only('username', 'password');
         $eventId = $request->input('event_id');
 

@@ -152,7 +152,7 @@
         roleSelect.innerHTML = '<option value="">{{ @__db('choose_option') }}</option>';
 
         if (module) {
-            fetch(`/mod-admin/get-roles-by-module/${module}`)
+            fetch(`/mod-events/get-roles-by-module/${module}`)
                 .then(res => res.json())
                 .then(data => {
                     data.forEach(role => {

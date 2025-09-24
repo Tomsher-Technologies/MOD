@@ -20,7 +20,7 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email'     => 'required|email',
+            'email'     => 'required',
             'password'  => 'required|string',
         ], [
             'email.required'     => __db('email_required'),
@@ -33,18 +33,24 @@ class LoginController extends Controller
         }
 
         $credentials = $request->only('email', 'password');
+        $login = $request->input('email'); 
+        $password = $request->input('password');
 
-        if (Auth::attempt($credentials)) {
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::attempt([$field => $login, 'password' => $password])) {
 
             $user = Auth::user();
-            $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-            $user->givePermissionTo($rolePermissions);
-            $redirectTo = match ($user->user_type) {
-                // 'admin' => route('admin.dashboard'),
-                // 'staff' => route('admin.dashboard'),
-                default => route('admin.dashboard'),
-            };
-                     
+            if ($user && in_array($user->user_type, ['admin', 'staff'])) {
+                $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
+                $user->givePermissionTo($rolePermissions);
+                $redirectTo = match ($user->user_type) {
+                    default => route('admin.dashboard'),
+                };
+            }else{
+                Auth::logout();
+                return back()->withErrors(['password' => __db('not_allowed_to_login')])->withInput();
+            }     
             return redirect()->intended($redirectTo);
         }
 
@@ -57,12 +63,12 @@ class LoginController extends Controller
         $user = Auth::user();
         Auth::logout();
 
-        // if ($request->is('mod-admin/*') || $request->is('mod-admin')) {
+        // if ($request->is('mod-events/*') || $request->is('mod-events')) {
         //     return redirect()->route('admin.login');
         // }
-        // if(in_array($user->user_type, ['delegate', 'hotel', 'escort', 'driver'])){
-        //     return redirect()->route('login');
-        // }
+        if(in_array($user->user_type, ['admin', 'staff'])){
+            return redirect()->route('admin.login');
+        }
         
         return redirect()->route('login');
     }

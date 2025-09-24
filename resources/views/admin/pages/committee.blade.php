@@ -46,7 +46,7 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][title1]" value="{{ $trans->title1 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div>

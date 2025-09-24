@@ -42,13 +42,20 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $grandTotal = 0; @endphp
                                 @foreach($delegatesByDivision as $division)
+                                    @php $grandTotal += $division->total; @endphp
                                     <tr class=" text-[12px] align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">{{ $division->department_name }}</td>
                                         <td class="px-4 text-center py-2 border border-gray-200">{{ $division->total }}</td>
                                     </tr>
                                 @endforeach
                             
+                                {{-- Total row --}}
+                                <tr class=" align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[16px]">
+                                    <td class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</td>
+                                    <td class="text-center px-4 py-2 border border-gray-200">{{ $grandTotal }}</td>
+                                </tr>
                             </tbody>
                         
                         </table>
@@ -59,20 +66,12 @@
     </div>
 
     @php
-        $baseColor = '#B68A35';
-        $labelsCount = count($data['delegatesByDivision']['labels']);
-        $colors = [];
-
-        $spread = 30; // +/- percentage from base color
-
-        for ($i = 0; $i < $labelsCount; $i++) {
-        // Alternate dark/light slices
-        $position = ($i % 2 == 0) ? -1 : 1; // even = darker, odd = lighter
-        $step = ceil($i / 2); // step away from base
-        $percent = $position * ($spread * $step / max(1, ceil($labelsCount / 2)));
-        
-        $colors[] = shadeColor($baseColor, $percent);
-        }
+       $colors = [
+                '#ce89de','#de8989','#dbde89','#898dde','#BFFAFF','#D9FFBA' ,'#D5BAFF','#8994de','#deda89',
+                '#A8E6CF','#FFB3BA',
+                '#FFD8A8','#FFDAC1', '#F5F5DC','#C19A6B','#FFE5B4','#B0E0E6','#BAE1FF','#FFC1E3','#FFFFBA','#D7CCC8','#FFE29F',
+                '#E0B0FF','#D3D3D3','#AEEEEE','#DFFFBA','#99E6E6','#ffaded', '#acbff7',
+            ];
     @endphp
 
 @endsection
