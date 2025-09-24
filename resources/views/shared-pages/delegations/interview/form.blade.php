@@ -401,7 +401,7 @@
                         } else {
                             toastr.error("{{ __db('delegation_not_found') }}");
                             membersSelect.innerHTML =
-                                '<option selected disabled>No members found</option>';
+                                '<option selected disabled>{{ __db('no_members_found') }}</option>';
                         }
                     })
                     .catch(() => {
@@ -471,10 +471,6 @@
                                 delegationsList.appendChild(li);
                             });
 
-
-
-
-
                             modalResults.classList.remove('hidden');
                             toastr.success("{{ __db('delegations_fetched') }}");
 
@@ -483,7 +479,7 @@
                                 'hidden');
 
                         } else {
-                            delegationsList.innerHTML = '<li>No delegations found.</li>';
+                            delegationsList.innerHTML = '<li>{{ __db('no_delegations_found') }}</li>';
                             toastr.error("{{ __db('delegation_not_found') }}");
                             modalResults.classList.remove('hidden');
 
@@ -526,10 +522,10 @@
 
             function populateMembers(members) {
                 if (!members || members.length === 0) {
-                    membersSelect.innerHTML = '<option selected disabled>No members found</option>';
+                    membersSelect.innerHTML = '<option selected disabled>{{ __db('no_members_found') }}</option>';
                     return;
                 }
-                membersSelect.innerHTML = '<option selected disabled>Select Members</option>';
+                membersSelect.innerHTML = '<option selected disabled>{{ __db('select') }}</option>';
                 members.forEach(member => {
                     const opt = document.createElement('option');
                     opt.value = member.id;

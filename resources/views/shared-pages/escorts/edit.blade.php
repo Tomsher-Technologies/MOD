@@ -22,7 +22,7 @@
             @method('PUT')
             <div class="grid grid-cols-12 gap-5">
 
-                <div class="col-span-4">
+                {{-- <div class="col-span-4">
                     <label class="form-label">{{ __db('title_en') }}: </label>
                     <input type="text" name="title_en"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
@@ -34,7 +34,7 @@
                     <input type="text" name="title_ar"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('title_ar', $escort->title_ar) }}">
-                </div>
+                </div> --}}
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
@@ -105,7 +105,7 @@
                     <select name="internal_ranking_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
                         <option selected disabled>{{ __db('select') . ' ' . __db('rank') }}</option>
-                        @foreach (getDropDown('internal_ranking')->options as $rank)
+                        @foreach (getDropDown('rank')->options as $rank)
                             <option value="{{ $rank->id }}"
                                 {{ old('internal_ranking_id', $escort->internal_ranking_id) == $rank->id ? 'selected' : '' }}>
                                 {{ $rank->value }}</option>

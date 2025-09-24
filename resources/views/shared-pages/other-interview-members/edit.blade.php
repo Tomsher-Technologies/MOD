@@ -62,27 +62,6 @@
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
                             </div>
-
-                            {{-- Optionally enable event change --}}
-                            {{--
-                            <div class="col-span-6">
-                                <label class="form-label">{{ __db('event') }} <span class="text-red-600">*</span></label>
-                                <select name="event_id" id="event_id" class="w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" required>
-                                    @foreach ($events as $event)
-                                        <option value="{{ $event->id }}" {{ (old('event_id', $interviewMember->event_id) == $event->id) ? 'selected' : '' }}>
-                                            {{ $event->code }} - {{ $event->name_en }}
-                                            @if ($event->is_default)
-                                                ({{ __db('default') }})
-                                            @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('event_id')
-                                    <div class="text-red-600">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            --}}
-
                         </div>
                     </div>
                 </div>

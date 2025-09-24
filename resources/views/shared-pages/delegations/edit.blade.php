@@ -650,17 +650,6 @@
     </div>
   </div>
 @endforeach
-
-
-
-
-
-
-
-
-
-
-
             </div>
         </div>
     </div>
@@ -713,6 +702,11 @@
                                     e($escort->military_number) .
                                     '</a>';
                             },
+                        ],
+                         [
+                            'label' => __db('rank'),
+                            'key' => 'rank',
+                            'render' => fn($escort) => e(optional($escort->internalRanking)->value),
                         ],
                         [
                             'label' => __db('name'),

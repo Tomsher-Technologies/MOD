@@ -38,20 +38,8 @@
             <div class="grid grid-cols-12 gap-5">
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title_en') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
-                </div>
-
-                <div class="col-span-4">
                     <label class="form-label">{{ __db('title_ar') }} : <span class="text-red-600">*</span></label>
                     <input type="text" name="title_ar" value="{{ old('title_ar', $delegate->title_ar) }}"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
-                </div>
-
-                <div class="col-span-4">
-                    <label class="form-label">{{ __db('name_en') }} : <span class="text-red-600">*</span></label>
-                    <input type="text" name="name_en" value="{{ old('name_en', $delegate->name_en) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
@@ -62,18 +50,34 @@
                 </div>
 
                 <div class="col-span-4">
+                    <label class="form-label">{{ __db('designation_ar') }} :</label>
+                    <input type="text" name="designation_ar"
+                        value="{{ old('designation_ar', $delegate->designation_ar) }}"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
+                </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title_en') }} : <span class="text-red-600">*</span></label>
+                    <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
+                </div>
+
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('name_en') }} : <span class="text-red-600">*</span></label>
+                    <input type="text" name="name_en" value="{{ old('name_en', $delegate->name_en) }}"
+                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
+                </div>
+
+
+                <div class="col-span-4">
                     <label class="form-label">{{ __db('designation_en') }} :</label>
                     <input type="text" name="designation_en"
                         value="{{ old('designation_en', $delegate->designation_en) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
 
-                <div class="col-span-4">
-                    <label class="form-label">{{ __db('designation_ar') }} :</label>
-                    <input type="text" name="designation_ar"
-                        value="{{ old('designation_ar', $delegate->designation_ar) }}"
-                        class="p-3 rounded-lg w-full border text-sm border-neutral-300">
-                </div>
+
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('gender') }}: <span class="text-red-600">*</span></label>

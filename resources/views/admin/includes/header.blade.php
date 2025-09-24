@@ -174,7 +174,6 @@
                     </ul>
                 </div>
 
-
                 <button data-dropdown-toggle="dropdownNotification"
                     class="has-indicator flex h-10 w-10 items-center justify-center rounded-full bg-neutral-200 "
                     type="button">
@@ -184,222 +183,24 @@
                             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                     </svg>
                     <span
-                        class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
+                        class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">{{ auth()->user()->unreadNotifications()->where('event_id', $currentEventId)->count() }}</span>
                 </button>
                 <div id="dropdownNotification"
-                    class="z-10 hidden w-full max-w-[394px] overflow-hidden rounded-2xl bg-white shadow-lg ">
+                    class="z-10 hidden w-full max-w-[394px] overflow-hidden rounded-2xl bg-white shadow-lg">
                     <div
                         class="m-4 flex items-center justify-between gap-2 rounded-lg bg-primary-50 px-4 py-2 dark:bg-primary-600/25">
                         <h6 class="mb-0 text-lg font-semibold text-neutral-900">
                             {{ __db('notifications') }}
                         </h6>
-                        <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ auth()->user()->unreadNonAlertNotifications()->whereNull('alert_id')->count() }}</span>
+                        <span id="notification-count-display"
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">0</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
-                        <div class="max-h-[400px] overflow-y-auto">
-                            @php
-                                $unreadNotifications = auth()
-                                    ->user()
-                                    ->unreadNonAlertNotifications()
-                                    ->whereNull('alert_id')
-                                    ->take(5)
-                                    ->get();
-                            @endphp
-                            @forelse($unreadNotifications as $notification)
-                                @php
-                                    $data = is_string($notification->data)
-                                        ? json_decode($notification->data, true)
-                                        : $notification->data;
-                                    $message = '';
-                                    if (isset($data['message'])) {
-                                        if (is_array($data['message'])) {
-                                            $lang = getActiveLanguage();
-                                            if ($lang !== 'en' && isset($data['message']['ar'])) {
-                                                $message = $data['message']['ar'];
-                                            } else {
-                                                $message = $data['message']['en'] ?? '';
-                                            }
-                                        } else {
-                                            $message = $data['message'];
-                                        }
-                                    }
-                                    $module = $data['module'] ?? null;
-                                    $action = $data['action'] ?? null;
-                                    $delegationId = $data['delegation_id'] ?? null;
-                                    $submoduleId = $data['submodule_id'] ?? null;
-
-                                    $moduleName = null;
-                                    $moduleCode = null;
-                                    $moduleDetails = [];
-
-                                    if (isset($data['changes'])) {
-                                        if (isset($data['changes']['escort_name'])) {
-                                            $moduleName = $data['changes']['escort_name'];
-                                        } elseif (isset($data['changes']['driver_name'])) {
-                                            $moduleName = $data['changes']['driver_name'];
-                                        } elseif (isset($data['changes']['member_name'])) {
-                                            $moduleName = $data['changes']['member_name'];
-                                        } elseif (isset($data['changes']['delegation_code'])) {
-                                            $moduleCode = $data['changes']['delegation_code'];
-                                        } elseif (isset($data['changes']['code'])) {
-                                            $moduleCode = $data['changes']['code'];
-                                        }
-
-                                        foreach ($data['changes'] as $key => $value) {
-                                            if (
-                                                in_array($key, [
-                                                    'escort_name',
-                                                    'driver_name',
-                                                    'member_name',
-                                                    'delegation_code',
-                                                    'code',
-                                                    'title',
-                                                ])
-                                            ) {
-                                                continue;
-                                            }
-
-                                            $displayValue = is_array($value)
-                                                ? (isset($value['new'])
-                                                    ? $value['new']
-                                                    : json_encode($value))
-                                                : $value;
-                                            if (!empty($displayValue) && $displayValue !== 'N/A') {
-                                                $moduleDetails[$key] = $displayValue;
-                                            }
-                                        }
-                                    }
-
-                                    $url = '#';
-
-                                    if ($delegationId) {
-                                        $url = route('delegations.show', $delegationId);
-                                    } elseif ($module && $submoduleId) {
-                                        switch (strtolower($module)) {
-                                            case 'escorts':
-                                                $url = route('escorts.edit', $submoduleId);
-                                                break;
-                                            case 'drivers':
-                                                $url = route('drivers.edit', $submoduleId);
-                                                break;
-                                            default:
-                                                switch (strtolower($module)) {
-                                                    case 'escorts':
-                                                        $escortName = null;
-                                                        if (isset($data['changes']['escort_name'])) {
-                                                            $escortName = $data['changes']['escort_name'];
-                                                        } elseif (isset($data['changes']['member_name'])) {
-                                                            $escortName = $data['changes']['member_name'];
-                                                        }
-
-                                                        if ($escortName) {
-                                                            $url = route('escorts.index', ['search' => $escortName]);
-                                                        } else {
-                                                            $url = route('escorts.index');
-                                                        }
-                                                        break;
-                                                    case 'drivers':
-                                                        $driverName = null;
-                                                        if (isset($data['changes']['driver_name'])) {
-                                                            $driverName = $data['changes']['driver_name'];
-                                                        } elseif (isset($data['changes']['member_name'])) {
-                                                            $driverName = $data['changes']['member_name'];
-                                                        }
-
-                                                        if ($driverName) {
-                                                            $url = route('drivers.index', ['search' => $driverName]);
-                                                        } else {
-                                                            $url = route('drivers.index');
-                                                        }
-                                                        break;
-                                                    default:
-                                                        $url = '#';
-                                                }
-                                        }
-                                    } elseif ($module) {
-                                        switch (strtolower($module)) {
-                                            case 'escorts':
-                                                $escortName = null;
-                                                if (isset($data['changes']['escort_name'])) {
-                                                    $escortName = $data['changes']['escort_name'];
-                                                } elseif (isset($data['changes']['member_name'])) {
-                                                    $escortName = $data['changes']['member_name'];
-                                                }
-
-                                                if ($escortName) {
-                                                    $url = route('escorts.index', ['search' => $escortName]);
-                                                } else {
-                                                    $url = route('escorts.index');
-                                                }
-                                                break;
-                                            case 'drivers':
-                                                $driverName = null;
-                                                if (isset($data['changes']['driver_name'])) {
-                                                    $driverName = $data['changes']['driver_name'];
-                                                } elseif (isset($data['changes']['member_name'])) {
-                                                    $driverName = $data['changes']['member_name'];
-                                                }
-
-                                                if ($driverName) {
-                                                    $url = route('drivers.index', ['search' => $driverName]);
-                                                } else {
-                                                    $url = route('drivers.index');
-                                                }
-                                                break;
-                                            default:
-                                                $url = '#';
-                                        }
-                                    }
-                                @endphp
-                                <a href="{{ $url }}"
-                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100">
-                                    <div class="flex items-center gap-3">
-                                        <div>
-                                            <h6 class="fw-semibold mb-1 text-sm">{{ $module ?? __db('notification') }}
-                                            </h6>
-                                            <p class="mb-0 line-clamp-1 text-sm">
-                                                {{ $message }}
-                                            </p>
-                                            @if ($moduleName || $moduleCode || !empty($moduleDetails))
-                                                <div class="text-xs text-neutral-500 mt-1">
-                                                    @if ($moduleName)
-                                                        <div><span class="font-medium">{{ __db('name') }}:</span>
-                                                            {{ $moduleName }}</div>
-                                                    @endif
-                                                    @if ($moduleCode)
-                                                        <div><span class="font-medium">{{ __db('code') }}:</span>
-                                                            {{ $moduleCode }}</div>
-                                                    @endif
-                                                    @if (!empty($moduleDetails))
-                                                        <div class="mt-1">
-                                                            @foreach (array_slice($moduleDetails, 0, 2) as $key => $value)
-                                                                <div>
-                                                                    <span
-                                                                        class="font-medium">{{ ucfirst(str_replace('_', ' ', $key)) }}:</span>
-                                                                    {{ is_array($value) ? json_encode($value) : $value }}
-                                                                </div>
-                                                            @endforeach
-                                                            @if (count($moduleDetails) > 2)
-                                                                <div>... {{ count($moduleDetails) - 2 }}
-                                                                    {{ __db('more_details') }}</div>
-                                                            @endif
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="shrink-0">
-                                        <span
-                                            class="text-sm text-neutral-500">{{ $notification->created_at->diffForHumans() }}</span>
-                                    </div>
-                                </a>
-                            @empty
-                                <div class="px-4 py-2 text-center text-neutral-500">
-                                    {{ __db('no_notifications') }}
-                                </div>
-                            @endforelse
+                        <div id="unread-notifications-list" class="max-h-[400px] overflow-y-auto">
+                            <!-- Initial loading state -->
+                            <div class="px-4 py-2 text-center text-neutral-500">
+                                {{ __db('loading') }}
+                            </div>
                         </div>
                         <div class="px-4 py-2 text-center">
                             <a href="{{ route('notifications.index') }}"
@@ -410,106 +211,35 @@
                     </div>
                 </div>
 
+
                 <button id="alertDropdownBtn" data-dropdown-toggle="dropdownAlert"
                     class="has-indicator flex h-10 w-10 items-center justify-center rounded-full bg-neutral-200 "
-                    type="button" onclick="showLatestAlertModal()">
+                    type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                     </svg>
-                    <span
-                        class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
+                                    <span id="alert-count-badge"
+                    class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">0</span>
                 </button>
 
                 <div id="dropdownAlert"
-                    class="z-10 hidden w-full max-w-[394px] overflow-hidden rounded-2xl bg-white shadow-lg ">
+                    class="z-10 hidden w-full max-w-[394px] overflow-hidden rounded-2xl bg-white shadow-lg">
                     <div
                         class="m-4 flex items-center justify-between gap-2 rounded-lg bg-primary-50 px-4 py-2 dark:bg-primary-600/25">
                         <h6 class="mb-0 text-lg font-semibold text-neutral-900">
                             {{ __db('alerts') }}
                         </h6>
-                        <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ auth()->user()->unreadNotifications()->whereNotNull('alert_id')->count() }}</span>
+                        <span id="alert-count-display"
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">0</span>
                     </div>
-
                     <div class="scroll-sm !border-t-0">
-                        <div class="max-h-[400px] overflow-y-auto">
-                            @php
-                                $unreadAlerts = auth()
-                                    ->user()
-                                    ->unreadNotifications()
-                                    ->whereNotNull('alert_id')
-                                    ->latest()
-                                    ->take(5)
-                                    ->get();
-                            @endphp
-                            @forelse($unreadAlerts as $notification)
-                                @php
-                                    $data = is_string($notification->data)
-                                        ? json_decode($notification->data, true)
-                                        : $notification->data;
-                                    $message = '';
-                                    if (isset($data['message'])) {
-                                        if (is_array($data['message'])) {
-                                            $lang = getActiveLanguage();
-                                            if ($lang !== 'en' && isset($data['message']['ar'])) {
-                                                $message = $data['message']['ar'];
-                                            } else {
-                                                $message = $data['message']['en'] ?? '';
-                                            }
-                                        } else {
-                                            $message = $data['message'];
-                                        }
-                                    }
-                                    $title = '';
-                                    if (isset($data['title'])) {
-                                        if (is_array($data['title'])) {
-                                            $lang = getActiveLanguage();
-                                            if ($lang !== 'en' && isset($data['title']['ar'])) {
-                                                $title = $data['title']['ar'];
-                                            } else {
-                                                $title = $data['title']['en'] ?? '';
-                                            }
-                                        } else {
-                                            $title = $data['title'];
-                                        }
-                                    } else {
-                                        if (isset($data['changes']['title'])) {
-                                            if (is_array($data['changes']['title'])) {
-                                                $lang = getActiveLanguage();
-                                                if ($lang !== 'en' && isset($data['changes']['title']['ar'])) {
-                                                    $title = $data['changes']['title']['ar'];
-                                                } else {
-                                                    $title = $data['changes']['title']['en'] ?? '';
-                                                }
-                                            } else {
-                                                $title = $data['changes']['title'];
-                                            }
-                                        }
-                                    }
-                                @endphp
-                                <a href="#"
-                                    onclick="showAlertModal({{ $data['alert_id'] ?? 0 }}, '{{ addslashes($title) }}', '{{ addslashes($message) }}'); return false;"
-                                    class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100">
-                                    <div class="flex items-center gap-3">
-                                        <div>
-                                            <h6 class="fw-semibold mb-1 text-sm">{{ $title ?: __db('alert') }}</h6>
-                                            <p class="mb-0 line-clamp-1 text-sm">
-                                                {{ $message }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="shrink-0">
-                                        <span
-                                            class="text-sm text-neutral-500">{{ $notification->created_at->diffForHumans() }}</span>
-                                    </div>
-                                </a>
-                            @empty
-                                <div class="px-4 py-2 text-center text-neutral-500">
-                                    {{ __db('no_alerts') }}
-                                </div>
-                            @endforelse
+                        <div id="unread-alerts-list" class="max-h-[400px] overflow-y-auto">
+                            <!-- Initial loading state -->
+                            <div class="px-4 py-2 text-center text-neutral-500">
+                                {{ __db('loading') }}
+                            </div>
                         </div>
                         <div class="px-4 py-2 text-center">
                             <a href="{{ route('alerts.index') }}"
@@ -519,46 +249,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="alertModal" tabindex="-1" aria-hidden="true"
-                    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                    <div class="relative p-4 w-full max-w-2xl max-h-full">
-                        <div class="relative bg-white rounded-lg shadow ">
-                            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t ">
-                                <h3 class="text-xl font-semibold text-gray-900 " id="alertModalTitle">
-                                    {{ __db('alert') }}
-                                </h3>
-                                <button type="button"
-                                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                    onclick="closeAlertModal()">
-                                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 14 14">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                            stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                    </svg>
-                                    <span class="sr-only">{{ __db('close') }}</span>
-                                </button>
-                            </div>
-                            <div class="p-4 md:p-5 space-y-4">
-                                <p class="text-base leading-relaxed text-gray-500 dark:text-gray-400"
-                                    id="alertModalMessage">
-                                    {{ __db('alert_message') }}
-                                </p>
-                            </div>
-                            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b ">
-                                <button onclick="closeAlertModal()" type="button"
-                                    class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400  dark:hover:text-white dark:hover:bg-gray-700">
-                                    {{ __db('close') }}
-                                </button>
-                                <a href="{{ route('alerts.index') }}" id="viewAllAlertsBtn" type="button"
-                                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                    {{ __db('view_all_alerts') }}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
 
 
                 <div id="dropdownProfile" class="dropdown-menu-sm z-10 hidden rounded-lg bg-white p-3 shadow-lg ">
@@ -577,16 +267,11 @@
                 </div>
             </div>
         </div>
-
-
-
     </div>
-
-
-
 </div>
 
-@section('script')
+
+@push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar');
@@ -623,116 +308,478 @@
             });
         });
     </script>
-@endsection
 
-
-<!-- Alert Modal -->
-<div id="alertModal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
-        <div class="flex justify-between items-center border-b pb-2">
-            <h3 id="alertModalTitle" class="text-lg font-semibold"></h3>
-            <button onclick="closeAlertModal()" class="text-gray-500 hover:text-gray-700"
-                aria-label="Close alert modal">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="mt-4">
-            <p id="alertModalMessage" class="text-gray-700"></p>
-        </div>
-        <div class="mt-6 flex justify-end space-x-3">
-            <a id="viewAllAlertsBtn" href="#"
-                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                View Alert
-            </a>
-            <button onclick="closeAlertModal()" class="px-4 py-2 border rounded-md">
-                Close
-            </button>
-        </div>
-    </div>
-</div>
-
-@section('script')
     <script>
-        function showLatestAlertModal() {
-            fetch('/mod-events/alerts/latest', {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const transStrings = {
+            name: '{{ __db('name') }}',
+            code: '{{ __db('code') }}',
+            more_details: '{{ __db('more_details') }}',
+            no_notifications: '{{ __db('no_notifications') }}',
+            no_alerts: '{{ __db('no_alerts') }}',
+            loading: '{{ __db('loading') }}'
+        };
+
+        let notificationsCache = {
+            data: null,
+            timestamp: 0,
+            isLoading: false
+        };
+
+        let alertsCache = {
+            count: 0,
+            timestamp: 0,
+            isLoading: false
+        };
+
+        const CACHE_DURATION = 0; 
+
+        function translateFieldName(fieldName) {
+            const translations = {
+                'escort_name': '{{ __db('escort_name') }}',
+                'driver_name': '{{ __db('driver_name') }}',
+                'member_name': '{{ __db('member_name') }}',
+                'delegation_code': '{{ __db('delegation_code') }}',
+                'title': '{{ __db('title') }}',
+                'status': '{{ __db('status') }}',
+                'created_at': '{{ __db('created_at') }}',
+                'updated_at': '{{ __db('updated_at') }}'
+            };
+            return translations[fieldName] || fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function updateNotificationBadge(unreadCount) {
+            const notificationBadge = document.querySelector('[data-dropdown-toggle="dropdownNotification"] .badge');
+            const notificationCount = document.getElementById('notification-count-display');
+
+            if (notificationBadge) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.style.display = 'flex';
+            }
+
+            if (notificationCount) {
+                notificationCount.textContent = unreadCount;
+            }
+        }
+
+        async function fetchUnreadCount() {
+            console.log("Fetching unread count");
+
+            try {
+                const response = await fetch('/mod-admin/notifications/count', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': csrfToken
                     }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.alert) {
-                        document.getElementById('alertModalTitle').textContent = data.alert.title;
-                        document.getElementById('alertModalMessage').textContent = data.alert.message;
-                        document.getElementById('viewAllAlertsBtn').href = '/mod-events/alerts/' + data.alert.id;
-
-                        document.getElementById('alertModal').classList.remove('hidden');
-                        document.getElementById('alertModal').classList.add('flex');
-
-                        if (data.alert.id > 0) {
-                            markAlertAsRead(data.alert.id);
-                        }
-                    } else {
-                        toggleDropdown();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching latest alert:', error);
-                    toggleDropdown();
                 });
-        }
 
-        function showAlertModal(alertId, title, message) {
-            document.getElementById('alertModalTitle').textContent = title;
-            document.getElementById('alertModalMessage').textContent = message;
-            document.getElementById('viewAllAlertsBtn').href = '/mod-events/alerts/' + alertId;
+                const data = await response.json();
 
-            document.getElementById('alertModal').classList.remove('hidden');
-            document.getElementById('alertModal').classList.add('flex');
+                if (data.success) {
+                    updateNotificationBadge(data.unread_count);
+                }
 
-            if (alertId > 0) {
-                markAlertAsRead(alertId);
+                return data;
+            } catch (error) {
+                console.error('Error fetching unread count:', error);
+                return null;
             }
         }
 
-        function markAlertAsRead(alertId) {
-            fetch('/mod-events/alerts/' + alertId + '/mark-as-read', {
+        async function fetchNotifications() {
+            console.log("Fetching notifications for dropdown");
+
+            const now = Date.now();
+            // if (notificationsCache.data && (now - notificationsCache.timestamp) < CACHE_DURATION) {
+            //     console.log("Using cached notifications");
+            //     updateNotificationDropdown(notificationsCache.data.notifications, notificationsCache.data.unread_count);
+            //     return notificationsCache.data;
+            // }
+
+            // if (notificationsCache.isLoading) {
+            //     console.log("Already loading notifications");
+            //     return;
+            // }
+
+            notificationsCache.isLoading = true;
+
+            try {
+                const response = await fetch('/mod-admin/notifications/fetch', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    notificationsCache.data = data;
+                    notificationsCache.timestamp = now;
+                    updateNotificationDropdown(data.notifications, data.unread_count);
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+                return null;
+            } finally {
+                notificationsCache.isLoading = false;
+            }
+        }
+
+        function updateNotificationDropdown(notifications, totalUnreadCount) {
+            const notificationList = document.getElementById('unread-notifications-list');
+            const notificationCount = document.getElementById('notification-count-display');
+
+            if (!notificationList) return;
+
+            if (notificationCount) {
+                notificationCount.textContent = totalUnreadCount;
+            }
+
+            notificationList.innerHTML = '';
+
+            if (notifications.length === 0) {
+                const noNotificationItem = document.createElement('div');
+                noNotificationItem.className = 'px-4 py-2 text-center text-neutral-500';
+                noNotificationItem.textContent = transStrings.no_notifications;
+                notificationList.appendChild(noNotificationItem);
+                return;
+            }
+
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('a');
+                notificationItem.href = notification.url || '#';
+                notificationItem.className = 'flex justify-between gap-1 px-4 py-2 hover:bg-gray-100 block';
+
+                let contentHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <h6 class="fw-semibold mb-1 text-sm">${notification.module || 'Notification'}</h6>
+                        <p class="mb-0 line-clamp-1 text-sm">
+                            ${notification.message || ''}
+                        </p>`;
+
+                if (notification.module_name || notification.module_code || (notification.module_details && Object
+                        .keys(notification.module_details).length > 0)) {
+                    contentHTML += `<div class="text-xs text-neutral-500 mt-1">`;
+
+                    if (notification.module_name) {
+                        contentHTML +=
+                            `<div><span class="font-medium">${transStrings.name}:</span> ${notification.module_name}</div>`;
+                    }
+
+                    if (notification.module_code) {
+                        contentHTML +=
+                            `<div><span class="font-medium">${transStrings.code}:</span> ${notification.module_code}</div>`;
+                    }
+
+                    if (notification.module_details && Object.keys(notification.module_details).length > 0) {
+                        contentHTML += '<div class="mt-1">';
+                        let detailCount = 0;
+
+                        for (const [key, value] of Object.entries(notification.module_details)) {
+                            if (detailCount >= 2) break;
+                            let fieldName = translateFieldName(key);
+                            let displayValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                            contentHTML +=
+                                `<div><span class="font-medium">${fieldName}:</span> ${displayValue}</div>`;
+                            detailCount++;
+                        }
+
+                        if (Object.keys(notification.module_details).length > 2) {
+                            contentHTML +=
+                                `<div>... ${Object.keys(notification.module_details).length - 2} ${transStrings.more_details}</div>`;
+                        }
+
+                        contentHTML += '</div>';
+                    }
+
+                    contentHTML += `</div>`;
+                }
+
+                contentHTML += `
+                    </div>
+                </div>
+                <div class="shrink-0">
+                    <span class="text-sm text-neutral-500">${notification.created_at || ''}</span>
+                </div>`;
+
+                notificationItem.innerHTML = contentHTML;
+                notificationList.appendChild(notificationItem);
+            });
+        }
+
+        function updateAlertBadge(alertCount) {
+            const alertBadge = document.getElementById('alert-count-badge');
+
+            if (alertBadge) {
+                alertBadge.textContent = alertCount;
+                alertBadge.style.display = 'flex';
+            }
+
+            alertsCache.count = alertCount;
+            alertsCache.timestamp = Date.now();
+        }
+
+        async function fetchAlertCount() {
+            console.log("Fetching alert count");
+
+            const now = Date.now();
+            if (alertsCache.count !== null && (now - alertsCache.timestamp) < CACHE_DURATION) {
+                return alertsCache.count;
+            }
+
+            try {
+                const response = await fetch('/mod-admin/alerts/count', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateAlertBadge(data.unread_count);
+                    return data.unread_count;
+                }
+
+                return 0;
+            } catch (error) {
+                console.error('Error fetching alert count:', error);
+                return 0;
+            }
+        }
+
+        async function showLatestAlertModal() {
+            console.log("fetching alerts for dropdown");
+
+            try {
+                const currentEventSelect = document.getElementById('current-event-select');
+                const currentEventId = currentEventSelect ? currentEventSelect.value : null;
+
+                const response = await fetch('/mod-admin/alerts/latest', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const alertNotifications = data.alerts;
+                    updateAlertDropdown(alertNotifications, data.unread_count);
+
+                    console.log("alertNotifications",alertNotifications);
+                    
+                } else {
+                    updateAlertDropdown([], 0);
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Error fetching alerts for dropdown:', error);
+                updateAlertDropdown([], 0);
+                return null;
+            }
+        }
+
+        function updateAlertDropdown(alertNotifications, totalUnreadCount) {
+            const alertListContainer = document.getElementById('unread-alerts-list');
+            console.log("alertNotifications",alertNotifications);
+
+            if (!alertListContainer) return;
+
+            alertListContainer.innerHTML = '';
+
+            const alertCountDisplay = document.getElementById('alert-count-display');
+            if (alertCountDisplay) {
+                alertCountDisplay.textContent = totalUnreadCount;
+            }
+
+            if (alertNotifications.length === 0) {
+                const noAlertItem = document.createElement('div');
+                noAlertItem.className = 'px-4 py-2 text-center text-neutral-500';
+                noAlertItem.textContent = transStrings.no_alerts || 'No alerts';
+                alertListContainer.appendChild(noAlertItem);
+            } else {
+                alertNotifications.forEach(alert => {
+                    const alertItem = document.createElement('a');
+                    alertItem.href = `/mod-admin/alerts/${alert.id}`;
+                    alertItem.className = 'flex justify-between gap-1 px-4 py-2 hover:bg-gray-100';
+
+                    alertItem.addEventListener('click', function(e) {
+                        markAlertAsRead(alert.id);
+                    });
+
+                    const title = alert.title || 'Alert';
+                    const message = alert.message || 'No message';
+                    const createdAt = alert.created_at || '';
+
+                    let contentHTML = `
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h6 class="fw-semibold mb-1 text-sm">${title}</h6>
+                                <p class="mb-0 line-clamp-1 text-sm">
+                                    ${message}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <span class="text-sm text-neutral-500">${createdAt}</span>
+                        </div>`;
+
+                    alertItem.innerHTML = contentHTML;
+                    alertListContainer.appendChild(alertItem);
+                });
+            }
+        }
+
+        async function markAlertAsRead(alertId) {
+            try {
+                const response = await fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const alertCountElement = document.querySelector('#dropdownAlert .badge');
-                    if (alertCountElement) {
-                        let count = parseInt(alertCountElement.textContent) || 0;
-                        if (count > 0) {
-                            alertCountElement.textContent = count - 1;
-                        }
+                        'X-CSRF-TOKEN': csrfToken
                     }
                 });
-        }
 
-        function closeAlertModal() {
-            document.getElementById('alertModal').classList.add('hidden');
-            document.getElementById('alertModal').classList.remove('flex');
-        }
+                const data = await response.json();
 
-        function toggleDropdown() {
-            document.getElementById('dropdownAlert').classList.toggle('hidden');
-        }
+                if (data.success) {
+                    fetchAlertCount();
+                    fetchUnreadCount();
+                }
 
-        document.getElementById('alertModal').addEventListener('click', function(event) {
-            if (event.target === this) {
-                closeAlertModal();
+                return data;
+            } catch (error) {
+                console.error('Error marking alert as read:', error);
+                return null;
             }
+        }
+
+        async function markNotificationAsReadByAlertId(alertId) {
+            try {
+                const response = await fetch(`/mod-admin/notifications/mark-by-alert/${alertId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    fetchUnreadCount();
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Error marking notification as read by alert ID:', error);
+                return null;
+            }
+        }
+        
+        async function markNotificationAsRead(notificationId) {
+            try {
+                const response = await fetch(`/mod-admin/notifications/${notificationId}/mark-as-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    fetchUnreadCount();
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+                return null;
+            }
+        }
+        
+        function closeAlertModal() {
+            const alertModal = document.getElementById('alertModal');
+            if (alertModal) {
+                alertModal.classList.add('hidden');
+                alertModal.classList.remove('flex');
+            }
+        }
+
+        function initializeDropdownListeners() {
+            const notificationDropdownToggle = document.querySelector('[data-dropdown-toggle="dropdownNotification"]');
+            const notificationDropdown = document.getElementById('dropdownNotification');
+
+            if (notificationDropdownToggle) {
+                notificationDropdownToggle.addEventListener('click', function(e) {
+                    setTimeout(() => {
+                        const isVisible = notificationDropdown && !notificationDropdown.classList.contains(
+                            'hidden');
+                        if (isVisible) {
+                            fetchNotifications();
+                        }
+                    }, 100);
+                });
+            }
+
+            const alertDropdownBtn = document.getElementById('alertDropdownBtn');
+            if (alertDropdownBtn) {
+                alertDropdownBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showLatestAlertModal();
+                });
+            }
+
+            if (notificationDropdown) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            const isDropdownVisible = !notificationDropdown.classList.contains('hidden');
+                            if (isDropdownVisible && !notificationsCache.isLoading) {
+                                const now = Date.now();
+                                if (!notificationsCache.timestamp || (now - notificationsCache.timestamp) >
+                                    CACHE_DURATION) {
+                                    fetchNotifications();
+                                }
+                            }
+                        }
+                    });
+                });
+
+                observer.observe(notificationDropdown, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Initializing notification and alert system");
+
+            fetchUnreadCount();
+            fetchAlertCount();
+
+            initializeDropdownListeners();
+
+            setInterval(() => {
+                fetchUnreadCount();
+                fetchAlertCount();
+            }, 10000); 
         });
     </script>
-@endsection
+@endpush

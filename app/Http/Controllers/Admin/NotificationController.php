@@ -11,7 +11,9 @@ class NotificationController extends Controller
 
     public function index(Request $request)
     {
-        $notifications = auth()->user()->notifications()->whereNull('alert_id')
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $notifications = auth()->user()->notifications()->whereNull('alert_id')->where('event_id', $currentEventId)
             ->latest()->paginate(10);
 
         $allShownIds = collect($notifications->items())->pluck('id');
@@ -28,7 +30,7 @@ class NotificationController extends Controller
         $notification = auth()->user()->notifications()->where('id', $id)->first();
 
         if (!$notification) {
-            return redirect()->back()->with('error', 'Notification not found.');
+            return redirect()->back()->with('error', __db('notification_not_found'));
         }
 
         $notification->update(['read_at' => now()]);
@@ -38,39 +40,148 @@ class NotificationController extends Controller
         $delegationId = $data['delegation_id'] ?? null;
         $submoduleId = $data['submodule_id'] ?? null;
 
-        if ($delegationId) {
-            try {
-                $delegation = \App\Models\Delegation::find($delegationId);
-                if ($delegation) {
-                    return redirect()->route('delegations.show', $delegationId);
+        $url = $this->getNotificationRedirectLink($delegationId, $module, $submoduleId, $data);
+
+        if (($url)) {
+            return redirect($url);
+        }
+
+        return redirect()->route('notifications.index');
+    }
+
+    public function fetchNotifications(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $notifications = [];
+
+        $notifications  = auth()->user()->unreadNotifications()
+            ->where('event_id', $currentEventId)
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $formattedNotifications = $notifications->map(function ($notification) {
+            $data = is_string($notification->data)
+                ? json_decode($notification->data, true)
+                : $notification->data;
+
+            $message = '';
+            if (isset($data['message'])) {
+                if (is_array($data['message'])) {
+                    $lang = getActiveLanguage();
+                    if ($lang !== 'en' && isset($data['message']['ar'])) {
+                        $message = $data['message']['ar'];
+                    } else {
+                        $message = $data['message']['en'] ?? '';
+                    }
+                } else {
+                    $message = $data['message'];
                 }
-            } catch (\Exception $e) {
-                return redirect()->route('delegations.index');
             }
+
+            $module = $data['module'] ?? null;
+            $action = $data['action'] ?? null;
+            $delegationId = $data['delegation_id'] ?? null;
+            $submoduleId = $data['submodule_id'] ?? null;
+
+            $moduleName = null;
+            $moduleCode = null;
+            $moduleDetails = [];
+
+            if (isset($data['changes'])) {
+                if (isset($data['changes']['escort_name'])) {
+                    $moduleName = $data['changes']['escort_name'];
+                } elseif (isset($data['changes']['driver_name'])) {
+                    $moduleName = $data['changes']['driver_name'];
+                } elseif (isset($data['changes']['member_name'])) {
+                    $moduleName = $data['changes']['member_name'];
+                } elseif (isset($data['changes']['delegation_code'])) {
+                    $moduleCode = $data['changes']['delegation_code'];
+                } elseif (isset($data['changes']['code'])) {
+                    $moduleCode = $data['changes']['code'];
+                }
+
+                foreach ($data['changes'] as $key => $value) {
+                    if (in_array($key, ['escort_name', 'driver_name', 'member_name', 'delegation_code', 'code', 'title'])) {
+                        continue;
+                    }
+
+                    $displayValue = is_array($value)
+                        ? (isset($value['new'])
+                            ? $value['new']
+                            : json_encode($value))
+                        : $value;
+                    if (!empty($displayValue) && $displayValue !== 'N/A') {
+                        $moduleDetails[$key] = $displayValue;
+                    }
+                }
+            }
+
+            $url = $this->getNotificationRedirectLink($delegationId, $module, $submoduleId, $data);
+
+            return [
+                'id' => $notification->id,
+                'module' => $module ?? __db('notification'),
+                'message' => $message,
+                'module_name' => $moduleName,
+                'module_code' => $moduleCode,
+                'module_details' => $moduleDetails,
+                'created_at' => $notification->created_at->diffForHumans(),
+                'url' => $url,
+                'read_at' => $notification->read_at,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'notifications' => $formattedNotifications,
+            'unread_count' => auth()->user()->unreadNotifications()->count(),
+        ]);
+    }
+
+
+    public function getUnreadCount(Request $request)
+    {
+        try {
+            $currentEventId = session('current_event_id', getDefaultEventId());
+
+            $unreadCount = auth()->user()
+                ->unreadNotifications()
+                ->where('event_id', $currentEventId)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching notification count',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    private function getNotificationRedirectLink($delegationId, $module, $submoduleId, $data = [])
+    {
+        $url = "";
+        if ($delegationId) {
+            $url = route('delegations.show', $delegationId);
         } elseif ($module && $submoduleId) {
             switch (strtolower($module)) {
                 case 'escorts':
-                    try {
-                        $escort = \App\Models\Escort::find($submoduleId);
-                        if ($escort) {
-                            return redirect()->route('escorts.index', ['id' => $submoduleId]);
-                        }
-                    } catch (\Exception $e) {
-                        return redirect()->route('escorts.index');
-                    }
+                    $url = route('escorts.index', ['id' => $submoduleId]);
                     break;
                 case 'drivers':
-                    try {
-                        $driver = \App\Models\Driver::find($submoduleId);
-                        if ($driver) {
-                            return redirect()->route('drivers.index', ['id' => $submoduleId]);
-                        }
-                    } catch (\Exception $e) {
-                        return redirect()->route('drivers.index');
-                    }
+                    $url = route('drivers.index', ['id' => $submoduleId]);
                     break;
                 default:
-                    return redirect()->route('notifications.index');
+                    $url = '#';
             }
         } elseif ($module) {
             switch (strtolower($module)) {
@@ -80,61 +191,33 @@ class NotificationController extends Controller
                         $escortName = $data['changes']['escort_name'];
                     } elseif (isset($data['changes']['member_name'])) {
                         $escortName = $data['changes']['member_name'];
-                    } elseif (isset($data['changes']['name_en'])) {
-                        $escortName = $data['changes']['name_en'];
-                    } elseif (isset($data['changes']['name_ar'])) {
-                        $escortName = $data['changes']['name_ar'];
                     }
-                    
-                    if ($escortName && is_array($escortName)) {
-                        $escortName = $escortName['new'] ?? $escortName['old'] ?? null;
-                    }
-                    
+
                     if ($escortName) {
-                        return redirect()->route('escorts.index', ['search' => $escortName]);
+                        $url = route('escorts.index', ['search' => $escortName]);
                     } else {
-                        return redirect()->route('escorts.index');
+                        $url = route('escorts.index');
                     }
+                    break;
                 case 'drivers':
                     $driverName = null;
                     if (isset($data['changes']['driver_name'])) {
                         $driverName = $data['changes']['driver_name'];
                     } elseif (isset($data['changes']['member_name'])) {
                         $driverName = $data['changes']['member_name'];
-                    } elseif (isset($data['changes']['name_en'])) {
-                        $driverName = $data['changes']['name_en'];
-                    } elseif (isset($data['changes']['name_ar'])) {
-                        $driverName = $data['changes']['name_ar'];
                     }
-                    
-                    if ($driverName && is_array($driverName)) {
-                        $driverName = $driverName['new'] ?? $driverName['old'] ?? null;
-                    }
-                    
+
                     if ($driverName) {
-                        return redirect()->route('drivers.index', ['search' => $driverName]);
+                        $url = route('drivers.index', ['search' => $driverName]);
                     } else {
-                        return redirect()->route('drivers.index');
-                    }
-                case 'delegations':
-                    if ($delegationId) {
-                        try {
-                            $delegation = \App\Models\Delegation::find($delegationId);
-                            if ($delegation) {
-                                return redirect()->route('delegations.show', $delegationId);
-                            }
-                        } catch (\Exception $e) {
-                            return redirect()->route('delegations.index');
-                        }
-                    } else {
-                        return redirect()->route('delegations.index');
+                        $url = route('drivers.index');
                     }
                     break;
                 default:
-                    return redirect()->route('notifications.index');
+                    $url = '#';
             }
         }
 
-        return redirect()->route('notifications.index');
+        return $url;
     }
 }

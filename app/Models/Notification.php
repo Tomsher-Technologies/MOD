@@ -13,7 +13,8 @@ class Notification extends DatabaseNotification
         'notifiable_id',
         'data',
         'read_at',
-        'alert_id'
+        'alert_id',
+        'event_id'
     ];
 
     protected $casts = [
@@ -50,4 +51,5 @@ class Notification extends DatabaseNotification
         
         return $data['title'] ?? '';
     }
+    
 }

@@ -22,7 +22,7 @@ class ImportLogController extends Controller
         
         if ($request->filled('import_type')) {
             $query->where('import_type', $request->import_type);
-        }
+        } 
         
         if ($request->filled('search')) {
             $query->where('error_message', 'like', '%' . $request->search . '%');
@@ -42,7 +42,7 @@ class ImportLogController extends Controller
             $this->importLogService->clearLogs();
         }
         
-        return back()->with('success', 'Import logs cleared successfully.');
+        return back()->with('success', __db('cleared_successfully'));
     }
     
 }

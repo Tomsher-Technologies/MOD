@@ -5,12 +5,16 @@
 
             @directCanany(['import_escorts'])
                 <a href="{{ route('escorts.import.form') }}"
-                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg " type="button">
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg "
+                    type="button">
                     {{ __db('import') . ' ' . __db('escorts') }}
                 </a>
             @enddirectCanany
 
-            @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'escort' && Session::has('escorts_index_last_url'))
+            @if (isset($delegationId) &&
+                    isset($assignmentMode) &&
+                    $assignmentMode === 'escort' &&
+                    Session::has('escorts_index_last_url'))
                 <x-back-btn title="" class="" back-url="{{ Session::get('escorts_index_last_url') }}" />
             @endif
         </div>
@@ -96,10 +100,15 @@
                             'render' => fn($escort) => e($escort->military_number),
                         ],
                         [
-                            'label' => __db('title'),
-                            'key' => 'title',
-                            'render' => fn($escort) => e($escort->getTranslation('title') ?? ''),
+                            'label' => __db('rank'),
+                            'key' => 'rank',
+                            'render' => fn($escort) => e(optional($escort->internalRanking)->value),
                         ],
+                        // [
+                        //     'label' => __db('title'),
+                        //     'key' => 'title',
+                        //     'render' => fn($escort) => e($escort->getTranslation('title') ?? ''),
+                        // ],
                         [
                             'label' => __db('name'),
                             'key' => 'name',
@@ -344,41 +353,7 @@
     </form>
 </div>
 
-<div id="column-visibility-modal" tabindex="-1" aria-hidden="true"
-    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-2xl mx-auto">
-        <div class="bg-white rounded-lg shadow">
-            <div class="flex items-start justify-between p-4 border-b rounded-t">
-                <h3 class="text-xl font-semibold text-gray-900">{{ __db('column_list') }}</h3>
-                <button type="button"
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 rounded-lg text-sm p-1.5 mr-auto inline-flex items-center"
-                    data-modal-hide="column-visibility-modal">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="p-6 space-y-6">
-                <div class="space-y-3 grid grid-cols-3" id="column-toggles">
-                    @foreach ($columns as $column)
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" class="form-checkbox text-blue-600 me-2 column-toggle-checkbox"
-                                value="{{ $column['key'] }}" checked>
-                            <span>{{ $column['label'] }}</span>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
 @push('scripts')
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function update_status(el) {
             if (el.checked) {

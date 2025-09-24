@@ -13,11 +13,11 @@ use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TranslationController;
 use App\Http\Controllers\Admin\ArrivalController;
 use App\Http\Controllers\Admin\AccommodationController;
-use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\AlertController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\CommitteeController;
+use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\EventPageController;
 use App\Http\Controllers\Admin\FloorPlanController;
 use App\Http\Controllers\Admin\ImportLogController;
@@ -44,9 +44,11 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard/tables/{table}', [AdminDashboardController::class, 'dashboardTables'])->name('admin.dashboard.tables');
 
     // Manage countries
+    Route::get('/countries/import', [CountryController::class, 'showImportForm'])->name('countries.import.form');
     Route::resource('countries', CountryController::class);
     Route::post('/countries/status', [CountryController::class, 'updateStatus'])->name('countries.status');
     Route::get('/get-countries', [CountryController::class, 'getByContinents'])->name('countries.by-continent');
+    Route::post('/countries/import', [CountryController::class, 'import'])->name('countries.import');
 
     // Manage staffs
     Route::resource('staffs', StaffController::class);
@@ -200,13 +202,18 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{id}/redirect', [NotificationController::class, 'redirectToModule'])->name('notifications.redirect');
+    Route::get('/notifications/fetch', [NotificationController::class, 'fetchNotifications'])->name('notifications.fetch');
+
+    Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
+    Route::get('/alerts/count', [AlertController::class, 'getUnreadCount'])->name('alerts.count');
+    Route::get('/alerts/latest', [AlertController::class, 'getLatest'])->name('alerts.latest');
+
 
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::get('/alerts/create', [AlertController::class, 'create'])->name('alerts.create');
     Route::post('/alerts', [AlertController::class, 'store'])->name('alerts.store');
     Route::get('/alerts/{alert}', [AlertController::class, 'show'])->name('alerts.show');
-    Route::get('/alerts/latest', [AlertController::class, 'getLatestAlert'])->name('alerts.latest');
     Route::post('/alerts/{id}/mark-as-read', [AlertController::class, 'markAsRead'])->name('alerts.markAsRead');
 
     // Badge Printed Delegates

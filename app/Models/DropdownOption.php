@@ -16,11 +16,15 @@ class DropdownOption extends Model
     public function getValueAttribute($value)
     {
         $lang = getActiveLanguage();
-        
+
         if ($lang !== 'en' && !empty($this->attributes['value_ar'])) {
             return $this->attributes['value_ar'];
         }
-        
+
+        if ($lang !== 'ar' && !empty($this->attributes['value_en'])) {
+            return $this->attributes['value_en'];
+        }
+
         return $value;
     }
 }

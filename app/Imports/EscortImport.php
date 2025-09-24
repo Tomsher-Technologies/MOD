@@ -43,8 +43,8 @@ class EscortImport implements ToCollection, WithHeadingRow
                     'military_number' => trim($row['military_number']) ?? null,
                     'phone_number' => trim($row['phone_number']) ?? null,
                     'email' => trim($row['email']) ?? null,
-                    'title_en' => trim($row['title_en']) ?? null,
-                    'title_ar' => trim($row['title_ar']) ?? null,
+                    // 'title_en' => trim($row['title_en']) ?? null,
+                    // 'title_ar' => trim($row['title_ar']) ?? null,
                     'status' => 1,
                 ];
 
@@ -63,7 +63,7 @@ class EscortImport implements ToCollection, WithHeadingRow
 
                 if (!empty($row['internal_ranking_id'])) {
                     $ranking = DropdownOption::whereHas('dropdown', function ($q) {
-                        $q->where('code', 'internal_ranking');
+                        $q->where('code', 'rank');
                     })->where('id', trim($row['internal_ranking_id']))->first();
 
                     if ($ranking) {

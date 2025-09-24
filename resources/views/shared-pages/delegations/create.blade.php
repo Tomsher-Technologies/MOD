@@ -48,7 +48,7 @@
                             $option,
                         ) {
                             $originalValue = $option->getOriginal('value');
-                            $currentValue = $option->value; 
+                            $currentValue = $option->value;
 
                             return strtolower($originalValue) === 'not yet arrived' ||
                                 strtolower($currentValue) === 'not yet arrived' ||
@@ -368,17 +368,6 @@
 
                         <div class="delegate-row border rounded p-4 grid grid-cols-12 gap-4 relative">
 
-                            <!-- Title en -->
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __db('title') }}</label>
-                                <input type="text" :name="`delegates[${index}][title_en]`"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
-                                    x-model="delegate.title_en">
-                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.title_en`]">
-                                    <span class="text-red-600"
-                                        x-text="window.delegatesFieldErrors[`delegates.${index}.title_en`][0]"></span>
-                                </div>
-                            </div>
 
                             <!-- Title ar -->
                             <div class="col-span-3">
@@ -405,6 +394,32 @@
                                 </div>
                             </div>
 
+                            <!-- Designation (Arabic) -->
+                            <div class="col-span-3">
+                                <label class="form-label">{{ __db('designation_ar') }}</label>
+                                <input type="text" :name="`delegates[${index}][designation_ar]`"
+                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                    x-model="delegate.designation_ar">
+                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.designation_ar`]">
+                                    <span class="text-red-600"
+                                        x-text="window.delegatesFieldErrors[`delegates.${index}.designation_ar`][0]"></span>
+                                </div>
+                            </div>
+
+
+                            <!-- Title en -->
+                            <div class="col-span-3">
+                                <label class="form-label">{{ __db('title') }}</label>
+                                <input type="text" :name="`delegates[${index}][title_en]`"
+                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
+                                    x-model="delegate.title_en">
+                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.title_en`]">
+                                    <span class="text-red-600"
+                                        x-text="window.delegatesFieldErrors[`delegates.${index}.title_en`][0]"></span>
+                                </div>
+                            </div>
+
+
                             <!-- Name (English) -->
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('name_en') }}<span
@@ -430,17 +445,6 @@
                                 </div>
                             </div>
 
-                            <!-- Designation (Arabic) -->
-                            <div class="col-span-3">
-                                <label class="form-label">{{ __db('designation_ar') }}</label>
-                                <input type="text" :name="`delegates[${index}][designation_ar]`"
-                                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
-                                    x-model="delegate.designation_ar">
-                                <div x-show="window.delegatesFieldErrors[`delegates.${index}.designation_ar`]">
-                                    <span class="text-red-600"
-                                        x-text="window.delegatesFieldErrors[`delegates.${index}.designation_ar`][0]"></span>
-                                </div>
-                            </div>
 
                             <!-- Gender -->
                             <div class="col-span-3">

@@ -28,6 +28,8 @@
                 <div class="flex-1 min-w-[150px]">
                     <select name="import_type" class="select2 w-full border border-gray-300 rounded p-2">
                         <option value="">{{ __db('all_types') }}</option>
+                        <option value="countries" {{ request('import_type') == 'countries' ? 'selected' : '' }}>
+                            {{ __db('countries') }}</option>
                         <option value="drivers" {{ request('import_type') == 'drivers' ? 'selected' : '' }}>
                             {{ __db('drivers') }}</option>
                         <option value="escorts" {{ request('import_type') == 'escorts' ? 'selected' : '' }}>
@@ -57,6 +59,9 @@
                         'render' => function ($log) {
                             $typeClass = '';
                             switch ($log->import_type) {
+                                case 'countries':
+                                    $typeClass = 'bg-red-100 text-red-800';
+                                    break;
                                 case 'drivers':
                                     $typeClass = 'bg-blue-100 text-blue-800';
                                     break;

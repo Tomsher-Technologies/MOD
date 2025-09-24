@@ -24,7 +24,9 @@ class AlertController extends Controller
     }
     public function index(Request $request)
     {
-        $alerts = Alert::with('creator')->latest()->paginate(10);
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $alerts = Alert::with('creator')->where('event_id', ($currentEventId))->latest()->paginate(10);
 
         return view('admin.alerts.index', compact('alerts'));
     }
@@ -34,7 +36,7 @@ class AlertController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
 
         if (!$currentEventId) {
-            return redirect()->back()->with('error', 'No current event selected.');
+            return redirect()->back()->with('error', __db('no_current_event'));
         }
 
         $event = Event::findOrFail($currentEventId);
@@ -62,7 +64,7 @@ class AlertController extends Controller
             'title_ar' => 'required|string|max:255',
             'message' => 'required|string',
             'message_ar' => 'required|string',
-            'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:2048',
+            'attachment' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
             'recipient_type' => 'required|in:all,module,users',
             'module' => 'exclude_unless:recipient_type,module|required|in:delegate,escort,driver,hotel',
             'users' => 'exclude_unless:recipient_type,users|required|array',
@@ -72,7 +74,7 @@ class AlertController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
 
         if (!$currentEventId) {
-            return redirect()->back()->with('error', 'No current event selected.');
+            return redirect()->back()->with('error',  __db('no_current_event'));
         }
 
         $event = Event::findOrFail($currentEventId);
@@ -95,6 +97,7 @@ class AlertController extends Controller
         $alert = Alert::create([
             'title' => $multilingualTitle,
             'message' => $multilingualMessage,
+            'event_id' => $currentEventId,
             'attachment' => $attachmentPath,
             'send_to_all' => $request->recipient_type === 'all',
             'created_by' => auth()->id()
@@ -138,13 +141,14 @@ class AlertController extends Controller
                     'title' => $multilingualTitle
                 ],
                 'created_at' => now(),
-                'alert_id' => $alert->id
+                'alert_id' => $alert->id,
+                'event_id' => $currentEventId
             ];
 
             $recipient->notify(new AlertNotification($notificationData));
         }
 
-        return redirect()->route('alerts.index')->with('success', 'Alert created successfully.');
+        return redirect()->route('alerts.index')->with('success', __db('created_successfully'));
     }
 
     public function show(Alert $alert)
@@ -160,5 +164,120 @@ class AlertController extends Controller
         }
 
         return view('admin.alerts.show', compact('alert'));
+    }
+
+    public function getLatest(Request $request)
+    {
+        try {
+            $currentEventId = session('current_event_id', getDefaultEventId());
+
+            $alerts = auth()->user()->unreadAlertNotifications()
+                ->where('event_id', $currentEventId)
+                ->latest()
+                ->limit(5)
+                ->get();
+
+            $unreadCount = auth()->user()->unreadAlertNotifications()
+                ->where('event_id', $currentEventId)
+                ->count();
+
+            if ($alerts && $alerts->count() > 0) {
+                $alertsData = [];
+
+                foreach ($alerts as $notification) {
+                    $alertId = $notification->alert_id ?? null;
+
+                    if ($alertId) {
+                        $alert = Alert::find($alertId);
+
+                        if ($alert) {
+                            $alertData = [
+                                'id' => $alert->id,
+                                'title' => is_array($alert->title)
+                                    ? ($alert->title[app()->getLocale()] ?? $alert->title['en'] ?? '')
+                                    : $alert->title,
+                                'message' => is_array($alert->message)
+                                    ? ($alert->message[app()->getLocale()] ?? $alert->message['en'] ?? '')
+                                    : $alert->message,
+                                'created_at' => $alert->created_at->format('Y-m-d H:i:s'),
+                                'notification_id' => $notification->id
+                            ];
+
+                            $alertsData[] = $alertData;
+
+                            $this->markAsRead($request, $notification->id);
+                        }
+                    }
+                }
+
+                if (!empty($alertsData)) {
+                    return response()->json([
+                        'success' => true,
+                        'alerts' => $alertsData,
+                        'unread_count' => $unreadCount
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No alerts found'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching latest alerts',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+    public function markAsRead(Request $request, $id)
+    {
+
+        $alertRecipient = AlertRecipient::where('alert_id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if ($alertRecipient && !$alertRecipient->read_at) {
+            $alertRecipient->update(['read_at' => now()]);
+        }
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $notification = auth()->user()->notifications()
+            ->where('event_id', $currentEventId)
+            ->where('data->alert_id', $id)
+            ->first();
+
+        if ($notification && !$notification->read_at) {
+            $notification->update(['read_at' => now()]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function getUnreadCount(Request $request)
+    {
+        try {
+            $currentEventId = session('current_event_id', getDefaultEventId());
+
+            $unreadCount = auth()->user()
+                ->unreadAlertNotifications()
+                ->where('event_id', $currentEventId)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'unread_count' => $unreadCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching alert count',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

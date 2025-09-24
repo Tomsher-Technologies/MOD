@@ -242,6 +242,11 @@
                             },
                         ],
                         [
+                            'label' => __db('rank'),
+                            'key' => 'rank',
+                            'render' => fn($escort) => e(optional($escort->internalRanking)->value),
+                        ],
+                        [
                             'label' => __db('name'),
                             'key' => 'name',
                             'render' => function ($escort) {
@@ -691,10 +696,6 @@
     </div>
 
 
-
-
-
-
     @foreach ($delegation->delegates as $delegate)
         <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
             class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-30 p-4 md:p-6">
@@ -777,19 +778,6 @@
             </div>
         </div>
     @endforeach
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @endsection
 

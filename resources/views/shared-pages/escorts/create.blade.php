@@ -28,7 +28,7 @@
             @csrf
             <div class="grid grid-cols-12 gap-5">
 
-                <div class="col-span-4">
+                {{-- <div class="col-span-4">
                     <label class="form-label">{{ __db('title_en') }}:</label>
                     <input type="text" name="title_en" value="{{ old('title_en') }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
@@ -41,7 +41,7 @@
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') . ' ' . __db('title_ar') }}">
                 </div>
-
+ --}}
 
                 <div class="col-span-4">
                     <label class="form-label">{{ __db('military_number') }}:</label>
@@ -125,7 +125,7 @@
                     <label class="form-label">{{ __db('rank') }}:</label>
                     <select name="internal_ranking_id"
                         class="select2 p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0">
-                        @foreach (getDropDown('internal_ranking')->options as $rank)
+                        @foreach (getDropDown('rank')->options as $rank)
                             <option value="{{ $rank->id }}"
                                 {{ old('internal_ranking_id') == $rank->id ? 'selected' : '' }}>
                                 {{ $rank->value }}

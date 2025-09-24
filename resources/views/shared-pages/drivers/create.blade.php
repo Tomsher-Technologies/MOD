@@ -1,4 +1,4 @@
-<div   >
+<div>
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('add') . ' ' . __db('driver') }}</h2>
         <a href="{{ route('drivers.index') }}"
@@ -30,6 +30,27 @@
             <div class="grid grid-cols-12 gap-5">
 
                 <div class="col-span-4">
+                    <label class="form-label">{{ __db('military_number') }}:</label>
+                    <input type="text" name="military_number" value="{{ old('military_number') }}"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}">
+                </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('title_ar') }}:</label>
+                    <input type="text" name="title_ar" value="{{ old('title_ar') }}"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('enter') }}">
+                </div>
+
+                <div class="col-span-4">
+                    <label class="form-label">{{ __db('name_ar') }}: <span class="text-red-600">*</span></label>
+                    <input type="text" name="name_ar" value="{{ old('name_ar') }}"
+                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                        placeholder="{{ __db('أدخل الاسم هنا') }}">
+                </div>
+
+                <div class="col-span-4">
                     <label class="form-label">{{ __db('title_en') }}:</label>
                     <input type="text" name="title_en" value="{{ old('title_en') }}"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
@@ -38,40 +59,11 @@
                 </div>
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title_ar') }}:</label>
-                    <input type="text" name="title_ar" value="{{ old('title_ar') }}"
-                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('enter') }}">
-
-                </div>
-
-
-                <div class="col-span-4">
-                    <label class="form-label">{{ __db('military_number') }}:</label>
-                    <input type="text" name="military_number" value="{{ old('military_number') }}"
-                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('enter') }}">
-
-                </div>
-
-                <div class="col-span-4">
-
                     <label class="form-label">{{ __db('name_en') }}: <span class="text-red-600">*</span></label>
-
                     <input type="text" name="name_en" value="{{ old('name_en') }}"
                         class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         placeholder="{{ __db('enter') }}">
                 </div>
-
-                <div class="col-span-4">
-
-                    <label class="form-label">{{ __db('name_ar') }}: <span class="text-red-600">*</span></label>
-
-                    <input type="text" name="name_ar" value="{{ old('name_ar') }}"
-                        class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                        placeholder="{{ __db('أدخل الاسم هنا') }}">
-                </div>
-                
 
                 <div class="col-span-4">
 
@@ -81,7 +73,8 @@
                             class="p-3 w-full border text-sm border-neutral-300 border-l-0 text-neutral-600 focus:border-primary-600 focus:ring-0 ltr"
                             placeholder="501234567" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" minlength="9"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 9)" dir="ltr" />
-                        <span class="inline-flex items-center px-3  border-neutral-300 bg-gray-50 border   border-r-0 border-l-1 text-gray-500 text-sm">+971</span>
+                        <span
+                            class="inline-flex items-center px-3  border-neutral-300 bg-gray-50 border   border-r-0 border-l-1 text-gray-500 text-sm">+971</span>
                     </div>
                 </div>
 
