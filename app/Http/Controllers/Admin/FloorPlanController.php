@@ -82,7 +82,7 @@ class FloorPlanController extends Controller
             'file_paths' => $filePaths,
         ]);
 
-        return redirect()->route('floor-plans.index')->with('success', 'Floor plans uploaded successfully.');
+        return redirect()->route('floor-plans.index')->with('success', __db('created_successfully'));
     }
 
     public function show(FloorPlan $floorPlan)
@@ -141,7 +141,7 @@ class FloorPlanController extends Controller
             }
         }
 
-        return redirect()->route('floor-plans.index')->with('success', 'Floor plan updated successfully.');
+        return redirect()->route('floor-plans.index')->with('success', __db('updated_successfully'));
     }
 
 
@@ -154,6 +154,6 @@ class FloorPlanController extends Controller
         }
         $floorPlan->delete();
 
-        return redirect()->route('floor-plans.index')->with('success', 'Floor plan deleted successfully.');
+        return redirect()->route('floor-plans.index')->with('success', __db('deleted_successfully'));
     }
 }

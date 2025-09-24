@@ -42,7 +42,7 @@ class ImportLogController extends Controller
             $this->importLogService->clearLogs();
         }
         
-        return back()->with('success', 'Import logs cleared successfully.');
+        return back()->with('success', __db('cleared_successfully'));
     }
     
 }

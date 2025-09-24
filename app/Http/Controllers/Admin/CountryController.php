@@ -92,9 +92,9 @@ class CountryController extends Controller
 
         try {
             Country::create($data);
-            return back()->with('success', 'Country added successfully');
+            return back()->with('success', __db('created_successfully'));
         } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Failed to create country: ' . $e->getMessage());
+            return back()->withInput()->with('error', __db('failed_to_create') . $e->getMessage());
         }
     }
 
@@ -126,7 +126,10 @@ class CountryController extends Controller
 
             $country->update($data);
 
-            return back()->with('success', 'Country updated successfully');
+            return back()->with(
+                'success',
+                __db('updated_successfully')
+            );
         } catch (\Exception $e) {
             \Log::error('Country update failed: ' . $e->getMessage());
 
@@ -179,6 +182,6 @@ class CountryController extends Controller
     {
         $country->delete();
 
-        return back()->with('success', 'Country deleted successfully');
+        return back()->with('success', __db('deleted_successfully'));
     }
 }

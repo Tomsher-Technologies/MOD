@@ -28,7 +28,7 @@ class NotificationController extends Controller
         $notification = auth()->user()->notifications()->where('id', $id)->first();
 
         if (!$notification) {
-            return redirect()->back()->with('error', 'Notification not found.');
+            return redirect()->back()->with('error', __db('notification_not_found'));
         }
 
         $notification->update(['read_at' => now()]);

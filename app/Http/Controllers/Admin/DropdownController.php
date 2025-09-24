@@ -61,13 +61,13 @@ class DropdownController extends Controller
         ]);
 
         DropdownOption::create($request->only('dropdown_id', 'value', 'value_ar', 'code', 'sort_order'));
-        return back()->with('success', 'Option added successfully');
+        return back()->with('success', __db('created_successfully'));
     }
 
     public function updateOption(Request $request, DropdownOption $option)
     {
         $option->update($request->only('value', 'value_ar', 'code', 'sort_order', 'status'));
-        return back()->with('success', 'Option updated successfully');
+        return back()->with('success', __db('updated_successfully'));
     }
 
      public function updateStatus(Request $request)
@@ -93,7 +93,7 @@ class DropdownController extends Controller
 
         Excel::import(new DropdownOptionImport, $request->file('file'));
 
-        return back()->with('success', 'Dropdown options imported successfully.');
+        return back()->with('success', __db('imported_successfully'));
     }
     
     public function export()

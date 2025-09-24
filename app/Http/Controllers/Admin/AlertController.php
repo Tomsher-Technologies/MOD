@@ -34,7 +34,7 @@ class AlertController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
 
         if (!$currentEventId) {
-            return redirect()->back()->with('error', 'No current event selected.');
+            return redirect()->back()->with('error', __db('no_current_event'));
         }
 
         $event = Event::findOrFail($currentEventId);
@@ -72,7 +72,7 @@ class AlertController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
 
         if (!$currentEventId) {
-            return redirect()->back()->with('error', 'No current event selected.');
+            return redirect()->back()->with('error',  __db('no_current_event'));
         }
 
         $event = Event::findOrFail($currentEventId);
@@ -144,7 +144,7 @@ class AlertController extends Controller
             $recipient->notify(new AlertNotification($notificationData));
         }
 
-        return redirect()->route('alerts.index')->with('success', 'Alert created successfully.');
+        return redirect()->route('alerts.index')->with('success', __db('created_successfully'));
     }
 
     public function show(Alert $alert)
