@@ -301,13 +301,7 @@
         }
     </script>
 
-
-
-
-
-
-
-    <script>
+<script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchBtn = document.getElementById('search-delegation-btn');
             const codeInput = document.getElementById('delegation_code_input');
@@ -354,7 +348,7 @@
                         } else {
                             toastr.error("{{ __db('delegation_not_found') }}");
                             membersSelect.innerHTML =
-                                '<option selected disabled>No members found</option>';
+                                '<option selected disabled>{{__db('no_members_found')}}</option>';
                         }
                     })
                     .catch(() => {
@@ -452,10 +446,10 @@
 
             function populateMembers(members) {
                 if (!members || members.length === 0) {
-                    membersSelect.innerHTML = '<option selected disabled>No members found</option>';
+                    membersSelect.innerHTML = '<option selected disabled>{{__db('no_members_found')}}</option>';
                     return;
                 }
-                membersSelect.innerHTML = '<option selected disabled>Select Members</option>';
+                membersSelect.innerHTML = '<option selected disabled>{{__db('select')}}</option>';
                 members.forEach(member => {
                     const opt = document.createElement('option');
                     opt.value = member.id;

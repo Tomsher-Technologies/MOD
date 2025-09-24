@@ -4,8 +4,7 @@
             'label' => __db('sl_no'),
             'render' => fn($row, $key) => $key +
                 1 +
-                (($paginator ?? $departures)->currentPage() - 1) *
-                    ($paginator ?? $departures)->perPage(),
+                (($paginator ?? $departures)->currentPage() - 1) * ($paginator ?? $departures)->perPage(),
         ],
         [
             'label' => __db('delegation'),
@@ -50,6 +49,10 @@
             },
         ],
         [
+            'label' => __db('invitation_from'),
+            'render' => fn($row) => $row['delegation']->invitationFrom->value ?? '-',
+        ],
+        [
             'label' => __db('delegates'),
             'render' => function ($row) {
                 $delegation = $row['delegation'] ?? null;
@@ -62,21 +65,15 @@
                             break;
                         }
                     }
-                    
+
                     if ($teamHead) {
-                        return e(
-                            $teamHead->getTranslation('title') .
-                                '. ' .
-                                $teamHead->getTranslation('name'),
-                        );
+                        return e($teamHead->getTranslation('title') . '. ' . $teamHead->getTranslation('name'));
                     }
-                    
+
                     $firstDelegate = collect($row['delegates'])->first();
                     if ($firstDelegate) {
                         return e(
-                            $firstDelegate->getTranslation('title') .
-                                '. ' .
-                                $firstDelegate->getTranslation('name'),
+                            $firstDelegate->getTranslation('title') . '. ' . $firstDelegate->getTranslation('name'),
                         );
                     }
                 }
@@ -96,9 +93,7 @@
             'label' => __db('drivers'),
             'render' => function ($row) {
                 return $row['delegation']->drivers->isNotEmpty()
-                    ? $row['delegation']->drivers
-                        ->map(fn($drivers) => e($drivers->code))
-                        ->implode('<br>')
+                    ? $row['delegation']->drivers->map(fn($drivers) => e($drivers->code))->implode('<br>')
                     : '-';
             },
         ],
@@ -185,9 +180,7 @@
         $rowDateTime = \Carbon\Carbon::parse($row['date_time']);
 
         $statusName =
-            is_object($row['status']) && isset($row['status']->value)
-                ? $row['status']->value
-                : $row['status'];
+            is_object($row['status']) && isset($row['status']->value) ? $row['status']->value : $row['status'];
 
         if ($statusName === 'to_be_departed') {
             if ($rowDateTime->between($oneHourAgo, $oneHourHence)) {
@@ -208,8 +201,8 @@
 @endphp
 
 <div>
-    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="departures-table" :enableColumnListBtn="true"
-        :data="$paginator" :row-class="$rowClass" />
+    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="departures-table" :data="$paginator"
+        :row-class="$rowClass" />
 </div>
 
 <div class="mt-3 flex items-center flex-wrap gap-4">

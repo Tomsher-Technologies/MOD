@@ -52,10 +52,6 @@
                     {{ __db('edit') }}
                 </a>
             @endcan
-            {{-- <a href="{{ route('other-interview-members.index') }}"
-                    class="btn !bg-gray-600 text-white rounded-lg px-6 py-2 font-semibold hover:bg-gray-700">
-                    {{ __db('back_to_interview_members') }}
-                </a> --}}
         </div>
     </div>
 </div>

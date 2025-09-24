@@ -460,7 +460,7 @@
 
                     if (note1.trim() !== '') {
                         html += `
-                    <h3 class="mb-2 font-medium">Note 1:</h3>
+                    <h3 class="mb-2 font-medium">{{ __db('note_1') }}:</h3>
                     <div class="border p-5 rounded-lg">
                         <p>${note1}</p>
                     </div>
@@ -469,7 +469,7 @@
 
                     if (note2.trim() !== '') {
                         html += `
-                    <h3 class="mb-2 font-medium">Note 2:</h3>
+                    <h3 class="mb-2 font-medium">{{ __db('note_2') }}:</h3>
                     <div class="border p-5 rounded-lg">
                         <p>${note2}</p>
                     </div>
@@ -477,7 +477,7 @@
                     }
 
                     if (html === '') {
-                        html = '<p>No notes available.</p>';
+                        html = '<p>{{ __db('no_notes_available') }}</p>';
                     }
 
                     noteModalContent.innerHTML = html;
