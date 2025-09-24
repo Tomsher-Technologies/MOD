@@ -440,7 +440,7 @@
 
         function deleteCountry(id, name) {
             if (confirm("{{ __db('are_you_sure_you_want_to_delete') }} " + name + "?")) {
-                $.post('{{ url('mod-admin/countries') }}/' + id, {
+                $.post('{{ url('mod-events/countries') }}/' + id, {
                     _token: '{{ csrf_token() }}',
                     _method: 'DELETE'
                 }, function(data) {

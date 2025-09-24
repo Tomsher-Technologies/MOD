@@ -42,13 +42,20 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php $grandTotal = 0; @endphp
                                 @foreach($delegatesByDivision as $division)
+                                    @php $grandTotal += $division->total; @endphp
                                     <tr class=" text-[12px] align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">{{ $division->department_name }}</td>
                                         <td class="px-4 text-center py-2 border border-gray-200">{{ $division->total }}</td>
                                     </tr>
                                 @endforeach
                             
+                                {{-- Total row --}}
+                                <tr class=" align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[16px]">
+                                    <td class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</td>
+                                    <td class="text-center px-4 py-2 border border-gray-200">{{ $grandTotal }}</td>
+                                </tr>
                             </tbody>
                         
                         </table>

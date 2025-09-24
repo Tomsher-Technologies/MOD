@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\ImportLogController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\LogController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::prefix('mod-admin')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('admin.login');
@@ -33,7 +34,12 @@ Route::prefix('mod-admin')->group(function () {
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
 
-Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
+Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
+    Route::get('/clear-cache', function () {
+        Artisan::call('optimize:clear');
+        return back()->with('success', 'All cache cleared successfully!');
+    })->name('clear.cache');
+
     Route::get('/dashboard', [AdminDashboardController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/dashboard/tables/{table}', [AdminDashboardController::class, 'dashboardTables'])->name('admin.dashboard.tables');
 

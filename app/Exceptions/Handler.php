@@ -21,8 +21,8 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
        
-        if ($request->is('mod-admin/*')) {
-            $loginRoute = route('admin.login'); // Adjust this route name as per your setup
+        if ($request->is('mod-events/*')) {
+            $loginRoute = route('login'); // Adjust this route name as per your setup
         } else {
             $loginRoute = route('web-login');
         }

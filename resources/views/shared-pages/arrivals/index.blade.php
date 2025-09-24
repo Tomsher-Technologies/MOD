@@ -332,7 +332,7 @@
             </div>
 
             <form
-                :action="`{{ url('mod-admin/travel-update') }}/${arrival.ids && arrival.ids.length > 0 ? arrival.ids[0] : arrival.id}`"
+                :action="`{{ url('mod-events/travel-update') }}/${arrival.ids && arrival.ids.length > 0 ? arrival.ids[0] : arrival.id}`"
                 method="POST" class="space-y-6" data-ajax-form="true">
                 @csrf
                 @method('POST')

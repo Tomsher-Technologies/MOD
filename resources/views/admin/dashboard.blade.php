@@ -151,33 +151,45 @@
                         </span>
 
                   </div>
-                  <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
+                    <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
                         <thead>
-                           <tr class="text-[10px]">
-                              <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <tr class="text-[10px]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                     {{ __db('airport_land_sea') }}</th>
-                              <th scope="col"
+                            <th scope="col"
                                     class="p-3 !bg-[#B68A35] text-white border !border-[#cbac71] text-center">
                                     {{ __db('arrivals') }}</th>
-                              <th scope="col"
+                            <th scope="col"
                                     class="p-3 !bg-[#B68A35] text-white border !border-[#cbac71] text-centertext-center">
                                     {{ __db('departures') }}</th>
-                           </tr>
+                        </tr>
                         </thead>
                         <tbody>
-                           @forelse($data['arr_dep_summary'] as $drow)
-                                 <tr class="text-[10px] align-[middle]">
-                                    <td class="px-2 py-2 border border-gray-200">{{ $drow->transport_point }}</td>
-                                    <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->arrival_count }}</td>
-                                    <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->departure_count }}</td>
-                                 </tr>
-                           @empty
-                                 <tr>
-                                    <td colspan="3" class="px-2 py-2 border text-center">{{ __db('no_record_found') }}</td>
-                                 </tr>
-                           @endforelse
+                            @forelse($data['arr_dep_summary'] as $drow)
+                                    <tr class="text-[10px] align-[middle]">
+                                        <td class="px-2 py-2 border border-gray-200">{{ $drow->transport_point }}</td>
+                                        <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->arrival_count }}</td>
+                                        <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->departure_count }}</td>
+                                    </tr>
+                            @empty
+                                    <tr>
+                                        <td colspan="3" class="px-2 py-2 border text-center">{{ __db('no_record_found') }}</td>
+                                    </tr>
+                            @endforelse
+
+                            @if($data['arr_dep_summary']->isNotEmpty())
+                                <tr class="align-[middle] bg-[#FFF9E4] font-medium text-[#B68A35] text-[13px]">
+                                    <td class="text-start px-4 py-2 border border-gray-200">{{ __db('total') }}</td>
+                                    <td class="text-center px-4 py-2 border border-gray-200">
+                                        {{ $data['arr_dep_summary']->sum('arrival_count') }}
+                                    </td>
+                                    <td class="text-center px-4 py-2 border border-gray-200">
+                                        {{ $data['arr_dep_summary']->sum('departure_count') }}
+                                    </td>
+                                </tr>
+                            @endif
                         </tbody>
-                  </table>
+                    </table>
 
                </div>
             </div>
