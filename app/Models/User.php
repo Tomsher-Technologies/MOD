@@ -54,41 +54,24 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Get user's notifications
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
     public function notifications()
     {
         return $this->morphMany(Notification::class, 'notifiable')->whereNull('alert_id')->orderBy('created_at', 'desc');
     }
 
-    /**
-     * Get user's unread notifications
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
+    
     public function unreadNotifications()
     {
         return $this->notifications()->whereNull('read_at')->whereNull('alert_id');
     }
     
-    /**
-     * Get user's non-alert notifications
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
+    
     public function alertNotifications()
     {
         return $this->notifications()->whereNotNull('alert_id');
     }
     
-    /**
-     * Get user's unread non-alert notifications
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
+    
     public function unreadAlertNotifications()
     {
         return $this->notifications()->whereNull('read_at')->whereNotNull('alert_id');
