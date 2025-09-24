@@ -114,13 +114,12 @@
                 },
                 navigation: { enabled: true } 
             },
-            colors: ['#B68A35', '#F2ECCF', '#D7BC6D', '#E6D7A2'],
+            colors: ['#FFE5BA', '#C8FFD4', '#FFBAF2'],
             series: [{
                 name: '{{ __db('delegates') }}',
                 data: [
                     { name: '{{ __db('to_be_arrived') }}', y: {{ $data['arrival_status']['to_be_arrived'] }} },
                     { name: '{{ __db('arrived') }}', y: {{ $data['arrival_status']['arrived'] }} },
-                    { name: '{{ __db('to_be_departed') }}', y: {{ $data['arrival_status']['to_be_departed'] }} },
                     { name: '{{ __db('departed') }}', y: {{ $data['arrival_status']['departed'] }} }
                 ]
             }]

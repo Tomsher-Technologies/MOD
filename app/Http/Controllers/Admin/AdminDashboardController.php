@@ -183,7 +183,7 @@ class AdminDashboardController extends Controller
         $allStatuses = [
             'to_be_arrived' => 0,
             'arrived' => 0,
-            'to_be_departed' => 0,
+            // 'to_be_departed' => 0,
             'departed' => 0
         ];
 
@@ -192,7 +192,7 @@ class AdminDashboardController extends Controller
         $data['arrival_status'] = [
             'to_be_arrived' => $statuses['to_be_arrived'],
             'arrived' => $statuses['arrived'],
-            'to_be_departed' => $statuses['to_be_departed'],
+            // 'to_be_departed' => $statuses['to_be_departed'],
             'departed' => $statuses['departed']
         ];
 
@@ -260,7 +260,7 @@ class AdminDashboardController extends Controller
             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
             ->where('dropdowns.code', 'invitation_status')
             ->where('d.status', 1)
-            ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+            ->select('d.id', 'd.code',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
             ->get();
 
         $rawData = DB::table('delegations')
@@ -302,14 +302,23 @@ class AdminDashboardController extends Controller
                 $dataNew[] = $match ? (int) $match->total : 0;
             }
 
-            $position = ($i % 2 == 0) ? -1 : 1; // even = darker, odd = lighter
-            $step = ceil($i / 2);
-            $percent = $position * ($spread * $step / max(1, ceil($labelsCount / 2)));
+            $color = '#B68A35';
+            if($status->code == '1') {  // Waiting
+                $color = '#FFF9C4';
+            }elseif($status->code == '2') {  // Accepted
+                $color = '#C8E6C9';
+            }elseif($status->code == '3') {   // Rejected
+                $color = '#F8BBD0';
+            }elseif($status->code == '9') {  // Accepted with representative
+                $color = '#E1BEE7';
+            }elseif($status->code == '10') {  // Accepted with secretary
+                $color = '#BBDEFB';
+            }
 
             $delegatesByInvitationStatus[] = [
                 'name' => $status->value,
                 'data' => $dataNew,
-                'color' => shadeColor($baseColor, $percent) ?? $baseColor,
+                'color' => $color,
             ];
         }
         $data['delegatesByInvitationStatus'] = [
@@ -330,7 +339,7 @@ class AdminDashboardController extends Controller
                 DB::raw('COUNT(delegates.id) as total')
             )
             ->whereIN('delegations.invitation_status_id', [41, 42])
-            ->groupBy('delegations.invitation_from_id', 'delegates.participation_status')
+            ->groupBy('delegates.participation_status')
             ->get();
 
         $departmentsIds = $departments->pluck('id');
@@ -338,10 +347,9 @@ class AdminDashboardController extends Controller
         $seriesParticipation = [];
 
         $statusColors = [
-            'arrived'        => '#7c5e24',
-            'to_be_arrived'  => '#b68a35',
-            'to_be_departed' => '#d1c1a2',
-            'departed'       => '#f0da8b',
+            'arrived'        => '#A8E6CF',
+            'to_be_arrived'  => '#D1C4E9',
+            'departed'       => '#FFAAA5',
         ];
 
         foreach ($participation_statuses as $part_status) {
@@ -387,7 +395,15 @@ class AdminDashboardController extends Controller
         }
 
         $seriesContinents = [];
-        $baseColorCont = ['#d9a644', '#A0782F', '#f0da8b', '#806028', '#5C451D', '#e8bc64', '#D2AA59', '#E0BA6B', '#ECCC85', '#F7DEA0'];
+        // $baseColorCont = ['#d9a644', '#A0782F', '#f0da8b', '#806028', '#5C451D', '#e8bc64', '#D2AA59', '#E0BA6B', '#ECCC85', '#F7DEA0'];
+         $baseColorCont = [
+                '#FFB3BA','#BAE0FF', '#FFFFBA', '#BAFFC9','#BAE1FF','#D5BAFF','#FFC1E3',
+                '#FFE0BA','#FFF5BA','#C8FFD4','#C4E7FF','#E1C8FF','#FFBAF2','#FFE5BA',
+                '#FCFFBA','#BAFFD0','#BAF0FF','#D0BAFF','#FFF0BA','#BAFFE4','#FFBAC8',
+                '#FFDABA','#FFFFC4','#BAFFD1','#E3BAFF','#FFBAE0','#FFE8BA','#FFDFBA',
+                '#BFFAFF','#D9FFBA' 
+            ];
+
 
         $ij = 0;
         foreach ($continents as $continentId => $continentName) {
@@ -495,7 +511,7 @@ class AdminDashboardController extends Controller
                 ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
                 ->where('dropdowns.code', 'invitation_status')
                 ->where('d.status', 1)
-                ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+                ->select('d.id','d.code',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                 ->get();
 
             $rawData = DB::table('delegations')
@@ -537,14 +553,23 @@ class AdminDashboardController extends Controller
                     $dataNew[] = $match ? (int) $match->total : 0;
                 }
 
-                $position = ($i % 2 == 0) ? -1 : 1; // even = darker, odd = lighter
-                $step = ceil($i / 2);
-                $percent = $position * ($spread * $step / max(1, ceil($labelsCount / 2)));
+                $color = '#B68A35';
+                if($status->code == '1') {  // Waiting
+                    $color = '#FFF9C4';
+                }elseif($status->code == '2') {  // Accepted
+                    $color = '#C8E6C9';
+                }elseif($status->code == '3') {   // Rejected
+                    $color = '#F8BBD0';
+                }elseif($status->code == '9') {  // Accepted with representative
+                    $color = '#E1BEE7';
+                }elseif($status->code == '10') {  // Accepted with secretary
+                    $color = '#BBDEFB';
+                }
 
                 $delegatesByInvitationStatus[] = [
                     'name' => $status->value,
                     'data' => $dataNew,
-                    'color' => shadeColor($baseColor, $percent) ?? $baseColor,
+                    'color' => $color,
                 ];
             }
             $tableData = [];
@@ -588,7 +613,7 @@ class AdminDashboardController extends Controller
             return view('admin.dashboard-tables.invitations', compact('data'));
         } elseif ($table == 'participations') {
 
-            $participation_statuses = ['to_be_arrived', 'arrived', 'to_be_departed', 'departed'];
+            $participation_statuses = ['to_be_arrived', 'arrived', 'departed'];
 
             $rawDataParticipation = DB::table('delegates')
                 ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
@@ -599,18 +624,17 @@ class AdminDashboardController extends Controller
                     DB::raw('COUNT(delegates.id) as total')
                 )
                 ->whereIN('delegations.invitation_status_id', [41, 42])
-                ->groupBy('delegations.invitation_from_id', 'delegates.participation_status')
+                ->groupBy('delegates.participation_status')
                 ->get();
-
+              
             $departmentsIds   = $departments->pluck('id');
             $categories       = $departments->pluck('value');
             $seriesParticipation = [];
 
             $statusColors = [
-                'arrived'        => '#7c5e24',
-                'to_be_arrived'  => '#b68a35',
-                'to_be_departed' => '#d1c1a2',
-                'departed'       => '#f0da8b',
+                'arrived'        => '#A8E6CF',
+                'to_be_arrived'  => '#D1C4E9',
+                'departed'       => '#FFAAA5',
             ];
 
             foreach ($participation_statuses as $part_status) {
@@ -684,7 +708,13 @@ class AdminDashboardController extends Controller
             }
 
             $seriesContinents = [];
-            $baseColorCont = ['#d9a644', '#A0782F', '#f0da8b', '#806028', '#5C451D', '#e8bc64', '#D2AA59', '#E0BA6B', '#ECCC85', '#F7DEA0'];
+            $baseColorCont = [
+                '#FFB3BA','#BAE0FF', '#FFFFBA', '#BAFFC9','#BAE1FF','#D5BAFF','#FFC1E3',
+                '#FFE0BA','#FFF5BA','#C8FFD4','#C4E7FF','#E1C8FF','#FFBAF2','#FFE5BA',
+                '#FCFFBA','#BAFFD0','#BAF0FF','#D0BAFF','#FFF0BA','#BAFFE4','#FFBAC8',
+                '#FFDABA','#FFFFC4','#BAFFD1','#E3BAFF','#FFBAE0','#FFE8BA','#FFDFBA',
+                '#BFFAFF','#D9FFBA' 
+            ];
 
             $ij = 0;
 
@@ -869,7 +899,7 @@ class AdminDashboardController extends Controller
             $allStatuses = [
                 'to_be_arrived' => 0,
                 'arrived' => 0,
-                'to_be_departed' => 0,
+                // 'to_be_departed' => 0,
                 'departed' => 0
             ];
 
@@ -878,7 +908,7 @@ class AdminDashboardController extends Controller
             $data['arrival_status'] = [
                 'to_be_arrived' => $statuses['to_be_arrived'],
                 'arrived' => $statuses['arrived'],
-                'to_be_departed' => $statuses['to_be_departed'],
+                // 'to_be_departed' => $statuses['to_be_departed'],
                 'departed' => $statuses['departed']
             ];
 

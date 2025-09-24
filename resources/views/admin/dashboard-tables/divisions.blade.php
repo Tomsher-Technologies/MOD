@@ -66,20 +66,12 @@
     </div>
 
     @php
-        $baseColor = '#B68A35';
-        $labelsCount = count($data['delegatesByDivision']['labels']);
-        $colors = [];
-
-        $spread = 30; // +/- percentage from base color
-
-        for ($i = 0; $i < $labelsCount; $i++) {
-        // Alternate dark/light slices
-        $position = ($i % 2 == 0) ? -1 : 1; // even = darker, odd = lighter
-        $step = ceil($i / 2); // step away from base
-        $percent = $position * ($spread * $step / max(1, ceil($labelsCount / 2)));
-        
-        $colors[] = shadeColor($baseColor, $percent);
-        }
+       $colors = [
+                '#ce89de','#de8989','#dbde89','#898dde','#BFFAFF','#D9FFBA' ,'#D5BAFF','#8994de','#deda89',
+                '#A8E6CF','#FFB3BA',
+                '#FFD8A8','#FFDAC1', '#F5F5DC','#C19A6B','#FFE5B4','#B0E0E6','#BAE1FF','#FFC1E3','#FFFFBA','#D7CCC8','#FFE29F',
+                '#E0B0FF','#D3D3D3','#AEEEEE','#DFFFBA','#99E6E6','#ffaded', '#acbff7',
+            ];
     @endphp
 
 @endsection

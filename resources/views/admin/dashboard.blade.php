@@ -523,18 +523,12 @@
         </div>
 
       @php
-         $baseColor = '#B68A35';
-         $labelsCount = count($data['delegatesByDivision']['labels']);
-         $colors = [];
-
-         $spread = 30; 
-
-         for ($i = 0; $i < $labelsCount; $i++) {
-            $position = ($i % 2 == 0) ? -1 : 1; 
-            $step = ceil($i / 2);
-            $percent = $position * ($spread * $step / max(1, ceil($labelsCount / 2)));
-            $colors[] = shadeColor($baseColor, $percent);
-         }
+            $colors = [
+                '#ce89de','#de8989','#dbde89','#898dde','#BFFAFF','#D9FFBA' ,'#D5BAFF','#8994de','#deda89',
+                '#A8E6CF','#FFB3BA',
+                '#FFD8A8','#FFDAC1', '#F5F5DC','#C19A6B','#FFE5B4','#B0E0E6','#BAE1FF','#FFC1E3','#FFFFBA','#D7CCC8','#FFE29F',
+                '#E0B0FF','#D3D3D3','#AEEEEE','#DFFFBA','#99E6E6','#ffaded', '#acbff7',
+            ];
       @endphp
     </div>
 @endsection
@@ -961,13 +955,13 @@
                   },
                   navigation: { enabled: true } 
                },
-               colors: ['#B68A35', '#F2ECCF', '#D7BC6D', '#E6D7A2'],
+               colors: ['#FFE5BA', '#C8FFD4', '#FFBAF2'],
                series: [{
                   name: '{{ __db('delegates') }}',
                   data: [
                         { name: '{{ __db('to_be_arrived') }}', y: {{ $data['arrival_status']['to_be_arrived'] }} },
                         { name: '{{ __db('arrived') }}', y: {{ $data['arrival_status']['arrived'] }} },
-                        { name: '{{ __db('to_be_departed') }}', y: {{ $data['arrival_status']['to_be_departed'] }} },
+                        
                         { name: '{{ __db('departed') }}', y: {{ $data['arrival_status']['departed'] }} }
                   ]
                }]
