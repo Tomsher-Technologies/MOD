@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\FloorPlanController;
 use App\Http\Controllers\Admin\ImportLogController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\LogController;
+use App\Http\Controllers\Admin\DeveloperController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
@@ -252,6 +253,10 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
     Route::post('/import-logs/clear', [ImportLogController::class, 'clearLogs'])->name('admin.import-logs.clear');
+    
+    // Developer routes
+    Route::get('/developer/tables', [DeveloperController::class, 'getAllTables'])->name('developer.tables');
+    Route::get('/developer/{model}', [DeveloperController::class, 'getModelData'])->name('developer.model');
 });
 
 Route::get('/lang/{lang}', function ($lang) {
