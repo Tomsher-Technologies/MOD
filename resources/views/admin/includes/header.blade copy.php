@@ -540,7 +540,7 @@
 @section('script')
     <script>
         function showLatestAlertModal() {
-            fetch('/mod-admin/alerts/latest', {
+            fetch('/mod-events/alerts/latest', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -553,13 +553,13 @@
                         document.getElementById('alertModalTitle').textContent = data.alert.title;
                         document.getElementById('alertModalMessage').textContent = data.alert.message;
 
-                        document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + data.alert.id;
+                        document.getElementById('viewAllAlertsBtn').href = '/mod-events/alerts/' + data.alert.id;
 
                         document.getElementById('alertModal').classList.remove('hidden');
                         document.getElementById('alertModal').classList.add('flex');
 
                         if (data.alert.id > 0) {
-                            fetch('/mod-admin/alerts/' + data.alert.id + '/mark-as-read', {
+                            fetch('/mod-events/alerts/' + data.alert.id + '/mark-as-read', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
@@ -592,13 +592,13 @@
             document.getElementById('alertModalTitle').textContent = title;
             document.getElementById('alertModalMessage').textContent = message;
 
-            document.getElementById('viewAllAlertsBtn').href = '/mod-admin/alerts/' + alertId;
+            document.getElementById('viewAllAlertsBtn').href = '/mod-events/alerts/' + alertId;
 
             document.getElementById('alertModal').classList.remove('hidden');
             document.getElementById('alertModal').classList.add('flex');
 
             if (alertId > 0) {
-                fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
+                fetch('/mod-events/alerts/' + alertId + '/mark-as-read', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

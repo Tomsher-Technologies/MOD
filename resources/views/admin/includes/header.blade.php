@@ -26,9 +26,14 @@
                 $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
             @endphp
 
-            @if (Auth::user()->user_type == 'admin' ||
+            @php
+                $currentRoute = Route::currentRouteName();
+                $isIndexRoute = str_ends_with($currentRoute, '.index');
+            @endphp
+
+            @if ((Auth::user()->user_type == 'admin' ||
                     Auth::user()->user_type == 'super_admin' ||
-                    Auth::user()->user_type == 'staff')
+                    Auth::user()->user_type == 'staff') && $isIndexRoute)
                 <form method="POST" action="{{ route('events.setCurrentEvent') }}" id="currentEventForm"
                     class="me-3 inline-block">
                     @csrf
@@ -367,7 +372,7 @@
             console.log("Fetching unread count");
 
             try {
-                const response = await fetch('/mod-admin/notifications/count', {
+                const response = await fetch('/mod-events/notifications/count', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -406,7 +411,7 @@
             notificationsCache.isLoading = true;
 
             try {
-                const response = await fetch('/mod-admin/notifications/fetch', {
+                const response = await fetch('/mod-events/notifications/fetch', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -535,7 +540,7 @@
             }
 
             try {
-                const response = await fetch('/mod-admin/alerts/count', {
+                const response = await fetch('/mod-events/alerts/count', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -564,7 +569,7 @@
                 const currentEventSelect = document.getElementById('current-event-select');
                 const currentEventId = currentEventSelect ? currentEventSelect.value : null;
 
-                const response = await fetch('/mod-admin/alerts/latest', {
+                const response = await fetch('/mod-events/alerts/latest', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -613,7 +618,7 @@
             } else {
                 alertNotifications.forEach(alert => {
                     const alertItem = document.createElement('a');
-                    alertItem.href = `/mod-admin/alerts/${alert.id}`;
+                    alertItem.href = `/mod-events/alerts/${alert.id}`;
                     alertItem.className = 'flex justify-between gap-1 px-4 py-2 hover:bg-gray-100';
 
                     alertItem.addEventListener('click', function(e) {
@@ -645,7 +650,7 @@
 
         async function markAlertAsRead(alertId) {
             try {
-                const response = await fetch('/mod-admin/alerts/' + alertId + '/mark-as-read', {
+                const response = await fetch('/mod-events/alerts/' + alertId + '/mark-as-read', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -669,7 +674,7 @@
 
         async function markNotificationAsReadByAlertId(alertId) {
             try {
-                const response = await fetch(`/mod-admin/notifications/mark-by-alert/${alertId}`, {
+                const response = await fetch(`/mod-events/notifications/mark-by-alert/${alertId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -692,7 +697,7 @@
         
         async function markNotificationAsRead(notificationId) {
             try {
-                const response = await fetch(`/mod-admin/notifications/${notificationId}/mark-as-read`, {
+                const response = await fetch(`/mod-events/notifications/${notificationId}/mark-as-read`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
