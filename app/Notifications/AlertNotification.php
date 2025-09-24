@@ -29,6 +29,8 @@ class AlertNotification extends Notification
     {
         return ['database'];
     }
+    
+    
 
     /**
      * Get the array representation of the notification.
@@ -36,6 +38,14 @@ class AlertNotification extends Notification
      * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
+    {
+        return $this->data;
+    }
+    
+    /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase($notifiable)
     {
         return $this->data;
     }

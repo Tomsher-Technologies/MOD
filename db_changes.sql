@@ -642,3 +642,23 @@
 -- alter table delegation_activities add column delegation_code text after delegation_id;
 -- INSERT INTO `dropdowns` (`id`, `name`, `code`, `status`, `created_at`, `updated_at`) VALUES (NULL, 'Rank', 'rank', '1', '2025-09-21 08:05:08', '2025-09-21 08:05:08'); 
 -- Done in live
+
+
+ALTER TABLE notifications 
+ADD COLUMN event_id BIGINT UNSIGNED NULL AFTER id;
+
+ALTER TABLE notifications 
+ADD CONSTRAINT fk_notifications_event_id 
+FOREIGN KEY (event_id) 
+REFERENCES events(id) 
+ON DELETE CASCADE;
+
+
+ALTER TABLE alerts 
+ADD COLUMN event_id BIGINT UNSIGNED NULL AFTER id;
+
+ALTER TABLE alerts 
+ADD CONSTRAINT fk_notifications_event_id 
+FOREIGN KEY (event_id) 
+REFERENCES events(id) 
+ON DELETE CASCADE;

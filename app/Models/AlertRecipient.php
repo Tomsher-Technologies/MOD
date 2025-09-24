@@ -11,6 +11,7 @@ class AlertRecipient extends Model
 
     protected $fillable = [
         'alert_id',
+        'event_id',
         'user_id',
         'read_at'
     ];

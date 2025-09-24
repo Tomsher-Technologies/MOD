@@ -194,6 +194,7 @@ Route::prefix('mod-admin')->middleware(['web', 'auth'])->group(function () {
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/notifications/{id}/redirect', [NotificationController::class, 'redirectToModule'])->name('notifications.redirect');
+    Route::get('/notifications/fetch', [NotificationController::class, 'fetchNotifications'])->name('notifications.fetch');
 
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');

@@ -167,6 +167,16 @@
                     </ul>
                 </div>
 
+                @php
+                    $latestFiveNotifications = auth()
+                        ->user()
+                        ->unreadNonAlertNotifications()
+                        ->where('event_id', $currentEventId)
+                        ->whereNull('alert_id')
+                        ->latest()
+                        ->take(5)
+                        ->get();
+                @endphp
 
                 <button data-dropdown-toggle="dropdownNotification"
                     class="has-indicator flex h-10 w-10 items-center justify-center rounded-full bg-neutral-200 "
@@ -176,8 +186,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                     </svg>
-                    <span
-                        class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">{{ auth()->user()->unreadNonAlertNotifications()->count() }}</span>
+                                    <span
+                    class="absolute top-3 -end-[8px] -translate-y-1/2 px-1 py-0.5 leading-[1] flex text-sm items-center justify-center badge rounded-full bg-danger-600 text-white">{{ auth()->user()->unreadNonAlertNotifications()->where('event_id', $currentEventId)->count() }}</span>
                 </button>
                 <div id="dropdownNotification"
                     class="z-10 hidden w-full max-w-[394px] overflow-hidden rounded-2xl bg-white shadow-lg ">
@@ -187,19 +197,11 @@
                             {{ __db('notifications') }}
                         </h6>
                         <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ auth()->user()->unreadNonAlertNotifications()->whereNull('alert_id')->count() }}</span>
+                            class="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-primary-600">{{ $latestFiveNotifications->count() }}</span>
                     </div>
                     <div class="scroll-sm !border-t-0">
                         <div class="max-h-[400px] overflow-y-auto">
-                            @php
-                                $unreadNotifications = auth()
-                                    ->user()
-                                    ->unreadNonAlertNotifications()
-                                    ->whereNull('alert_id')
-                                    ->take(5)
-                                    ->get();
-                            @endphp
-                            @forelse($unreadNotifications as $notification)
+                            @forelse($latestFiveNotifications as $notification)
                                 @php
                                     $data = is_string($notification->data)
                                         ? json_decode($notification->data, true)
@@ -264,88 +266,8 @@
                                         }
                                     }
 
-                                    $url = '#';
-
-                                    if ($delegationId) {
-                                        $url = route('delegations.show', $delegationId);
-                                    } elseif ($module && $submoduleId) {
-                                        switch (strtolower($module)) {
-                                            case 'escorts':
-                                                $url = route('escorts.edit', $submoduleId);
-                                                break;
-                                            case 'drivers':
-                                                $url = route('drivers.edit', $submoduleId);
-                                                break;
-                                            default:
-                                                switch (strtolower($module)) {
-                                                    case 'escorts':
-                                                        $escortName = null;
-                                                        if (isset($data['changes']['escort_name'])) {
-                                                            $escortName = $data['changes']['escort_name'];
-                                                        } elseif (isset($data['changes']['member_name'])) {
-                                                            $escortName = $data['changes']['member_name'];
-                                                        }
-
-                                                        if ($escortName) {
-                                                            $url = route('escorts.index', ['search' => $escortName]);
-                                                        } else {
-                                                            $url = route('escorts.index');
-                                                        }
-                                                        break;
-                                                    case 'drivers':
-                                                        $driverName = null;
-                                                        if (isset($data['changes']['driver_name'])) {
-                                                            $driverName = $data['changes']['driver_name'];
-                                                        } elseif (isset($data['changes']['member_name'])) {
-                                                            $driverName = $data['changes']['member_name'];
-                                                        }
-
-                                                        if ($driverName) {
-                                                            $url = route('drivers.index', ['search' => $driverName]);
-                                                        } else {
-                                                            $url = route('drivers.index');
-                                                        }
-                                                        break;
-                                                    default:
-                                                        $url = '#';
-                                                }
-                                        }
-                                    } elseif ($module) {
-                                        switch (strtolower($module)) {
-                                            case 'escorts':
-                                                $escortName = null;
-                                                if (isset($data['changes']['escort_name'])) {
-                                                    $escortName = $data['changes']['escort_name'];
-                                                } elseif (isset($data['changes']['member_name'])) {
-                                                    $escortName = $data['changes']['member_name'];
-                                                }
-
-                                                if ($escortName) {
-                                                    $url = route('escorts.index', ['search' => $escortName]);
-                                                } else {
-                                                    $url = route('escorts.index');
-                                                }
-                                                break;
-                                            case 'drivers':
-                                                $driverName = null;
-                                                if (isset($data['changes']['driver_name'])) {
-                                                    $driverName = $data['changes']['driver_name'];
-                                                } elseif (isset($data['changes']['member_name'])) {
-                                                    $driverName = $data['changes']['member_name'];
-                                                }
-
-                                                if ($driverName) {
-                                                    $url = route('drivers.index', ['search' => $driverName]);
-                                                } else {
-                                                    $url = route('drivers.index');
-                                                }
-                                                break;
-                                            default:
-                                                $url = '#';
-                                        }
-                                    }
                                 @endphp
-                                <a href="{{ $url }}"
+                                <a href="{{ route('notifications.redirect', $notification->id) }}"
                                     class="flex justify-between gap-1 px-4 py-2 hover:bg-gray-100">
                                     <div class="flex items-center gap-3">
                                         <div>
@@ -649,12 +571,132 @@
 
 @section('script')
     <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        async function fetchNotifications() {
+            const currentEventSelect = document.getElementById('current-event-select');
+            const currentEventId = currentEventSelect ? currentEventSelect.value : null;
+            
+            try {
+                const response = await fetch('/mod-admin/notifications/fetch', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateNotificationDropdown(data.notifications, data.unread_count);
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+                return null;
+            }
+        }
+
+        function updateNotificationDropdown(notifications, unreadCount) {
+            const notificationList = document.querySelector('#dropdownNotification .max-h-[400px]');
+            const notificationBadge = document.querySelector('[data-dropdown-toggle="dropdownNotification"] .badge');
+            const notificationCount = document.querySelector('#dropdownNotification .font-bold.text-primary-600');
+
+            if (!notificationList) return;
+
+            const existingNotificationItems = notificationList.querySelectorAll('a:not(:last-child)');
+            existingNotificationItems.forEach(item => item.remove());
+
+            if (notificationBadge) {
+                notificationBadge.textContent = unreadCount;
+                notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+
+            if (notificationCount) {
+                notificationCount.textContent = unreadCount;
+            }
+
+            notifications.forEach(notification => {
+                const notificationItem = document.createElement('a');
+                notificationItem.href = notification.url;
+                notificationItem.className = 'flex justify-between gap-1 px-4 py-2 hover:bg-gray-100';
+
+                let contentHTML = `
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <h6 class="fw-semibold mb-1 text-sm">${notification.module}</h6>
+                            <p class="mb-0 line-clamp-1 text-sm">
+                                ${notification.message}
+                            </p>`;
+
+                if (notification.module_name || notification.module_code || Object.keys(notification.module_details)
+                    .length > 0) {
+                    contentHTML += `<div class="text-xs text-neutral-500 mt-1">`;
+
+                    if (notification.module_name) {
+                        contentHTML +=
+                            `<div><span class="font-medium">Name:</span> ${notification.module_name}</div>`;
+                    }
+                    if (notification.module_code) {
+                        contentHTML +=
+                            `<div><span class="font-medium">Code:</span> ${notification.module_code}</div>`;
+                    }
+                    if (Object.keys(notification.module_details).length > 0) {
+                        contentHTML += '<div class="mt-1">';
+                        let detailCount = 0;
+                        for (const [key, value] of Object.entries(notification.module_details)) {
+                            if (detailCount >= 2) break;
+                            contentHTML +=
+                                `<div><span class="font-medium">${key.replace(/_/g, ' ') + ':'}</span> ${typeof value === 'object' ? JSON.stringify(value) : value}</div>`;
+                            detailCount++;
+                        }
+                        if (Object.keys(notification.module_details).length > 2) {
+                            contentHTML +=
+                                `<div>... ${Object.keys(notification.module_details).length - 2} more details</div>`;
+                        }
+                        contentHTML += '</div>';
+                    }
+                    contentHTML += '</div>';
+                }
+
+                contentHTML += `</div>
+                    </div>
+                    <div class="shrink-0">
+                        <span class="text-sm text-neutral-500">${notification.created_at}</span>
+                    </div>`;
+
+                notificationItem.innerHTML = contentHTML;
+
+                const seeAllLink = notificationList.parentElement.querySelector('.px-4.py-2.text-center a');
+                if (seeAllLink) {
+                    notificationList.parentElement.insertBefore(notificationItem, seeAllLink.parentElement);
+                } else {
+                    notificationList.appendChild(notificationItem);
+                }
+            });
+
+            if (notifications.length === 0) {
+                const noNotificationItem = document.createElement('div');
+                noNotificationItem.className = 'px-4 py-2 text-center text-neutral-500';
+                noNotificationItem.textContent = 'No notifications';
+
+                const seeAllLink = notificationList.parentElement.querySelector('.px-4.py-2.text-center');
+                if (seeAllLink) {
+                    notificationList.parentElement.insertBefore(noNotificationItem, seeAllLink);
+                } else {
+                    notificationList.appendChild(noNotificationItem);
+                }
+            }
+        }
+
         function showLatestAlertModal() {
             fetch('/mod-admin/alerts/latest', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': csrfToken
                     }
                 })
                 .then(response => response.json())
@@ -698,7 +740,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': csrfToken
                     }
                 })
                 .then(response => response.json())
@@ -726,6 +768,14 @@
             if (event.target === this) {
                 closeAlertModal();
             }
+        });
+
+        setInterval(() => {
+            fetchNotifications();
+        }, 20000);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchNotifications();
         });
     </script>
 @endsection

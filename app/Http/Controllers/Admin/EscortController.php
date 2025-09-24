@@ -60,14 +60,14 @@ class EscortController extends Controller
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
             ->select('escorts.*')
-            ->where('escorts.event_id', $currentEventId)
-            ->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
-            ->orderBy('escorts.military_number')
-            ->orderBy('rankings.sort_order');
-
+            ->where('escorts.event_id', $currentEventId);
 
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
+
+        if ($request->has('id')) {
+            $query->where('escorts.id', $request->id);
+        }
 
         if ($delegationId && $assignmentMode === 'escort') {
             $query->where('escorts.delegation_id', null)->where('escorts.status', 1);
@@ -118,11 +118,11 @@ class EscortController extends Controller
             });
         }
 
-        $limit = $request->limit ? $request->limit : 20;
+        $query->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
+            ->orderBy('escorts.military_number')
+            ->orderBy('rankings.sort_order');
 
-        if ($request->id) {
-            $query->where('escorts.id', $request->id);
-        }
+        $limit = $request->limit ? $request->limit : 20;
 
         $escorts = $query->paginate($limit);
 

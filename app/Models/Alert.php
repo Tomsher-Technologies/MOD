@@ -12,6 +12,7 @@ class Alert extends Model
     protected $fillable = [
         'title',
         'message',
+        'event_id',
         'attachment',
         'send_to_all',
         'created_by'

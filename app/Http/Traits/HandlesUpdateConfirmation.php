@@ -405,17 +405,18 @@ trait HandlesUpdateConfirmation
 
     protected function sendNotification($activity, $action, $module, $delegationId = null)
     {
+        $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
+
         $notificationData = [
             'delegation_id' => $delegationId,
             'submodule_id' => $activity->submodule_id ?? null,
             'message' => $activity->message,
             'module' => $module,
             'action' => $action,
+            'event_id' => $currentEventId,
             'changes' => $activity->changes,
             'created_at' => $activity->created_at,
         ];
-
-        $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
 
         if (!$currentEventId) {
             return;

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class CommonNotification extends Notification implements ShouldQueue
+class CommonNotification extends Notification 
 {
     use Queueable;
 
@@ -41,6 +41,14 @@ class CommonNotification extends Notification implements ShouldQueue
      * @return array
      */
     public function toArray($notifiable)
+    {
+        return $this->data;
+    }
+    
+    /**
+     * Get the database representation of the notification.
+     */
+    public function toDatabase($notifiable)
     {
         return $this->data;
     }
