@@ -143,10 +143,7 @@
                         [
                             'label' => __db('delegate_name'),
                             'render' => function ($row) {
-                                return $row->getTranslation('title') .
-                                    '. ' .
-                                    $row->getTranslation('name') ??
-                                    '-';
+                                return $row->getTranslation('title') . '. ' . $row->getTranslation('name') ?? '-';
                             },
                         ],
                         [
@@ -215,7 +212,9 @@
                 @endphp
 
                 @if (request('badge_printed') == '0')
-                    <div class="mb-4">
+                    <div class="mb-4 flex justify-between">
+                        <div></div>
+
                         <div class="flex items-center gap-2">
                             <input type="checkbox" id="select-all-checkbox"
                                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
@@ -223,18 +222,12 @@
                                 class="ml-2 text-sm font-bold text-gray-700">{{ __db('select') }}
                                 {{ __db('all') }}</label>
                         </div>
+
                     </div>
                 @endif
 
-                {{-- <div class="mb-4 text-sm">
-                    <span class="team-head-indicator">TH</span> = Team Head | 
-                    <span style="background-color: #fee2e2; padding: 2px 6px; border-radius: 4px;">Red background</span> = Team Head rows
-                </div> --}}
-
                 <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="badge-printed-delegates-table"
                     :enableColumnListBtn="true" :data="$delegates" />
-
-
 
                 <div class="mt-3 flex items-center flex-wrap gap-4">
 
@@ -250,7 +243,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-4">
                     {{ $delegates->links() }}
                 </div>
