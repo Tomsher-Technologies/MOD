@@ -286,7 +286,7 @@
         window.pageRoutes = {
             delegationSearchByCode: @json(route('delegations.searchByCode')),
             delegationSearchByFilters: @json(route('delegations.search')),
-            delegationMembers: '/mod-admin/delegations/members'
+            delegationMembers: '/mod-events/delegations/members'
         };
     </script>
 
@@ -342,7 +342,7 @@
                     '<option value="" selected disabled>{{ __db('select_country') }}</option>';
 
                 if (continentId) {
-                    fetch(`/mod-admin/get-countries?continent_ids=${continentId}`, {
+                    fetch(`/mod-events/get-countries?continent_ids=${continentId}`, {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest'
                             }

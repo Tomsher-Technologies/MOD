@@ -92,7 +92,6 @@
         $assignedHotels = [];
     @endphp
 
-    {{-- Escorts + Accommodation --}}
     <div class="section">
         <table class="info-table">
             @foreach ($delegation->escorts as $escort)
@@ -121,7 +120,6 @@
         </table>
     </div>
 
-    {{-- Delegation Info --}}
     <div class="section">
         <table class="info-table">
             <tr>
@@ -140,7 +138,6 @@
     @php
         $teamHead = '';
     @endphp
-    {{-- Arrival Details --}}
     <div class="section">
         <h3>{{ __db('arrival_details') }}</h3>
         <table>
@@ -207,7 +204,6 @@
         </table>
     </div>
 
-    {{-- Departure Head of Delegation --}}
     <div class="section">
         <h3>{{  __db('departure_details_of_head_of_delegation') }}</h3>
         <table>
@@ -224,7 +220,6 @@
         </table>
     </div>
 
-    {{-- Hotel Details --}}
     @php
         $assignedHotels = array_filter(array_unique($assignedHotels));
         $hotelDetails = getAccommodationDetails($assignedHotels);
@@ -255,7 +250,6 @@
         </div>
     @endforeach
 
-    {{-- Drivers --}}
     <div class="section">
         <h3>{{ __db('drivers') }}</h3>
         <table>
@@ -284,7 +278,6 @@
         </table>
     </div>
 
-    {{-- Interviews --}}
     <div class="section">
         <h3>{{ __db('interviews') }}</h3>
         <table>

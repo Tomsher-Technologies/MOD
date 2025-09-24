@@ -513,7 +513,7 @@
                         if (result.isConfirmed) {
                             const form = document.createElement('form');
                             form.method = 'POST';
-                            form.action = '{{ url('/mod-admin/delegations') }}/' +
+                            form.action = '{{ url('/mod-events/delegations') }}/' +
                                 delegationId;
 
                             const tokenInput = document.createElement('input');

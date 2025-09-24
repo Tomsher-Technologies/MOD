@@ -149,7 +149,7 @@
                         '<div class="text-center py-4">{{ __db('loading') }}...</div>';
                     delegationModal.classList.remove('hidden');
 
-                    fetch(`/mod-admin/delegations/${delegationId}`, {
+                    fetch(`/mod-events/delegations/${delegationId}`, {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')

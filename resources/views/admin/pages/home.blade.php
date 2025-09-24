@@ -50,7 +50,7 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][title1]" value="{{ $trans->title1 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div>
@@ -58,7 +58,7 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][title2]" value="{{ $trans->title2 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div class="grid grid-cols-12 gap-5">
@@ -67,7 +67,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][btn_link_1]" value="{{ $trans->btn_link_1 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-6">
@@ -93,7 +93,7 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][title3]" value="{{ $trans->title3 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div>
@@ -109,7 +109,7 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][btn_link_2]" value="{{ $trans->btn_link_2 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div>
@@ -121,7 +121,7 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][title4]" value="{{ $trans->title4 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div>
@@ -142,7 +142,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][title5]" value="{{ $trans->title5 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-6">
@@ -150,7 +150,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][content5]" value="{{ $trans->content5 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
                     </div>
 
@@ -164,7 +164,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][title6]" value="{{ $trans->title6 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-6">
@@ -172,7 +172,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][content6]" value="{{ $trans->content6 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
                     </div>
 
@@ -186,7 +186,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][title7]" value="{{ $trans->title7 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-6">
@@ -194,7 +194,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][content7]" value="{{ $trans->content7 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
                     </div>
 
@@ -208,7 +208,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][title8]" value="{{ $trans->title8 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-6">
@@ -216,7 +216,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][content8]" value="{{ $trans->content8 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
                     </div>
 
@@ -229,12 +229,12 @@
                         <input type="text" name="translations[{{ $lang['code'] }}][content3]" value="{{ $trans->content3 ?? '' }}"
                                @if($lang['code']=='en') dir="ltr" @endif
                                class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                               @if($lang['code']=='en') required @endif>
+                               @if($lang['code']=='en')  @endif>
                     </div>
 
                     <div>
                         <label class="form-label">{{ __db('content') }} ({{ $lang['name'] }}) <span class="text-red-600">*</span></label>
-                        <textarea name="translations[{{ $lang['code'] }}][content4]" @if($lang['code']=='en') dir="ltr" @else dir="rtl" @endif class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"  @if($lang['code']=='en') required @endif>{!! $trans->content4 ?? '' !!}</textarea>
+                        <textarea name="translations[{{ $lang['code'] }}][content4]" @if($lang['code']=='en') dir="ltr" @else dir="rtl" @endif class="texteditor p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"  @if($lang['code']=='en')  @endif>{!! $trans->content4 ?? '' !!}</textarea>
                     </div>
 
                     <div class="grid grid-cols-12 gap-5">
@@ -243,7 +243,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][btn_link_3]" value="{{ $trans->btn_link_3 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-6">
@@ -264,7 +264,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][title9]" value="{{ $trans->title9 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
 
                         <div class="col-span-4">
@@ -272,7 +272,7 @@
                             <input type="text" name="translations[{{ $lang['code'] }}][btn_link_4]" value="{{ $trans->btn_link_4 ?? '' }}"
                                 @if($lang['code']=='en') dir="ltr" @endif
                                 class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" 
-                                @if($lang['code']=='en') required @endif>
+                                @if($lang['code']=='en')  @endif>
                         </div>
                     </div>
 

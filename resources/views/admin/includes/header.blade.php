@@ -142,11 +142,18 @@
             @endif
         </div>
         <div class="col-auto ml-4 mr-2">
-            <div class="flex flex-wrap items-center gap-6">
+            <div class="flex flex-wrap items-center gap-3">
 
-                <button id="languageToggleBtn" data-dropdown-toggle="languageDropdown"
+                <a href="{{ route('clear.cache') }}"  class="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-200 hover:bg-neutral-300" title="{{ __db('clear_cache') }}" onclick="return confirm(__db('are_you_sure_clear_cache'))">
+                    <svg class="size-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgba(7,98,181,1)"><path d="M12 4C9.25144 4 6.82508 5.38626 5.38443 7.5H8V9.5H2V3.5H4V5.99936C5.82381 3.57166 8.72764 2 12 2C17.5228 2 22 6.47715 22 12H20C20 7.58172 16.4183 4 12 4ZM4 12C4 16.4183 7.58172 20 12 20C14.7486 20 17.1749 18.6137 18.6156 16.5H16V14.5H22V20.5H20V18.0006C18.1762 20.4283 15.2724 22 12 22C6.47715 22 2 17.5228 2 12H4Z"></path></svg>
+                </a>
+
+                <button id="languageToggleBtn" data-dropdown-toggle="languageDropdown" title="{{ __db('change_language') }}"
                     class="flex items-center justify-center h-10 w-10 rounded-full bg-neutral-200 hover:bg-neutral-300">
-                    🌐
+                    <svg class="size-7 stroke-current transition-colors duration-200 " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="36" height="30" fill="none" viewBox="0 0 24 24" stroke-width="1.6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m13 19 3.5-9 3.5 9m-6.125-2h5.25M3 7h7m0 0h2m-2 0c0 1.63-.793 3.926-2.239 5.655M7.5 6.818V5m.261 7.655C6.79 13.82 5.521 14.725 4 15m3.761-2.345L5 10m2.761 2.655L10.2 15" />
+                    </svg>
                 </button>
 
                 <div id="languageDropdown"
@@ -606,13 +613,10 @@
             } else {
                 alertNotifications.forEach(alert => {
                     const alertItem = document.createElement('a');
-                    // The alert_id in response is just 'id', not 'alert_id'
                     alertItem.href = `/mod-admin/alerts/${alert.id}`;
                     alertItem.className = 'flex justify-between gap-1 px-4 py-2 hover:bg-gray-100';
 
-                    // Mark alert as read when clicked
                     alertItem.addEventListener('click', function(e) {
-                        // Since this is an alert from /alerts/latest, use markAlertAsRead
                         markAlertAsRead(alert.id);
                     });
 

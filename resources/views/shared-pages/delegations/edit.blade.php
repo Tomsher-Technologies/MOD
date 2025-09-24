@@ -1659,7 +1659,7 @@
                         // Submit delete form
                         const form = document.createElement('form');
                         form.method = 'POST';
-                        form.action = '{{ url('/mod-admin/delegations') }}/' + delegationId;
+                        form.action = '{{ url('/mod-events/delegations') }}/' + delegationId;
 
                         const tokenInput = document.createElement('input');
                         tokenInput.type = 'hidden';

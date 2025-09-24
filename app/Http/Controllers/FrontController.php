@@ -16,6 +16,7 @@ class FrontController extends Controller
         $page = EventPage::with('translations')->where('event_id', $eventId)->where('status', 1)->where('slug', 'home')->first();
 
         $news = News::with('event')->where('event_id', $eventId)->where('status', 1)->orderBy('news_date', 'desc')->limit(3)->get();
+     
         return view('frontend.index', compact('page','lang','news'));
     }
 

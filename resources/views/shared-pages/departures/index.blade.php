@@ -89,7 +89,7 @@
                 </div>
 
                 <form
-                    :action="`{{ url('mod-admin/travel-update') }}/${departure.ids && departure.ids.length > 0 ? departure.ids[0] : departure.id}`"
+                    :action="`{{ url('mod-events/travel-update') }}/${departure.ids && departure.ids.length > 0 ? departure.ids[0] : departure.id}`"
                     method="POST" class="space-y-6" data-ajax-form="true">
                     @csrf
                     @method('POST')

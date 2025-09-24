@@ -23,7 +23,7 @@
                             <iconify-icon icon="mage:email"></iconify-icon>
                         </span>
                     
-                        <input id="email" type="email" class="form-control h-[56px] ps-11 border-neutral-300 bg-neutral-50 dark:bg-dark-2 rounded-xl @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autofocus placeholder="{{ __db('email') }}">
+                        <input id="email" type="text" class="form-control h-[56px] ps-11 border-neutral-300 bg-neutral-50 dark:bg-dark-2 rounded-xl @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" autofocus placeholder="{{ __db('email') }}">
                         @error('email')
                             <span class="text-red-500 text-xs" role="alert">
                                 <strong>{{ $message }}</strong>
