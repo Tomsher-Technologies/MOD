@@ -1,4 +1,6 @@
-<header id="header" class="@if (Route::currentRouteName() == 'home') top-0 w-full py-6 bg-transparent z-[999] @else w-full py-6 z-[999] bg-[#ebebea] @endif fixed top-0 w-full z-[999] shadow-md transition-all ease-in-out duration-500 opacity-0" style="transition: background-color 0.3s ease;">
+<header id="header"
+    class="@if (Route::currentRouteName() == 'home') top-0 w-full py-6 bg-transparent z-[999] @else w-full py-6 z-[999] bg-[#ebebea] @endif fixed top-0 w-full z-[999] shadow-md transition-all ease-in-out duration-500 opacity-0"
+    style="transition: background-color 0.3s ease;">
     <div class="container mx-auto">
         <div class="flex items-center justify-between">
             <!-- Logo Section -->
@@ -11,15 +13,7 @@
                 </a>
             </div>
 
-            <!-- Countdown Section -->
-            <div class="flex items-center">
-                @php
-                    $eventDate = \Carbon\Carbon::parse(config('app.event_start_date', '2025-12-31 00:00:00'));
-                @endphp
-                <div class="countdown-timer bg-gradient-to-r from-[#ffcc00] via-[#ff9900] to-[#ffcc00] text-white py-2 px-2 rounded-lg animate-gradient">
-                    <x-countdown />
-                </div>
-            </div>
+            <x-countdown />
 
             <!-- Navigation Links -->
             <div class="flex items-center gap-6 text-md">
@@ -38,7 +32,8 @@
 
             <!-- Login Button -->
             <div class="flex items-center">
-                <a href="{{ route('login') }}" class="inline-block bg-[#b68a35] text-white px-8 py-2 rounded-lg hover:bg-[#9e7526]">
+                <a href="{{ route('login') }}"
+                    class="inline-block bg-[#b68a35] text-white px-8 py-2 rounded-lg hover:bg-[#9e7526]">
                     {{ __db('login') }}
                 </a>
             </div>
@@ -50,7 +45,8 @@
     /* Smooth fade-in for the header */
     #header {
         opacity: 1;
-        transition: opacity 1.5s ease-out; /* Smooth fade-in transition */
+        transition: opacity 1.5s ease-out;
+        /* Smooth fade-in transition */
     }
 
     /* Apply gradient animation for the countdown timer only */
@@ -58,21 +54,24 @@
         0% {
             background: linear-gradient(90deg, #9e7526, #b68a35);
         }
+
         50% {
             background: linear-gradient(90deg, #b68a35, #9e7526);
         }
+
         100% {
             background: linear-gradient(90deg, #9e7526, #b68a35);
         }
     }
 
     .animate-gradient {
-        animation: countdownGradient 6s ease-in-out infinite; /* Smoother gradient animation for countdown timer */
+        animation: countdownGradient 6s ease-in-out infinite;
+        /* Smoother gradient animation for countdown timer */
     }
 
     /* Smooth fade-in effect for header */
-    window.onload = function() {
-        document.getElementById('header').style.opacity = '1';
+    window.onload=function() {
+        document.getElementById('header').style.opacity='1';
     }
 
     /* Smooth transitions for elements */
@@ -99,7 +98,8 @@
 
     /* Change header background on scroll */
     .scrolled {
-        background-color: white !important; /* Change to white on scroll */
+        background-color: white !important;
+        /* Change to white on scroll */
     }
 </style>
 
