@@ -56,6 +56,20 @@ class EscortController extends Controller
     public function index(Request $request)
     {
 
+        $isRedirect = false;
+        $referer = $request->headers->get('referer');
+
+        if ($referer) {
+            $refererPath = parse_url($referer, PHP_URL_PATH);
+
+            if (
+                str_contains($refererPath, '/delegations') ||
+                str_contains($refererPath, '/delegations/')
+            ) {
+                $isRedirect = true;
+            }
+        }
+
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $query = Escort::with('delegations', 'gender', 'nationality', 'delegation')
@@ -70,7 +84,8 @@ class EscortController extends Controller
         }
 
         if ($delegationId && $assignmentMode === 'escort') {
-            $query->where('escorts.delegation_id', null)->where('escorts.status', 1);
+            // $query->where('escorts.delegation_id', null)->where('escorts.status', 1);
+            $query->where('escorts.status', 1);
         }
 
         if ($search = $request->input('search')) {
@@ -146,7 +161,7 @@ class EscortController extends Controller
         $request->session()->put('assign_escorts_last_url', url()->full());
         $request->session()->put('import_escorts_last_url', url()->full());
 
-        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs'));
+        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'isRedirect', 'request'));
     }
 
     public function updateStatus(Request $request)
