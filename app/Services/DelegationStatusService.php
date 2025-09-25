@@ -8,6 +8,13 @@ use Carbon\Carbon;
 
 class DelegationStatusService
 {
+    const STATUS_CODES = [
+        'NOT_YET_ARRIVED' => 1,
+        'PARTIALLY_ARRIVED' => 2,
+        'ARRIVED' => 3,
+        'PARTIALLY_DEPARTED' => 4,
+        'DEPARTED' => 5
+    ];
     public function updateDelegateParticipationStatus(Delegate $delegate)
     {
         if (!$delegate->exists) {
@@ -78,10 +85,9 @@ class DelegationStatusService
         $delegates = $delegation->delegates;
 
         if ($delegates->isEmpty()) {
-            $newStatus = 'not yet arrived';
             $participationStatusOption = \App\Models\DropdownOption::whereHas('dropdown', function ($query) {
                 $query->where('code', 'participation_status');
-            })->where('value', $newStatus)->first();
+            })->where('code', self::STATUS_CODES['NOT_YET_ARRIVED'])->first();
 
             if ($participationStatusOption && $delegation->participation_status_id !== $participationStatusOption->id) {
                 $delegation->participation_status_id = $participationStatusOption->id;
@@ -106,33 +112,31 @@ class DelegationStatusService
             }
         }
 
-        $newStatus = 'not yet arrived';
+        $newStatusCode = self::STATUS_CODES['NOT_YET_ARRIVED'];
 
         if ($departedCount === $totalDelegates) {
-            $newStatus = 'departured';
+            $newStatusCode = self::STATUS_CODES['DEPARTED'];
         } elseif ($arrivedCount === $totalDelegates) {
-            $newStatus = 'arrived';
+            $newStatusCode = self::STATUS_CODES['ARRIVED'];
         } elseif ($arrivedCount > 0) {
-
             if ($toBeArrivedCount > 0) {
-                $newStatus = 'Partially Arrived';
+                $newStatusCode = self::STATUS_CODES['PARTIALLY_ARRIVED'];
             } elseif ($departedCount > 0) {
-                $newStatus = 'Partially Departured';
+                $newStatusCode = self::STATUS_CODES['PARTIALLY_DEPARTED'];
             }
         } elseif ($toBeArrivedCount > 0) {
-
             if ($arrivedCount > 0 || $departedCount > 0) {
-                $newStatus = 'Partially Arrived';
+                $newStatusCode = self::STATUS_CODES['PARTIALLY_ARRIVED'];
             } else {
-                $newStatus = 'Not Yet Arrived';
+                $newStatusCode = self::STATUS_CODES['NOT_YET_ARRIVED'];
             }
         } elseif ($departedCount > 0) {
-            $newStatus = 'Partially Departured';
+            $newStatusCode = self::STATUS_CODES['PARTIALLY_DEPARTED'];
         }
 
         $participationStatusOption = \App\Models\DropdownOption::whereHas('dropdown', function ($query) {
             $query->where('code', 'participation_status');
-        })->where('value', $newStatus)->first();
+        })->where('code', $newStatusCode)->first();
 
         if ($participationStatusOption && $delegation->participation_status_id !== $participationStatusOption->id) {
             $delegation->participation_status_id = $participationStatusOption->id;
