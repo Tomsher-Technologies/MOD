@@ -140,7 +140,7 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'notifications' => $formattedNotifications,
-            'unread_count' => auth()->user()->unreadNotifications()->whereNull('alert_id')->count(),
+            'unread_count' => auth()->user()->unreadNotifications()->whereNull('alert_id')->where('event_id', $currentEventId)->count(),
         ]);
     }
 
