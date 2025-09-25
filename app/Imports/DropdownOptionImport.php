@@ -27,6 +27,7 @@ class DropdownOptionImport implements ToModel, WithHeadingRow
         if ($existing) {
             $existing->update([
                 'status'     => $row['status'] ?? $existing->status,
+                'code'       => $row['option_code'] ?? $existing->code,
                 'sort_order' => $row['sort_order'] ?? $existing->sort_order,
             ]);
             return null;
