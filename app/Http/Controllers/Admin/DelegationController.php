@@ -1229,7 +1229,7 @@ class DelegationController extends Controller
                 $oldAssignment = \App\Models\RoomAssignment::find($escorts->current_room_assignment_id);
                 if ($oldAssignment) {
 
-                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id); 
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                         $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
                             ->where('room_type_id', $oldAssignment->room_type_id)
@@ -2495,14 +2495,14 @@ class DelegationController extends Controller
         try {
             $delegation->interviews()->delete();
             $delegation->attachments()->delete();
+
+            $this->removeDelegationAllAccommodation($delegation);
             $escorts = $delegation->escorts()->pluck('escorts.id');
 
             if ($escorts->count() > 0) {
                 $delegation->escorts()->detach();
                 Escort::whereIn('id', $escorts)->update(['delegation_id' => null]);
             }
-
-            $this->removeDelegationAllAccommodation($delegation);
 
             $this->logActivity(
                 module: 'Delegation',
