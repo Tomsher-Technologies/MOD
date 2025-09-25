@@ -9,14 +9,15 @@
             </div>
             <div class="col-span-6">
                <ul class="flex items-center gap-6 text-md   justify-end">
-                  <li>
-                     <a href="{{ route('about-us') }}">{{ __db('about_us') }}</a>
+                   <li>
+                     <a href="{{ route('news') }}">{{ __db('news_events') }}</a>
                   </li>
                   <li>
                      <a href="{{ route('committees') }}">{{ __db('committees') }}</a>
                   </li>
+                 
                   <li>
-                     <a href="{{ route('news') }}">{{ __db('news_events') }}</a>
+                     <a href="{{ route('about-us') }}">{{ __db('about_us') }}</a>
                   </li>
                </ul>
             </div>
