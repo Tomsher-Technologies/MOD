@@ -19,6 +19,7 @@ class NotificationController extends Controller
         $allShownIds = collect($notifications->items())->pluck('id');
 
         auth()->user()->unreadNotifications()
+            ->whereNull('alert_id')
             ->whereIn('id', $allShownIds)
             ->update(['read_at' => now()]);
 
@@ -57,6 +58,7 @@ class NotificationController extends Controller
 
         $notifications  = auth()->user()->unreadNotifications()
             ->where('event_id', $currentEventId)
+            ->whereNull('alert_id')
             ->latest()
             ->limit(5)
             ->get();
@@ -138,7 +140,7 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'notifications' => $formattedNotifications,
-            'unread_count' => auth()->user()->unreadNotifications()->count(),
+            'unread_count' => auth()->user()->unreadNotifications()->whereNull('alert_id')->where('event_id', $currentEventId)->count(),
         ]);
     }
 
@@ -150,6 +152,7 @@ class NotificationController extends Controller
 
             $unreadCount = auth()->user()
                 ->unreadNotifications()
+                ->whereNull('alert_id')
                 ->where('event_id', $currentEventId)
                 ->count();
 
