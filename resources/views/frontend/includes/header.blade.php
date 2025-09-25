@@ -1,4 +1,4 @@
-<header class="@if (Route::currentRouteName() == 'home') top-0 w-full py-6 bg-transparent z-[999] @else w-full py-6 z-[999] bg-[#ebebea] @endif fixed top-0 w-full z-[999] shadow-md transition-all ease-in-out duration-500 opacity-0" id="header">
+<header id="header" class="@if (Route::currentRouteName() == 'home') top-0 w-full py-6 bg-transparent z-[999] @else w-full py-6 z-[999] bg-[#ebebea] @endif fixed top-0 w-full z-[999] shadow-md transition-all ease-in-out duration-500 opacity-0" style="transition: background-color 0.3s ease;">
     <div class="container mx-auto">
         <div class="flex items-center justify-between">
             <!-- Logo Section -->
@@ -54,18 +54,17 @@
     }
 
     /* Apply gradient animation for the countdown timer only */
-@keyframes countdownGradient {
-    0% {
-        background: linear-gradient(90deg, #9e7526, #b68a35);
+    @keyframes countdownGradient {
+        0% {
+            background: linear-gradient(90deg, #9e7526, #b68a35);
+        }
+        50% {
+            background: linear-gradient(90deg, #b68a35, #9e7526);
+        }
+        100% {
+            background: linear-gradient(90deg, #9e7526, #b68a35);
+        }
     }
-    50% {
-        background: linear-gradient(90deg, #b68a35, #9e7526);
-    }
-    100% {
-        background: linear-gradient(90deg, #9e7526, #b68a35);
-    }
-}
-
 
     .animate-gradient {
         animation: countdownGradient 6s ease-in-out infinite; /* Smoother gradient animation for countdown timer */
@@ -97,4 +96,21 @@
         background-color: #9e7526;
         transition: background-color 0.3s ease-in-out;
     }
+
+    /* Change header background on scroll */
+    .scrolled {
+        background-color: white !important; /* Change to white on scroll */
+    }
 </style>
+
+<script>
+    // Detect scroll and add class to change header background color
+    window.onscroll = function() {
+        let header = document.getElementById('header');
+        if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }
+</script>
