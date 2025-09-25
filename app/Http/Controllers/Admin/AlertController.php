@@ -7,9 +7,11 @@ use App\Models\Alert;
 use App\Models\AlertRecipient;
 use App\Models\Event;
 use App\Models\EventUserRole;
+use App\Models\Notification;
 use App\Models\User;
 use App\Notifications\AlertNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AlertController extends Controller
 {
@@ -153,15 +155,7 @@ class AlertController extends Controller
 
     public function show(Alert $alert)
     {
-        $alert->load(['alertRecipients.user']);
-
-        $alertRecipient = AlertRecipient::where('alert_id', $alert->id)
-            ->where('user_id', auth()->id())
-            ->first();
-
-        if ($alertRecipient && !$alertRecipient->read_at) {
-            $alertRecipient->update(['read_at' => now()]);
-        }
+        $this->markAsRead(request(), $alert->id);
 
         return view('admin.alerts.show', compact('alert'));
     }
@@ -171,15 +165,9 @@ class AlertController extends Controller
         try {
             $currentEventId = session('current_event_id', getDefaultEventId());
 
-            $alerts = auth()->user()->unreadAlertNotifications()
-                ->where('event_id', $currentEventId)
-                ->latest()
-                ->limit(5)
-                ->get();
+            $alerts = auth()->user()->notifications()->whereNotNull('alert_id')->where('event_id', $currentEventId)->latest()->limit(5)->get();
 
-            $unreadCount = auth()->user()->unreadAlertNotifications()
-                ->where('event_id', $currentEventId)
-                ->count();
+            $unreadCount = auth()->user()->notifications()->whereNotNull('alert_id')->where('event_id', $currentEventId)->whereNull('read_at')->count();
 
             if ($alerts && $alerts->count() > 0) {
                 $alertsData = [];
@@ -189,6 +177,7 @@ class AlertController extends Controller
 
                     if ($alertId) {
                         $alert = Alert::find($alertId);
+
 
                         if ($alert) {
                             $alertData = [
@@ -232,8 +221,6 @@ class AlertController extends Controller
         }
     }
 
-
-
     public function markAsRead(Request $request, $id)
     {
 
@@ -246,9 +233,10 @@ class AlertController extends Controller
         }
 
         $currentEventId = session('current_event_id', getDefaultEventId());
+
         $notification = auth()->user()->notifications()
             ->where('event_id', $currentEventId)
-            ->where('data->alert_id', $id)
+            ->where('alert_id', $id)
             ->first();
 
         if ($notification && !$notification->read_at) {
@@ -261,16 +249,14 @@ class AlertController extends Controller
     public function getUnreadCount(Request $request)
     {
         try {
+
             $currentEventId = session('current_event_id', getDefaultEventId());
 
-            $unreadCount = auth()->user()
-                ->unreadAlertNotifications()
-                ->where('event_id', $currentEventId)
-                ->count();
+            $modelCount = auth()->user()->notifications()->whereNotNull('alert_id')->where('event_id', $currentEventId)->whereNull('read_at')->count();
 
             return response()->json([
                 'success' => true,
-                'unread_count' => $unreadCount
+                'unread_count' => $modelCount
             ]);
         } catch (\Exception $e) {
             return response()->json([

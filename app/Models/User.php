@@ -56,30 +56,34 @@ class User extends Authenticatable
 
     public function notifications()
     {
-        return $this->morphMany(Notification::class, 'notifiable')->whereNull('alert_id')->orderBy('created_at', 'desc');
+        return $this->morphMany(Notification::class, 'notifiable')->orderBy('created_at', 'desc');
     }
 
-    
+
     public function unreadNotifications()
     {
-        return $this->notifications()->whereNull('read_at')->whereNull('alert_id');
+        return $this->notifications()->whereNull('read_at');
     }
-    
-    
+
+
     public function alertNotifications()
     {
-        return $this->notifications()->whereNotNull('alert_id');
+        return $this->notifications()
+            ->whereNotNull('alert_id')
+            ->orderBy('created_at', 'desc');
     }
-    
-    
+
+
     public function unreadAlertNotifications()
     {
-        return $this->notifications()->whereNull('read_at')->whereNotNull('alert_id');
+        return $this->notifications()
+            ->whereNotNull('alert_id')
+            ->whereNull('read_at')
+            ->orderBy('created_at', 'desc');
     }
 
     public function eventUserRoles()
     {
         return $this->hasMany(EventUserRole::class, 'user_id');
     }
-
 }
