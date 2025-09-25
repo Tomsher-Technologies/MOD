@@ -139,28 +139,66 @@ class DelegationController extends Controller
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('delegations.code', 'like', "%{$search}%")
+
+                    ->orWhereHas('country', function ($countryQuery) use ($search) {
+                        $countryQuery->where('countries.name', 'like', "%{$search}%")
+                            ->orWhere('countries.name_ar', 'like', "%{$search}%")
+                            ->orWhere('countries.short_code', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('continent', function ($continentQuery) use ($search) {
+                        $continentQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('invitationFrom', function ($invitationQuery) use ($search) {
+                        $invitationQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('invitationStatus', function ($statusQuery) use ($search) {
+                        $statusQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('participationStatus', function ($participationQuery) use ($search) {
+                        $participationQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+
                     ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
                         $delegateQuery->where(function ($dq) use ($search) {
-                            $dq->where('name_en', 'like', "%{$search}%")
-                                ->orWhere('name_ar', 'like', "%{$search}%")
-                                ->orWhere('title_en', 'like', "%{$search}%")
-                                ->orWhere('title_ar', 'like', "%{$search}%");
+                            $dq->where('delegates.name_en', 'like', "%{$search}%")
+                                ->orWhere('delegates.name_ar', 'like', "%{$search}%")
+                                ->orWhere('delegates.title_en', 'like', "%{$search}%")
+                                ->orWhere('delegates.title_ar', 'like', "%{$search}%")
+                                ->orWhere('delegates.code', 'like', "%{$search}%")
+                                ->orWhere('delegates.designation_en', 'like', "%{$search}%")
+                                ->orWhere('delegates.designation_ar', 'like', "%{$search}%");
                         });
                     })
+
                     ->orWhereHas('escorts', function ($escortQuery) use ($search) {
                         $escortQuery->where(function ($eq) use ($search) {
-                            $eq->where('name_en', 'like', "%{$search}%")
-                                ->orWhere('name_ar', 'like', "%{$search}%")
-                                ->orWhere('title_en', 'like', "%{$search}%")
-                                ->orWhere('title_ar', 'like', "%{$search}%");
+                            $eq->where('escorts.name_en', 'like', "%{$search}%")
+                                ->orWhere('escorts.name_ar', 'like', "%{$search}%")
+                                ->orWhere('escorts.title_en', 'like', "%{$search}%")
+                                ->orWhere('escorts.title_ar', 'like', "%{$search}%")
+                                ->orWhere('escorts.code', 'like', "%{$search}%")
+                                ->orWhere('escorts.military_number', 'like', "%{$search}%")
+                                ->orWhere('escorts.rank', 'like', "%{$search}%")
+                                ->orWhere('escorts.phone_number', 'like', "%{$search}%")
+                                ->orWhere('escorts.email', 'like', "%{$search}%");
                         });
                     })
+
                     ->orWhereHas('drivers', function ($driverQuery) use ($search) {
                         $driverQuery->where(function ($eq) use ($search) {
-                            $eq->where('name_en', 'like', "%{$search}%")
-                                ->orWhere('name_ar', 'like', "%{$search}%")
-                                ->orWhere('title_en', 'like', "%{$search}%")
-                                ->orWhere('title_ar', 'like', "%{$search}%");
+                            $eq->where('drivers.name_en', 'like', "%{$search}%")
+                                ->orWhere('drivers.name_ar', 'like', "%{$search}%")
+                                ->orWhere('drivers.title_en', 'like', "%{$search}%")
+                                ->orWhere('drivers.title_ar', 'like', "%{$search}%")
+                                ->orWhere('drivers.code', 'like', "%{$search}%")
+                                ->orWhere('drivers.military_number', 'like', "%{$search}%")
+                                ->orWhere('drivers.phone_number', 'like', "%{$search}%")
+                                ->orWhere('drivers.car_type', 'like', "%{$search}%")
+                                ->orWhere('drivers.car_number', 'like', "%{$search}%");
                         });
                     });
             });
@@ -314,6 +352,13 @@ class DelegationController extends Controller
         $request->session()->put('escorts_index_last_url', url()->full());
         $request->session()->put('drivers_index_last_url', url()->full());
         $request->session()->put('add_interview_last_url', url()->full());
+
+        $request->session()->put('edit_drivers_last_url', url()->full());
+        $request->session()->put('edit_escorts_last_url', url()->full());
+
+        $request->session()->put('show_escorts_last_url', url()->full());
+        $request->session()->put('show_drivers_last_url', url()->full());
+
         $request->session()->put('other_interview_member_show_last_url', url()->full());
 
         return view('admin.delegations.edit', [
@@ -364,8 +409,16 @@ class DelegationController extends Controller
 
         $request->session()->put('interview_member_last_url', url()->full());
         $request->session()->put('edit_delegations_last_url', url()->full());
+        
         $request->session()->put('escorts_index_last_url', url()->full());
         $request->session()->put('drivers_index_last_url', url()->full());
+
+        $request->session()->put('edit_drivers_last_url', url()->full());
+        $request->session()->put('edit_escorts_last_url', url()->full());
+
+        $request->session()->put('show_escorts_last_url', url()->full());
+        $request->session()->put('show_drivers_last_url', url()->full());
+
         $request->session()->put('other_interview_member_show_last_url', url()->full());
 
         return view('admin.delegations.show', compact('delegation', 'hotels'));
@@ -1229,7 +1282,7 @@ class DelegationController extends Controller
                 $oldAssignment = \App\Models\RoomAssignment::find($escorts->current_room_assignment_id);
                 if ($oldAssignment) {
 
-                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id); 
+                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
                     if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                         $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
                             ->where('room_type_id', $oldAssignment->room_type_id)
@@ -1905,7 +1958,7 @@ class DelegationController extends Controller
                             $oldRoom->save();
                         }
                     }
-  
+
                     $oldAssignment->delete();
                 }
             }

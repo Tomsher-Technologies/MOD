@@ -56,6 +56,20 @@ class DriverController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
 
+        $isRedirect = false;
+        $referer = $request->headers->get('referer');
+
+        if ($referer) {
+            $refererPath = parse_url($referer, PHP_URL_PATH);
+
+            if (
+                str_contains($refererPath, '/delegations') ||
+                str_contains($refererPath, '/delegations/')
+            ) {
+                $isRedirect = true;
+            }
+        }
+
         $query = Driver::with('delegations')
             ->where('drivers.event_id', $currentEventId)
             ->latest();
@@ -154,7 +168,7 @@ class DriverController extends Controller
         $request->session()->put('edit_drivers_last_url', url()->full());
         $request->session()->put('assign_drivers_last_url', url()->full());
 
-        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities'));
+        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities', 'isRedirect', 'request'));
     }
 
 
@@ -413,6 +427,16 @@ class DriverController extends Controller
         }
 
         if ($activeAssignments->isNotEmpty()) {
+
+            $existingActiveDelegation = $driver->delegations()
+                ->where('delegation_id', $delegationId)
+                ->wherePivot('status', 1)
+                ->exists();
+
+            if ($existingActiveDelegation) {
+                return redirect()->route('delegations.show', $delegationId)->with('error', __db('delegation_already_has_same_driver_assignment'));
+            }
+
             if ($action === 'reassign') {
                 foreach ($activeAssignments as $assignment) {
                     $assignmentStart = $assignment->pivot->start_date;
@@ -473,7 +497,6 @@ class DriverController extends Controller
                 $driver->current_room_assignment_id = null;
                 $driver->save();
             }
-            
         } else {
             $driver->delegations()->attach($delegationId, [
                 'status' => 1,

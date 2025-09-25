@@ -5,12 +5,18 @@
 
             @directCanany(['import_drivers'])
                 <a href="{{ route('drivers.import.form') }}"
-                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg " type="button">
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#B68A35] text-white rounded-lg "
+                    type="button">
                     {{ __db('import') . ' ' . __db('driver') }}
                 </a>
             @enddirectCanany
 
-           @if (isset($delegationId) && isset($assignmentMode) && $assignmentMode === 'driver' && Session::has('drivers_index_last_url'))
+            @if (
+                (isset($delegationId) &&
+                    isset($assignmentMode) &&
+                    $assignmentMode === 'driver' &&
+                    Session::has('drivers_index_last_url')) ||
+                    (isset($isRedirect) && isset($request) && $request->input('search')))
                 <x-back-btn title="" class="" back-url="{{ Session::get('drivers_index_last_url') }}" />
             @endif
 
