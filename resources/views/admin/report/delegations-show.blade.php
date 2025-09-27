@@ -7,10 +7,12 @@
             
 
             <div class="flex gap-3 ms-auto">
-                <a href="{{ route('delegations.exportPdf', ['id' => base64_encode($delegation->id)]) }}" class="!text-[#5D471D]  !bg-[#E6D7A2] hover:bg-yellow-400  rounded-lg py-2 px-3">
-                {{ __db('export_pdf') }}
-            </a>
-            <x-back-btn class="" back-url="{{ route('reports-delegations') }}" />
+                @directCanany(['export_delegations_escort'])
+                    <a href="{{ route('delegations.exportPdf', ['id' => base64_encode($delegation->id)]) }}" class="!text-[#5D471D]  !bg-[#E6D7A2] hover:bg-yellow-400  rounded-lg py-2 px-3">
+                        {{ __db('export_pdf') }}
+                    </a>
+                @enddirectCanany
+                <x-back-btn class="" back-url="{{ route('reports-delegations') }}" />
             </div>
             
         </div>

@@ -43,7 +43,9 @@ class LoginController extends Controller
             $user = Auth::user();
             if ($user && in_array($user->user_type, ['admin', 'staff'])) {
                 $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-                $user->givePermissionTo($rolePermissions);
+                $user->syncPermissions($rolePermissions);
+                $user = $user->fresh();
+            
                 $redirectTo = match ($user->user_type) {
                     default => route('admin.dashboard'),
                 };

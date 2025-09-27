@@ -64,7 +64,9 @@ class AuthController extends Controller
 
             if($user->user_type == 'admin' || $user->user_type == 'staff') {
                 $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
-                $user->givePermissionTo($rolePermissions);
+                // $user->givePermissionTo($rolePermissions);
+                $user->syncPermissions($rolePermissions);
+                $user = $user->fresh();
             }else{
                 $roleAssignment = EventUserRole::where('user_id', $user->id)
                                 ->where('event_id', $eventId)
@@ -88,10 +90,13 @@ class AuthController extends Controller
                         return str_contains($perm, '_view_') || str_contains($perm, '_manage_');
                     })->toArray();
 
-                    $user->givePermissionTo($filtered);
+                    // $user->givePermissionTo($filtered);
+                    $user->syncPermissions($filtered);
                 } else {
-                    $user->givePermissionTo($rolePermissions);
+                    // $user->givePermissionTo($rolePermissions);
+                    $user->syncPermissions($rolePermissions);
                 }
+                $user = $user->fresh();
 
                 session(['current_event_id' => $eventId]);
                 session(['current_module' => $roleAssignment->module]);

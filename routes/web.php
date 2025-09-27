@@ -22,6 +22,13 @@ Route::get('logout', [AuthController::class, 'logout'])->name('web.logout');
 Route::get('/force-password', [AuthController::class, 'showForcePasswordForm'])->name('force.password.form');
 Route::post('/force-password', [AuthController::class, 'updateForcePassword'])->name('force.password.update');
     
+Route::get('/lang/{lang}', function ($lang) {
+    if (in_array($lang, ['en', 'ar'])) {
+        session(['locale' => $lang]);
+        app()->setLocale($lang);
+    }
+    return redirect()->back();
+})->name('lang.switch');
 
 // Delegate Module
 Route::prefix('mod-delegate') ->middleware(['auth', 'check.permission']) ->group(function () {

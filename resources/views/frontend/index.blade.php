@@ -35,53 +35,17 @@
 
 
 @php
-    // DEMO DATA: Pass this from your controller.
-    $floorPlans = [
-        (object) [
-            'name' => 'Ground Floor & Lobby',
-            'files' => [
-                ['type' => 'PDF', 'url' => '#'],
-                ['type' => 'Image', 'url' => '#'],
-                ['type' => 'DWG', 'url' => '#'],
-            ],
-        ],
-        (object) [
-            'name' => 'First Floor Conference Halls',
-            'files' => [
-                ['type' => 'PDF', 'url' => '#'],
-                ['type' => 'Image', 'url' => '#'],
-            ],
-        ],
-        (object) [
-            'name' => 'Grand Exhibition Hall',
-            'files' => [['type' => 'PDF', 'url' => '#']],
-        ],
-        (object) [
-            'name' => 'Executive Suites',
-            'files' => [
-                ['type' => 'PDF', 'url' => '#'],
-                ['type' => 'Image', 'url' => '#'],
-            ],
-        ],
-        (object) [
-            'name' => 'Basement & Parking Area',
-            'files' => [['type' => 'PDF', 'url' => '#']],
-        ],
-        (object) [
-            'name' => 'Rooftop Terrace',
-            'files' => [
-                ['type' => 'PDF', 'url' => '#'],
-                ['type' => 'Image', 'url' => '#'],
-            ],
-        ],
-    ];
+    $floorPlans = getFloorPlans();
+    
 @endphp
 
 <section class="py-[100px] bg-[#f2f2f2]">
     <div class="container mx-auto">
         <div class="text-center mb-12">
-            <h2 class="text-[40px] text-[#744e2e] font-bold">Venue Layouts</h2>
-            <p class="text-lg text-gray-500 mt-2 max-w-2xl mx-auto">Explore our versatile spaces. Select a plan to view details and download files.</p>
+            <h2 class="text-[40px] text-[#744e2e] font-bold">Floor Plans</h2>
+            <p class="text-lg text-gray-500 mt-2 max-w-2xl mx-auto">
+                Explore our versatile spaces. Select a plan to view details and download files.
+            </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -97,24 +61,21 @@
                     </div>
 
                     <div class="relative z-10">
-                        <h3 class="text-2xl font-bold text-[#744e2e] mb-3">{{ $plan->name }}</h3>
+                        <h3 class="text-2xl font-bold text-[#744e2e] mb-3">{{ $plan->title }}</h3>
                     </div>
 
                     <div class="relative z-10">
                         <div class="flex items-center gap-2 flex-wrap">
-                            @foreach ($plan->files as $file)
-                                <a href="{{ $file['url'] }}" target="_blank" rel="noopener noreferrer"
+                            @php
+                                $files = $plan->file_paths;
+                            @endphp
+                            @foreach ($files as $file)
+                                <a href="{{ asset('storage/' . $file) }}" target="_blank" rel="noopener noreferrer"
                                    class="flex items-center gap-2 bg-gray-100 text-[#797E86] text-sm font-semibold px-3 py-1.5 rounded-full border border-gray-200 hover:bg-[#b68a35] hover:text-white hover:border-[#b68a35] transition-colors duration-200">
                                     
-                                    @php $fileType = strtoupper($file['type']); @endphp
-
-                                    @if ($fileType == 'PDF') <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                                    @elseif ($fileType == 'IMAGE') <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
-                                    @elseif ($fileType == 'DWG') <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>
-                                    @else <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h4.5m-4.5 0H5.625c-.621 0-1.125.504-1.125 1.125v-17.25c0-.621.504-1.125 1.125-1.125h12.75c.621 0 1.125.504 1.125-1.125v17.25c0 .621-.504 1.125-1.125 1.125h-1.5m-4.5-12.75h.008v.008h-.008v-.008Z" /></svg>
-                                    @endif
+                                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
                                     
-                                    <span>{{ $file['type'] }}</span>
+                                    <span>{{ __db('pdf') }}</span>
                                 </a>
                             @endforeach
                         </div>
