@@ -115,6 +115,11 @@
                             },
                         ],
                         [
+                            'label' => __db('invitation_from'),
+                            'key' => 'invitation_from',
+                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
+                        ],
+                        [
                             'label' => __db('team_head'),
                             'key' => 'team_head',
                             'render' => function ($delegation) {
@@ -146,11 +151,6 @@
                             'label' => __db('delegation'),
                             'key' => 'id',
                             'render' => fn($delegation) => e($delegation->code),
-                        ],
-                        [
-                            'label' => __db('invitation_from'),
-                            'key' => 'invitation_from',
-                            'render' => fn($delegation) => e($delegation->invitationFrom->value ?? '-'),
                         ],
 
                         [

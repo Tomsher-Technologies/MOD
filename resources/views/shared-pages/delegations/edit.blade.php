@@ -103,17 +103,7 @@
                     $participationStatusOptions = getDropDown('participation_status');
                     $participationStatusDefaultOption = null;
                     if ($participationStatusOptions && $participationStatusOptions->options) {
-                        $participationStatusDefaultOption = $participationStatusOptions->options->firstWhere(function (
-                            $option,
-                        ) {
-                            $originalValue = $option->getOriginal('value');
-                            $currentValue = $option->value;
-
-                            return strtolower($originalValue) === 'not yet arrived' ||
-                                strtolower($currentValue) === 'not yet arrived' ||
-                                strtolower($originalValue) === 'لم يصل بعد' ||
-                                strtolower($currentValue) === 'لم يصل بعد';
-                        });
+                        $participationStatusDefaultOption = $participationStatusOptions->options->firstWhere('code', 1); // NOT_YET_ARRIVED
                     }
 
                     $selectedValue = old(

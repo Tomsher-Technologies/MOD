@@ -114,10 +114,10 @@
                                 } else {
                                     $with =
                                         '<a href="' .
-                                        route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                        route('delegations.show', $row?->interviewWithDelegation?->id ?? '') .
                                         '" class="!text-[#B68A35]">' .
                                         'Delegation ID : ' .
-                                        e($row->interviewWithDelegation->code ?? '') .
+                                        e($row?->interviewWithDelegation?->code ?? '') .
                                         '</a>';
                                 }
 
