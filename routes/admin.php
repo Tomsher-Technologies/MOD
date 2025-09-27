@@ -244,6 +244,7 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     Route::post('/profile/change-password', [AdminDashboardController::class, 'changePassword'])->name('staffs.change-password');
 
     // Report Section
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
     Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
     Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
