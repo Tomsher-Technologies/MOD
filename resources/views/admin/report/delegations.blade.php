@@ -4,6 +4,7 @@
     <div>
     <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
         <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('all_delegations') }}</h2>
+        <x-back-btn class="" back-url="{{ route('reports.index') }}" />
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full">
@@ -338,6 +339,7 @@
 
 
 </div>
+@endsection
 
 @section('script')
     <script>
@@ -424,4 +426,4 @@
     </script>
 @endsection
 
-@endsection
+

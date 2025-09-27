@@ -663,3 +663,42 @@
 -- FOREIGN KEY (event_id) 
 -- REFERENCES events(id) 
 -- ON DELETE CASCADE;
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+( 'admin', NULL, 'manage_reports', 'Manage Reports', 'web', 1, NULL, '2025-09-27 07:16:37');
+INSERT INTO `permissions` ( `module`,`parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('admin', 154, 'view_delegations_head_arrival', 'View Delegations Head Arrival', 'web', 1, NULL, NULL),
+('admin', 154, 'export_delegations_head_arrival', 'Export Delegations Head Arrival', 'web', 1, NULL, NULL),
+('admin', 154, 'view_delegations_head_departure', 'View Delegations Head Departure', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_delegations_head_departure', 'Export Delegations Head Departure', 'web', 1, NULL, NULL),
+('admin', 154, 'view_delegations_cars', 'View Delegations Cars', 'web', 1, NULL, NULL),
+('admin', 154, 'export_delegations_cars', 'Export Delegations Cars', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_delegations_escort', 'View Delegations Escort', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_delegations_escort', 'Export Delegations Escort', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_delegations_members', 'View Delegations Members', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_delegations_members', 'Export Delegations Members', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_delegations_without_escort', 'View Delegations Without Escort', 'web', 1, NULL, NULL),
+('admin', 154, 'export_delegations_without_escort', 'Export Delegations Without Escort', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_departures_report', 'View Departures Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_departures_report', 'Export Departures Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_drivers_report', 'View Drivers Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_drivers_report', 'Export Drivers Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_escorts_report', 'View Escorts Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_escorts_report', 'Export Escorts Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_hotel_room_vacancies', 'View Hotel Room Vacancies', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_hotel_room_vacancies', 'Export Hotel Room Vacancies', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_hotel_delegations', 'View Hotel Delegations', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_hotel_delegations', 'Export Hotel Delegations', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_interviews_reports', 'View Interviews Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_interviews_reports', 'Export Interviews Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_vip', 'View VIP', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_vip', 'Export VIP', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_wives', 'View Wives', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_wives', 'Export Wives', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_arrivals_report', 'View Arrivals Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_arrivals_report', 'Export Arrivals Report', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_arrival_hotels', 'View Arrival Hotels', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_arrival_hotels', 'Export Arrival Hotels', 'web', 1, NULL, NULL),
+( 'admin', 154, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
+( 'admin', 154, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
