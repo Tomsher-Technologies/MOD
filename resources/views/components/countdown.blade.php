@@ -1,60 +1,91 @@
- @php
-     $currentEvent = \App\Models\Event::default()->first();
-     if (!$currentEvent) {
-         $currentEvent = \App\Models\Event::latest()->first();
-     }
-     $eventDate = $currentEvent ? $currentEvent->start_date : null;
-     $hasEventStarted = $currentEvent ? now()->greaterThanOrEqualTo($currentEvent->start_date) : true;
- @endphp
+    @php
+        $currentEvent = \App\Models\Event::default()->first();
+        if (!$currentEvent) {
+            $currentEvent = \App\Models\Event::latest()->first();
+        }
+        //  $eventDate = $currentEvent ? $currentEvent->start_date : null;
+        //  $hasEventStarted = $currentEvent ? now()->greaterThanOrEqualTo($currentEvent->start_date) : true;
 
- @unless ($hasEventStarted)
-     <div class="flex items-center">
-         <div
-             class="countdown-timer bg-gradient-to-r from-[#ffcc00] via-[#ff9900] to-[#ffcc00] text-white py-2 px-2 rounded-lg animate-gradient">
-             <div id="event-countdown" class="flex items-center justify-center ">
-                 <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
-                     <div
-                         class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
-                         <span id="countdown-days">00</span>
-                     </div>
-                     <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Days</div>
-                 </div>
-                 <div class="countdown-separator text-lg font-bold text-white">:</div>
 
-                 <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
-                     <div
-                         class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
-                         <span id="countdown-hours">00</span>
-                     </div>
-                     <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Hours</div>
-                 </div>
-                 <div class="countdown-separator text-lg font-bold text-white">:</div>
 
-                 <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
-                     <div
-                         class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
-                         <span id="countdown-minutes">00</span>
-                     </div>
-                     <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Minutes</div>
-                 </div>
-                 <div class="countdown-separator text-lg font-bold text-white">:</div>
 
-                 <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
-                     <div
-                         class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
-                         <span id="countdown-seconds">00</span>
-                     </div>
-                     <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Seconds</div>
-                 </div>
-             </div>
-         </div>
-     </div>
- @endunless
+        $startDate = $currentEvent ? $currentEvent->start_date : null;
+        $endDate   = $currentEvent ? $currentEvent->end_date : null;
+        $now       = now();
+
+        $hasEventStarted = $startDate ? $now->greaterThanOrEqualTo($startDate) : false;
+        $hasEventEnded   = $endDate ? $now->greaterThan($endDate) : false;
+
+    @endphp
+
+    @if(!$hasEventStarted)
+        <div class="flex items-center">
+            <div class="countdown-timer bg-gradient-to-r from-[#ffcc00] via-[#ff9900] to-[#ffcc00] text-white py-2 px-2 rounded-lg animate-gradient">
+                <div id="event-countdown" class="flex items-center justify-center ">
+                    <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
+                        <div
+                            class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
+                            <span id="countdown-days">00</span>
+                        </div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Days</div>
+                    </div>
+                    <div class="countdown-separator text-lg font-bold text-white">:</div>
+
+                    <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
+                        <div
+                            class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
+                            <span id="countdown-hours">00</span>
+                        </div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Hours</div>
+                    </div>
+                    <div class="countdown-separator text-lg font-bold text-white">:</div>
+
+                    <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
+                        <div
+                            class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
+                            <span id="countdown-minutes">00</span>
+                        </div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Minutes</div>
+                    </div>
+                    <div class="countdown-separator text-lg font-bold text-white">:</div>
+
+                    <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
+                        <div
+                            class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
+                            <span id="countdown-seconds">00</span>
+                        </div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Seconds</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($hasEventStarted && !$hasEventEnded)
+        @php
+            $startDate = \Carbon\Carbon::parse($currentEvent->start_date);
+            $endDate   = \Carbon\Carbon::parse($currentEvent->end_date);
+
+            $dayNumber = $startDate->diffInDays(now()->startOfDay()) + 1;
+
+            $totalDays = $startDate->diffInDays($endDate) + 1;
+        @endphp
+        <div class="flex items-center">
+            <div class="countdown-timer bg-gradient-to-r from-[#ffcc00] via-[#ff9900] to-[#ffcc00] text-white py-2 px-4 rounded-lg animate-gradient">
+                <span class="text-xl font-bold text-white">Day {{ $dayNumber }}</span>
+            </div>
+        </div>
+    @endif
 
  <script>
      document.addEventListener('DOMContentLoaded', function() {
-         const eventDateString = @json($eventDate ?? null);
+         const eventDateString = @json($startDate ?? null);
          const eventDate = new Date(eventDateString).getTime();
+         const countdownWrapper = document.getElementById('event-countdown');
+
+        if (!countdownWrapper || !eventDateString) {
+            return;
+        }
 
          const countdownInterval = setInterval(function() {
              const now = new Date().getTime();

@@ -533,20 +533,6 @@
             @directCanany(['manage_labels'])
                 <!-- Add label menu items here consistently styled as above -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 <li>
                     <a href="{{ route('translations.index') }}"
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
@@ -566,33 +552,26 @@
             @enddirectCanany
             <hr>
 
-            <li>
-                <a href="{{ route('reports-delegations') }}"
-                    class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
-            hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35]
-            {{ areActiveRoutes(['reports-delegations']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
-                    <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['reports-delegations']) ? 'stroke-[#b68a35]' : '' }}"
-                        width="36" height="30" fill="none" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M15 17h3a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3m4-9h2m-2 3h2m-6 0h.01M12 17v.01" />
-                    </svg>
-                    <span class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">
-                        {{ __db('delegations') }} {{ __db('reports') }}
-                    </span>
-                </a>
-            </li>
+            @directCanany(['manage_reports'])
+                <li>
+                    <a href="{{ route('reports.index') }}" class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35] {{ areActiveRoutes(['reports.index','reports-delegations','reports-delegations.show']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
+                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['reports.index','reports-delegations','reports-delegations.show']) ? 'stroke-[#b68a35]' : '' }}"
+                            width="36" height="30" fill="none" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 17h3a3 3 0 0 0 3-3v-6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h3m4-9h2m-2 3h2m-6 0h.01M12 17v.01" />
+                        </svg>
+                        <span class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">
+                            {{ __db('reports') }}
+                        </span>
+                    </a>
+                </li>
 
-
+            @enddirectCanany
 
 
 
             <hr>
-
-
-
-
-
 
             <li>
                 <a href="{{ route('account') }}"

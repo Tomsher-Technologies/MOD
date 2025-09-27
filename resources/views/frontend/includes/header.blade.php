@@ -19,13 +19,13 @@
             <div class="flex items-center gap-6 text-md">
                 <ul class="flex items-center gap-6">
                     <li>
-                        <a href="{{ route('about-us') }}" class="hover:text-[#b68a35]">{{ __db('about_us') }}</a>
+                        <a href="{{ route('news') }}" class="hover:text-[#b68a35]">{{ __db('news_events') }}</a>
                     </li>
                     <li>
                         <a href="{{ route('committees') }}" class="hover:text-[#b68a35]">{{ __db('committees') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('news') }}" class="hover:text-[#b68a35]">{{ __db('news_events') }}</a>
+                        <a href="{{ route('about-us') }}" class="hover:text-[#b68a35]">{{ __db('about_us') }}</a>
                     </li>
                 </ul>
             </div>
