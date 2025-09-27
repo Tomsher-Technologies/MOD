@@ -171,6 +171,7 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('admin.report.delegation-escorts', compact('delegation'))
             ->setPaper('A4', 'portrait');
 
+
         return $pdf->download("delegation-report-{$delegation->id}.pdf");
     }
 }
