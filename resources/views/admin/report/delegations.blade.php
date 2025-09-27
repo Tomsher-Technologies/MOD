@@ -194,7 +194,8 @@
                                     </a>';
                                 }
 
-                                $buttons .='<a href="'.route("delegations.exportPdf", ["id" => base64_encode($delegation->id)]).'" class
+                                if(can(['export_delegations_escort'])){
+                                    $buttons .='<a href="'.route("delegations.exportPdf", ["id" => base64_encode($delegation->id)]).'" class
                                     "w-8 h-8 text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center" style="margin-top:6px;" title="'.__db('export_pdf').'">
                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C5E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -205,6 +206,8 @@
                                         </svg>
                                     </a>';
 
+                                }
+                                
                                     $buttons .= '</div>';
                                 return $buttons;
                             },

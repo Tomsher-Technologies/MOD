@@ -750,3 +750,10 @@ if (!function_exists('getModuleCode')) {
         }
     }
 }
+
+function getFloorPlans()
+{
+    $floorPlans = \App\Models\FloorPlan::where('event_id', getDefaultEventId())->get();
+
+    return $floorPlans;
+}
