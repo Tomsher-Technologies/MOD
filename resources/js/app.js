@@ -7,9 +7,6 @@ window.jQuery.moment = moment;
 
 import "./refresh-arrivals-departures.js";
 
-import AOS from 'aos';
-import 'aos/dist/aos.css'; // Import AOS styles
-
 import "daterangepicker/daterangepicker.css";
 
 import "jquery-validation";
@@ -61,15 +58,6 @@ import 'tinymce/plugins/wordcount';
 // import 'tinymce/skins/ui/oxide/skin.min.css';
 // import 'tinymce/skins/ui/oxide/content.min.css';
 // import 'tinymce/skins/content/default/content.min.css';
-
-
-
-
-AOS.init({
-  duration: 1000, // Animation duration
-  once: true, // Run animation once
-});
-
 
 import Highcharts from "highcharts";
 window.Highcharts = Highcharts;

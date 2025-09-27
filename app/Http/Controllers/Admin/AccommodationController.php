@@ -482,7 +482,7 @@ class AccommodationController extends Controller
                 return response()->json(['success' => 3]);
             }
 
-            if ($availableRooms <= 0) {
+            if ($availableRooms <= 0 && !$alreadyAssigned) {
                 return response()->json(['success' => 2]);
             }
 

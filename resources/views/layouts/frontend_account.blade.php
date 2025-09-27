@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="robots" content="noindex, nofollow">
     <title>{{ $title ?? env('APP_NAME') }}</title>
-   
+
     <!-- Custom CSS for Public Sans -->
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
     <link rel="icon" href="{{ asset('assets/img/favicon.ico') }}" type="image/x-icon">
@@ -26,7 +26,21 @@
 
     @include('frontend.includes.header')
 
-    @yield('content')
+    @php
+        $currentPath = Request::path();
+    @endphp
+
+    @if ($currentPath !== '/')
+        <style>
+            body {
+                padding-top: 8rem;
+            }
+        </style>
+    @endif
+
+    <div class="min-h-[85vh]">
+        @yield('content')
+    </div>
 
     @include('frontend.includes.footer')
 
