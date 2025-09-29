@@ -33,8 +33,9 @@
                     
                     <li class="mt-2"><span class="font-semibold">Required columns</span> in the file:
                         <ul class="list-disc pl-6 mt-4 text-gray-700">
-                            <li><span class="font-semibold">Code</span> - Dropdown code (Check dropdown list)</li>
-                            <li><span class="font-semibold">Value</span> - Option name</li>
+                            <li><span class="font-semibold"> Dropdown Code</span> - Dropdown code (Check dropdown list)</li>
+                            <li><span class="font-semibold">Value_en</span> - Option english name</li>
+                            <li><span class="font-semibold">Value_ar</span> - Option arabic name</li>
                             <li><span class="font-semibold">Sort Order</span> - Numeric sort order</li>
                             <li><span class="font-semibold">Status</span> - Use 1 for active, 0 for inactive</li>
                         </ul>
