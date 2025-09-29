@@ -38,6 +38,7 @@ class CountryImport implements ToCollection, WithHeadingRow
                     'name_ar' => trim($row['name_ar']) ?? null,
                     'short_code' => trim($row['short_code']) ?? null,
                     'sort_order' => trim($row['sort_order']) ?? null,
+                    'code' => trim($row['code']) ?? null,
                     'status' => 1,
                 ];
 

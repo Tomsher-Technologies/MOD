@@ -12,6 +12,7 @@ class Country extends Model
         'continent_id',
         'short_code',
         'sort_order',
+        'code',
         'status',
         'flag',
     ];
