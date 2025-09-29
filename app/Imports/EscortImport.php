@@ -43,58 +43,61 @@ class EscortImport implements ToCollection, WithHeadingRow
                     'military_number' => trim($row['military_number']) ?? null,
                     'phone_number' => trim($row['phone_number']) ?? null,
                     'email' => trim($row['email']) ?? null,
+                    'internal_ranking_id' => null,
+                    'unit_id' => null,
                     // 'title_en' => trim($row['title_en']) ?? null,
                     // 'title_ar' => trim($row['title_ar']) ?? null,
                     'status' => 1,
                 ];
 
-                if (!empty($row['gender_id'])) {
+                if (!empty($row['gender_code'])) {
                     $gender = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'gender');
-                    })->where('id', trim($row['gender_id']))->first();
+                    })->where('code', trim($row['gender_code']))->first();
 
                     if ($gender) {
                         $escortData['gender_id'] = $gender->id;
                     } else {
-                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid gender_id: ' . $row['gender_id'], $row->toArray());
+                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid gender_code: ' . $row['gender_code'], $row->toArray());
                         continue;
                     }
                 }
 
-                if (!empty($row['internal_ranking_id'])) {
+                if (!empty($row['internal_ranking_code'])) {
                     $ranking = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'rank');
-                    })->where('id', trim($row['internal_ranking_id']))->first();
+                    })->where('code', trim($row['internal_ranking_code']))->first();
 
                     if ($ranking) {
                         $escortData['internal_ranking_id'] = $ranking->id;
                     } else {
-                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid internal_ranking_id: ' . $row['internal_ranking_id'], $row->toArray());
+                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid internal_ranking_code: ' . $row['internal_ranking_code'], $row->toArray());
                         continue;
                     }
                 }
 
-                if (!empty($row['unit_id'])) {
+                if (!empty($row['unit_code'])) {
                     $unit = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'unit');
-                    })->where('id', trim($row['unit_id']))->first();
+                    })->where('code', trim($row['unit_code']))->first();
 
                     if ($unit) {
                         $escortData['unit_id'] = $unit->id;
                     } else {
-                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid unit_id: ' . $row['unit_id'], $row->toArray());
+                        $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid unit_code: ' . $row['unit_code'], $row->toArray());
                         continue;
                     }
                 }
 
-                if (!empty($row['spoken_languages_ids'])) {
-                    $languageIds = explode(',', trim($row['spoken_languages_ids']));
+                if (!empty($row['spoken_languages_codes'])) {
+                    $languageCodes = explode(',', trim($row['spoken_languages_codes']));
                     $validLanguageIds = [];
 
-                    foreach ($languageIds as $languageId) {
+                    foreach ($languageCodes as $languageCode) {
+                        
                         $lang = DropdownOption::whereHas('dropdown', function ($q) {
                             $q->where('code', 'language');
-                        })->where('id', trim($languageId))->first();
+                        })->where('code', trim($languageCode))->first();
 
                         if ($lang) {
                             $validLanguageIds[] = $lang->id;
