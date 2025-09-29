@@ -169,7 +169,7 @@ class CountryController extends Controller
 
         $countries = Country::whereIn('continent_id', $continentIds)
             ->select('id', 'name', 'name_ar')
-            ->orderBy('name')
+            ->orderBy('sort_order')
             ->where('status', 1)
             ->get();
 
