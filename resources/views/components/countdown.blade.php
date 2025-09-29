@@ -58,7 +58,7 @@
                             class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
                             <span id="countdown-seconds">00</span>
                         </div>
-                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Seconds</div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Seconds</div> 
                     </div>
                 </div>
             </div>
