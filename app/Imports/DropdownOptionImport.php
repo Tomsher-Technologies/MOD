@@ -18,30 +18,39 @@ class DropdownOptionImport implements ToModel, WithHeadingRow
         }
 
         $value = trim($row['value_en']);
+        $valueAr = trim($row['value_ar']);
 
-        $existing = DropdownOption::where('dropdown_id', $dropdown->id)
-            ->where('value', $value)
-            ->first();
+        if(($value != NULL || $value != '') || ($valueAr != NULL || $valueAr != '')){ 
+            $query = DropdownOption::where('dropdown_id', $dropdown->id);
 
-        if ($existing) {
-            $existing->update([
-                'status'     => $row['status'] ?? $existing->status,
-                'code'       => $row['code'] ?? $existing->code,
-                'value_ar'    => $row['value_ar'] ?? null,
+            if (!empty($value)) {
+                $query->where('value', $value);
+            } elseif (!empty($valueAr)) {
+                $query->where('value_ar', $valueAr);
+            }
+
+            $existing = $query->first();
+
+            if ($existing) {
+                $existing->update([
+                    'status'     => $row['status'] ?? $existing->status,
+                    'code'       => $row['code'] ?? $existing->code,
+                    'value_ar'    => $valueAr ?? null,
+                    'sort_order'  => $row['sort_order'] ?? 0,
+                    'status'      => $row['status'] ?? 1,
+                ]);
+                return null;
+            }
+
+            // Create new
+            return new DropdownOption([
+                'dropdown_id' => $dropdown->id,
+                'value'       => $value,
+                'code'        => $row['code'] ?? null,
+                'value_ar'    => $valueAr ?? null,
                 'sort_order'  => $row['sort_order'] ?? 0,
                 'status'      => $row['status'] ?? 1,
             ]);
-            return null;
         }
-
-        // Create new
-        return new DropdownOption([
-            'dropdown_id' => $dropdown->id,
-            'value'       => $value,
-            'code'        => $row['code'] ?? null,
-            'value_ar'    => $row['value_ar'] ?? null,
-            'sort_order'  => $row['sort_order'] ?? 0,
-            'status'      => $row['status'] ?? 1,
-        ]);
     }
 }
