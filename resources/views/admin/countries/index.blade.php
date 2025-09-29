@@ -169,11 +169,6 @@
 
                 <x-reusable-table :columns="$columns" :data="$countries" />
 
-                <div class="mt-4">
-                    {{ $countries->links() }}
-                </div>
-
-
             </div>
         </div>
 

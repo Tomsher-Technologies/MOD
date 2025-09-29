@@ -31,13 +31,13 @@ class DelegationAttachmentImport implements ToCollection, WithHeadingRow, WithBa
                     continue;
                 }
 
-                $title = DropdownOption::where('id', $row['title_id'])
+                $title = DropdownOption::where('code', $row['title_code'])
                     ->whereHas('dropdown', function ($query) {
                         $query->where('code', 'attachment_title');
                     })->first();
                 
                 if (!$title) {
-                    Log::warning("Invalid title_id: " . $row['title_id']);
+                    Log::warning("Invalid title_code: " . $row['title_code']);
                 }
 
                 $sourcePath = $row['file_path'];
