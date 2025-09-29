@@ -118,39 +118,39 @@ class DelegateImport implements ToCollection, WithHeadingRow
         ];
 
 
-        if (!empty($row['delegate_gender_id'])) {
+        if (!empty($row['delegate_gender_code'])) {
             $gender = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'gender');
-            })->where('id', trim($row['delegate_gender_id']))->first();
+            })->where('code', trim($row['delegate_gender_code']))->first();
 
             if ($gender) {
                 $delegateData['gender_id'] = $gender->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_gender_id: ' . $row['delegate_gender_id'], $row->toArray());
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_gender_code: ' . $row['delegate_gender_code'], $row->toArray());
             }
         }
 
-        if (!empty($row['delegate_relationship_id'])) {
+        if (!empty($row['delegate_relationship_code'])) {
             $relationship = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'relationship');
-            })->where('id', trim($row['delegate_relationship_id']))->first();
+            })->where('code', trim($row['delegate_relationship_code']))->first();
 
             if ($relationship) {
                 $delegateData['relationship_id'] = $relationship->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_relationship_id: ' . $row['delegate_relationship_id'], $row->toArray());
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_relationship_code: ' . $row['delegate_relationship_code'], $row->toArray());
             }
         }
 
-        if (!empty($row['delegate_internal_ranking_id'])) {
+        if (!empty($row['delegate_internal_ranking_code'])) {
             $ranking = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'internal_ranking');
-            })->where('id', trim($row['delegate_internal_ranking_id']))->first();
+            })->where('code', trim($row['delegate_internal_ranking_code']))->first();
 
             if ($ranking) {
                 $delegateData['internal_ranking_id'] = $ranking->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_internal_ranking_id: ' . $row['delegate_internal_ranking_id'], $row->toArray());
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_internal_ranking_code: ' . $row['delegate_internal_ranking_code'], $row->toArray());
             }
         }
 
@@ -174,7 +174,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
         $fieldPrefix = $type . '_';
 
         $hasData = false;
-        foreach (['mode', 'airport_id', 'flight_no', 'flight_name', 'date_time', 'comment'] as $field) {
+        foreach (['mode', 'airport_code', 'flight_no', 'flight_name', 'date_time', 'comment'] as $field) {
             if (!empty($row[$fieldPrefix . $field])) {
                 $hasData = true;
                 break;
@@ -187,7 +187,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
         $transportData = [
             'mode' => trim($row[$fieldPrefix . 'mode'] ?? '') ?: null,
-            'airport_id' => !empty($row[$fieldPrefix . 'airport_id']) ? trim($row[$fieldPrefix . 'airport_id']) : null,
+            'airport_code' => !empty($row[$fieldPrefix . 'airport_code']) ? trim($row[$fieldPrefix . 'airport_code']) : null,
+            'airport_id' => null,
             'flight_no' => trim($row[$fieldPrefix . 'flight_no'] ?? '') ?: null,
             'flight_name' => trim($row[$fieldPrefix . 'flight_name'] ?? '') ?: null,
             'date_time' => null,
@@ -212,17 +213,22 @@ class DelegateImport implements ToCollection, WithHeadingRow
             }
         }
 
-        if (!empty($transportData['mode']) && $transportData['mode'] === 'flight' && !empty($transportData['airport_id'])) {
+        if (!empty($transportData['mode']) && $transportData['mode'] === 'flight' && !empty($transportData['airport_code'])) {
             $airport = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'airports');
-            })->where('id', trim($transportData['airport_id']))->first();
+            })->where('code', trim($transportData['airport_code']))->first();
 
             if (!$airport) {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid ' . $type . ' airport_id: ' . $transportData['airport_id'], $row->toArray());
+                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid ' . $type . ' airport_code: ' . $transportData['airport_code'], $row->toArray());
                 $transportData['airport_id'] = null;
+                unset($transportData['airport_code']);
+            } else {
+                $transportData['airport_id'] = $airport->id;
+                unset($transportData['airport_code']);
             }
         } elseif ($transportData['mode'] !== 'flight') {
             $transportData['airport_id'] = null;
+            unset($transportData['airport_code']);
         }
 
         return $transportData;

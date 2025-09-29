@@ -45,18 +45,19 @@ class DriverImport implements ToCollection, WithHeadingRow
                     'note1' => trim($row['note1']) ?? null,
                     'title_en' => trim($row['title_en']) ?? null,
                     'title_ar' => trim($row['title_ar']) ?? null,
+                    'unit_id' => null,
                     'status' => 1,
                 ];
 
-                if (!empty($row['unit_id'])) {
+                if (!empty($row['unit_code'])) {
                     $unit = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'unit');
-                    })->where('id', trim($row['unit_id']))->first();
+                    })->where('code', trim($row['unit_code']))->first();
 
                     if ($unit) {
                         $driverData['unit_id'] = $unit->id;
                     } else {
-                        $this->importLogService->logError('drivers', $this->fileName, $rowNumber, 'Invalid unit_id: ' . $row['unit_id'], $row->toArray());
+                        $this->importLogService->logError('drivers', $this->fileName, $rowNumber, 'Invalid unit_code: ' . $row['unit_code'], $row->toArray());
                         continue;
                     }
                 }

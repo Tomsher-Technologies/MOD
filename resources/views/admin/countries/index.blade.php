@@ -99,6 +99,7 @@
                         ['label' => __db('name'), 'render' => fn($country) => e($country?->getNameEn())],
                         ['label' => __db('name_ar'), 'render' => fn($country) => e($country?->getNameAr() ?? '')],
                         ['label' => __db('short_code'), 'render' => fn($country) => e($country?->short_code)],
+                        ['label' => __db('code'), 'render' => fn($country) => e($country?->code)],
                         [
                             'label' => __db('continent'),
                             'render' => fn($country) => e($country?->continent->value ?? ''),
@@ -168,11 +169,6 @@
 
                 <x-reusable-table :columns="$columns" :data="$countries" />
 
-                <div class="mt-4">
-                    {{ $countries->links() }}
-                </div>
-
-
             </div>
         </div>
 
@@ -222,6 +218,14 @@
                                     {{ __db('short_code') }} <span class="text-red-500">*</span>
                                 </label>
                                 <input type="text" name="short_code" id="short_code"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                    required maxlength="10">
+                            </div>
+                            <div>
+                                <label for="code" class="block mb-2 text-sm font-medium text-gray-900">
+                                    {{ __db('code') }} <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="code" id="code"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                     required maxlength="10">
                             </div>
@@ -323,6 +327,15 @@
                                     <input type="text" name="short_code" id="short_code-{{ $country->id }}"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                                         value="{{ old('short_code', $country->short_code) }}" required maxlength="10">
+                                </div>
+                                <div>
+                                    <label for="code-{{ $country->id }}"
+                                        class="block mb-2 text-sm font-medium text-gray-900">
+                                        {{ __db('code') }} <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" name="code" id="code-{{ $country->id }}"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                        value="{{ old('code', $country->code) }}" required maxlength="10">
                                 </div>
                                 <div>
                                     <label for="sort_order-{{ $country->id }}"
