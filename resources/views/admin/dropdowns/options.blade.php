@@ -72,7 +72,8 @@
                 <thead>
                     <tr class="text-[13px]">
                         <th class="p-3 !bg-[#B68A35] text-center text-white">#</th>
-                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name_en') }}</th>
+                        <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('name_ar') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('code') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('sort_order') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-center text-white">{{ __db('status') }}</th>
@@ -87,6 +88,7 @@
                                 {{ ($key+1) }}
                             </td>
                             <td class="px-4 py-3 text-black text-center">{{ $option->value }}</td>
+                            <td class="px-4 py-3 text-black text-center">{{ $option->value_ar }}</td>
                             <td class="px-4 py-3 text-black text-center">{{ $option->code ?? '-' }}</td>
                             <td class="px-4 py-3 text-black text-center">{{ $option->sort_order }}</td>
                             <td class="px-4 py-3 text-center">
