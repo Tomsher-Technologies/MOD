@@ -141,10 +141,6 @@
             @endphp
 
             <x-reusable-table :columns="$columns" :data="$logs" />
-
-            <div class="mt-4">
-                {{ $logs->appends(request()->input())->links() }}
-            </div>
         @else
             <div class="text-center py-12">
                 <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
