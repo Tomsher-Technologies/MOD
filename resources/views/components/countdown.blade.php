@@ -22,13 +22,15 @@
         <div class="flex items-center">
             <div class="countdown-timer bg-gradient-to-r from-[#ffcc00] via-[#ff9900] to-[#ffcc00] text-white py-2 px-2 rounded-lg animate-gradient">
                 <div id="event-countdown" class="flex items-center justify-center ">
-                    <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
+                
+                    <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
                         <div
                             class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
-                            <span id="countdown-days">00</span>
+                            <span id="countdown-minutes">00</span>
                         </div>
-                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Days</div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">{{ __db('minutes') }}</div>
                     </div>
+
                     <div class="countdown-separator text-lg font-bold text-white">:</div>
 
                     <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
@@ -36,20 +38,22 @@
                             class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
                             <span id="countdown-hours">00</span>
                         </div>
-                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Hours</div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">{{ __db('hours') }}</div>
                     </div>
+                    
                     <div class="countdown-separator text-lg font-bold text-white">:</div>
 
-                    <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
+                    <div class="countdown-item text-center flex flex-col items-center  justify-center mx-2">
                         <div
                             class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
-                            <span id="countdown-minutes">00</span>
+                            <span id="countdown-days">00</span>
                         </div>
-                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">Minutes</div>
+                        <div class="countdown-label text-[0.6rem] mt-1 text-white uppercase">{{ __db('days') }}</div>
                     </div>
-                    <div class="countdown-separator text-lg font-bold text-white">:</div>
 
-                    <div class="countdown-item text-center flex flex-col items-center justify-center mx-2">
+                    {{-- <div class="countdown-separator text-lg font-bold text-white">:</div> --}}
+
+                    <div class="countdown-item text-center flex flex-col items-center justify-center mx-2 hidden">
                         <div
                             class="countdown-value bg-[#333]/30 text-white w-10 h-10 flex items-center justify-center rounded font-bold text-sm">
                             <span id="countdown-seconds">00</span>
