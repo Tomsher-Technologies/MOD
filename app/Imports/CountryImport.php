@@ -41,15 +41,15 @@ class CountryImport implements ToCollection, WithHeadingRow
                     'status' => 1,
                 ];
 
-                if (!empty($row['continent_id'])) {
+                if (!empty($row['continent_code'])) {
                     $continent = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'continents');
-                    })->where('id', trim($row['continent_id']))->first();
+                    })->where('code', trim($row['continent_code']))->first();
 
                     if ($continent) {
                         $countryData['continent_id'] = $continent->id;
                     } else {
-                        $this->importLogService->logError('countries', $this->fileName, $rowNumber, 'Invalid continent_id: ' . $row['continent_id'], $row->toArray());
+                        $this->importLogService->logError('countries', $this->fileName, $rowNumber, 'Invalid continent_code: ' . $row['continent_code'], $row->toArray());
                         continue;
                     }
                 }
