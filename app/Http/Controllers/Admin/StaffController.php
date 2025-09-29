@@ -37,8 +37,8 @@ class StaffController extends Controller
             $users = $users->where(function ($query) use ($sort_search){
                         $query->where('name', 'like','%' . $sort_search . '%')
                             ->orWhere('email', 'like', '%' . $sort_search . '%')
-                            ->orWhere('phone', 'like', '%' . $sort_search . '%')
-                            ->orWhere('military_number', 'like', '%' . $sort_search . '%');
+                            ->orWhere('phone', 'like', '%' . $sort_search . '%');
+                            // ->orWhere('military_number', 'like', '%' . $sort_search . '%');
                     });
         }
         
