@@ -76,6 +76,7 @@ class CountryController extends Controller
                 'name' => 'required|string|max:255|unique:countries',
                 'name_ar' => 'nullable|string|max:255',
                 'short_code' => 'required|string|max:10|unique:countries',
+                'code' => 'string|max:10',
                 'sort_order' => 'nullable|integer',
                 'flag' => 'nullable|mimes:jpeg,png,jpg,webp,svg,avif|max:2048',
                 'continent_id' => 'required|integer|exists:dropdown_options,id'
@@ -109,6 +110,7 @@ class CountryController extends Controller
             'name' => 'required|string|max:255|unique:countries,name,' . $country->id,
             'name_ar' => 'nullable|string|max:255',
             'short_code' => 'required|string|max:10|unique:countries,short_code,' . $country->id,
+            'code' => 'string|max:10',
             'sort_order' => 'nullable|integer',
             'flag' => 'nullable|mimes:jpeg,png,jpg,webp,svg,avif|max:2048',
             'continent_id' => 'required|integer|exists:dropdown_options,id'

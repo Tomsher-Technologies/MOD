@@ -40,13 +40,13 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
                 $rowNumber++;
                 
                 try {
-                    if (empty($row['invitation_from_id'])) {
-                        $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing invitation_from_id', $row->toArray());
+                    if (empty($row['invitation_from_code'])) {
+                        $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing invitation_from_code', $row->toArray());
                         continue;
                     }
                     
-                    if (empty($row['country_id'])) {
-                        $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing country_id', $row->toArray());
+                    if (empty($row['country_code'])) {
+                        $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing country_code', $row->toArray());
                         continue;
                     }
 
@@ -93,44 +93,44 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             'note2' => trim($row['note2']) ?? null,
         ];
 
-        if (!empty($row['invitation_from_id'])) {
+        if (!empty($row['invitation_from_code'])) {
             $invitationFrom = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'departments');
-            })->where('id', trim($row['invitation_from_id']))->first();
+            })->where('code', trim($row['invitation_from_code']))->first();
 
             if ($invitationFrom) {
                 $delegationData['invitation_from_id'] = $invitationFrom->id;
             } else {
-                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid invitation_from_id: ' . $row['invitation_from_id'], $row->toArray());
+                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid invitation_from_code: ' . $row['invitation_from_code'], $row->toArray());
             }
         }
 
-        if (!empty($row['continent_id'])) {
+        if (!empty($row['continent_code'])) {
             $continent = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'continents');
-            })->where('id', trim($row['continent_id']))->first();
+            })->where('code', trim($row['continent_code']))->first();
 
             if ($continent) {
                 $delegationData['continent_id'] = $continent->id;
             } else {
-                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid continent_id: ' . $row['continent_id'], $row->toArray());
+                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid continent_code: ' . $row['continent_code'], $row->toArray());
             }
         }
 
-        if (!empty($row['country_id'])) {
-            $country = Country::where('id', trim($row['country_id']))->first();
+        if (!empty($row['country_code'])) {
+            $country = Country::where('code', trim($row['country_code']))->first();
 
             if ($country) {
                 $delegationData['country_id'] = $country->id;
             } else {
-                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid country_id: ' . $row['country_id'], $row->toArray());
+                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid country_code: ' . $row['country_code'], $row->toArray());
             }
         }
 
-        if (!empty($row['invitation_status_id'])) {
+        if (!empty($row['invitation_status_code'])) {
             $invitationStatus = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'invitation_status');
-            })->where('id', trim($row['invitation_status_id']))->first();
+            })->where('code', trim($row['invitation_status_code']))->first();
 
             if ($invitationStatus) {
                 $delegationData['invitation_status_id'] = $invitationStatus->id;
