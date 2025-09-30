@@ -11,8 +11,9 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class=" mb-4 flex items-center justify-between gap-3">
-                    <form class="w-[50%] me-4" action="{{ route('reports-delegations') }}" method="GET">
-                        <div class="relative">
+                    <form class="w-[65%] me-4" action="{{ route('reports-delegations') }}" method="GET">
+                        
+                        <div class="flex relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                     fill="none" viewBox="0 0 20 20">
@@ -23,12 +24,32 @@
                             <input type="search" id="default-search" name="search" value="{{ request('search') }}"
                                 class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg "
                                 placeholder="{{ __db('delegation_search_placeholder') }}" />
+
+
                             <button type="submit"
-                                class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+                                class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+
+                            <a href="{{ route('reports-delegations') }}"
+                                class=" end-[80px]  bottom-[3px] mr-2 border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">{{ __db('reset') }}</a>
+                                
                         </div>
                     </form>
 
-                    <div class="text-center">
+                    <div class="text-center flex items-center gap-2">
+
+                        <form method="POST" id="bulkExportForm" action="{{ route('delegations.bulk-exportPdf') }}">
+                            @csrf
+                            <input type="hidden" name="export_pdf" id="export_pdf" value="[]">
+                            <button class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                                type="submit" >
+                                <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                                        d="M15 5v14M9 5v14M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" />
+                                </svg>
+                                <span>{{ __db('export_pdf') }}</span>
+                            </button>
+                        </form>
                         <button
                             class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
                             type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
@@ -41,10 +62,22 @@
                             <span>{{ __db('filter') }}</span>
                         </button>
                     </div>
+                    
                 </div>
 
                 @php
                     $columns = [
+                        [
+                            'label' => '<input type="checkbox" id="selectAllCheckbox"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                            ',
+                            'render' => function ($row) {
+                                return '
+                                <input type="checkbox" 
+                                    data-delegation-id="' . $row->id . '" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 delegation-checkbox">
+                            ';
+                            },
+                        ],
                         [
                             'label' => __db('sl_no'),
                             'key' => 'sl_no',
@@ -177,15 +210,8 @@
                             'render' => function ($delegation) {
                                 $buttons = '<div class="flex">';
                             
-                                if (
-                                    can([
-                                        'view_delegations',
-                                        'delegate_view_delegations',
-                                        'escort_view_delegations',
-                                        'driver_view_delegations',
-                                        'hotel_view_delegations',
-                                    ])
-                                ) {
+                                if (can(['view_delegations_escort',
+                                    ])) {
                                     $buttons .=
                                         '<a href="' .
                                         route('reports-delegations.show', base64_encode($delegation->id)) .
@@ -347,6 +373,38 @@
 @section('script')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Checkbox Start
+            const exportInput = document.getElementById('export_pdf');
+
+            function updateExportInput() {
+                const selected = Array.from(document.querySelectorAll('.delegation-checkbox:checked'))
+                    .map(cb => cb.dataset.delegationId);
+                exportInput.value = JSON.stringify(selected);
+            }
+
+            document.getElementById('selectAllCheckbox').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.delegation-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+                updateExportInput();
+            });
+
+            document.querySelectorAll('.delegation-checkbox').forEach(cb => {
+                cb.addEventListener('change', updateExportInput);
+            });
+
+            document.getElementById('bulkExportForm').addEventListener('submit', function(e) {
+                const exportInput = document.getElementById('export_pdf');
+                const selected = JSON.parse(exportInput.value || '[]');
+
+                if (selected.length === 0) {
+                    e.preventDefault(); 
+                    toastr.error("{{ __db('select_at_least_one_delegation') }}");
+                }
+            });
+
+            //  Checkbox End
             const noteModalContent = document.getElementById('note-modal-content');
 
             document.querySelectorAll('.note-icon').forEach(icon => {

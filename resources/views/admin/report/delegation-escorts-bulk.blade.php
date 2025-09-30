@@ -1,104 +1,107 @@
-@extends('layouts.admin_account', ['title' => __db('delegation_details')])
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ __db('delegations_escort_report') }}</title>
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            color: #000;
+            /* direction: rtl; */
+            /* margin: 20px; */
+            text-align: right;
+        }
+    * { box-sizing: border-box; }
 
-@section('content')
-    <div>
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('delegations_escort_report') }}</h2>
-            
+    </style>
+</head>
+<body style="margin: 0px; padding: 0px; font-size: 10px;">
+    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" >
+        
 
-            <div class="flex gap-3 ms-auto">
-                @directCanany(['export_delegations_escort'])
-                    <a href="{{ route('delegations.exportPdf', ['id' => base64_encode($delegation->id)]) }}" class="!text-[#5D471D]  !bg-[#E6D7A2] hover:bg-yellow-400  rounded-lg py-2 px-3">
-                        {{ __db('export_pdf') }}
-                    </a>
-                @enddirectCanany
-                <x-back-btn class="" back-url="{{ route('reports-delegations') }}" />
-            </div>
-            
-        </div>
-
-        <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" dir="ltr">
-            <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                    <div style="width: auto;">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="{{ env('APP_NAME') }}"
-                            style="height: auto; width: 150px;">
-
-                    </div>
-                    <div style="text-align: center; width: 50%;">
-                        <div style="font-size: 20px; font-weight: bold;">{{ __db('united_arab_emirates') }}</div>
-                        <div style="font-size: 20px; font-weight: bold; margin-top: 5px;">{{ __db('ministry_of_defense') }}</div>
-                        <div style="font-size: 20px; font-weight: bold; color: #cc0000; margin-top: 5px;">{{ __db('delegations_escort_report') }}</div>
-                    </div>
-                    <div style=" width: auto; text-align: right;">
-                        <img src="{{ getAdminEventLogo() }}" alt="{{ getCurrentEventName() }}"
-                            style=" width: 150px; height: auto;">
-                    </div>
-                </div>
-                <div style="text-align: right; font-size: 0.9em; margin-top:10px;">{{ date('d-m-Y H:i A') }}</div>
-
-            </div>
-
+        @foreach ($delegations as $delegation)
             @php
                 $assignedHotels = [];
                 $escortAccHtml = $escortContactHtml = $escortDetailsHtml = '';
             @endphp
 
-            @foreach ($delegation->escorts as $escort)
-                @php
-                    $roomEscort = $escort->currentRoomAssignment ?? null;
-                    $assignedHotels[] = $roomEscort?->hotel_id ?? null;
+            <table style="width:100%; border-collapse: collapse; margin-bottom: 10px;">
+                <tbody>
+                    @foreach ($delegation->escorts as $key => $escort)
+                        @php
+                            $roomEscort = $escort->currentRoomAssignment ?? null;
+                            $assignedHotels[] = $roomEscort?->hotel_id ?? null;
+                        @endphp
 
-                    $escortAccHtml .= '<div style="margin-bottom: 5px;">' . $roomEscort?->room_number . '-' . $roomEscort?->hotel?->hotel_name. '<strong>:'.__db('accommodation').'</strong></div>';
-            
-                    $escortContactHtml .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;"><span>' . $escort->phone_number . '</span><strong style="width: 10%;">:'.__db('mobile').'</strong></div>';
-                    
-                    $escortDetailsHtml .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;"><span>' . $escort->internalRanking?->value.' '.$escort->name . '-(' . $escort->code . ')</span><strong style="width: 22%;">:'.__db('escort').'</strong></div>';
-                @endphp
+                        <tr>
+                            <td style="padding: 6px; border: 0px;">
+                                {{ $roomEscort?->room_number }} - {{ $roomEscort?->hotel?->hotel_name }} <strong> : {{ __db('accommodation') }}</strong>
+                            </td>
+                            <td style="padding: 6px; border: 0px;">
+                                {{ $escort->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                            </td>
+                            <td style="padding: 6px; border: 0px;text-align: right;">
+                               {{ $escort->internalRanking?->value }} {{ $escort->name }} ({{ $escort->code }})  @if($key == 0) <strong> : {{ __db('escort') }}</strong> @else <strong style="margin-right: 25px;"></strong> @endif
+                                    
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
 
-            @endforeach
+            <table style="width:100%; border-collapse: collapse; margin-bottom: 8px;">
+                <tbody>
+                    <tr>
+                        <td style="width:40%; padding: 6px; border: 0px;">
+                            <div style="margin-bottom: 5px;">
+                                {{ $delegation->invitationFrom?->value ?? '-' }}
+                                <strong> : {{ __db('invitation_from') }}</strong>
+                            </div>
+                           
+                        </td>
+                        <td style="width:15%; padding: 6px; border: 0px;">
+                            
+                        </td>
 
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
-                <div style="width: 40%;">
-                    {!! $escortAccHtml !!}
-                </div>
+                        <td style="width:55%; padding: 6px; border: 0px;text-align: right;">
+                            <div style="margin-bottom: 5px;">
+                                {{ $delegation->country?->name ?? '-' }}
+                                <strong> : {{ __db('country') }}</strong>
+                            </div>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:40%; padding: 6px; border: 0px;">
+                          
+                            <div style="margin-bottom: 5px;">
+                                {{ $delegation->participationStatus?->value ?? '-' }}
+                                <strong> : {{ __db('participation_status') }}</strong>
+                            </div>
+                        </td>
+                        <td style="width:15%; padding: 6px; border: 0px;">
+                            
+                        </td>
 
-                <div style="width:15%; text-align: right;">
-                    {!! $escortContactHtml !!}
-                </div>
+                        <td style="width:55%; padding: 6px; border: 0px;text-align: right;">
+                           
+                            <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                <span>{{ $delegation->invitationStatus?->value ?? '-' }}</span>
+                                <strong style="width: 22%;"> : {{ __db('invitation_status') }}</strong>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-                <div style="width: 55%; text-align: right;">
-                    {!! $escortDetailsHtml !!}
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
-                <div style="width: 40%;">
-                    <div style="margin-bottom: 5px;">{{ $delegation->invitationFrom?->value ?? '-' }} <strong>:{{ __db('invitation_from') }}</strong></div>
-                    <div style="margin-bottom: 5px;">{{ $delegation->participationStatus?->value ?? '-' }} <strong>:{{ __db('participation_status') }}</strong></div>
-                </div>
-
-                <div style="width:15%; text-align: right;">
-
-                </div>
-
-                <div style="width: 55%; text-align: right;">
-                    <div style="margin-bottom: 5px;">{{ $delegation->country?->name ?? '-' }} <strong>:{{ __db('country') }}</strong></div>
-                    <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                        <span>{{ $delegation->invitationStatus?->value ?? '-' }}</span>
-                        <strong style="width: 22%;">:{{ __db('invitation_status') }}</strong>
-                    </div>
-
-                </div>
-            </div>
             @php
                 $teamHead = '';
             @endphp
 
-            <h2 class="font-bold text-center mb-3" style="font-size: 20px;">{{ __db('arrival_details') }}</h2>
+            <h2 class="font-bold text-center mb-3" style="font-size: 14px;">{{ __db('arrival_details') }}</h2>
             
-            <table style="width: 100%; border-collapse: collapse;">
+            <table style="width: 100%; border-collapse: collapse;border: 1px solid #000;">
                 <thead>
                     <tr style="background-color: #d9d9d9;">
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
@@ -120,7 +123,7 @@
                             if($delegate->team_head == 1){
                                 $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                         
-                                $teamHead.= '<tr>                                    
+                                $teamHead.= '<tr style="border: 1px solid #000;">                                    
                                     <td style="padding: 8px; border: 1px solid #000;">'.date('H:i', strtotime($departure?->date_time)).'</td>
                                     <td style="padding: 8px; border: 1px solid #000;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
                                     <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
@@ -137,7 +140,7 @@
                                 }
                                 $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
                             @endphp
-                            <td style="padding: 8px; border: 1px solid #000 !important;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
                             <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
                             <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
                             <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
@@ -147,10 +150,10 @@
                             <td style="padding: 8px; border: 1px solid #000;">
                                 {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : 'Not Required'}}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) color: red; @endif ">
                                 {{ $delegate->internalRanking?->value ?? $relation }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) text-report-red @endif  font-bold">
+                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) color: red; @endif  font-bold">
                                 {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
                             </td>
                             <td style="padding: 8px; border: 1px solid #000;">{{ $key + 1 }}</td>
@@ -165,7 +168,8 @@
                 </tbody>
             </table>
 
-            <h2 class="text-md font-bold mb-3 text-center" style="margin-top: 30px;font-size: 18px;">{{  __db('departure_details_of_head_of_delegation') }}</h2>
+            <h2 class="text-md font-bold mb-3" style="margin-top: 30px;font-size: 14px;">{{  __db('departure_details_of_head_of_delegation') }}</h2>
+            
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background-color: #d9d9d9;">
@@ -178,7 +182,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {!! $teamHead !!}
+                    @if($teamHead)
+                        {!! $teamHead !!}
+                    @else
+                        <tr class="border-t">
+                            <td colspan="5" style="padding: 8px; border: 1px solid #000; text-center">
+                                {{ __db('no_record_found') }}
+                            </td>
+                        </tr>
+                    @endif
+                    
                 </tbody>
             </table>
 
@@ -186,52 +199,54 @@
 
                 @php
                     $assignedHotels = array_filter(array_unique($assignedHotels));
-                    // $assignedHotels = implode(',', $assignedHotels);
                     $hotelDetails = getAccommodationDetails($assignedHotels);
-
                 @endphp
 
-                @foreach($hotelDetails as $key => $hotel)
-                    @php
-                        $acc_con = $acc_name = '';
-                    @endphp
+                <table style="width:100%; border-collapse: collapse; margin-bottom: 12px;">
+                    <tbody>
+                        @foreach($hotelDetails as $key => $hotel)
+                            @php
+                                $acc_con = $acc_name = '';
+                                foreach($hotel->contacts as $k => $con){
+                                    $acc_con .= '<div style="margin-bottom: 5px; display: flex;">
+                                                    <span>'.$con->phone.'</span>
+                                                    <strong style="width: 30%;"> : '. __db('mobile').'</strong>
+                                                </div>';
+                                    $acc_name .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                                    <span>'.$con->name.'</span>
+                                                    <strong style="width: 22%;"> : '. __db('res'.$k).'</strong>
+                                                </div>';
+                                }
+                            @endphp
 
-                    @foreach($hotel->contacts as $k => $con)
-                        @php
-                            $acc_con .= '<div style="margin-bottom: 5px; display: flex;">
-                                    <span>'.$con->phone.'</span>
-                                    <strong style="width: 30%;">:'. __db('mobile').'</strong>
-                                    </div>';
-                            $acc_name .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                                <span>'.$con->name.'</span>
-                                <strong style="width: 22%;">:'. __db('res'.$k).'</strong>
-                            </div>';
-                        @endphp
-                    @endforeach
-                    
+                            <tr>
+                                <!-- Left side (hotel numbers + contacts) -->
+                                <td style="width:30%; vertical-align: top; padding: 6px;">
+                                    <div style="margin-bottom: 5px; display: flex;">
+                                        <span>{{ $hotel->contact_number }}</span>
+                                        <strong style="width: 30%;"> : {{ __db('hotel_number') }}</strong>
+                                    </div>
+                                    {!! $acc_con !!}
+                                </td>
 
-                    <div style="width: 30%;">
-                        <div style="margin-bottom: 5px; display: flex;">
-                            <span>{{ $hotel->contact_number }}</span>
-                            <strong style="width: 30%;">:{{ __db('hotel_number') }}</strong>
-                        </div>
-                        {!! $acc_con !!}
-                    </div>
-
-                    <div style="width: 25%; text-align: right;">
-                        <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                            <span>{{ $hotel->hotel_name }} </span>
-                            <strong style="width: 22%;">:{{ __db('hotel') }}</strong>
-                        </div>
-                        {!! $acc_name !!}
-                    </div>
-                @endforeach
+                                <!-- Right side (hotel name + responsible persons) -->
+                                <td style="width:25%; text-align: right; vertical-align: top; padding: 6px;">
+                                    <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                        <span>{{ $hotel->hotel_name }}</span>
+                                        <strong style="width: 22%;"> : {{ __db('hotel') }}</strong>
+                                    </div>
+                                    {!! $acc_name !!}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-1 gap-x-0 md:gap-x-8 gap-y-8">
                 <section>
-                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 18px;" >{{ __db('drivers') }}</h2>
+                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 14px;" >{{ __db('drivers') }}</h2>
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr style="background-color: #d9d9d9;">
@@ -265,10 +280,10 @@
                 </section>
 
                 <section>
-                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 18px;">{{ __db('interviews') }}</h2>
+                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 14px;">{{ __db('interviews') }}</h2>
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr class="bg-gray-200">
+                            <tr  style="background-color: #d9d9d9;">
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('notes') }}
                                 </th>
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
@@ -321,6 +336,12 @@
                     </table>
                 </section>
             </div>
-        </div>
+
+            @if(!$loop->last)
+                <div style="page-break-after: always;"></div>
+            @endif
+        @endforeach
     </div>
-@endsection
+        
+</body>
+</html>

@@ -17,14 +17,15 @@ class DropdownOption extends Model
     {
         $lang = getActiveLanguage();
 
-        if ($lang !== 'en' && !empty($this->attributes['value_ar'])) {
+        if ($lang === 'ar' && !empty($this->attributes['value_ar'])) {
             return $this->attributes['value_ar'];
         }
 
-        if ($lang !== 'ar' && !empty($this->attributes['value_en'])) {
-            return $this->attributes['value_en'];
+        if ($lang === 'en' && !empty($this->attributes['value'])) {
+            return $this->attributes['value'];
         }
 
-        return !empty($value_ar) ? $value_ar : $value;
+        return !empty($this->attributes['value_ar']) ? $this->attributes['value_ar'] :
+           (!empty($this->attributes['value_en']) ? $this->attributes['value_en'] : $value);
     }
 }
