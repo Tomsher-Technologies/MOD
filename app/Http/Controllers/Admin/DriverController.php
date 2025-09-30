@@ -222,6 +222,16 @@ class DriverController extends Controller
 
         $driverData = $request->all();
 
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingDriver = Driver::where('event_id', $currentEventId)->where('military_number', $driverData['military_number'])->exists();
+
+        if ($isExistingDriver) {
+            return back()->withErrors([
+                'military_number' => __db('military_number_exists')
+            ])->withInput();
+        }
+
         if (isset($driverData['phone_number']) && !empty($driverData['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $driverData['phone_number']);
             if (strlen($phoneNumber) === 9) {
@@ -298,6 +308,27 @@ class DriverController extends Controller
             'delegation_id.exists' => __db('delegation_id_exists'),
         ]);
 
+        $driverData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingDriver = Driver::where('event_id', $currentEventId)
+            ->where('military_number', $driverData['military_number'])
+            ->when(!empty($id), function ($q) use ($id) {
+                $q->where('id', '!=', $id);
+            })
+            ->exists();
+
+        if ($isExistingDriver) {
+            return response()->json(['message' => __db('military_number_exists')], 409);
+        };
+
+        // if ($isExistingDriver) {
+        //     return back()->withErrors([
+        //         'military_number' => __db('military_number_exists')
+        //     ])->withInput();
+        // }
+
         $driver = Driver::findOrFail($id);
 
         $relationsToCompare = [
@@ -330,10 +361,10 @@ class DriverController extends Controller
             'status' => [],
         ];
 
-        if (isset($dataToSave['phone_number']) && !empty($dataToSave['phone_number'])) {
-            $phoneNumber = preg_replace('/[^0-9]/', '', $dataToSave['phone_number']);
+        if (isset($validated['phone_number']) && !empty($validated['phone_number'])) {
+            $phoneNumber = preg_replace('/[^0-9]/', '', $validated['phone_number']);
             if (strlen($phoneNumber) === 9) {
-                $dataToSave['phone_number'] = '971' . $phoneNumber;
+                $validated['phone_number'] = '971' . $phoneNumber;
             }
         }
 

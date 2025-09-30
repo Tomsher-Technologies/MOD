@@ -9,6 +9,7 @@ use App\Models\Dropdown;
 use App\Models\Escort;
 use App\Imports\EscortImport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class EscortController extends Controller
@@ -183,7 +184,6 @@ class EscortController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'title_en' => 'nullable|string|max:255',
             'title_ar' => 'nullable|string|max:255',
@@ -203,6 +203,7 @@ class EscortController extends Controller
         ], [
             'name_en.required_without' => __db('either_english_name_or_arabic_name'),
             'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
+            'military_number.military_number_exists' => __db('military_number_exists'),
             'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
             'delegation_id.exists' => __db('delegation_id_exists'),
@@ -219,6 +220,16 @@ class EscortController extends Controller
         ]);
 
         $escortData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingEscort = Escort::where('event_id', $currentEventId)->where('military_number', $escortData['military_number'])->exists();
+
+        if ($isExistingEscort) {
+            return back()->withErrors([
+                'military_number' => __db('military_number_exists')
+            ])->withInput();
+        }
 
         if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $escortData['phone_number']);
@@ -341,6 +352,22 @@ class EscortController extends Controller
             'name_en' => [],
             'status' => [],
         ];
+
+
+        $escortData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingEscort = Escort::where('event_id', $currentEventId)
+            ->where('military_number', $escortData['military_number'])
+            ->when(!empty($id), function ($q) use ($id) {
+                $q->where('id', '!=', $id);
+            })
+            ->exists();
+
+        if ($isExistingEscort) {
+            return response()->json(['message' => __db('military_number_exists')], 409);
+        };
 
         if (isset($validated['phone_number']) && !empty($validated['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $validated['phone_number']);
