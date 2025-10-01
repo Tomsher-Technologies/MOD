@@ -71,8 +71,8 @@ class DriverController extends Controller
         }
 
         $query = Driver::with('delegations')
-            ->where('drivers.event_id', $currentEventId)
-            ->latest();
+            ->select('drivers.*')  
+            ->where('drivers.event_id', $currentEventId);
 
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
@@ -132,12 +132,37 @@ class DriverController extends Controller
             $query->whereIn('capacity', $capacities);
         }
 
+        if ($request->has('unit_id') && !empty($request->unit_id)) {
+            $unitIds = is_array($request->unit_id) ? $request->unit_id : [$request->unit_id];
+            $query->whereIn('unit_id', $unitIds);
+        }
+
         if ($request->has('delegation_id') && !empty($request->delegation_id) && $assignmentMode !== 'driver') {
             $delegations = is_array($request->delegation_id) ? $request->delegation_id : [$request->delegation_id];
             $query->whereHas('delegations', function ($q) use ($delegations) {
                 $q->whereIn('delegations.id', $delegations);
             });
         }
+
+        if ($request->has('assigned') && !empty($request->assigned)) {
+            if ($request->assigned == 'assigned') {
+                $query->whereHas('delegations', function ($q) {
+                    $q->where('delegation_drivers.status', 1);
+                });
+            } elseif ($request->assigned == 'unassigned') {
+                $query->whereDoesntHave('delegations', function ($q) {
+                    $q->where('delegation_drivers.status', 1);
+                });
+            }
+        }
+
+        $query->leftJoin('delegation_drivers as dd', function($join) {
+                $join->on('drivers.id', '=', 'dd.driver_id')
+                     ->where('dd.status', '=', 1);
+            })
+            ->select('drivers.*')  
+            ->orderByRaw('CASE WHEN dd.driver_id IS NULL THEN 0 ELSE 1 END') 
+            ->orderBy('drivers.military_number');
 
         $limit = $request->limit ?: 20;
 
@@ -158,6 +183,9 @@ class DriverController extends Controller
         $carTypes = Driver::where('event_id', $currentEventId)->whereNotNull('car_type')->distinct()->pluck('car_type')->sort()->values()->all();
         $carNumbers = Driver::where('event_id', $currentEventId)->whereNotNull('car_number')->distinct()->pluck('car_number')->sort()->values()->all();
         $capacities = Driver::where('event_id', $currentEventId)->whereNotNull('capacity')->distinct()->pluck('capacity')->sort()->values()->all();
+        $units = \App\Models\DropdownOption::whereHas('dropdown', function ($q) {
+            $q->where('code', 'unit');
+        })->orderBy('sort_order')->get();
 
         $assignmentDelegation = null;
         if ($delegationId && $assignmentMode === 'driver') {
@@ -168,7 +196,7 @@ class DriverController extends Controller
         $request->session()->put('edit_drivers_last_url', url()->full());
         $request->session()->put('assign_drivers_last_url', url()->full());
 
-        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities', 'isRedirect', 'request'));
+        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities', 'units', 'isRedirect', 'request'));
     }
 
 
@@ -221,6 +249,16 @@ class DriverController extends Controller
         ]);
 
         $driverData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingDriver = Driver::where('event_id', $currentEventId)->where('military_number', $driverData['military_number'])->exists();
+
+        if ($isExistingDriver) {
+            return back()->withErrors([
+                'military_number' => __db('military_number_exists')
+            ])->withInput();
+        }
 
         if (isset($driverData['phone_number']) && !empty($driverData['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $driverData['phone_number']);
@@ -298,6 +336,27 @@ class DriverController extends Controller
             'delegation_id.exists' => __db('delegation_id_exists'),
         ]);
 
+        $driverData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingDriver = Driver::where('event_id', $currentEventId)
+            ->where('military_number', $driverData['military_number'])
+            ->when(!empty($id), function ($q) use ($id) {
+                $q->where('id', '!=', $id);
+            })
+            ->exists();
+
+        if ($isExistingDriver) {
+            return response()->json(['message' => __db('military_number_exists')], 409);
+        };
+
+        // if ($isExistingDriver) {
+        //     return back()->withErrors([
+        //         'military_number' => __db('military_number_exists')
+        //     ])->withInput();
+        // }
+
         $driver = Driver::findOrFail($id);
 
         $relationsToCompare = [
@@ -330,10 +389,10 @@ class DriverController extends Controller
             'status' => [],
         ];
 
-        if (isset($dataToSave['phone_number']) && !empty($dataToSave['phone_number'])) {
-            $phoneNumber = preg_replace('/[^0-9]/', '', $dataToSave['phone_number']);
+        if (isset($validated['phone_number']) && !empty($validated['phone_number'])) {
+            $phoneNumber = preg_replace('/[^0-9]/', '', $validated['phone_number']);
             if (strlen($phoneNumber) === 9) {
-                $dataToSave['phone_number'] = '971' . $phoneNumber;
+                $validated['phone_number'] = '971' . $phoneNumber;
             }
         }
 
