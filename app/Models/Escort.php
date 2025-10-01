@@ -70,15 +70,6 @@ class Escort extends Model
     protected static function booted()
     {
         static::creating(function ($escort) {
-            $latestEscort = self::latest('id')->first();
-            $newId = $latestEscort ? $latestEscort->id + 1 : 1;
-
-            $minLength = 3;
-            $newIdLength = strlen((string)$newId);
-            $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
-
-            $escort->code = 'EC' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
-
             if (!$escort->event_id) {
                 $sessionEventId = Session::get('current_event_id');
                 if ($sessionEventId) {
@@ -87,6 +78,25 @@ class Escort extends Model
                     $defaultEventId = getDefaultEventId();
                     $escort->event_id = $defaultEventId ? $defaultEventId : null;
                 }
+            }
+
+            $eventId = $escort->event_id ?: Session::get('current_event_id') ?: getDefaultEventId();
+            $event = Event::find($eventId);
+            
+            if ($event) {
+                $latestEscort = self::where('event_id', $eventId)->latest('id')->first();
+                $newId = $latestEscort ? $latestEscort->id + 1 : 1;
+                
+                $escort->code = $event->code . '-ES-' . str_pad($newId, 4, '0', STR_PAD_LEFT);
+            } else {
+                $latestEscort = self::latest('id')->first();
+                $newId = $latestEscort ? $latestEscort->id + 1 : 1;
+
+                $minLength = 3;
+                $newIdLength = strlen((string)$newId);
+                $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
+
+                $escort->code = 'EC' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
             }
         });
     }

@@ -37,14 +37,29 @@ class Delegate extends Model
     protected static function booted()
     {
         static::creating(function ($delegate) {
-            $latestDelegate = self::latest('id')->first();
-            $newId = $latestDelegate ? $latestDelegate->id + 1 : 1;
-
-            $minLength = 3;
-            $newIdLength = strlen((string)$newId);
-            $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
-
-            $delegate->code = 'DL' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
+            if ($delegate->delegation_id) {
+                $delegation = Delegation::find($delegate->delegation_id);
+                if ($delegation) {
+                    $latestDelegate = self::where('delegation_id', $delegate->delegation_id)->latest('id')->first();
+                    $newId = $latestDelegate ? (int)substr(strrchr($latestDelegate->code, '-'), 1) + 1 : 1;
+                    
+                    $delegate->code = $delegation->code . '-' . str_pad($newId, 2, '0', STR_PAD_LEFT);
+                } else {
+                    $latestDelegate = self::latest('id')->first();
+                    $newId = $latestDelegate ? $latestDelegate->id + 1 : 1;
+                    $minLength = 3;
+                    $newIdLength = strlen((string)$newId);
+                    $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
+                    $delegate->code = 'DL' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
+                }
+            } else {
+                $latestDelegate = self::latest('id')->first();
+                $newId = $latestDelegate ? $latestDelegate->id + 1 : 1;
+                $minLength = 3;
+                $newIdLength = strlen((string)$newId);
+                $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
+                $delegate->code = 'DL' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
+            }
         });
     }
 
