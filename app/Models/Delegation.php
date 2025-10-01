@@ -44,10 +44,20 @@ class Delegation extends Model
                 }
             }
 
-            $year = date('y');
-            $latestDelegation = self::whereYear('created_at', date('Y'))->latest('id')->first();
-            $newId = $latestDelegation ? (int)substr($latestDelegation->code, -3) + 1 : 1;
-            $delegation->code = 'DA' . $year . '-' . str_pad($newId, 3, '0', STR_PAD_LEFT);
+            $eventId = $delegation->event_id ?: Session::get('current_event_id') ?: getDefaultEventId();
+            $event = Event::find($eventId);
+            
+            if ($event) {
+                $latestDelegation = self::where('event_id', $eventId)->latest('id')->first();
+                $newId = $latestDelegation ? (int)substr(strrchr($latestDelegation->code, '-'), 1) + 1 : 1;
+                
+                $delegation->code = $event->code . '-' . str_pad($newId, 4, '0', STR_PAD_LEFT);
+            } else {
+                $year = date('y');
+                $latestDelegation = self::whereYear('created_at', date('Y'))->latest('id')->first();
+                $newId = $latestDelegation ? (int)substr($latestDelegation->code, -3) + 1 : 1;
+                $delegation->code = 'DA' . $year . '-' . str_pad($newId, 3, '0', STR_PAD_LEFT);
+            }
         });
 
         static::updating(function ($delegation) {

@@ -54,7 +54,7 @@
                 @endforeach
                 <select id="limit" name="limit" onchange="this.form.submit()"
                     class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
-                    @foreach ([10, 25, 50, 100] as $size)
+                    @foreach ([10, 25, 50, 100, 500] as $size)
                         <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
                             {{ $size }}
                         </option>
@@ -82,7 +82,7 @@
                     <th scope="col"
                         class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
                         data-column-key="{{ $column['key'] }}">
-                        {{ $column['label'] }}
+                        {!! $column['label'] !!}
                     </th>
                 @endif
             @endforeach
@@ -164,12 +164,14 @@
                     @foreach ($columns as $column)
                         @php
                             $isActionColumn = in_array($column['key'], ['action', 'actions']);
+                            $isCheckboxColumn = str_contains($column['key'], 'input'); 
                         @endphp
-                        @if (!$isActionColumn)
+                        
+                        @if (!$isActionColumn && !$isCheckboxColumn)
                             <label class="flex items-center space-x-2">
                                 <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox me-2"
                                     value="{{ $column['key'] }}" checked>
-                                <span>{{ $column['label'] }}</span>
+                                <span>{!! $column['label'] !!}</span>
                             </label>
                         @endif
                     @endforeach

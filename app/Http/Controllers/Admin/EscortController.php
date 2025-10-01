@@ -9,6 +9,7 @@ use App\Models\Dropdown;
 use App\Models\Escort;
 use App\Imports\EscortImport;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class EscortController extends Controller
@@ -133,7 +134,30 @@ class EscortController extends Controller
             });
         }
 
+        if ($request->has('internal_ranking_id') && !empty($request->internal_ranking_id)) {
+            $rankIds = is_array($request->internal_ranking_id) ? $request->internal_ranking_id : [$request->internal_ranking_id];
+            $query->whereIn('escorts.internal_ranking_id', $rankIds);
+        }
+
+        if ($request->has('assigned') && !empty($request->assigned)) {
+            if ($request->assigned == 'assigned') {
+                $query->whereHas('delegations', function ($q) {
+                    $q->where('delegation_escorts.status', 1);
+                });
+            } elseif ($request->assigned == 'unassigned') {
+                $query->whereDoesntHave('delegations', function ($q) {
+                    $q->where('delegation_escorts.status', 1);
+                });
+            }
+        }
+
         $query->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
+            ->leftJoin('delegation_escorts as de', function($join) {
+                $join->on('escorts.id', '=', 'de.escort_id')
+                     ->where('de.status', '=', 1);
+            })
+            ->select('escorts.*') 
+            ->orderByRaw('CASE WHEN de.escort_id IS NULL THEN 0 ELSE 1 END')  
             ->orderBy('escorts.military_number')
             ->orderBy('rankings.sort_order');
 
@@ -149,6 +173,9 @@ class EscortController extends Controller
 
         $titleEns = Escort::where('event_id', $currentEventId)->whereNotNull('title_en')->distinct()->pluck('title_en')->sort()->values()->all();
         $titleArs = Escort::where('event_id', $currentEventId)->whereNotNull('title_ar')->distinct()->pluck('title_ar')->sort()->values()->all();
+        $rankings = \App\Models\DropdownOption::whereHas('dropdown', function ($q) {
+            $q->where('code', 'rank');
+        })->orderBy('sort_order')->get();
 
         $assignmentDelegation = null;
 
@@ -161,7 +188,7 @@ class EscortController extends Controller
         $request->session()->put('assign_escorts_last_url', url()->full());
         $request->session()->put('import_escorts_last_url', url()->full());
 
-        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'isRedirect', 'request'));
+        return view('admin.escorts.index', compact('escorts', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'rankings', 'isRedirect', 'request'));
     }
 
     public function updateStatus(Request $request)
@@ -183,7 +210,6 @@ class EscortController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'title_en' => 'nullable|string|max:255',
             'title_ar' => 'nullable|string|max:255',
@@ -203,6 +229,7 @@ class EscortController extends Controller
         ], [
             'name_en.required_without' => __db('either_english_name_or_arabic_name'),
             'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
+            'military_number.military_number_exists' => __db('military_number_exists'),
             'name_en.max' => __db('escort_name_en_max', ['max' => 255]),
             'name_ar.max' => __db('escort_name_ar_max', ['max' => 255]),
             'delegation_id.exists' => __db('delegation_id_exists'),
@@ -219,6 +246,16 @@ class EscortController extends Controller
         ]);
 
         $escortData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingEscort = Escort::where('event_id', $currentEventId)->where('military_number', $escortData['military_number'])->exists();
+
+        if ($isExistingEscort) {
+            return back()->withErrors([
+                'military_number' => __db('military_number_exists')
+            ])->withInput();
+        }
 
         if (isset($escortData['phone_number']) && !empty($escortData['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $escortData['phone_number']);
@@ -341,6 +378,22 @@ class EscortController extends Controller
             'name_en' => [],
             'status' => [],
         ];
+
+
+        $escortData = $request->all();
+
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $isExistingEscort = Escort::where('event_id', $currentEventId)
+            ->where('military_number', $escortData['military_number'])
+            ->when(!empty($id), function ($q) use ($id) {
+                $q->where('id', '!=', $id);
+            })
+            ->exists();
+
+        if ($isExistingEscort) {
+            return response()->json(['message' => __db('military_number_exists')], 409);
+        };
 
         if (isset($validated['phone_number']) && !empty($validated['phone_number'])) {
             $phoneNumber = preg_replace('/[^0-9]/', '', $validated['phone_number']);

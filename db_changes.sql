@@ -703,4 +703,4 @@
 -- ( 'admin', 154, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
 -- ( 'admin', 154, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
 
-alter table countries add column code text;
+-- alter table countries add column code text;

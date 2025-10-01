@@ -153,7 +153,7 @@
                   </div>
                     <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
                         <thead>
-                        <tr class="text-[10px]">
+                        <tr class="text-[13px]">
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                     {{ __db('airport_land_sea') }}</th>
                             <th scope="col"
@@ -166,7 +166,7 @@
                         </thead>
                         <tbody>
                             @forelse($data['arr_dep_summary'] as $drow)
-                                    <tr class="text-[10px] align-[middle]">
+                                    <tr class="text-[12px] align-[middle]">
                                         <td class="px-2 py-2 border border-gray-200">{{ $drow->transport_point }}</td>
                                         <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->arrival_count }}</td>
                                         <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->departure_count }}</td>

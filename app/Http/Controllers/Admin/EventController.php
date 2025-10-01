@@ -83,7 +83,7 @@ class EventController extends Controller
         } else {
             $data['is_default'] = false;
         }
-        $data['code'] =  generateEventCode();
+        // $data['code'] =  generateEventCode();
 
         $event = Event::create($data);
         $defaultSlugs = ['home','about-us','committee'];

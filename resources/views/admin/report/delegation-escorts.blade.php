@@ -8,67 +8,12 @@
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
             color: #000;
-            direction: rtl;
-            margin: 20px;
+            /* direction: rtl; */
+            /* margin: 20px; */
             text-align: right;
         }
     * { box-sizing: border-box; }
-/* 
-        table {
-            direction: rtl;
-            text-align: right;
-        }
-       
-        h1, h2, h3 {
-            margin: 4px 0;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 18px;
-            font-size: 11px;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 5px;
-            vertical-align: top;
-            text-align: left;
-        }
-        th {
-            background: #eee;
-        }
-        .section {
-            margin-bottom: 30px;
-            page-break-inside: avoid;
-        }
-        .header-table {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        .header-table td {
-            border: none;
-            text-align: center;
-        }
-        .header-table img {
-            height: 60px;
-        }
-        .info-table td {
-            border: none;
-            padding: 3px 6px;
-        }
-        .no-border {
-            border: none !important;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .text-bold {
-            font-weight: bold;
-        }
-        .text-red {
-            color: #c00;
-        } */
+
     </style>
 </head>
 <body style="margin: 0px; padding: 0px; font-size: 10px;">
@@ -76,14 +21,12 @@
         <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
                 <tr>
-                    <!-- Left Logo -->
                     <td style="width: 25%; text-align: left; vertical-align: middle;">
                         <img src="{{ public_path('assets/img/md-logo.svg') }}" 
                             alt="{{ env('APP_NAME') }}" 
                             style="width: 150px; height: auto;">
                     </td>
 
-                    <!-- Center Text -->
                     <td style="width: 50%; text-align: center; vertical-align: middle;">
                         <div style="font-size: 14px; font-weight: bold;">
                             {{ __db('united_arab_emirates') }}
@@ -96,7 +39,6 @@
                         </div>
                     </td>
 
-                    <!-- Right Logo -->
                     <td style="width: 25%; text-align: right; vertical-align: middle;">
                         <img src="{{ public_path(getAdminEventPDFLogo()) }}" 
                             alt="{{ getCurrentEventName() }}" 
@@ -130,7 +72,7 @@
                             {{ $escort->phone_number }} <strong>: {{ __db('mobile') }} </strong>
                         </td>
                         <td style="padding: 6px; border: 0px;text-align: right;">
-                            {{ $escort->name }} ({{ $escort->code }})  @if($key == 0) <strong>:{{ __db('escort') }}</strong> @else <strong> &nbsp;</strong> @endif
+                            {{ $escort->internalRanking?->value }} {{ $escort->name }} ({{ $escort->code }})  @if($key == 0) <strong>:{{ __db('escort') }}</strong> @else <strong> &nbsp;&nbsp;</strong> @endif
                                 
                         </td>
                     </tr>
@@ -175,18 +117,18 @@
 
         <h2 class="font-bold text-center mb-3" style="font-size: 14px;">{{ __db('arrival_details') }}</h2>
         
-        <table style="width: 100%; border-collapse: collapse;">
+        <table style="width: 100%; border-collapse: collapse;border: 1px solid #000;">
             <thead>
                 <tr style="background-color: #d9d9d9;">
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('date') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('airport') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_name') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('delegations') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('date') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('airport') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('flight_name') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('room') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('position') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('delegations') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -197,12 +139,12 @@
                         if($delegate->team_head == 1){
                             $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                     
-                            $teamHead.= '<tr>                                    
-                                <td style="padding: 8px; border: 2px solid #000;">'.date('H:i', strtotime($departure?->date_time)).'</td>
-                                <td style="padding: 8px; border: 2px solid #000;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
-                                <td style="padding: 8px; border: 2px solid #000;">'.($departure?->airport?->value) .'</td>
-                                <td style="padding: 8px; border: 2px solid #000;">'.($departure?->flight_no).'</td>
-                                <td style="padding: 8px; border: 2px solid #000;">'.($departure?->flight_name).'</td>
+                            $teamHead.= '<tr style="border: 1px solid #000;">                                    
+                                <td style="padding: 8px; border: 1px solid #000;">'.date('H:i', strtotime($departure?->date_time)).'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value) .'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_no).'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_name).'</td>
                             </tr>';
                         }
                     @endphp
@@ -214,27 +156,27 @@
                             }
                             $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
                         @endphp
-                        <td style="padding: 8px; border: 2px solid #000 !important;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
-                        <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
-                        <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->airport?->value ?? '-' }}</td>
-                        <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
-                        <td style="padding: 8px; border: 2px solid #000;">
+                        <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                        <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
+                        <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
+                        <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
+                        <td style="padding: 8px; border: 1px solid #000;">
                             {{ $arrival?->flight_name ?? '-' }}
                         </td>
-                        <td style="padding: 8px; border: 2px solid #000;">
+                        <td style="padding: 8px; border: 1px solid #000;">
                             {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : 'Not Required'}}
                         </td>
-                        <td style="padding: 8px; border: 2px solid #000;">
+                        <td style="padding: 8px; border: 1px solid #000;">
                             {{ $delegate->internalRanking?->value ?? $relation }}
                         </td>
-                        <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) text-report-red @endif  font-bold">
+                        <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) text-report-red @endif  font-bold">
                             {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
                         </td>
-                        <td style="padding: 8px; border: 2px solid #000;">{{ $key + 1 }}</td>
+                        <td style="padding: 8px; border: 1px solid #000;">{{ $key + 1 }}</td>
                     </tr>
                 @empty
                     <tr class="border-t">
-                        <td colspan="9" style="padding: 8px; border: 2px solid #000; text-center">
+                        <td colspan="9" style="padding: 8px; border: 1px solid #000; text-center">
                             {{ __db('no_record_found') }}
                         </td>
                     </tr>
@@ -247,12 +189,12 @@
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="background-color: #d9d9d9;">
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('date') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('airport') }}
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('date') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('airport') }}
                     </th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
-                    <th style="padding: 8px; border: 2px solid #000; text-align: center;"> {{ __db('flight_name') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
+                    <th style="padding: 8px; border: 1px solid #000; text-align: center;"> {{ __db('flight_name') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -315,27 +257,27 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9;">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_number') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;"> {{  __db('vehicle') . " " . __db('type') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('phone') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('name') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('car_number') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;"> {{  __db('vehicle') . " " . __db('type') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('phone') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('name') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($delegation->drivers as $keyDriver => $rowDriver)
                             <tr>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ $rowDriver->car_type ?? '-' }}</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ $rowDriver->phone_number ?? '-' }}</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_type ?? '-' }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->phone_number ?? '-' }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">
                                     {{ $rowDriver->name ?? '-' }}
                                 </td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ $keyDriver + 1 }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ $keyDriver + 1 }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" style="padding: 8px; border: 2px solid #000;text-align: center;">
+                                <td colspan="5" style="padding: 8px; border: 1px solid #000;text-align: center;">
                                     {{ __db('no_record_found') }}
                                 </td>
                             </tr>
@@ -348,14 +290,14 @@
                 <h2 class="text-md font-bold mb-3 text-end" style="font-size: 14px;">{{ __db('interviews') }}</h2>
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
-                        <tr class="bg-gray-200">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('notes') }}
+                        <tr style="background-color: #d9d9d9;">
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('notes') }}
                             </th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('date') }}
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('date') }}
                             </th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('interview_request_with') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('interview_request_with') }}</th>
+                            <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -383,15 +325,15 @@
                             @endphp
 
                             <tr>
-                                <td  style="padding: 8px; border: 2px solid #000;">-</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ date('H:i', strtotime($row->date_time)) }}</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{!! $interviewMembers !!}</td>
-                                <td  style="padding: 8px; border: 2px solid #000;">{{ $in + 1 }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">-</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ date('H:i', strtotime($row->date_time)) }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{!! $interviewMembers !!}</td>
+                                <td  style="padding: 8px; border: 1px solid #000;">{{ $in + 1 }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" style="padding: 8px; border: 2px solid #000;text-align: center;">
+                                <td colspan="5" style="padding: 8px; border: 1px solid #000;text-align: center;">
                                     {{ __db('no_record_found') }}
                                 </td>
                             </tr>
