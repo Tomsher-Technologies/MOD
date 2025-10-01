@@ -347,6 +347,19 @@
                 </select>
             </div>
 
+            <div class="flex flex-col">
+                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('unit') }}</label>
+                <select name="unit_id[]"
+                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
+                    data-placeholder="{{ __db('select') }}">
+                    <option value="">{{ __db('all') }}</option>
+                    @foreach ($units as $unit)
+                        <option value="{{ $unit->id }}" @if (is_array(request('unit_id', [])) && in_array($unit->id, request('unit_id', []))) selected @endif>
+                            {{ $unit->value }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             {{-- <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
                 <select multiple name="title_en[]"

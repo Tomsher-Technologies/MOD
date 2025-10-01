@@ -132,6 +132,11 @@ class DriverController extends Controller
             $query->whereIn('capacity', $capacities);
         }
 
+        if ($request->has('unit_id') && !empty($request->unit_id)) {
+            $unitIds = is_array($request->unit_id) ? $request->unit_id : [$request->unit_id];
+            $query->whereIn('unit_id', $unitIds);
+        }
+
         if ($request->has('delegation_id') && !empty($request->delegation_id) && $assignmentMode !== 'driver') {
             $delegations = is_array($request->delegation_id) ? $request->delegation_id : [$request->delegation_id];
             $query->whereHas('delegations', function ($q) use ($delegations) {
@@ -178,6 +183,9 @@ class DriverController extends Controller
         $carTypes = Driver::where('event_id', $currentEventId)->whereNotNull('car_type')->distinct()->pluck('car_type')->sort()->values()->all();
         $carNumbers = Driver::where('event_id', $currentEventId)->whereNotNull('car_number')->distinct()->pluck('car_number')->sort()->values()->all();
         $capacities = Driver::where('event_id', $currentEventId)->whereNotNull('capacity')->distinct()->pluck('capacity')->sort()->values()->all();
+        $units = \App\Models\DropdownOption::whereHas('dropdown', function ($q) {
+            $q->where('code', 'unit');
+        })->orderBy('sort_order')->get();
 
         $assignmentDelegation = null;
         if ($delegationId && $assignmentMode === 'driver') {
@@ -188,7 +196,7 @@ class DriverController extends Controller
         $request->session()->put('edit_drivers_last_url', url()->full());
         $request->session()->put('assign_drivers_last_url', url()->full());
 
-        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities', 'isRedirect', 'request'));
+        return view('admin.drivers.index', compact('drivers', 'delegations', 'delegationId', 'assignmentMode', 'assignmentDelegation', 'titleEns', 'titleArs', 'carTypes', 'carNumbers', 'capacities', 'units', 'isRedirect', 'request'));
     }
 
 
