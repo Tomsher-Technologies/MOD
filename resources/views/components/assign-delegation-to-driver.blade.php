@@ -205,8 +205,8 @@
                                                 ${delegation.code}
                                             </a>
                                         </td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value_ar || delegation.continent?.value || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name_ar || delegation.country?.name || ''}</td>
                                         <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
                                     </tr>
                                 `;
@@ -277,15 +277,19 @@
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('country') }}:</p>
-                                        <p>${data.delegation.country?.name || '-'}</p>
+                                        <p>${data.delegation.country?.name_ar || data.delegation.country?.name || '-'}</p>
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('continent') }}:</p>
-                                        <p>${data.delegation.continent?.value || '-'}</p>
+                                        <p>${data.delegation.continent?.value_ar || data.delegation.continent?.value || '-'}</p>
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('invitation_from') }}:</p>
-                                        <p>${data.delegation.invitationFrom?.value || '-'}</p>
+                                        <p>${data.delegation.invitation_from?.value_ar || data.delegation.invitation_from?.value || '-'}</p>
+                                    </div>
+                                     <div>
+                                        <p class="font-medium">{{ __db('invitation_status') }}:</p>
+                                        <p>${data.delegation.invitation_status?.value_ar || data.delegation.invitation_status?.value || '-'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -315,16 +319,16 @@
                             if (data.delegation.delegates && data.delegation.delegates.length > 0) {
                                 data.delegation.delegates.forEach(delegate => {
                                     detailsHtml += `
-                                    <tr>
+                                     <tr>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_ar || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internalRanking?.value || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.gender?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.badge_printed || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.participation_status || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.designation_en || delegate?.designation_ar || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.designation_ar || delegate?.designation_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.team_head ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.accommodation ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
                                     </tr>
