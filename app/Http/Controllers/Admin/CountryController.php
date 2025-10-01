@@ -167,11 +167,17 @@ class CountryController extends Controller
             $continentIds = [];
         }
 
+        $lang = getActiveLanguage();
+
+        $orderColumn = $lang === 'en' ? 'name' : 'name_ar';
+
         $countries = Country::whereIn('continent_id', $continentIds)
             ->select('id', 'name', 'name_ar')
-            ->orderBy('sort_order')
             ->where('status', 1)
+            ->orderBy($orderColumn, 'asc')
             ->get();
+
+
 
         return response()->json($countries);
     }
