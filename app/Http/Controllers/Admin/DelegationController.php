@@ -331,7 +331,7 @@ class DelegationController extends Controller
             'invitationStatus',
             'participationStatus',
             'delegates' => function ($query) {
-                $query->with(['gender', 'parent', 'delegateTransports']);
+                $query->with(['gender', 'parent', 'delegateTransports', 'relationship', 'internalRanking']);
             },
             'attachments',
             'interviews' => function ($query) {
@@ -380,6 +380,8 @@ class DelegationController extends Controller
                     'gender',
                     'parent',
                     'delegateTransports',
+                    'relationship',
+                    'internalRanking'
                 ]);
             },
             'attachments',
@@ -409,7 +411,7 @@ class DelegationController extends Controller
 
         $request->session()->put('interview_member_last_url', url()->full());
         $request->session()->put('edit_delegations_last_url', url()->full());
-        
+
         $request->session()->put('escorts_index_last_url', url()->full());
         $request->session()->put('drivers_index_last_url', url()->full());
 

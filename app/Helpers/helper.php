@@ -757,3 +757,5 @@ function getFloorPlans()
 
     return $floorPlans;
 }
+
+

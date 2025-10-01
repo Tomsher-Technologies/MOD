@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
-    document.querySelectorAll('.texteditor').forEach(function(el) {
+    document.querySelectorAll('.texteditor').forEach(function (el) {
         tinymce.init({
             target: el,
             directionality: el.getAttribute('dir') === 'rtl' ? 'rtl' : 'ltr',
@@ -116,10 +116,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             content_css: true,
             plugins: 'advlist autolink lists link image table preview code fullscreen media wordcount',
             toolbar: 'undo redo | styles | bold italic underline | ' +
-                    'alignleft aligncenter alignright alignjustify | ' +
-                    'bullist numlist outdent indent | link image table | code preview fullscreen',   
+                'alignleft aligncenter alignright alignjustify | ' +
+                'bullist numlist outdent indent | link image table | code preview fullscreen',
             menubar: 'file edit view insert format tools table',
-            skin_url: '/tinymce/skins/ui/oxide',   
+            skin_url: '/tinymce/skins/ui/oxide',
             content_css: '/tinymce/skins/content/default/content.min.css',
         });
     });
@@ -147,3 +147,17 @@ window.addEventListener("load", () => {
 
     }, 100);
 });
+
+export function getLocalized(obj, ...fields) {
+    const getByPath = (o, path) =>
+        path.split('.').reduce((acc, key) => (acc == null ? undefined : acc[key]), o);
+
+    for (const field of fields) {
+        const val = getByPath(obj || {}, field);
+        if (val != null && String(val).trim() !== '') return val;
+    }
+    return '-';
+}
+
+
+window.getLocalized = getLocalized;

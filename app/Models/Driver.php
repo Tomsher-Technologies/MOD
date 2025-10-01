@@ -49,15 +49,6 @@ class Driver extends Model
     protected static function booted()
     {
         static::creating(function ($driver) {
-            $latestDriver = self::latest('id')->first();
-            $newId = $latestDriver ? $latestDriver->id + 1 : 1;
-
-            $minLength = 3;
-            $newIdLength = strlen((string)$newId);
-            $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
-
-            $driver->code = 'DR' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
-
             if (!$driver->event_id) {
                 $sessionEventId = Session::get('current_event_id');
                 if ($sessionEventId) {
@@ -66,6 +57,25 @@ class Driver extends Model
                     $defaultEventId = getDefaultEventId();
                     $driver->event_id = $defaultEventId ? $defaultEventId : null;
                 }
+            }
+
+            $eventId = $driver->event_id ?: Session::get('current_event_id') ?: getDefaultEventId();
+            $event = Event::find($eventId);
+            
+            if ($event) {
+                $latestDriver = self::where('event_id', $eventId)->latest('id')->first();
+                $newId = $latestDriver ? $latestDriver->id + 1 : 1;
+                
+                $driver->code = $event->code . '-DR-' . str_pad($newId, 4, '0', STR_PAD_LEFT);
+            } else {
+                $latestDriver = self::latest('id')->first();
+                $newId = $latestDriver ? $latestDriver->id + 1 : 1;
+
+                $minLength = 3;
+                $newIdLength = strlen((string)$newId);
+                $padLength = $newIdLength > $minLength ? $newIdLength : $minLength;
+
+                $driver->code = 'DR' . str_pad($newId, $padLength, '0', STR_PAD_LEFT);
             }
         });
     }
