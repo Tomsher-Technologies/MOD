@@ -16,7 +16,7 @@
 
     </style>
 </head>
-<body style="margin: 0px; padding: 0px; font-size: 10px;">
+<body style="margin: 0px; padding: 0px; font-size: 12px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" >
         
 

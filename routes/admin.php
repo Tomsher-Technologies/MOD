@@ -245,10 +245,32 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
 
     // Report Section
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // Delegations escort reports
     Route::get('/reports/delegations', [ReportController::class, 'reportsDelegations'])->name('reports-delegations');
     Route::get('/report/delegations/{id}', [ReportController::class, 'showReportsDelegations'])->name('reports-delegations.show');
     Route::get('/delegations/export-pdf/{id}', [ReportController::class, 'exportReportDelegationPdf'])->name('delegations.exportPdf');
-     Route::post('/delegations/bulk-export-pdf', [ReportController::class, 'exportBulkReportDelegationPdf'])->name('delegations.bulk-exportPdf');
+    Route::post('/delegations/bulk-export-pdf', [ReportController::class, 'exportBulkReportDelegationPdf'])->name('delegations.bulk-exportPdf');
+
+    // Hotel Room Vacancy Report
+    Route::get('/reports/hotel-rooms', [ReportController::class, 'hotelRooms'])->name('hotel-rooms');
+    Route::post('/hotel-rooms/bulk-export-pdf', [ReportController::class, 'exportBulkHotelRoomPdf'])->name('hotel-rooms.bulk-exportPdf');
+
+    // Escorts Report
+    Route::get('/reports/escorts', [ReportController::class, 'escorts'])->name('report.escorts');
+    Route::post('/escorts/bulk-export-pdf', [ReportController::class, 'exportBulkEscortsPdf'])->name('escorts.bulk-exportPdf');
+
+    // Drivers Report
+    Route::get('/reports/drivers', [ReportController::class, 'drivers'])->name('report.drivers');
+    Route::post('/drivers/bulk-export-pdf', [ReportController::class, 'exportBulkDriversPdf'])->name('drivers.bulk-exportPdf');
+
+    // Delegation Heads Arrival Report
+    Route::get('/reports/heads-arrivals', [ReportController::class, 'delegationHeadsArrivals'])->name('report.heads-arrivals');
+    Route::post('/heads-arrivals/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationHeadsArrivalsPdf'])->name('heads-arrivals.bulk-exportPdf');
+
+    // Delegation Heads Arrival Report
+    Route::get('/reports/heads-departure', [ReportController::class, 'delegationHeadsDeparture'])->name('report.heads-departure');
+    Route::post('/heads-departure/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationHeadsDeparturePdf'])->name('heads-departure.bulk-exportPdf');
 
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');

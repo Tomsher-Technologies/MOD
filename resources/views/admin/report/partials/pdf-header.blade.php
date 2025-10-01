@@ -17,7 +17,7 @@
                     {{ __db('ministry_of_defense') }}
                 </div>
                 <div style="font-size: 14px; font-weight: bold; color: #cc0000;">
-                    {!! $reportName !!}
+                    {!! __db($reportName) ?? $reportName !!}
                 </div>
             </td>
 

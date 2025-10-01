@@ -29,6 +29,11 @@ class Driver extends Model
         'event_id',
         'current_room_assignment_id'
     ];
+    public function delegationDrivers()
+    {
+        return $this->hasMany(DelegationDriver::class, 'driver_id');
+    }
+
 
     public function getNameAttribute()
     {

@@ -318,9 +318,9 @@ class AccommodationController extends Controller
             'escorts',
             'drivers'
         ])
-            ->whereHas('invitationStatus', function ($q) {
-                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-            });
+        ->whereHas('invitationStatus', function ($q) {
+            $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+        });
 
         $query->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
             ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
@@ -336,59 +336,91 @@ class AccommodationController extends Controller
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                    ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
-                        $delegateQuery->where('name_en', 'like', "%{$search}%");
+                $q->where('delegations.code', 'like', "%{$search}%")
+
+                    ->orWhereHas('country', function ($countryQuery) use ($search) {
+                        $countryQuery->where('countries.name', 'like', "%{$search}%")
+                            ->orWhere('countries.name_ar', 'like', "%{$search}%")
+                            ->orWhere('countries.short_code', 'like', "%{$search}%");
                     })
+                    ->orWhereHas('continent', function ($continentQuery) use ($search) {
+                        $continentQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('invitationFrom', function ($invitationQuery) use ($search) {
+                        $invitationQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('invitationStatus', function ($statusQuery) use ($search) {
+                        $statusQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('participationStatus', function ($participationQuery) use ($search) {
+                        $participationQuery->where('dropdown_options.value', 'like', "%{$search}%")
+                            ->orWhere('dropdown_options.value_ar', 'like', "%{$search}%");
+                    })
+
+                    ->orWhereHas('delegates', function ($delegateQuery) use ($search) {
+                        $delegateQuery->where(function ($dq) use ($search) {
+                            $dq->where('delegates.name_en', 'like', "%{$search}%")
+                                ->orWhere('delegates.name_ar', 'like', "%{$search}%")
+                                ->orWhere('delegates.title_en', 'like', "%{$search}%")
+                                ->orWhere('delegates.title_ar', 'like', "%{$search}%")
+                                ->orWhere('delegates.code', 'like', "%{$search}%")
+                                ->orWhere('delegates.designation_en', 'like', "%{$search}%")
+                                ->orWhere('delegates.designation_ar', 'like', "%{$search}%");
+                        });
+                    })
+
                     ->orWhereHas('escorts', function ($escortQuery) use ($search) {
-                        $escortQuery->where('name_en', 'like', "%{$search}%")
-                            ->orWhere('name_ar', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%");
-                    })->orWhereHas('drivers', function ($driversQuery) use ($search) {
-                        $driversQuery->where('name_en', 'like', "%{$search}%")
-                            ->orWhere('name_ar', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%");
+                        $escortQuery->where(function ($eq) use ($search) {
+                            $eq->where('escorts.name_en', 'like', "%{$search}%")
+                                ->orWhere('escorts.name_ar', 'like', "%{$search}%")
+                                ->orWhere('escorts.title_en', 'like', "%{$search}%")
+                                ->orWhere('escorts.title_ar', 'like', "%{$search}%")
+                                ->orWhere('escorts.code', 'like', "%{$search}%")
+                                ->orWhere('escorts.military_number', 'like', "%{$search}%")
+                                ->orWhere('escorts.rank', 'like', "%{$search}%")
+                                ->orWhere('escorts.phone_number', 'like', "%{$search}%")
+                                ->orWhere('escorts.email', 'like', "%{$search}%");
+                        });
+                    })
+
+                    ->orWhereHas('drivers', function ($driverQuery) use ($search) {
+                        $driverQuery->where(function ($eq) use ($search) {
+                            $eq->where('drivers.name_en', 'like', "%{$search}%")
+                                ->orWhere('drivers.name_ar', 'like', "%{$search}%")
+                                ->orWhere('drivers.title_en', 'like', "%{$search}%")
+                                ->orWhere('drivers.title_ar', 'like', "%{$search}%")
+                                ->orWhere('drivers.code', 'like', "%{$search}%")
+                                ->orWhere('drivers.military_number', 'like', "%{$search}%")
+                                ->orWhere('drivers.phone_number', 'like', "%{$search}%")
+                                ->orWhere('drivers.car_type', 'like', "%{$search}%")
+                                ->orWhere('drivers.car_number', 'like', "%{$search}%");
+                        });
                     });
             });
         }
 
 
         if ($invitationFrom = $request->input('invitation_from')) {
-            if (is_array($invitationFrom)) {
-                $query->whereIn('invitation_from_id', $invitationFrom);
-            } else {
-                $query->where('invitation_from_id', $invitationFrom);
-            }
+            $query->whereIn('delegations.invitation_from_id', $invitationFrom);
         }
 
         if ($continentId = $request->input('continent_id')) {
-            if (is_array($continentId)) {
-                $query->whereIn('continent_id', $continentId);
-            } else {
-                $query->where('continent_id', $continentId);
-            }
+            $query->whereIn('delegations.continent_id', $continentId);
         }
 
         if ($countryId = $request->input('country_id')) {
-            if (is_array($countryId)) {
-                $query->whereIn('country_id', $countryId);
-            } else {
-                $query->where('country_id', $countryId);
-            }
+            $query->whereIn('delegations.country_id', $countryId);
         }
 
         if ($invitationStatusId = $request->input('invitation_status_id')) {
-            if (is_array($invitationStatusId)) {
-                $query->whereIn('invitation_status_id', $invitationStatusId);
-            } else {
-                $query->where('invitation_status_id', $invitationStatusId);
-            }
+            $query->whereIn('delegations.invitation_status_id', $invitationStatusId);
         }
 
         if ($participationStatusId = $request->input('participation_status_id')) {
-            if (is_array($participationStatusId)) {
-                $query->whereIn('participation_status_id', $participationStatusId);
-            } else {
-                $query->where('participation_status_id', $participationStatusId);
-            }
+            $query->whereIn('delegations.participation_status_id', $participationStatusId);
         }
 
         $limit = $request->limit ? $request->limit : 20;
