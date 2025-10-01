@@ -71,8 +71,8 @@ class DriverController extends Controller
         }
 
         $query = Driver::with('delegations')
-            ->where('drivers.event_id', $currentEventId)
-            ->latest();
+            ->select('drivers.*')  
+            ->where('drivers.event_id', $currentEventId);
 
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
@@ -150,6 +150,14 @@ class DriverController extends Controller
                 });
             }
         }
+
+        $query->leftJoin('delegation_drivers as dd', function($join) {
+                $join->on('drivers.id', '=', 'dd.driver_id')
+                     ->where('dd.status', '=', 1);
+            })
+            ->select('drivers.*')  
+            ->orderByRaw('CASE WHEN dd.driver_id IS NULL THEN 0 ELSE 1 END') 
+            ->orderBy('drivers.military_number');
 
         $limit = $request->limit ?: 20;
 

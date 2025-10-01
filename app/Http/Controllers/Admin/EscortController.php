@@ -152,6 +152,12 @@ class EscortController extends Controller
         }
 
         $query->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
+            ->leftJoin('delegation_escorts as de', function($join) {
+                $join->on('escorts.id', '=', 'de.escort_id')
+                     ->where('de.status', '=', 1);
+            })
+            ->select('escorts.*') 
+            ->orderByRaw('CASE WHEN de.escort_id IS NULL THEN 0 ELSE 1 END')  
             ->orderBy('escorts.military_number')
             ->orderBy('rankings.sort_order');
 
