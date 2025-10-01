@@ -139,6 +139,18 @@ class DriverController extends Controller
             });
         }
 
+        if ($request->has('assigned') && !empty($request->assigned)) {
+            if ($request->assigned == 'assigned') {
+                $query->whereHas('delegations', function ($q) {
+                    $q->where('delegation_drivers.status', 1);
+                });
+            } elseif ($request->assigned == 'unassigned') {
+                $query->whereDoesntHave('delegations', function ($q) {
+                    $q->where('delegation_drivers.status', 1);
+                });
+            }
+        }
+
         $limit = $request->limit ?: 20;
 
         if ($request->id) {

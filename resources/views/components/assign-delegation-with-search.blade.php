@@ -210,13 +210,15 @@
 
                                 if (data.delegation.delegates && data.delegation.delegates.length > 0) {
                                     data.delegation.delegates.forEach(delegate => {
+                                        console.log("data.delegation", data.delegation);
+
                                         detailsHtml += `
                                     <tr>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_ar || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internalRanking?.value || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.gender?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_en || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_ar || delegate?.parent?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.badge_printed || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.participation_status || '-'}</td>

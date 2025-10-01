@@ -266,7 +266,6 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            // Build delegation details HTML
                             let detailsHtml = `
                             <div class="mb-6">
                                 <h3 class="text-lg font-semibold mb-3">{{ __db('delegation_information') }}</h3>
@@ -322,10 +321,10 @@
                                      <tr>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_ar || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internalRanking?.value || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internal_ranking?.value_ar || delegate?.internal_ranking?.value || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.gender?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_en || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_ar || delegate?.parent?.name_en || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship_value_ar || delegate?.relationship_value || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.badge_printed || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.participation_status || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.designation_ar || delegate?.designation_en || '-'}</td>
