@@ -161,6 +161,7 @@ class DriverController extends Controller
                      ->where('dd.status', '=', 1);
             })
             ->select('drivers.*')  
+            ->groupBy('drivers.id')
             ->orderByRaw('CASE WHEN dd.driver_id IS NULL THEN 0 ELSE 1 END') 
             ->orderBy('drivers.military_number');
 
