@@ -272,6 +272,10 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     Route::get('/reports/heads-departure', [ReportController::class, 'delegationHeadsDeparture'])->name('report.heads-departure');
     Route::post('/heads-departure/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationHeadsDeparturePdf'])->name('heads-departure.bulk-exportPdf');
 
+    // Delegation Heads Invitations Report
+    Route::get('/reports/heads-invitations', [ReportController::class, 'delegationHeadsInvitations'])->name('report.heads-invitations');
+    Route::post('/heads-invitations/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationHeadsInvitationsPdf'])->name('heads-invitations.bulk-exportPdf');
+
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
     Route::post('/import-logs/clear', [ImportLogController::class, 'clearLogs'])->name('admin.import-logs.clear');
