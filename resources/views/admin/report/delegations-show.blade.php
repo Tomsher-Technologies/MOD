@@ -59,7 +59,7 @@
 
             @endforeach
 
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
+            <div style="display: flex;font-size: 12px; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
                 <div style="width: 40%;">
                     {!! $escortAccHtml !!}
                 </div>
@@ -73,7 +73,7 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
+            <div style="display: flex;font-size: 12px; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
                 <div style="width: 40%;">
                     <div style="margin-bottom: 5px;">{{ $delegation->invitationFrom?->value ?? '-' }} <strong>:{{ __db('invitation_from') }}</strong></div>
                     <div style="margin-bottom: 5px;">{{ $delegation->participationStatus?->value ?? '-' }} <strong>:{{ __db('participation_status') }}</strong></div>
@@ -96,11 +96,11 @@
                 $teamHead = '';
             @endphp
 
-            <h2 class="font-bold text-center mb-3" style="font-size: 20px;">{{ __db('arrival_details') }}</h2>
+            <h2 class="font-bold text-center mb-3  text-end" style="font-size: 16px;">{{ __db('arrival_details') }}</h2>
             
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="background-color: #d9d9d9;">
+                    <tr style="background-color: #d9d9d9; font-size: 13px">
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('date') }}</th>
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('airport') }}</th>
@@ -112,7 +112,7 @@
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="font-size: 12px">
                     @forelse ($delegation->delegates as $key => $delegate)
                         @php
                             $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -165,10 +165,10 @@
                 </tbody>
             </table>
 
-            <h2 class="text-md font-bold mb-3 text-center" style="margin-top: 30px;font-size: 18px;">{{  __db('departure_details_of_head_of_delegation') }}</h2>
+            <h2 class="text-md font-bold mb-3 text-end" style="margin-top: 30px;font-size: 16px;">{{  __db('departure_details_of_head_of_delegation') }}</h2>
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="background-color: #d9d9d9;">
+                    <tr style="background-color: #d9d9d9; font-size: 13px">
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('date') }}</th>
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('airport') }}
@@ -177,7 +177,7 @@
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;"> {{ __db('flight_name') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="font-size: 12px">
                     {!! $teamHead !!}
                 </tbody>
             </table>
@@ -190,51 +190,55 @@
                     $hotelDetails = getAccommodationDetails($assignedHotels);
 
                 @endphp
+                
+                 <table style="width:100%; border-collapse: collapse; margin-bottom: 12px;">
+                    <tbody style="font-size: 12px">
+                        @foreach($hotelDetails as $key => $hotel)
+                            @php
+                                $acc_con = $acc_name = '';
+                                foreach($hotel->contacts as $k => $con){
+                                    $acc_con .= '<div style="margin-bottom: 5px; display: flex;">
+                                                    <span>'.$con->phone.'</span>
+                                                    <strong style="width: 30%;"> : '. __db('mobile').'</strong>
+                                                </div>';
+                                    $acc_name .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                                    <span>'.$con->name.'</span>
+                                                    <strong style="width: 22%;"> : '. __db('res'.$k).'</strong>
+                                                </div>';
+                                }
+                            @endphp
 
-                @foreach($hotelDetails as $key => $hotel)
-                    @php
-                        $acc_con = $acc_name = '';
-                    @endphp
+                            <tr>
+                                <!-- Left side (hotel numbers + contacts) -->
+                                <td style="width:30%; vertical-align: top; padding: 6px;">
+                                    <div style="margin-bottom: 5px; display: flex;">
+                                        <span>{{ $hotel->contact_number }}</span>
+                                        <strong style="width: 30%;"> : {{ __db('hotel_number') }}</strong>
+                                    </div>
+                                    {!! $acc_con !!}
+                                </td>
 
-                    @foreach($hotel->contacts as $k => $con)
-                        @php
-                            $acc_con .= '<div style="margin-bottom: 5px; display: flex;">
-                                    <span>'.$con->phone.'</span>
-                                    <strong style="width: 30%;">:'. __db('mobile').'</strong>
-                                    </div>';
-                            $acc_name .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                                <span>'.$con->name.'</span>
-                                <strong style="width: 22%;">:'. __db('res'.$k).'</strong>
-                            </div>';
-                        @endphp
-                    @endforeach
-                    
-
-                    <div style="width: 30%;">
-                        <div style="margin-bottom: 5px; display: flex;">
-                            <span>{{ $hotel->contact_number }}</span>
-                            <strong style="width: 30%;">:{{ __db('hotel_number') }}</strong>
-                        </div>
-                        {!! $acc_con !!}
-                    </div>
-
-                    <div style="width: 25%; text-align: right;">
-                        <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                            <span>{{ $hotel->hotel_name }} </span>
-                            <strong style="width: 22%;">:{{ __db('hotel') }}</strong>
-                        </div>
-                        {!! $acc_name !!}
-                    </div>
-                @endforeach
-
+                                <!-- Right side (hotel name + responsible persons) -->
+                                <td style="width:25%; text-align: right; vertical-align: top; padding: 6px;">
+                                    <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                        <span>{{ $hotel->hotel_name }}</span>
+                                        <strong style="width: 22%;"> : {{ __db('hotel') }}</strong>
+                                    </div>
+                                    {!! $acc_name !!}
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-1 gap-x-0 md:gap-x-8 gap-y-8">
                 <section>
-                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 18px;" >{{ __db('drivers') }}</h2>
+                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 16px;" >{{ __db('drivers') }}</h2>
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr style="background-color: #d9d9d9;">
+                            <tr style="background-color: #d9d9d9; font-size: 13px">
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('car_number') }}</th>
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;"> {{  __db('vehicle') . " " . __db('type') }}</th>
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('phone') }}</th>
@@ -242,7 +246,7 @@
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-size: 12px">
                             @forelse ($delegation->drivers as $keyDriver => $rowDriver)
                                 <tr>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
@@ -265,10 +269,10 @@
                 </section>
 
                 <section>
-                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 18px;">{{ __db('interviews') }}</h2>
+                    <h2 class="text-md font-bold mb-3 text-end" style="font-size: 16px;">{{ __db('interviews') }}</h2>
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
-                            <tr class="bg-gray-200">
+                            <tr class="bg-gray-200"  style="font-size: 13px;">
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('notes') }}
                                 </th>
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
@@ -278,7 +282,7 @@
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-size: 12px">
                             @php
                                 $interviewData = $delegation->interviews ?? collect();
                                 $interviewMembers = '';
