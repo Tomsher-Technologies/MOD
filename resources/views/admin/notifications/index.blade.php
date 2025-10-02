@@ -109,9 +109,9 @@
                                                             @endif
                                                         @else
                                                             @if (getActiveLanguage() === 'ar')
-                                                                <li>{{ $field }}: {{ $change }}</li>
+                                                                <li>{{ __db($field) }}: {{ $change }}</li>
                                                             @else
-                                                                <li>{{ $field }}: {{ $change }}</li>
+                                                                <li>{{ __db($field) }}: {{ $change }}</li>
                                                             @endif
                                                         @endif
                                                     @endforeach
