@@ -485,14 +485,6 @@ class ReportController extends Controller
         $filters = request()->only(['date_range', 'invitation_from']);
 
         $headsArrivals = DelegateTransport::where('type', 'arrival')
-                            ->with([
-                                'delegate.delegation.country',
-                                'delegate.delegation.continent',
-                                'delegate.delegation.escorts',
-                                'delegate.delegation.drivers',
-                                'airport',
-                                'delegate.delegation.invitationFrom',
-                            ])
                             ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId, $filters) {
                                 $delegationQuery->where('event_id', $currentEventId)
                                     ->whereHas('invitationStatus', function ($q) {
@@ -525,14 +517,6 @@ class ReportController extends Controller
         $filters = request()->only(['date_range', 'invitation_from']);
 
         $headsArrivals = DelegateTransport::where('type', 'arrival')
-                            ->with([
-                                'delegate.delegation.country',
-                                'delegate.delegation.continent',
-                                'delegate.delegation.escorts',
-                                'delegate.delegation.drivers',
-                                'airport',
-                                'delegate.delegation.invitationFrom',
-                            ])
                             ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId, $filters) {
                                 $delegationQuery->where('event_id', $currentEventId)
                                     ->whereHas('invitationStatus', function ($q) {
@@ -581,26 +565,30 @@ class ReportController extends Controller
     public function delegationHeadsDeparture(Request $request){
         $currentEventId = session('current_event_id', getDefaultEventId());
 
+        $filters = request()->only(['date_range', 'invitation_from']);
+
         $headsDeparture = DelegateTransport::where('type', 'departure')
-                        ->with([
-                            'delegate.delegation.country',
-                            'delegate.delegation.continent',
-                            'delegate.delegation.escorts',
-                            'delegate.delegation.drivers',
-                            'airport',
-                            'delegate.delegation.invitationFrom',
-                        ])
-                        ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                            $delegationQuery->where('event_id', $currentEventId)
-                                ->whereHas('invitationStatus', function ($q) {
-                                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-                                });
-                        })
-                        ->whereHas('delegate', function ($delegateQuery) {
-                            $delegateQuery->where('team_head', 1);
-                        })
-                        ->orderBy('date_time')
-                        ->get();
+                            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId, $filters) {
+                                $delegationQuery->where('event_id', $currentEventId)
+                                    ->whereHas('invitationStatus', function ($q) {
+                                        $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                                    });
+
+                                if (!empty($filters['invitation_from'])) {
+                                    $delegationQuery->whereIn('invitation_from_id', $filters['invitation_from']);
+                                }
+                            })
+                            ->whereHas('delegate', function ($delegateQuery) {
+                                $delegateQuery->where('team_head', 1);
+                            })
+                            ->when(!empty($filters['date_range']), function ($query) use ($filters) {
+                                [$start, $end] = array_map('trim', explode(' - ', $filters['date_range']));
+                                $start = \Carbon\Carbon::parse($start)->startOfDay();
+                                $end = \Carbon\Carbon::parse($end)->endOfDay();
+                                $query->whereBetween('date_time', [$start->toDateTimeString(), $end->toDateTimeString()]);
+                            })
+                            ->orderBy('date_time')
+                            ->get();
 
         return view('admin.report.head_departure', compact('headsDeparture'));
     }
@@ -608,26 +596,30 @@ class ReportController extends Controller
     public function exportBulkDelegationHeadsDeparturePdf(Request $request){
         $currentEventId = session('current_event_id', getDefaultEventId());
 
+        $filters = request()->only(['date_range', 'invitation_from']);
+
         $headsDeparture = DelegateTransport::where('type', 'departure')
-                        ->with([
-                            'delegate.delegation.country',
-                            'delegate.delegation.continent',
-                            'delegate.delegation.escorts',
-                            'delegate.delegation.drivers',
-                            'airport',
-                            'delegate.delegation.invitationFrom',
-                        ])
-                        ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId) {
-                            $delegationQuery->where('event_id', $currentEventId)
-                                ->whereHas('invitationStatus', function ($q) {
-                                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-                                });
-                        })
-                        ->whereHas('delegate', function ($delegateQuery) {
-                            $delegateQuery->where('team_head', 1);
-                        })
-                        ->orderBy('date_time')
-                        ->get();
+                            ->whereHas('delegate.delegation', function ($delegationQuery) use ($currentEventId, $filters) {
+                                $delegationQuery->where('event_id', $currentEventId)
+                                    ->whereHas('invitationStatus', function ($q) {
+                                        $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                                    });
+
+                                if (!empty($filters['invitation_from'])) {
+                                    $delegationQuery->whereIn('invitation_from_id', $filters['invitation_from']);
+                                }
+                            })
+                            ->whereHas('delegate', function ($delegateQuery) {
+                                $delegateQuery->where('team_head', 1);
+                            })
+                            ->when(!empty($filters['date_range']), function ($query) use ($filters) {
+                                [$start, $end] = array_map('trim', explode(' - ', $filters['date_range']));
+                                $start = \Carbon\Carbon::parse($start)->startOfDay();
+                                $end = \Carbon\Carbon::parse($end)->endOfDay();
+                                $query->whereBetween('date_time', [$start->toDateTimeString(), $end->toDateTimeString()]);
+                            })
+                            ->orderBy('date_time')
+                            ->get();
 
         $today = date('Y-m-d-H-i');
         $reportName = 'delegations_heads_departure';
@@ -649,6 +641,84 @@ class ReportController extends Controller
 
         $mpdf->WriteHTML($html);
         $reportName = 'delegations_heads_departure'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');
+    }
+
+    public function delegationHeadsInvitations(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['invitation_from', 'country_id', 'invitation_status']);
+
+        $invitations = Delegate::query()
+                        ->where('team_head', 1)
+                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->leftJoin('dropdown_options as invitation_status_sort', 'delegations.invitation_status_id', '=', 'invitation_status_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                        })
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->orderBy('invitation_status_sort.sort_order', 'asc')
+                        ->get();
+
+        return view('admin.report.head_invitations', compact('invitations'));
+    }
+
+    public function exportBulkDelegationHeadsInvitationsPdf(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['invitation_from', 'country_id', 'invitation_status']);
+
+        $invitations = Delegate::query()
+                        ->where('team_head', 1)
+                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->leftJoin('dropdown_options as invitation_status_sort', 'delegations.invitation_status_id', '=', 'invitation_status_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                        })
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->orderBy('invitation_status_sort.sort_order', 'asc')
+                        ->get();
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'delegation_head_invitations_report';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+
+        $html = view('admin.report.pdf.head_invitations_bulk', compact('invitations'))->render();
+
+        $mpdf->WriteHTML($html);
+        $reportName = 'delegation_head_invitations_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
 }
