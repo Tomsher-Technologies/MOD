@@ -18,7 +18,7 @@
         </div>
 
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" dir="ltr">
-            <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+            {{-- <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
 
                     <div style="width: auto;">
@@ -38,7 +38,7 @@
                 </div>
                 <div style="text-align: right; font-size: 0.9em; margin-top:10px;">{{ date('d-m-Y H:i A') }}</div>
 
-            </div>
+            </div> --}}
 
             @php
                 $assignedHotels = [];
