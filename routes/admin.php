@@ -276,6 +276,10 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     Route::get('/reports/heads-invitations', [ReportController::class, 'delegationHeadsInvitations'])->name('report.heads-invitations');
     Route::post('/heads-invitations/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationHeadsInvitationsPdf'])->name('heads-invitations.bulk-exportPdf');
 
+    // VIP Report
+    Route::get('/reports/vip', [ReportController::class, 'vipReport'])->name('report.vip');
+    Route::post('/vip/bulk-export-pdf', [ReportController::class, 'exportBulkVipPdf'])->name('vip.bulk-exportPdf');
+
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
     Route::post('/import-logs/clear', [ImportLogController::class, 'clearLogs'])->name('admin.import-logs.clear');
