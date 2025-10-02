@@ -43,7 +43,7 @@
             </div>
 
             <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; gap: 20px;">
-                <h3 style="text-align: right !important; font-weight: bold; color: #cc0000;">{{ __db('assigned_drivers') }}</h3>
+                <h3 style="text-align: right !important; font-weight: bold; color: #cc0000;">{{ __db('assigned_escorts') }}</h3>
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9;font-size: 13px">
@@ -84,7 +84,7 @@
             </div>
 
             <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; gap: 20px; margin-top:5%;">
-                <h3 style="text-align: right !important; font-weight: bold; color: #cc0000;"> {{ __db('unassigned_drivers') }}</h3>
+                <h3 style="text-align: right !important; font-weight: bold; color: #cc0000;"> {{ __db('unassigned_escorts') }}</h3>
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9;font-size: 13px">
