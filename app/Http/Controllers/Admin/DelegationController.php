@@ -523,7 +523,7 @@ class DelegationController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
         $now = now();
 
-        $oneHourAgo = $now->copy()->subHour();
+        $oneHourAgo = $now->copy()->subHour(1);
         $oneHourFromNow = $now->copy()->addHours(1);
 
         // Set default date range to today if not provided
