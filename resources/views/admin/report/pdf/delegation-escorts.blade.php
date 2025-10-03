@@ -40,7 +40,7 @@
                     </td>
 
                     <td style="width: 25%; text-align: right; vertical-align: middle;">
-                        <img src="{{ public_path(getAdminEventPDFLogo()) }}" 
+                        <img src="{{ asset(getAdminEventPDFLogo()) }}" 
                             alt="{{ getCurrentEventName() }}" 
                             style="width: 150px; height: auto;">
                     </td>
