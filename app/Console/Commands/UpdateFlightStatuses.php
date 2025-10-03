@@ -1,4 +1,5 @@
 <?php
+// app/Console/Commands/UpdateFlightStatuses.php
 
 namespace App\Console\Commands;
 
@@ -6,65 +7,82 @@ use Illuminate\Console\Command;
 use App\Models\DelegateTransport;
 use App\Services\DelegationStatusService;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class UpdateFlightStatuses extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'flights:update-statuses';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Automatically update flight statuses based on current time';
-
+    protected $description = 'Automatically update flight statuses and related participation statuses';
 
     public function handle()
     {
         $this->info('Updating flight statuses...');
-        
+
+        $service = new DelegationStatusService();
         $oneHourAgo = Carbon::now()->subHour();
-        $passedArrivals = DelegateTransport::where('type', 'arrival')
+
+        $affectedDelegateIds = collect();
+        $affectedDelegationIds = collect();
+
+        $passedArrivals = DelegateTransport::with('delegate.delegation')
+            ->where('type', 'arrival')
             ->where('date_time', '<', $oneHourAgo)
+            ->where('status', '!=', 'arrived')
             ->get();
-            
-        $updatedCount = 0;
-        
+
+        $updatedArrivals = 0;
         foreach ($passedArrivals as $arrival) {
-            if ($arrival->status != 'arrived') {
-                $arrival->status = 'arrived';
-                $arrival->save();
-                $updatedCount++;
+            $arrival->status = 'arrived';
+            $arrival->save();
+            $updatedArrivals++;
+            if ($arrival->delegate) {
+                $affectedDelegateIds->push($arrival->delegate_id);
+                if ($arrival->delegate->delegation) {
+                    $affectedDelegationIds->push($arrival->delegate->delegation->id);
+                }
             }
         }
-        
-        $this->info("Updated {$updatedCount} arrival statuses to 'Arrived'");
-        
-        $passedDepartures = DelegateTransport::where('type', 'departure')
+        $this->info("Updated {$updatedArrivals} arrival statuses to 'Arrived'");
+
+        $passedDepartures = DelegateTransport::with('delegate.delegation')
+            ->where('type', 'departure')
             ->where('date_time', '<', $oneHourAgo)
+            ->where('status', '!=', 'departed')
             ->get();
-            
-        $departedCount = 0;
-        
+
+        $updatedDepartures = 0;
         foreach ($passedDepartures as $departure) {
-            if ($departure->status != 'departed') {
-                $departure->status = 'departed';
-                $departure->save();
-                $departedCount++;
+            $departure->status = 'departed';
+            $departure->save();
+            $updatedDepartures++;
+            if ($departure->delegate) {
+                $affectedDelegateIds->push($departure->delegate_id);
+                if ($departure->delegate->delegation) {
+                    $affectedDelegationIds->push($departure->delegate->delegation->id);
+                }
             }
         }
-        
-        $this->info("Updated {$departedCount} departure statuses to 'Departed'");
-        
-        $this->info('Updating delegation statuses...');
-        $delegationService = new DelegationStatusService();
-        $delegationService->updateAllDelegationStatuses();
-        
+        $this->info("Updated {$updatedDepartures} departure statuses to 'Departed'");
+
+        $affectedDelegateIds = $affectedDelegateIds->unique()->values();
+        if ($affectedDelegateIds->isNotEmpty()) {
+            $delegates = \App\Models\Delegate::with(['delegateTransports', 'delegation'])
+                ->whereIn('id', $affectedDelegateIds)->get();
+
+            foreach ($delegates as $delegate) {
+                $service->updateDelegateParticipationStatus($delegate);
+            }
+        }
+
+        $affectedDelegationIds = $affectedDelegationIds->unique()->values();
+        if ($affectedDelegationIds->isNotEmpty()) {
+            $delegations = \App\Models\Delegation::with(['delegates'])->whereIn('id', $affectedDelegationIds)->get();
+
+            foreach ($delegations as $delegation) {
+                $service->updateDelegationParticipationStatus($delegation);
+            }
+        }
+
         $this->info('Flight status update completed.');
     }
 }
