@@ -12,6 +12,7 @@ use App\Models\Interview;
 use App\Models\DelegationEscort;
 use App\Models\DelegationDriver;
 use App\Models\DelegateTransport;
+use App\Models\DropdownOption;
 use App\Models\Accommodation;
 use App\Models\AccommodationRoom;
 use App\Models\AccommodationContact;
@@ -776,7 +777,6 @@ class ReportController extends Controller
 
         $delegates = $newQuery->get();
 
-
         return view('admin.report.vip_report', compact('delegates'));
     }
 
@@ -856,4 +856,99 @@ class ReportController extends Controller
         $reportName = 'vip_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
+
+    public function wivesReport(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['country_id', 'invitation_from']);
+
+        $femaleId = DropdownOption::whereHas('dropdown', function ($q) {
+                                        $q->where('code', 'gender');
+                                    })
+                                    ->where('code', 2) // "2" => Female 
+                                    ->value('id');
+        
+        $delegates = Delegate::with([
+                                'delegation.invitationFrom',
+                                'delegation.country',
+                                'delegation.escorts' => function ($q) use ($femaleId) {
+                                    $q->where('gender_id', $femaleId); 
+                                }
+                            ])
+                            ->where('gender_id', $femaleId) 
+                            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                            ->where('delegations.event_id', $currentEventId)
+                            ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                                $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                            })
+                            ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                                $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                            })
+                            ->orderBy('country_sort.sort_order', 'asc')
+                            ->orderBy('invitation_from_sort.sort_order', 'asc')
+                            ->select('delegates.*')
+                            ->get();
+
+        return view('admin.report.wives_report', compact('delegates'));
+    }
+
+    public function exportBulkWivesPdf(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['country_id', 'invitation_from']);
+        
+        $femaleId = DropdownOption::whereHas('dropdown', function ($q) {
+                                        $q->where('code', 'gender');
+                                    })
+                                    ->where('code', 2) // "2" => Female 
+                                    ->value('id');
+        
+        $delegates = Delegate::with([
+                                'delegation.invitationFrom',
+                                'delegation.country',
+                                'delegation.escorts' => function ($q) use ($femaleId) {
+                                    $q->where('gender_id', $femaleId); 
+                                }
+                            ])
+                            ->where('gender_id', $femaleId) 
+                            ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                            ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                            ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                            ->where('delegations.event_id', $currentEventId)
+                            ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                                $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                            })
+                            ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                                $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                            })
+                            ->orderBy('country_sort.sort_order', 'asc')
+                            ->orderBy('invitation_from_sort.sort_order', 'asc')
+                            ->select('delegates.*')
+                            ->get();
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'wives_report';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+
+        $html = view('admin.report.pdf.wives_report-bulk', compact('delegates'))->render();
+
+        $mpdf->WriteHTML($html);
+        $reportName = 'wives_report'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');
+    }
+
 }
