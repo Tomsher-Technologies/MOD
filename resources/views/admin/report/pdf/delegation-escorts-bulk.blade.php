@@ -124,11 +124,11 @@
                                 $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                         
                                 $teamHead.= '<tr style="border: 1px solid #000;">                                    
-                                    <td style="padding: 8px; border: 1px solid #000;">'.date('H:i', strtotime($departure?->date_time)).'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_no).'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_name).'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.date('H:i', strtotime($departure?->date_time)).'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_no).'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_name).'</td>
                                 </tr>';
                             }
                         @endphp
@@ -140,23 +140,23 @@
                                 }
                                 $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
                             @endphp
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->flight_no ?? '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
                                 {{ $arrival?->flight_name ?? '-' }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
                                 {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : 'Not Required'}}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) color: red; @endif ">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif ">
                                 {{ $delegate->internalRanking?->value ?? $relation }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) color: red; @endif  font-bold">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif  font-bold">
                                 {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $key + 1 }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $key + 1 }}</td>
                         </tr>
                     @empty
                         <tr class="border-t">
@@ -260,13 +260,13 @@
                         <tbody style="text-align: center;">
                             @forelse ($delegation->drivers as $keyDriver => $rowDriver)
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_type ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->phone_number ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->car_number ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->car_type ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->phone_number ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">
                                         {{ $rowDriver->name ?? '-' }}
                                     </td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $keyDriver + 1 }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $keyDriver + 1 }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -318,11 +318,11 @@
                                 @endphp
 
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">-</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ date('H:i', strtotime($row->date_time)) }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{!! $interviewMembers !!}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $in + 1 }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">-</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ date('H:i', strtotime($row->date_time)) }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{!! $interviewMembers !!}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $in + 1 }}</td>
                                 </tr>
                             @empty
                                 <tr>
