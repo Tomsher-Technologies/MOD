@@ -930,16 +930,13 @@ class ReportController extends Controller
 
         $today = date('Y-m-d-H-i');
         $reportName = 'wives_report';
-        $lang = getActiveLanguage();
-        $dir = ($lang == 'ar') ? 'rtl' : 'ltr';
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             // 'format' => 'A4',
             'format' => 'A4-L',
             'margin_top' => 40,
             'margin_bottom' => 20,
-            'default_font' => 'amiri',
-            'direction' => $dir,
+            'default_font' => 'amiri'
         ]);
 
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
