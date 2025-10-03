@@ -10,7 +10,7 @@
 </style>
     <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('delegations_heads_arrival') }}</h2>
+            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('vip_report') }}</h2>
         </div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             
@@ -23,10 +23,10 @@
                         </div>
 
                         <div class="w-[50%]">
-                            <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }} {{ __db('invitation_from') }}" class="select2 rounded-lg border border-gray-300 text-sm w-full">
-                                <option value="">{{ __db('select') }} {{ __db('invitation_from') }}</option>
-                                @foreach (getDropDown('departments')->options as $option)
-                                    <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
+                            <select name="internal_ranking[]" multiple data-placeholder="{{ __db('internal_ranking') }}" class="select2 rounded-lg border border-gray-300 text-sm w-full">
+                                <option value="">{{ __db('select') }} {{ __db('internal_ranking') }}</option>
+                                @foreach (getDropDown('internal_ranking')->options as $option)
+                                    <option value="{{ $option->id }}" @if (in_array($option->id, request('internal_ranking', []))) selected @endif>
                                         {{ $option->value }}
                                     </option>
                                 @endforeach
@@ -38,7 +38,7 @@
                     <div class="w-[30%]"> 
                         <button type="submit" class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
 
-                        <a href="{{ route('report.heads-arrivals') }}"
+                        <a href="{{ route('report.vip') }}"
                             class=" end-[80px]  bottom-[3px] mr-2 border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">{{ __db('reset') }}</a>
                     </div>
                         
@@ -46,8 +46,8 @@
             </form>
 
             <div class="flex gap-3 ms-auto">
-                @directCanany(['export_delegations_head_arrival'])
-                    <form action="{{ route('heads-arrivals.bulk-exportPdf') }}" method="POST" style="display:inline;">
+                @directCanany(['export_vip'])
+                    <form action="{{ route('vip.bulk-exportPdf') }}" method="POST" style="display:inline;">
                         @csrf
                         @foreach (request()->except('limit', 'page') as $key => $value)
                             @if (is_array($value))
@@ -69,38 +69,13 @@
         </div>
 
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" dir="ltr">
-            {{-- <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                    <div style="width: auto;">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="{{ env('APP_NAME') }}"
-                            style="height: auto; width: 150px;">
-
-                    </div>
-                    <div style="text-align: center; width: 50%;">
-                        <div style="font-size: 20px; font-weight: bold;">{{ __db('united_arab_emirates') }}</div>
-                        <div style="font-size: 20px; font-weight: bold; margin-top: 5px;">{{ __db('ministry_of_defense') }}</div>
-                        <div style="font-size: 20px; font-weight: bold; color: #cc0000; margin-top: 5px;">{{ __db('delegations_heads_arrival') }}</div>
-                    </div>
-                    <div style=" width: auto; text-align: right;">
-                        <img src="{{ getAdminEventLogo() }}" alt="{{ getCurrentEventName() }}"
-                            style=" width: 150px; height: auto;">
-                    </div>
-                </div>
-                <div style="text-align: right; font-size: 0.9em; margin-top:10px;">{{ date('d-m-Y H:i A') }}</div>
-
-            </div> --}}
-
             <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; gap: 20px;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9; font-size: 13px">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('invitation_from') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('hotel') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('departure') }} </th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('arrival') }} </th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('airport') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('escort') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('delegation_head') }}</th>
@@ -109,39 +84,41 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
-                        @foreach ($headsArrivals as $i => $arrival)
+                        @foreach ($delegates as $i => $del)
+                            @php
+                                $arrival_date = $departure_date = '';
+                                if($del->arrivals->isNotEmpty()){
+                                    $arrival_date = $del->arrivals->first()->date_time;
+                                }
+                                if($del->departures->isNotEmpty()){
+                                    $departure_date = $del->departures->first()->date_time;
+                                }
+                            @endphp
                             <tr>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->delegate?->delegation?->invitationFrom?->value ?? '-' }}
+                                    {{ $departure_date ? \Carbon\Carbon::parse($departure_date)?->format('d-m-Y') : '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->delegate?->currentRoomAssignment?->hotel?->hotel_name ?? '-' }}
+                                    {{  $arrival_date ? \Carbon\Carbon::parse($arrival_date)?->format('H:i') : '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->date_time ? \Carbon\Carbon::parse($arrival?->date_time)?->format('H:i') : '-' }}
-                                </td>
-                                <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->date_time ? \Carbon\Carbon::parse($arrival?->date_time)?->format('d-m-Y') : '-' }}
-                                </td>
-                                <td style="padding: 8px; border: 2px solid #000; text-align: center;">{{ $arrival?->flight_no ?? '-' }}</td>
-                                <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}
+                                    {{  $arrival_date ? \Carbon\Carbon::parse($arrival_date)?->format('d-m-Y') : '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     @php
-                                        $escort = $arrival?->delegate?->delegation?->escorts?->first();
+                                        $escort = $del?->delegation?->escorts?->first();
                                     @endphp
                                     {{ $escort?->code ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->delegate?->getTranslation('designation') ?? '-' }}
+                                    {{ $del->internalRanking?->value ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->delegate?->getTranslation('title') }}
-                                    {{ $arrival?->delegate?->getTranslation('name') ?? '-' }}
+                                    {{ $del->getTranslation('title') }}
+                                    {{ $del->getTranslation('name') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $arrival?->delegate?->delegation?->country?->name ?? '-' }}
+                                    {{ $del->delegation?->country?->name ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $i + 1 }}

@@ -135,4 +135,27 @@ class Delegate extends Model
 
         return !empty($arabicContent) ? $arabicContent : $englishContent;
     }
+
+    public function arrivals()
+    {
+        return $this->hasMany(DelegateTransport::class)->where('type', 'arrival');
+    }
+
+    public function departures()
+    {
+        return $this->hasMany(DelegateTransport::class)->where('type', 'departure');
+    }
+
+    public function arrivalsFiltered($filters = [])
+    {
+        return $this->hasMany(DelegateTransport::class, 'delegate_id')
+                    ->where('type', 'arrival')
+                    ->when(!empty($filters['date_range']), function($q) use ($filters) {
+                        [$start, $end] = array_map('trim', explode(' - ', $filters['date_range']));
+                        $start = \Carbon\Carbon::parse($start)->startOfDay();
+                        $end = \Carbon\Carbon::parse($end)->endOfDay();
+                        $q->whereBetween('date_time', [$start->toDateTimeString(), $end->toDateTimeString()]);
+                        // $q->whereBetween('date_time', [$start, $end]);
+                    });
+    }
 }
