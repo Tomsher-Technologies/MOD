@@ -31,7 +31,7 @@
                             <td style="padding: 6px;text-align: center; border: 2px solid #000; width: 75%;">
                                 {{ $hotel->hotel_name }}
                             </td>
-                            <td style="padding: 6px; border: 2px solid #000; text-align: right; width: 25%;">
+                            <td style="padding: 6px; border: 2px solid #000; width: 25%;text-align: center;">
                                 {{ __db('hotel_name') }}
                             </td>
                         </tr>
@@ -52,7 +52,7 @@
                             <!-- Remaining Rooms Table -->
                             <td style="width: 30%; vertical-align: top;">
                                 <table style="width: 100%; background-color: white;">
-                                    <tbody>
+                                    <tbody style="text-align: center;">
                                         <tr class="header-row" style="font-weight: 600; background-color: #f0f0f0;">
                                             <td style="border: 1px solid black; padding: 8px;"><b>{{ __db('total_remaining') }}</b></td>
                                             <td style="text-align: right;border: 1px solid black; padding: 8px;"><b>{{ $totalAvailable }}</b></td>
@@ -81,7 +81,7 @@
                             <!-- Accommodated Rooms Table -->
                             <td style="width: 30%; vertical-align: top;">
                                 <table style="width: 100%; background-color: white;">
-                                    <tbody>
+                                    <tbody style="text-align: center;">
                                         <tr class="header-row" style="font-weight: bold; background-color: #f0f0f0;">
                                             <td style="border: 1px solid black; padding: 8px;"><b>{{ __db('total_accommodations') }}</b></td>
                                             <td style="text-align: right;border: 1px solid black; padding: 8px;"><b>{{ $totalAssigned }}</b></td>
@@ -94,7 +94,7 @@
                             <!-- Total Rooms Table -->
                             <td style="width: 30%; vertical-align: top;">
                                 <table style="width: 100%; background-color: white;">
-                                    <tbody>
+                                    <tbody style="text-align: center;">
                                         <tr class="header-row" style="font-weight: bold; background-color: #f0f0f0;">
                                             <td style="border: 1px solid black; padding: 8px;"><b>{{ __db('total_rooms') }}</b></td>
                                             <td style="text-align: right;border: 1px solid black; padding: 8px;"><b>{{ $totalRooms }}</b></td>

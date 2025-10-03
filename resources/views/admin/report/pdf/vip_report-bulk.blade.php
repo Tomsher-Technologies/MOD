@@ -62,7 +62,9 @@
                                     @php
                                         $escort = $del?->delegation?->escorts?->first();
                                     @endphp
-                                    {{ $escort?->code ?? '-' }}
+                                    {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
+                                    <br>
+                                    {{ $escort?->phone_number }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $del->internalRanking?->value ?? '-' }}

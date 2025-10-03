@@ -39,10 +39,10 @@
                                 {{ $roomEscort?->room_number }} - {{ $roomEscort?->hotel?->hotel_name }} <strong> : {{ __db('accommodation') }}</strong>
                             </td>
                             <td style="padding: 6px; border: 0px;">
-                                {{ $escort->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                                {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
                             </td>
                             <td style="padding: 6px; border: 0px;text-align: right;">
-                               {{ $escort->internalRanking?->value }} {{ $escort->name }} ({{ $escort->code }})  @if($key == 0) <strong> : {{ __db('escort') }}</strong> @else <strong style="margin-right: 25px;"></strong> @endif
+                               {{ $escort?->internalRanking?->value }} {{ $escort?->name }} ({{ $escort?->military_number }})  @if($key == 0) <strong> : {{ __db('escort') }}</strong> @else <strong style="margin-right: 25px;"></strong> @endif
                                     
                             </td>
                         </tr>
@@ -115,7 +115,7 @@
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="text-align: center;">
                     @forelse ($delegation->delegates as $key => $delegate)
                         @php
                             $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -181,7 +181,7 @@
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;"> {{ __db('flight_name') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="text-align: center;">
                     @if($teamHead)
                         {!! $teamHead !!}
                     @else
@@ -257,7 +257,7 @@
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="text-align: center;">
                             @forelse ($delegation->drivers as $keyDriver => $rowDriver)
                                 <tr>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
@@ -293,7 +293,7 @@
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="text-align: center;">
                             @php
                                 $interviewData = $delegation->interviews ?? collect();
                                 $interviewMembers = '';
