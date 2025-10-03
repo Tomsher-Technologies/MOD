@@ -930,6 +930,7 @@ class ReportController extends Controller
 
         $today = date('Y-m-d-H-i');
         $reportName = 'wives_report';
+        $lang = getActiveLanguage();
         $dir = ($lang == 'ar') ? 'rtl' : 'ltr';
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
