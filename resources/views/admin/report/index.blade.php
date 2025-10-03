@@ -42,7 +42,7 @@
 
                             ['slug' => 'view_vip','name' => __db('vip_report'),'url' => route('report.vip')],
 
-                            ['slug' => 'view_wives','name' => __db('wives_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_wives','name' => __db('wives_report'),'url' => route('report.wives')],
 
                             ['slug' => 'view_arrivals_report','name' => __db('arrivals_report'),'url' => route('reports-delegations')],
 
