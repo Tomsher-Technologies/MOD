@@ -540,7 +540,7 @@ class ReportController extends Controller
                             ->get();
 
         $today = date('Y-m-d-H-i');
-        $reportName = 'delegation_heads_arrivals_report';
+        $reportName = 'delegations_heads_arrival';
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             // 'format' => 'A4',
@@ -558,7 +558,7 @@ class ReportController extends Controller
         $html = view('admin.report.pdf.head_arrivals_bulk', compact('headsArrivals'))->render();
 
         $mpdf->WriteHTML($html);
-        $reportName = 'delegation_heads_arrivals_report'.$today.'.pdf';
+        $reportName = 'delegations_heads_arrival'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
 
