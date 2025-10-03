@@ -24,7 +24,7 @@
 
                             ['slug' => 'view_delegations_escort','name' =>  __db('delegations_escort_report'),'url' => route('reports-delegations')],
 
-                            ['slug' => 'view_delegations_members','name' => __db('delegations_members_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_delegations_members','name' => __db('delegations_members_report'),'url' => route('report.delegation-members')],
 
                             ['slug' => 'view_delegations_without_escort','name' => __db('delegations_without_escort_report'),'url' => route('reports-delegations')],
 
