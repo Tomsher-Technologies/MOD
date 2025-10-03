@@ -930,16 +930,13 @@ class ReportController extends Controller
 
         $today = date('Y-m-d-H-i');
         $reportName = 'wives_report';
-        $lang = getActiveLanguage();
-        $dir = ($lang == 'ar') ? 'rtl' : 'ltr';
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             // 'format' => 'A4',
             'format' => 'A4-L',
             'margin_top' => 40,
             'margin_bottom' => 20,
-            'default_font' => 'amiri',
-            'direction' => $dir,
+            'default_font' => 'amiri'
         ]);
 
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
@@ -954,4 +951,82 @@ class ReportController extends Controller
         $mpdf->Output($reportName, 'D');
     }
 
+    public function delegationMembersReport(){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
+
+        $delegations = Delegation::with([
+                            'delegates' => function ($query) {
+                                $query->orderBy('team_head', 'desc');
+                            }
+                        ])
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                        })
+                        ->select('delegations.*')
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->get();
+       
+        return view('admin.report.delegation_members', compact('delegations'));
+    }
+
+    public function exportBulkDelegationMembersPdf(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $delegations = Delegation::with([
+                            'delegates' => function ($query) {
+                                $query->orderBy('team_head', 'desc');
+                            }
+                        ])
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                        })
+                        ->select('delegations.*')
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->get();
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'delegations_members_report';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+
+        $html = view('admin.report.pdf.delegations_members-bulk', compact('delegations'))->render();
+
+        $mpdf->WriteHTML($html);
+        $reportName = 'delegations_members_report'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');
+
+    }
 }
