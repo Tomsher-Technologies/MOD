@@ -431,7 +431,7 @@ class DelegationController extends Controller
         $currentEventId = session('current_event_id', getDefaultEventId());
         $now = now();
 
-        $oneHourAgo = $now->copy()->subHour();
+        $oneHourAgo = $now->copy()->subHour(1);
         $oneHourFromNow = $now->copy()->addHours(1);
 
         if (!$request->input('date_range') && !$request->input('from_date') && !$request->input('to_date')) {
