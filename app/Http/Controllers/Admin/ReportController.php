@@ -983,7 +983,7 @@ class ReportController extends Controller
 
     public function exportBulkDelegationMembersPdf(Request $request){
         $currentEventId = session('current_event_id', getDefaultEventId());
-
+        $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
         $delegations = Delegation::with([
                             'delegates' => function ($query) {
                                 $query->orderBy('team_head', 'desc');
