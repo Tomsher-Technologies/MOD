@@ -50,26 +50,26 @@
                     <table style="width: 100%; margin-top: 10px;">
                         <tr>
                             <!-- Remaining Rooms Table -->
-                            <td style="width: 30%; vertical-align: top;">
+                            <td style="width: 30%; vertical-align: top; text-align: center;">
                                 <table style="width: 100%; background-color: white;">
                                     <tbody style="text-align: center;">
                                         <tr class="header-row" style="font-weight: 600; background-color: #f0f0f0;">
-                                            <td style="border: 1px solid black; padding: 8px;"><b>{{ __db('total_remaining') }}</b></td>
-                                            <td style="text-align: right;border: 1px solid black; padding: 8px;"><b>{{ $totalAvailable }}</b></td>
+                                            <td style="border: 1px solid black; padding: 8px; text-align: center;"><b>{{ __db('total_remaining') }}</b></td>
+                                            <td style="text-align: right;border: 1px solid black; padding: 8px; text-align: center;"><b>{{ $totalAvailable }}</b></td>
                                         </tr>
                                         @foreach ($rooms as $room)
                                             <tr>
-                                                <td style="border: 1px solid black; padding: 8px;">{{ $room->roomType?->value ?? 'Unknown' }}</td>
-                                                <td style="text-align: right;border: 1px solid black; padding: 8px;">{{ $room->available_rooms }}</td>
+                                                <td style="border: 1px solid black; padding: 8px; text-align: center;">{{ $room->roomType?->value ?? 'Unknown' }}</td>
+                                                <td style="text-align: right;border: 1px solid black; padding: 8px; text-align: center;">{{ $room->available_rooms }}</td>
                                             </tr>
                                             @php
                                                 $accommodatedHtml .= '<tr>
-                                                                        <td style="border: 1px solid black; padding: 8px;">'. ($room->roomType?->value ?? 'Unknown') .'</td>
-                                                                        <td style="text-align:right;border: 1px solid black; padding: 8px;">'. $room->assigned_rooms .'</td>
+                                                                        <td style="border: 1px solid black; padding: 8px; text-align: center;">'. ($room->roomType?->value ?? 'Unknown') .'</td>
+                                                                        <td style="text-align:right;border: 1px solid black; padding: 8px; text-align: center;">'. $room->assigned_rooms .'</td>
                                                                     </tr>';
                                                 $totalHtml .= '<tr>
-                                                                    <td style="border: 1px solid black; padding: 8px;">'. ($room->roomType?->value ?? 'Unknown') .'</td>
-                                                                    <td style="text-align:right;border: 1px solid black; padding: 8px;">'. $room->total_rooms .'</td>
+                                                                    <td style="border: 1px solid black; padding: 8px; text-align: center;">'. ($room->roomType?->value ?? 'Unknown') .'</td>
+                                                                    <td style="text-align:right;border: 1px solid black; padding: 8px; text-align: center;">'. $room->total_rooms .'</td>
                                                                 </tr>';
                                             @endphp
                                         @endforeach
@@ -79,12 +79,12 @@
 
                             <td style="width:3%; "></td>
                             <!-- Accommodated Rooms Table -->
-                            <td style="width: 30%; vertical-align: top;">
+                            <td style="width: 30%; vertical-align: top; text-align: center;">
                                 <table style="width: 100%; background-color: white;">
                                     <tbody style="text-align: center;">
                                         <tr class="header-row" style="font-weight: bold; background-color: #f0f0f0;">
-                                            <td style="border: 1px solid black; padding: 8px;"><b>{{ __db('total_accommodations') }}</b></td>
-                                            <td style="text-align: right;border: 1px solid black; padding: 8px;"><b>{{ $totalAssigned }}</b></td>
+                                            <td style="border: 1px solid black; padding: 8px; text-align: center;"><b>{{ __db('total_accommodations') }}</b></td>
+                                            <td style="text-align: right;border: 1px solid black; padding: 8px; text-align: center;"><b>{{ $totalAssigned }}</b></td>
                                         </tr>
                                         {!! $accommodatedHtml !!}
                                     </tbody>
@@ -92,12 +92,12 @@
                             </td>
                             <td style="width:3% ;"></td>
                             <!-- Total Rooms Table -->
-                            <td style="width: 30%; vertical-align: top;">
+                            <td style="width: 30%; vertical-align: top; text-align: center;">
                                 <table style="width: 100%; background-color: white;">
                                     <tbody style="text-align: center;">
                                         <tr class="header-row" style="font-weight: bold; background-color: #f0f0f0;">
-                                            <td style="border: 1px solid black; padding: 8px;"><b>{{ __db('total_rooms') }}</b></td>
-                                            <td style="text-align: right;border: 1px solid black; padding: 8px;"><b>{{ $totalRooms }}</b></td>
+                                            <td style="border: 1px solid black; padding: 8px; text-align: center;"><b>{{ __db('total_rooms') }}</b></td>
+                                            <td style="text-align: right;border: 1px solid black; padding: 8px; text-align: center;"><b>{{ $totalRooms }}</b></td>
                                         </tr>
                                         {!! $totalHtml !!}
                                     </tbody>
