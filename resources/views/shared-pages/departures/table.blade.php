@@ -200,7 +200,7 @@
     };
 @endphp
 
-<div>
+<div id="departures-table-container">
     <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="departures-table" :data="$paginator"
         :row-class="$rowClass" />
 </div>
