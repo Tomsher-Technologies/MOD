@@ -189,11 +189,7 @@
                         </tr>
 
                         @if(($i + 1) % 2 == 0 && !$loop->last)
-                            <tr>
-                                <td colspan="10" style="border:0; padding:0;">
-                                    <div style="page-break-after: always;"></div>
-                                </td>
-                            </tr>
+                            <div style="page-break-after: always;"></div>
                         @endif
                     @endforeach
                 </tbody>
