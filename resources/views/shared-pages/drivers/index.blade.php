@@ -342,8 +342,10 @@
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
                     <option value="">{{ __db('all') }}</option>
-                    <option value="assigned" @if (request('assigned') == 'assigned') selected @endif>{{ __db('assigned') }}</option>
-                    <option value="unassigned" @if (request('assigned') == 'unassigned') selected @endif>{{ __db('unassigned') }}</option>
+                    <option value="assigned" @if (request('assigned') == 'assigned') selected @endif>{{ __db('assigned') }}
+                    </option>
+                    <option value="unassigned" @if (request('assigned') == 'unassigned') selected @endif>
+                        {{ __db('unassigned') }}</option>
                 </select>
             </div>
 
