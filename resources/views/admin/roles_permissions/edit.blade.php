@@ -28,6 +28,7 @@
                         <option value="escort" {{ (old('module', $role->module) == 'escort') ? 'selected' : '' }}>{{ __db('escort') }}</option>
                         <option value="driver" {{ (old('module', $role->module) == 'driver') ? 'selected' : '' }}>{{ __db('driver') }}</option>
                         <option value="hotel" {{ (old('module', $role->module) == 'hotel') ? 'selected' : '' }}>{{ __db('hotel') }}</option>
+                        <option value="top-management" {{ (old('module', $role->module) == 'top-management') ? 'selected' : '' }}>{{ __db('top_management') }}</option>
                     </select>
                     @error('module')
                         <div class="text-red-600">{{ $message }}</div>

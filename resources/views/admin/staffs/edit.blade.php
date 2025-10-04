@@ -64,6 +64,7 @@
                                     <option value="escort" {{ (old('module', $staff->user_type) == "escort") ? 'selected' : '' }}>{{ __db('escort') }}</option>
                                     <option value="driver" {{ (old('module', $staff->user_type) == "driver") ? 'selected' : '' }}>{{ __db('driver') }}</option>
                                     <option value="hotel" {{ (old('module', $staff->user_type) == "hotel") ? 'selected' : '' }}>{{ __db('hotel') }}</option>
+                                    <option value="top-management" {{ (old('module', $staff->user_type) == "top-management") ? 'selected' : '' }}>{{ __db('top_management') }}</option>
                                 </select>
                                 @error('module')
                                     <div class="text-red-600">{{ $message }}</div>
