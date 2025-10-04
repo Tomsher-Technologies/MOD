@@ -48,7 +48,7 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 10px">
-                    @foreach ($delegates as $i => $del)
+                    @foreach ($delegates as $idel => $del)
                         @php
                             $arrival_date = $departure_date = '';
                             if ($del->arrivals->isNotEmpty()) {
@@ -119,7 +119,7 @@
                                 {{ $del->delegation?->country?->name ?? '-' }}
                             </td>
                             <td style="padding: 8px; border-right: 2px solid #000; text-align: center;">
-                                {{ $i + 1 }}
+                                {{ $idel + 1 }}
                             </td>
                         </tr>
 
@@ -188,7 +188,7 @@
                             </td>
                         </tr>
 
-                        @if(($i + 1) % 2 == 0 && !$loop->last)
+                        @if(($idel + 1) % 2 == 0 && !$loop->last)
                             <div style="page-break-after: always;"></div>
                         @endif
                     @endforeach
