@@ -73,8 +73,8 @@
                             $drivers = $del?->delegation?->drivers;
 
                             $driverCount = count($drivers);
-                            $ulStyle = 'list-style:none; margin:0; padding:0;';
-                            $liStyle = 'padding:4px 0;';
+                            $ulStyle = 'list-style:none !important; margin:0; padding:0;';
+                            $liStyle = 'padding:4px 0;list-style:none !important;';
 
                             $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '<ul style="' . $ulStyle . '">';
 
@@ -224,19 +224,19 @@
                                             <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
                                                 {{ __db('driver') }}
                                             </th>
-                                            <th style="width: 7%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                            <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
                                                 {{ __db('no_of_delegates') }}
                                             </th>
-                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                            <th style="width: 11%; padding: 8px; border: 2px solid #000; text-align: center;">
                                                 {{ __db('position') }}
                                             </th>
-                                            <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                            <th style="width: 16%; padding: 8px; border: 2px solid #000; text-align: center;">
                                                 {{ __db('delegation_head') }}
                                             </th>
-                                            <th style="width: 12%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
                                                 {{ __db('country') }}
                                             </th>
-                                            <th style="width: 5%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                            <th style="width: 4%; padding: 8px; border: 2px solid #000; text-align: center;">
                                                 {{ __db('sl_no') }}
                                             </th>
                                         </tr>
