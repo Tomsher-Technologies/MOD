@@ -508,16 +508,8 @@ class AccommodationController extends Controller
                 ->where('active_status', 1)
                 ->exists();
                 
-            $existingAssignment = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type_id)
-                ->where('room_number', $request->room_number)
-                ->where('assignable_id', '!=', $user->id)
-                ->where('active_status', 1)
-                ->first();
-
             $roomType = AccommodationRoom::with('roomType')->find($request->room_type_id);
             $availableRooms = $roomType->available_rooms;
-
 
             if ($alreadyAssignedExternal) {
                 return response()->json(['success' => 3]);
