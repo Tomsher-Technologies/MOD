@@ -1029,4 +1029,80 @@ class ReportController extends Controller
         $mpdf->Output($reportName, 'D');
 
     }
+
+     public function delegationWithoutEscortsReport(){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
+
+        $delegations = Delegation::with([
+                            'delegates' => function ($query) {
+                                $query->orderBy('team_head', 'desc');
+                            }
+                        ])
+                        ->whereDoesntHave('escorts')
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->select('delegations.*')
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->get();
+       
+        return view('admin.report.without_escorts', compact('delegations'));
+    }
+
+    public function exportBulkDelegationWithoutEscortsPdf(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
+
+        $delegations = Delegation::with([
+                            'delegates' => function ($query) {
+                                $query->orderBy('team_head', 'desc');
+                            }
+                        ])
+                        ->whereDoesntHave('escorts')
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->select('delegations.*')
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->get();
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'delegations_without_escort_report';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+
+        $html = view('admin.report.pdf.without_escorts-bulk', compact('delegations'))->render();
+
+        $mpdf->WriteHTML($html);
+        $reportName = 'delegations_without_escort_report'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');
+
+    }
 }

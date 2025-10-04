@@ -63,17 +63,23 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         $user = Auth::user();
-        $user_type = $user->user_type;
-        Auth::logout();
 
-        // if ($request->is('mod-events/*') || $request->is('mod-events')) {
-        //     return redirect()->route('admin.login');
-        // }
-        if(in_array($user_type, ['admin', 'staff'])){
-            return redirect()->route('admin.login');
+        if ($user) {
+            $user_type = $user->user_type;
+            Auth::logout();
+
+            // if ($request->is('mod-events/*') || $request->is('mod-events')) {
+            //     return redirect()->route('admin.login');
+            // }
+
+            // if (in_array($user_type, ['admin', 'staff'])) {
+            //     return redirect()->route('admin.login');
+            // }
+
+            return redirect()->route('home');
         }
-        
-        return redirect()->route('login');
+
+        return redirect()->route('home');
     }
 
     public function checkUsername(Request $request)
