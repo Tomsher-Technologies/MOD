@@ -168,7 +168,7 @@
                                 </td>
                             </tr>
 
-                            @php
+                            {{-- @php
                                 $minDrivers = 5; // minimum drivers
                                 $rowsPerDriver = 2; // 2 rows per driver
 
@@ -184,9 +184,9 @@
                                 }
 
                                 $totalCols = 10; 
-                            @endphp
+                            @endphp --}}
 
-                            @for ($i = 0; $i < $totalRows; $i++)
+                            {{-- @for ($i = 0; $i < $totalRows; $i++)
                                 <tr>
                                     @for ($j = 0; $j < $totalCols; $j++)
                                         @php
@@ -196,7 +196,32 @@
                                         <td style="{{ $style }}"> </td>
                                     @endfor
                                 </tr>
-                            @endfor
+                            @endfor --}}
+
+                            <tr>
+                                <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                                <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
+                            </tr>
 
                             <tr>
                                 <td colspan="10" style="padding: 8px; border: 2px solid #000;">
