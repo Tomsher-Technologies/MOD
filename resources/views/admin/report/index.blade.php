@@ -20,7 +20,7 @@
                             ],
                             ['slug' => 'view_delegations_head_departure','name' => __db('delegations_heads_departure'),'url' => route('report.heads-departure')],
 
-                            ['slug' => 'view_delegations_cars','name' => __db('delegations_cars_report'), 'url' => route('reports-delegations')],
+                            ['slug' => 'view_delegations_cars','name' => __db('delegations_cars_report'), 'url' => route('report.delegation-cars')],
 
                             ['slug' => 'view_delegations_escort','name' =>  __db('delegations_escort_report'),'url' => route('reports-delegations')],
 
