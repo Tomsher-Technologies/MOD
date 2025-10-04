@@ -48,7 +48,7 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 10px">
-                     @foreach ($delegates as $i => $del)
+                    @foreach ($delegates as $i => $del)
                         @php
                             $arrival_date = $departure_date = '';
                             if ($del->arrivals->isNotEmpty()) {
@@ -125,14 +125,14 @@
 
                         @php
                             $minDrivers = 5; // minimum drivers
-                            $rowsPerDriver = 2; // 2 rows per driver
+                            $rowsPerDriver = 3; // 2 rows per driver
 
                             if ($driverCount === 0) {
                                 $totalRows = $minDrivers * $rowsPerDriver; 
                             } else {
                                 $totalRows = max($driverCount * $rowsPerDriver, $minDrivers * $rowsPerDriver);
                                 if ($driverCount >= $minDrivers) {
-                                    $totalRows = 2; 
+                                    $totalRows = 3; 
                                 }else{
                                     $totalRows = ($minDrivers - $driverCount) * $rowsPerDriver;
                                 }
@@ -187,6 +187,14 @@
                                 </table>
                             </td>
                         </tr>
+
+                        @if(($i + 1) % 2 == 0 && !$loop->last)
+                            <tr>
+                                <td colspan="10" style="border:0; padding:0;">
+                                    <div style="page-break-after: always;"></div>
+                                </td>
+                            </tr>
+                        @endif
                     @endforeach
                 </tbody>
             </table>
