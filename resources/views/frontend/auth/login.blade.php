@@ -2,7 +2,7 @@
 
 @section('content')
     <section class="bg-white dark:bg-dark-2 flex flex-wrap min-h-[100vh]">
-        <div class="lg:w-1/2 lg:block hidden">
+        <div class="lg:w-1/2 lg:block hidden px-2 py-2">
             <div class="flex items-center flex-col h-full justify-center">
                 <img src="{{ getloginImage() }}" alt="">
             </div>
@@ -10,18 +10,21 @@
         <div class="lg:w-1/2 py-8 px-6 flex flex-col justify-center">
             <div class="lg:max-w-[464px] mx-auto w-full">
                 <div>
-                    <a href="index.html" class="mb-2.5 max-w-[290px]">
+                    <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
+                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="">
+                    </a>
+                    <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
                         <img src="{{ getModuleEventLogo() }}" alt="">
                     </a>
                     <h4 class="mb-3">{{ __db('sign_in_to_your_account') }}</h4>
-                    <p class="mb-8 text-secondary-light text-lg">{{ __db('login_welcome_back') }}</p>
+                    <p class="mb-6 text-secondary-light text-lg">{{ __db('login_welcome_back') }}</p>
                 </div>
                 <form method="POST" action="{{ route('web.login') }}" autocomplete="off" id="loginForm">
                     @csrf
                     <div class="icon-field mb-4 relative">
                         <label for="password">{{ __db('username') }}</label>
                         <input id="username" type="text" 
-                            class="mt-2 form-control h-[50px] ps-11 border-neutral-300 bg-neutral-50 rounded-xl" 
+                            class=" form-control ps-11 border-neutral-300 bg-neutral-50 rounded-xl" 
                             name="username" 
                             value="{{ old('username') }}" 
                             autofocus 
@@ -32,7 +35,7 @@
                     <div id="eventWrapper" class="mt-4 mb-4 hidden">
                         <label for="event_id">{{ __db('event') }}</label>
                         <select name="event_id" id="event_id"
-                            class="mt-2 select2 form-control h-[50px] border-neutral-300 bg-neutral-50 rounded-xl">
+                            class="mt-2 select2 form-control border-neutral-300 bg-neutral-50 rounded-xl">
                             <option value="">{{ __db('select_an_event') }}</option>
                         </select>
                         
@@ -41,7 +44,7 @@
                     <div id="passwordWrapper" class="relative mb-5 hidden">
                         <label for="password">{{ __db('password') }}</label>
                         <div class="relative">
-                            <input id="password" type="password" class="mt-2  form-control h-[50px] ps-11 border-neutral-300 bg-neutral-50 rounded-xl" name="password" placeholder="{{ __db('password') }}">
+                            <input id="password" type="password" class="mt-2  form-control ps-11 border-neutral-300 bg-neutral-50 rounded-xl" name="password" placeholder="{{ __db('password') }}">
                             
                             <button type="button" onclick="togglePassword('password')" class="absolute mt-1 left-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-primary-600">
                                 <svg id="eye_open_password" xmlns="http://www.w3.org/2000/svg" 
@@ -83,7 +86,7 @@
                         <span id="password-error" class="text-red-500 text-xs hidden"></span>
                     </div>
                 
-                    <button type="button" id="loginBtn" class="btn text-md  !bg-[#B68A35] text-white rounded-lg h-12 mr-4">
+                    <button type="button" id="loginBtn" class="btn bg-[#B68A35] text-white justify-center text-md btn-sm px-1 py-2 w-[50%] rounded-xl mt-2">
                         {{ __db('login') }}
                     </button>
 

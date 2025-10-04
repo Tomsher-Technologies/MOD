@@ -155,17 +155,18 @@
         }
 
         const printWindow = window.open('', 'PRINT', 'height=800,width=1200');
-        printWindow.document.write('<html><head><title>' + document.title + '</title>');
+        printWindow.document.write('<html dir="rtl"><head><title>' + document.title + '</title>');
 
         printWindow.document.write('<style>' +
             '@media print {' +
             '.no-print { display: none !important; }' +
             'table { border-collapse: collapse !important; width: 100%; }' +
             'th, td { border: 1px solid #cbac71 !important; padding: 0.5rem !important; }' +
-            'th, td { text-align: center !important; }' +
-            'td:first-child,th:first-child { text-align: left !important; }' +
+            'th, td { text-align: right !important; }' +
+            'th:nth-child(2), td:nth-child(2) { text-align: center !important; }' +
+            'th:nth-child(3), td:nth-child(3) { text-align: center !important; }' +
             'th {color: #cbac71 !important; }' +
-            'svg { max-width: 85%; height: auto; }' +
+            'svg { display: block !important; margin: 0 auto !important; max-width: 85% !important; height: auto !important; }' +
             '}' +
             '</style>'
         );

@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'auth' => Authenticate::class,
+            'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
             'user_type' => \App\Http\Middleware\UserTypeMiddleware::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
