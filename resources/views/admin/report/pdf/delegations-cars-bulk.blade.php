@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+            font-size: 10px;
             color: #000;
             /* direction: rtl; */
             /* margin: 20px; */
@@ -21,12 +21,12 @@
 
     </style>
 </head>
-<body style="margin: 0; font-size: 12px;">
+<body style="margin: 0; font-size: 10px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="background-color: #d9d9d9; font-size: 13px">
+                    <tr style="background-color: #d9d9d9; font-size: 12px">
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">
                             {{ __db('driver') }}{{ __db('notes') }} </th>
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_type') }}
@@ -47,8 +47,8 @@
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                     </tr>
                 </thead>
-                <tbody style="font-size: 12px">
-                    @foreach ($delegates as $i => $del)
+                <tbody style="font-size: 10px">
+                     @foreach ($delegates as $i => $del)
                         @php
                             $arrival_date = $departure_date = '';
                             if ($del->arrivals->isNotEmpty()) {
@@ -92,30 +92,30 @@
                             $driverCarTypes .= '</ul>';
                         @endphp
                         <tr>
-                            <td style="padding: 8px;border-left: 2px solid #000; text-align: center;"></td>
-                            <td style="padding: 8px; text-align: center;">
+                            <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;"></td>
+                            <td style="padding: 8px; text-align: center; border-right: 2px solid #000;">
                                 {!! $driverCarTypes !!}
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {!! $driverCarNos !!}
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {!! $driverPhones !!}                                    
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {!! $driverNames !!}
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {{ $del->delegation?->delegates?->count() ?? '0' }}
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {{ $del->internalRanking?->value ?? '-' }}
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {{ $del->getTranslation('title') }}
                                 {{ $del->getTranslation('name') ?? '-' }}
                             </td>
-                            <td style="padding: 8px;text-align: center;">
+                            <td style="padding: 8px;text-align: center; border-right: 2px solid #000; ">
                                 {{ $del->delegation?->country?->name ?? '-' }}
                             </td>
                             <td style="padding: 8px; border-right: 2px solid #000; text-align: center;">
@@ -145,13 +145,8 @@
                             <tr>
                                 @for ($j = 0; $j < $totalCols; $j++)
                                     @php
-                                        $style = 'padding: 8px; text-align: center;';
-                                            if ($j == 0) {
-                                                $style .= ' border-left: 2px solid #000;';
-                                            }
-                                            if ($j == $totalCols - 1) {
-                                                $style .= ' border-right: 2px solid #000;';
-                                        } 
+                                        $style = 'padding: 8px; text-align: center; border-left: 2px solid #000; border-right: 2px solid #000;';
+                                            
                                     @endphp 
                                     <td style="{{ $style }}"> </td>
                                 @endfor
@@ -192,8 +187,6 @@
                                 </table>
                             </td>
                         </tr>
-
-
                     @endforeach
                 </tbody>
             </table>
