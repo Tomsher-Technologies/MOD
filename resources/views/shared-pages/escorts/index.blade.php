@@ -309,7 +309,6 @@
                 <select multiple name="internal_ranking_id[]"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
-                    <option value="">{{ __db('all') }}</option>
                     @foreach ($rankings as $ranking)
                         <option value="{{ $ranking->id }}" @if (is_array(request('internal_ranking_id', [])) && in_array($ranking->id, request('internal_ranking_id', []))) selected @endif>
                             {{ $ranking->value }}</option>

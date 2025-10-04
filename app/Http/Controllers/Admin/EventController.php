@@ -128,7 +128,7 @@ class EventController extends Controller
             ->get();
 
         $roles = Role::where('is_active', 1)->get();
-        $allModules = ['delegate', 'escort', 'driver', 'hotel'];
+        $allModules = ['delegate', 'escort', 'driver', 'hotel', 'top-management'];
         return view('admin.events.show', compact('event', 'assignedUsers', 'availableUsers', 'roles', 'allModules'));
     }
 
