@@ -76,32 +76,17 @@
                             $ulStyle = 'list-style:none !important; margin:0; padding:0;';
                             $liStyle = 'padding:4px 0;list-style:none !important;';
 
-                            $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '<ul style="' . $ulStyle . '">';
+                            $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '';
 
                             foreach ($drivers as $driver) {
-                                $driverNames .= '<li style="' . $liStyle . '">' 
-                                    . ($driver?->military_number ?? '') . ' - ' 
+                                $driverNames .= ($driver?->military_number ?? '') . ' - ' 
                                     . ($driver?->getTranslation('title') ?? '') . ' ' 
-                                    . ($driver?->getTranslation('name') ?? '-') 
-                                    . '</li>';
+                                    . ($driver?->getTranslation('name') ?? '-') . '<br>';
 
-                                $driverPhones .= '<li style="' . $liStyle . '">' 
-                                    . ($driver?->phone_number ?? '-') 
-                                    . '</li>';
-
-                                $driverCarNos .= '<li style="' . $liStyle . '">' 
-                                    . ($driver?->car_number ?? '-') 
-                                    . '</li>';
-
-                                $driverCarTypes .= '<li style="' . $liStyle . '">' 
-                                    . ($driver?->car_type ?? '-') 
-                                    . '</li>';
+                                $driverPhones .= ($driver?->phone_number ?? '-') . '<br>';
+                                $driverCarNos .= ($driver?->car_number ?? '-') . '<br>';
+                                $driverCarTypes .= ($driver?->car_type ?? '-') . '<br>';
                             }
-
-                            $driverNames .= '</ul>';
-                            $driverPhones .= '</ul>';
-                            $driverCarNos .= '</ul>';
-                            $driverCarTypes .= '</ul>';
                         @endphp
                         <tr>
                             <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;"></td>
