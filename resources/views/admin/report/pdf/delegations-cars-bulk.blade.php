@@ -19,6 +19,9 @@
         width: 100%;
     }
 
+    tr {
+        page-break-inside: avoid;
+    }
     </style>
 </head>
 <body style="margin: 0; font-size: 10px;">
@@ -189,7 +192,7 @@
                         </tr>
 
                         @if(($idel + 1) % 2 == 0 && !$loop->last)
-                            <div style="page-break-after: always;"></div>
+                            <tr style="page-break-after: always;"></tr>
                         @endif
                     @endforeach
                 </tbody>
