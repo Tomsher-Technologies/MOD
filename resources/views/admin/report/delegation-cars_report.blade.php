@@ -137,30 +137,30 @@
                                 $driverCarTypes .= '</ul>';
                             @endphp
                             <tr>
-                                <td style="padding: 8px;border-left: 2px solid #000; text-align: center;"></td>
-                                <td style="padding: 8px; text-align: center;">
+                                <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;"></td>
+                                <td style="padding: 8px; text-align: center; border-right: 2px solid #000;">
                                     {!! $driverCarTypes !!}
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {!! $driverCarNos !!}
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {!! $driverPhones !!}                                    
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {!! $driverNames !!}
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {{ $del->delegation?->delegates?->count() ?? '0' }}
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {{ $del->internalRanking?->value ?? '-' }}
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {{ $del->getTranslation('title') }}
                                     {{ $del->getTranslation('name') ?? '-' }}
                                 </td>
-                                <td style="padding: 8px;text-align: center;">
+                                <td style="padding: 8px;text-align: center; border-right: 2px solid #000; ">
                                     {{ $del->delegation?->country?->name ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;">
@@ -190,13 +190,8 @@
                                 <tr>
                                     @for ($j = 0; $j < $totalCols; $j++)
                                         @php
-                                            $style = 'padding: 8px; text-align: center;';
-                                                if ($j == 0) {
-                                                    $style .= ' border-left: 2px solid #000;';
-                                                }
-                                                if ($j == $totalCols - 1) {
-                                                    $style .= ' border-right: 2px solid #000;';
-                                            } 
+                                            $style = 'padding: 8px; text-align: center; border-left: 2px solid #000; border-right: 2px solid #000;';
+                                             
                                         @endphp 
                                         <td style="{{ $style }}"> </td>
                                     @endfor
