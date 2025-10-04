@@ -125,7 +125,7 @@
 
                         @php
                             $minDrivers = 5; // minimum drivers
-                            $rowsPerDriver = 3; // 2 rows per driver
+                            $rowsPerDriver = 2; // 2 rows per driver
 
                             if ($driverCount === 0) {
                                 $totalRows = $minDrivers * $rowsPerDriver; 
