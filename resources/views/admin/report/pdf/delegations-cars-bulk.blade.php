@@ -27,24 +27,36 @@
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
                     <tr style="background-color: #d9d9d9; font-size: 12px">
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">
-                            {{ __db('driver') }}{{ __db('notes') }} </th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_type') }}
+                        <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('driver') }}{{ __db('notes') }}
                         </th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_number') }}
+                        <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('car_type') }}
                         </th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('driver') }}
-                            {{ __db('mobile_number') }} </th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('driver') }}</th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">
-                            {{ __db('no_of_delegates') }}</th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}
+                        <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('car_number') }}
                         </th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">
-                            {{ __db('delegation_head') }}</th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}
+                        <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('driver') }} {{ __db('mobile_number') }}
                         </th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
+                        <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('driver') }}
+                        </th>
+                        <th style="width: 7%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('no_of_delegates') }}
+                        </th>
+                        <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('position') }}
+                        </th>
+                        <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('delegation_head') }}
+                        </th>
+                        <th style="width: 12%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('country') }}
+                        </th>
+                        <th style="width: 5%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('sl_no') }}
+                        </th>
                     </tr>
                 </thead>
                 <tbody style="font-size: 10px">
@@ -197,24 +209,36 @@
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background-color: #d9d9d9; font-size: 12px">
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('driver') }}{{ __db('notes') }} </th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_type') }}
+                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('driver') }}{{ __db('notes') }}
                                             </th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_number') }}
+                                            <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('car_type') }}
                                             </th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('driver') }}
-                                                {{ __db('mobile_number') }} </th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('driver') }}</th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('no_of_delegates') }}</th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}
+                                            <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('car_number') }}
                                             </th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('delegation_head') }}</th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}
+                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('driver') }} {{ __db('mobile_number') }}
                                             </th>
-                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
+                                            <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('driver') }}
+                                            </th>
+                                            <th style="width: 7%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('no_of_delegates') }}
+                                            </th>
+                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('position') }}
+                                            </th>
+                                            <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('delegation_head') }}
+                                            </th>
+                                            <th style="width: 12%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('country') }}
+                                            </th>
+                                            <th style="width: 5%; padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('sl_no') }}
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody style="font-size: 10px">
