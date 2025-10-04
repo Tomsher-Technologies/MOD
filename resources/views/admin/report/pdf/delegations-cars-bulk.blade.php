@@ -188,10 +188,36 @@
                             </td>
                         </tr>
 
-                        @if(($idel + 1) % 2 == 0 && !$loop->last)
-                            <tr>
-                                <td colspan="10" style="padding:0; margin:0; border:0; page-break-after: always;"></td>
-                            </tr>
+                        @php $isPageBreak = ($idel + 1) % 2 == 0 && !$loop->last; @endphp
+
+                        @if($isPageBreak)
+                                </tbody>
+                            </table>
+                            <div style="page-break-after: always;"></div>
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background-color: #d9d9d9; font-size: 12px">
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('driver') }}{{ __db('notes') }} </th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_type') }}
+                                            </th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('car_number') }}
+                                            </th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('driver') }}
+                                                {{ __db('mobile_number') }} </th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('driver') }}</th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('no_of_delegates') }}</th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}
+                                            </th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                                {{ __db('delegation_head') }}</th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}
+                                            </th>
+                                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="font-size: 10px">
                         @endif
                     @endforeach
                 </tbody>
