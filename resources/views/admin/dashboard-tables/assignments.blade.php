@@ -54,19 +54,19 @@
                                 </thead>
                                 <tbody>
                                     <tr class=" text-[12px] align-[middle]">
-                                        <td class="px-4 py-2 border border-gray-200">Escorts</td>
+                                        <td class="px-4 py-2 border border-gray-200">{{ __db('escorts') }}</td>
                                         <td class="px-4 py-2  text-center border border-gray-200">{{ $data['delegation_assignments']['assignedEscorts'] }}</td>
                                         <td class="px-4 py-2  text-center border border-gray-200">{{ $data['delegation_assignments']['notAssignedEscorts'] }}</td>
                                     </tr>
 
                                     <tr class=" text-[12px] align-[middle]">
-                                        <td class="px-4 py-2 border border-gray-200">Drivers</td>
+                                        <td class="px-4 py-2 border border-gray-200">{{ __db('drivers') }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['assignedDrivers'] }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['notAssignedDrivers'] }}</td>
                                     </tr>
 
                                     <tr class=" text-[12px] align-[middle]">
-                                        <td class="px-4 py-2 border border-gray-200">Hotels</td>
+                                        <td class="px-4 py-2 border border-gray-200">{{ __db('hotels') }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['assignedHotels'] }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['notAssignedHotels'] }}</td>
                                     </tr>
@@ -182,7 +182,7 @@
         }
 
         const printWindow = window.open('', 'PRINT', 'height=800,width=1200');
-        printWindow.document.write('<html><head><title>' + document.title + '</title>');
+        printWindow.document.write('<html dir="rtl"><head><title>' + document.title + '</title>');
 
         printWindow.document.write('<style>' +
             '@media print {' +
@@ -190,9 +190,9 @@
             'table { border-collapse: collapse !important; width: 100%; }' +
             'th, td { border: 1px solid #cbac71 !important; padding: 0.5rem !important; }' +
             'th, td { text-align: center !important; }' +
-            'td:first-child,th:first-child { text-align: left !important; }' +
+            
             'th {color: #cbac71 !important; }' +
-            'svg { max-width: 85%; height: auto; }' +
+            'svg { display: block !important; margin: 0 auto !important; max-width: 85% !important; height: auto !important;}' +
             '}' +
             '</style>'
         );
