@@ -39,10 +39,10 @@
                                 {{ $roomEscort?->room_number }} - {{ $roomEscort?->hotel?->hotel_name }} <strong> : {{ __db('accommodation') }}</strong>
                             </td>
                             <td style="padding: 6px; border: 0px;">
-                                {{ $escort->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                                {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
                             </td>
                             <td style="padding: 6px; border: 0px;text-align: right;">
-                               {{ $escort->internalRanking?->value }} {{ $escort->name }} ({{ $escort->code }})  @if($key == 0) <strong> : {{ __db('escort') }}</strong> @else <strong style="margin-right: 25px;"></strong> @endif
+                               {{ $escort?->internalRanking?->value }} {{ $escort?->name }} ({{ $escort?->military_number }})  @if($key == 0) <strong> : {{ __db('escort') }}</strong> @else <strong style="margin-right: 25px;"></strong> @endif
                                     
                             </td>
                         </tr>
@@ -115,7 +115,7 @@
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="text-align: center;">
                     @forelse ($delegation->delegates as $key => $delegate)
                         @php
                             $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -124,11 +124,11 @@
                                 $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                         
                                 $teamHead.= '<tr style="border: 1px solid #000;">                                    
-                                    <td style="padding: 8px; border: 1px solid #000;">'.date('H:i', strtotime($departure?->date_time)).'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_no).'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_name).'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.date('H:i', strtotime($departure?->date_time)).'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_no).'</td>
+                                    <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_name).'</td>
                                 </tr>';
                             }
                         @endphp
@@ -140,23 +140,23 @@
                                 }
                                 $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
                             @endphp
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->flight_no ?? '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
                                 {{ $arrival?->flight_name ?? '-' }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
                                 {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : 'Not Required'}}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) color: red; @endif ">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif ">
                                 {{ $delegate->internalRanking?->value ?? $relation }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) color: red; @endif  font-bold">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif  font-bold">
                                 {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $key + 1 }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $key + 1 }}</td>
                         </tr>
                     @empty
                         <tr class="border-t">
@@ -181,7 +181,7 @@
                         <th style="padding: 8px; border: 1px solid #000; text-align: center;"> {{ __db('flight_name') }}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style="text-align: center;">
                     @if($teamHead)
                         {!! $teamHead !!}
                     @else
@@ -257,16 +257,16 @@
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="text-align: center;">
                             @forelse ($delegation->drivers as $keyDriver => $rowDriver)
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_type ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->phone_number ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->car_number ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->car_type ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->phone_number ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">
                                         {{ $rowDriver->name ?? '-' }}
                                     </td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $keyDriver + 1 }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $keyDriver + 1 }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -293,7 +293,7 @@
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="text-align: center;">
                             @php
                                 $interviewData = $delegation->interviews ?? collect();
                                 $interviewMembers = '';
@@ -318,11 +318,11 @@
                                 @endphp
 
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">-</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ date('H:i', strtotime($row->date_time)) }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{!! $interviewMembers !!}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $in + 1 }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">-</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ date('H:i', strtotime($row->date_time)) }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{!! $interviewMembers !!}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $in + 1 }}</td>
                                 </tr>
                             @empty
                                 <tr>
