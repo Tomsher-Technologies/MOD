@@ -44,7 +44,7 @@
 
                             ['slug' => 'view_wives','name' => __db('wives_report'),'url' => route('report.wives')],
 
-                            ['slug' => 'view_arrivals_report','name' => __db('arrivals_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_arrivals_report','name' => __db('arrivals_report'),'url' => route('report.delegation-arrivals')],
 
                             ['slug' => 'view_arrival_hotels','name' => __db('arrival_hotels_report'),'url' => route('reports-delegations')],
 

@@ -2,7 +2,7 @@
 <html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>{{ __db('vip_report') }}</title>
+    <title>{{ __db('delegations_cars_report') }}</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
