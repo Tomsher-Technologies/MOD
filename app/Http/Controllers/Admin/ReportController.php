@@ -1270,6 +1270,7 @@ class ReportController extends Controller
                         })
                         ->groupBy('delegates.delegation_id', 'delegate_transports.mode', 'delegate_transports.flight_no', 'delegate_transports.date_time')
                         ->orderBy('delegate_transports.date_time', 'asc')
+                        ->orderBy('delegates.team_head', 'desc')
                         ->get();
 
         $allDelegateIds = $transportGroups->pluck('delegate_ids')
@@ -1280,6 +1281,7 @@ class ReportController extends Controller
 
         $delegates = Delegate::with('delegation')
                             ->whereIn('id', $allDelegateIds)
+                            ->orderBy('team_head', 'desc')
                             ->get()
                             ->keyBy('id');
 
@@ -1328,6 +1330,7 @@ class ReportController extends Controller
                         })
                         ->groupBy('delegates.delegation_id', 'delegate_transports.mode', 'delegate_transports.flight_no', 'delegate_transports.date_time')
                         ->orderBy('delegate_transports.date_time', 'asc')
+                        ->orderBy('delegates.team_head', 'desc')
                         ->get();
 
         $allDelegateIds = $transportGroups->pluck('delegate_ids')
@@ -1338,6 +1341,7 @@ class ReportController extends Controller
 
         $delegates = Delegate::with('delegation')
                             ->whereIn('id', $allDelegateIds)
+                            ->orderBy('team_head', 'desc')
                             ->get()
                             ->keyBy('id');
 
@@ -1406,6 +1410,7 @@ class ReportController extends Controller
                         })
                         ->groupBy('delegates.delegation_id', 'delegate_transports.mode', 'delegate_transports.flight_no', 'delegate_transports.date_time')
                         ->orderBy('delegate_transports.date_time', 'asc')
+                        ->orderBy('delegates.team_head', 'desc')
                         ->get();
 
         $allDelegateIds = $transportGroups->pluck('delegate_ids')
@@ -1416,6 +1421,7 @@ class ReportController extends Controller
 
         $delegates = Delegate::with('delegation')
                             ->whereIn('id', $allDelegateIds)
+                            ->orderBy('team_head', 'desc')
                             ->get()
                             ->keyBy('id');
 
@@ -1464,6 +1470,7 @@ class ReportController extends Controller
                         })
                         ->groupBy('delegates.delegation_id', 'delegate_transports.mode', 'delegate_transports.flight_no', 'delegate_transports.date_time')
                         ->orderBy('delegate_transports.date_time', 'asc')
+                        ->orderBy('delegates.team_head', 'desc')
                         ->get();
 
         $allDelegateIds = $transportGroups->pluck('delegate_ids')
@@ -1474,6 +1481,7 @@ class ReportController extends Controller
 
         $delegates = Delegate::with('delegation')
                             ->whereIn('id', $allDelegateIds)
+                            ->orderBy('team_head', 'desc')
                             ->get()
                             ->keyBy('id');
 
