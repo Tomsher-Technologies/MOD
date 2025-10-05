@@ -167,11 +167,7 @@
                             @php
                                 $delegateRoom = $delegate->currentRoomAssignment ?? null;
                                 $assignedHotels[] = $delegateRoom?->hotel_id ?? null;
-                                if($delegate->team_head == 1){
-                                    $departure = $delegate->delegateTransports->where('type', 'departure')->first();
-                            
-                                }
-
+                                
                                 $relation = '';
                                 if($delegate->relationship){
                                     $relation = $delegate->relationship?->value .' '. __db('of') .' '. $delegate->parent?->getTranslation('name');
