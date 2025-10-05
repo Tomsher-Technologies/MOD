@@ -2,7 +2,7 @@
 <html lang="en" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>{{ __db('arrivals_report') }}</title>
+    <title>{{ __db('departures_report') }}</title>
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
@@ -122,16 +122,12 @@
                             @php
                                 $delegateRoom = $delegate->currentRoomAssignment ?? null;
                                 $assignedHotels[] = $delegateRoom?->hotel_id ?? null;
-                                if($delegate->team_head == 1){
-                                    $departure = $delegate->delegateTransports->where('type', 'departure')->first();
-                            
-                                }
-
+                                
                                 $relation = '';
                                 if($delegate->relationship){
                                     $relation = $delegate->relationship?->value .' '. __db('of') .' '. $delegate->parent?->getTranslation('name');
                                 }
-                                $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                                $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                             @endphp
                             <tr>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $delegateRoom ? $delegateRoom?->room_number : '-' }}</td>
@@ -140,14 +136,14 @@
                                     {{ $delegateRoom?->hotel?->hotel_name ?? 'Not Required'}}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
-                                    {{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}
+                                    {{ $departure?->date_time ? date('H:i', strtotime($departure?->date_time)) : '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000;">
-                                    {{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}
+                                    {{ $departure?->date_time ? date('d-m-Y', strtotime($departure?->date_time)) : '-' }}
                                 </td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_name ?? '-' }}</td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $departure?->flight_no ?? '-' }}</td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $departure?->flight_name ?? '-' }}</td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $departure?->airport?->value ?? ucwords($departure?->mode) }}</td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $delegate->internalRanking?->value ?? $relation }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
                                     <strong>
