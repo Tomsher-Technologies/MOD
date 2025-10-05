@@ -1371,7 +1371,7 @@ class ReportController extends Controller
 
         $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
 
-        $html = view('admin.report.pdf.delegation-arrivals-bulk', compact('delegates'))->render();
+        $html = view('admin.report.pdf.delegation-arrivals-bulk', compact('formattedGroups'))->render();
 
         $mpdf->WriteHTML($html);
         $reportName = 'arrivals_report'.$today.'.pdf';
