@@ -1,75 +1,30 @@
-@extends('layouts.admin_account', ['title' => __db('reports')])
-
-@section('content')
-<style>
-    .select2-container--default .select2-selection--multiple {
-        min-height: 2rem !important;
-        /* height: 40px !important; */
-        padding: 0.2rem 0.75rem;
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ __db('arrival_hotels_report') }}</title>
+    <style>
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            color: #000;
+            /* direction: rtl; */
+            /* margin: 20px; */
+            text-align: right;
+        }
+    * { box-sizing: border-box; }
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;   
+        width: 100%;
     }
-</style>
-    <div>
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('arrivals_report') }}</h2>
-        </div>
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            
-             <form class="w-[75%] me-4"  method="GET"> 
-                <div class="flex relative">
-                    
-                    <div class="flex flex-row w-[70%] gap-4">
-                        <div class="w-[50%]">
-                            <input type="text" class="block w-full text-secondary-light text-sm !border-[#d1d5db] rounded-lg date-range" id="date_range" name="date_range" placeholder="DD-MM-YYYY - DD-MM-YYYY" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off" value="{{ request('date_range') }}">
-                        </div>
 
-                        <div class="w-[50%]">
-                            <select name="airport[]" multiple data-placeholder="{{ __db('select') }} {{ __db('airport') }}" class="select2 rounded-lg border border-gray-300 text-sm w-full">
-                                <option value="">{{ __db('select') }} {{ __db('airport') }}</option>
-                                @foreach (getDropDown('airports')->options as $option)
-                                    <option value="{{ $option->id }}" @if (in_array($option->id, request('airport', []))) selected @endif>
-                                        {{ $option->value }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-
-
-                    <div class="w-[30%]"> 
-                        <button type="submit" class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
-
-                        <a href="{{ route('report.delegation-arrivals') }}"
-                            class=" end-[80px]  bottom-[3px] mr-2 border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">{{ __db('reset') }}</a>
-                    </div>
-                        
-                </div>
-            </form>
-
-            <div class="flex gap-3 ms-auto">
-                @directCanany(['export_arrivals_report'])
-                    <form action="{{ route('delegation-arrivals.bulk-exportPdf') }}" method="POST" style="display:inline;">
-                        @csrf
-                        @foreach (request()->except('limit', 'page') as $key => $value)
-                            @if (is_array($value))
-                                @foreach ($value as $subKey => $subValue)
-                                    <input type="hidden" name="{{ $key }}[{{ $subKey }}]"
-                                        value="{{ $subValue }}">
-                                @endforeach
-                            @else
-                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                            @endif
-                        @endforeach
-                        <button type="submit" class="!text-[#5D471D]  !bg-[#E6D7A2] hover:bg-yellow-400 rounded-lg py-2 px-3">
-                            {{ __db('export_pdf') }}
-                        </button>
-                    </form>
-                @enddirectCanany
-                <x-back-btn class="" back-url="{{ route('reports.index') }}" />
-            </div>
-        </div>
-
-        <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" dir="ltr"  style="font-size: 12px">
-            @foreach($formattedGroups as $group)
+    </style>
+</head>
+<body style="margin: 0; font-size: 12px;">
+    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+        <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
+           @foreach($formattedGroups as $group)
                 @php
                     $delegation = $group->delegation;
                     $delegates = $group->delegates;
@@ -149,17 +104,18 @@
                 <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; border-bottom: 0;">
                     <thead>
                         <tr style="background-color: #d9d9d9;">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('room') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('room_type') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('hotel') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('time') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('date') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('flight_number') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('flight_name') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('airport') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('position') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('delegations') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('sl_no') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room_type') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('hotel') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('departure_date') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('arrival_date') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('delegations') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
                     <tbody style="text-align: center;">
@@ -173,6 +129,7 @@
                                     $relation = $delegate->relationship?->value .' '. __db('of') .' '. $delegate->parent?->getTranslation('name');
                                 }
                                 $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
+                                $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                             @endphp
                             <tr>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $delegateRoom ? $delegateRoom?->room_number : '-' }}</td>
@@ -180,15 +137,20 @@
                                 <td style="padding: 8px; border: 2px solid #000;">
                                     {{ $delegateRoom?->hotel?->hotel_name ?? 'Not Required'}}
                                 </td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $departure?->flight_no ?? '-' }}</td>
+                                <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
+                                    {{ $departure?->date_time ? date('H:i', strtotime($departure?->date_time)) : '-' }}
+                                </td>
+                                <td style="padding: 8px; border: 2px solid #000;">
+                                    {{ $departure?->date_time ? date('d-m-Y', strtotime($departure?->date_time)) : '-' }}
+                                </td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
                                     {{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000;">
                                     {{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}
                                 </td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_name ?? '-' }}</td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $delegate->internalRanking?->value ?? $relation }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
                                     <strong>
@@ -241,4 +203,5 @@
             @endforeach
         </div>
     </div>
-@endsection
+</body>
+</html>

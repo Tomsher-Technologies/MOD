@@ -304,6 +304,10 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::get('/reports/delegation-departures', [ReportController::class, 'delegationDeparturesReport'])->name('report.delegation-departures');
     Route::post('/delegation-departures/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationDeparturesPdf'])->name('delegation-departures.bulk-exportPdf');
 
+    // Hotels Arrivals Report
+    Route::get('/reports/hotels-arrivals', [ReportController::class, 'hotelsArrivalsReport'])->name('report.hotels-arrivals');
+    Route::post('/hotels-arrivals/bulk-export-pdf', [ReportController::class, 'exportBulkHotelsArrivalsPdf'])->name('hotels-arrivals.bulk-exportPdf');
+
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
     Route::post('/import-logs/clear', [ImportLogController::class, 'clearLogs'])->name('admin.import-logs.clear');

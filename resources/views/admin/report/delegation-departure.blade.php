@@ -162,7 +162,7 @@
                             <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody style="text-align: center;">
                         @forelse ($delegates as $key => $delegate)
                             @php
                                 $delegateRoom = $delegate->currentRoomAssignment ?? null;
