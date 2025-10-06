@@ -1717,4 +1717,159 @@ class ReportController extends Controller
         $reportName = 'arrival_hotels_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
+
+    public function interviewsReport(Request $request) {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['interviewee', 'date_range']);
+
+        $interviews = Interview::query()
+                    ->with([
+                        'toMembers.delegate',
+                        'otherMember', 
+                    ])
+                    ->whereHas('delegation', function ($q) use ($currentEventId) {
+                        $q->where('event_id', $currentEventId)
+                        ->whereHas('invitationStatus', fn($q2) => $q2->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
+                    })
+                    ->when(!empty($filters['date_range']), function ($query) use ($filters) {
+                        [$start, $end] = explode(' - ', $filters['date_range']);
+                        $start = \Carbon\Carbon::parse(trim($start))->startOfDay();
+                        $end = \Carbon\Carbon::parse(trim($end))->endOfDay();
+                        $query->whereBetween('date_time', [$start, $end]);
+                    })
+                    ->when(!empty($filters['interviewee']), function ($query) use ($filters) {
+                        [$type, $id] = explode('_', $filters['interviewee']);
+
+                        if ($type === 'delegate') {
+                            // Filter by delegate in toMembers
+                            $query->whereHas('toMembers', function ($q) use ($id) {
+                                $q->where('type', 'to')
+                                ->whereHas('delegate', fn($q2) => $q2->where('id', $id));
+                            });
+                        } elseif ($type === 'other') {
+                            // Filter by other member directly
+                            $query->where('other_member_id', $id);
+                        }
+                    })
+                    ->orderBy('date_time', 'asc')
+                    ->get()
+                    ->map(function ($interview) {
+                        $to = $interview->toMembers->first();
+
+                        $interview->interviewee_name = $to?->delegate?->name_en 
+                            ?? $interview->otherMember?->name_en 
+                            ?? 'Unknown';
+
+                        return $interview;
+                    })
+                    ->groupBy('interviewee_name');
+
+        $interviewMembers = Interview::query()
+            ->with([
+                'otherMember',
+                'toMembers.toDelegate',     
+                'toMembers.otherMember',   
+            ])
+            ->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
+                $delegationQuery->where('event_id', $currentEventId)
+                    ->whereHas('invitationStatus', function ($q) {
+                        $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                    });
+            })
+            ->orderBy('date_time', 'asc')
+            ->get();
+
+        $delegates = $interviewMembers->pluck('toMembers')
+            ->flatten()
+            ->map(fn($member) => $member->toDelegate ? [
+                'id' => 'delegate_'.$member->toDelegate->id,
+                'name' => $member->toDelegate->name_en,
+            ] : null)
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        $otherMembers = $interviewMembers
+            ->map(fn($interview) => $interview->otherMember)
+            ->filter() 
+            ->map(fn($member) => [
+                'id' => 'other_'.$member->id,
+                'name' => $member->name_en,
+            ])
+            ->unique('id')
+            ->values();
+                   
+        return view('admin.report.interviews', compact('interviews','delegates','otherMembers'));
+    }
+
+    public function exportBulkInterviewsPdf(Request $request) {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['interviewee', 'date_range']);
+
+        $interviews = Interview::query()
+                    ->with([
+                        'toMembers.delegate',
+                        'otherMember', 
+                    ])
+                    ->whereHas('delegation', function ($q) use ($currentEventId) {
+                        $q->where('event_id', $currentEventId)
+                        ->whereHas('invitationStatus', fn($q2) => $q2->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
+                    })
+                    ->when(!empty($filters['date_range']), function ($query) use ($filters) {
+                        [$start, $end] = explode(' - ', $filters['date_range']);
+                        $start = \Carbon\Carbon::parse(trim($start))->startOfDay();
+                        $end = \Carbon\Carbon::parse(trim($end))->endOfDay();
+                        $query->whereBetween('date_time', [$start, $end]);
+                    })
+                    ->when(!empty($filters['interviewee']), function ($query) use ($filters) {
+                        [$type, $id] = explode('_', $filters['interviewee']);
+
+                        if ($type === 'delegate') {
+                            // Filter by delegate in toMembers
+                            $query->whereHas('toMembers', function ($q) use ($id) {
+                                $q->where('type', 'to')
+                                ->whereHas('delegate', fn($q2) => $q2->where('id', $id));
+                            });
+                        } elseif ($type === 'other') {
+                            // Filter by other member directly
+                            $query->where('other_member_id', $id);
+                        }
+                    })
+                    ->orderBy('date_time', 'asc')
+                    ->get()
+                    ->map(function ($interview) {
+                        $to = $interview->toMembers->first();
+
+                        $interview->interviewee_name = $to?->delegate?->name_en 
+                            ?? $interview->otherMember?->name_en 
+                            ?? 'Unknown';
+
+                        return $interview;
+                    })
+                    ->groupBy('interviewee_name');
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'interviews_report';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+
+        $html = view('admin.report.pdf.interviews-bulk', compact('interviews'))->render();
+
+        $mpdf->WriteHTML($html);
+        $reportName = 'interviews_report'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');                    
+    }
 }

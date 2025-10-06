@@ -38,7 +38,7 @@
 
                             ['slug' => 'view_hotel_delegations','name' => __db('hotel_delegations_report'),'url' => route('reports-delegations')],
 
-                            ['slug' => 'view_interviews_reports','name' => __db('interviews_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_interviews_reports','name' => __db('interviews_report'),'url' => route('report.interviews')],
 
                             ['slug' => 'view_vip','name' => __db('vip_report'),'url' => route('report.vip')],
 
