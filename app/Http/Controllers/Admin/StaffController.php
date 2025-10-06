@@ -200,6 +200,9 @@ class StaffController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $userType = $user->user_type;
+
+        $user->user_type = ($request->module === 'admin') ? 'staff' : $request->module;
         $user->username = $request->username;
         $user->name = $request->name;
         $user->email = $request->email ?? NULL;
@@ -225,6 +228,11 @@ class StaffController extends Controller
                             'role_id' => $role->id,
                         ]
                     );
+                }
+            }else{
+                $newUserType = ($request->module === 'admin') ? 'staff' : $request->module;
+                if($userType != $newUserType){
+                    EventUserRole::where('user_id', $user->id)->delete();
                 }
             }
            
