@@ -78,7 +78,7 @@
                                             </td>
 
                                             <td style="border:2px solid black; padding:5px; text-align:center;">
-                                                {{ $assignment->assignable->getTranslation('name') ?? '' }}
+                                                {{ $assignment->assignable?->getTranslation('title') ?? '' .' '.$assignment->assignable?->getTranslation('name') ?? '' }}
                                             </td>
 
                                             @if($index == 0)
