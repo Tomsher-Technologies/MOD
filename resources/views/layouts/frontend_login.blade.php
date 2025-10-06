@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{{ $title || env('APP_NAME') }}</title>
+    <title>{{ $title ?? env('APP_NAME') }}</title>
 
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
 
@@ -17,9 +17,9 @@
 
     @yield('style')
     <style>
-.select2-container--open .select2-dropdown {
-  z-index: 9999 !important;
-}
+        .select2-container--open .select2-dropdown {
+            z-index: 9999 !important;
+        }
 
     </style>
 </head>
