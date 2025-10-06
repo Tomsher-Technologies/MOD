@@ -47,33 +47,33 @@
                         @php $ser = 1; @endphp
                         @foreach($group as $interview)
                             @foreach($interview->fromMembers as $member)
-                                <tr style="text-align: center">
+                                <tr style="text-align: center;">
                                     @php
                                         $escort = $member->delegate?->delegation?->escorts?->first();
                                     @endphp
                                     
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $escort?->phone_number ?? '-' }}
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $interview->date_time ? date('d-m-Y', strtotime($interview->date_time)) : '-' }}
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $interview->date_time ? date('H:i', strtotime($interview->date_time)) : '-' }}
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $member->delegate?->designation_en ?? '' }}
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         <strong>{{ ($member->delegate) ? $member->delegate?->getTranslation('title').' '.$member->delegate?->getTranslation('name') : $member->otherMember?->getTranslation('name') }}</strong>
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $member->delegate?->delegation?->country?->name ?? '' }}
                                     </td>
-                                    <td style="padding:8px;border:2px solid #000;">
+                                    <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $ser++ }}
                                     </td>
                                 </tr>
