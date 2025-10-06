@@ -19,14 +19,15 @@ class UpdateFlightStatuses extends Command
         $this->info('Updating flight statuses...');
 
         $service = new DelegationStatusService();
-        $oneHourAgo = Carbon::now()->subHour();
+        // $oneHourAgo = Carbon::now()->subHour();
+        $thirtyMinutesAgo = now()->subMinutes(30);
 
         $affectedDelegateIds = collect();
         $affectedDelegationIds = collect();
 
         $passedArrivals = DelegateTransport::with('delegate.delegation')
             ->where('type', 'arrival')
-            ->where('date_time', '<', $oneHourAgo)
+            ->where('date_time', '<', $thirtyMinutesAgo)
             ->where('status', '!=', 'arrived')
             ->get();
 
@@ -46,7 +47,7 @@ class UpdateFlightStatuses extends Command
 
         $passedDepartures = DelegateTransport::with('delegate.delegation')
             ->where('type', 'departure')
-            ->where('date_time', '<', $oneHourAgo)
+            ->where('date_time', '<', $thirtyMinutesAgo)
             ->where('status', '!=', 'departed')
             ->get();
 
