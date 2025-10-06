@@ -81,8 +81,8 @@
                                     <img src="{{ getUploadedImage($event->image) }}" alt="Image" width="100" height="100" />
                                 @endif
                             </td> --}}
-                            <td class="px-4 py-3 text-black  text-center">{{ ($event->start_date != NULL) ? date('d-m-Y', strtotime($event->start_date)) : '' }}</td>
-                            <td class="px-4 py-3 text-black  text-center">{{ ($event->end_date != NULL) ? date('d-m-Y', strtotime($event->end_date)) : '' }}</td>
+                            <td class="px-4 py-3 text-black  text-center">{{ ($event->start_date != NULL) ? date('d-m-Y h:i A', strtotime($event->start_date)) : '' }}</td>
+                            <td class="px-4 py-3 text-black  text-center">{{ ($event->end_date != NULL) ? date('d-m-Y h:i A', strtotime($event->end_date)) : '' }}</td>
 
                             <td class="px-4 py-3">
                                 <div class=" text-center gap-5">
