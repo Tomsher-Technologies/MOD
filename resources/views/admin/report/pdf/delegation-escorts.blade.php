@@ -178,7 +178,7 @@
                             {{ $arrival?->flight_name ?? '-' }}
                         </td>
                         <td style="padding: 8px; border: 1px solid #000; text-align: center;">
-                            {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : 'Not Required'}}
+                            {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : __db('not_required') }}
                         </td>
                         <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif ">
                             {{ $delegate->internalRanking?->value ?? $relation }}

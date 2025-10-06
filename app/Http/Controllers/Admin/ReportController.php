@@ -1757,8 +1757,8 @@ class ReportController extends Controller
                     ->map(function ($interview) {
                         $to = $interview->toMembers->first();
 
-                        $interview->interviewee_name = $to?->delegate?->name_en 
-                            ?? $interview->otherMember?->name_en 
+                        $interview->interviewee_name = $to?->delegate?->getTranslation('name') 
+                            ?? $interview->otherMember?->getTranslation('name') 
                             ?? 'Unknown';
 
                         return $interview;
@@ -1784,7 +1784,7 @@ class ReportController extends Controller
             ->flatten()
             ->map(fn($member) => $member->toDelegate ? [
                 'id' => 'delegate_'.$member->toDelegate->id,
-                'name' => $member->toDelegate->name_en,
+                'name' => $member->toDelegate->getTranslation('name') ?? '-',
             ] : null)
             ->filter()
             ->unique('id')
@@ -1795,7 +1795,7 @@ class ReportController extends Controller
             ->filter() 
             ->map(fn($member) => [
                 'id' => 'other_'.$member->id,
-                'name' => $member->name_en,
+                'name' => $member->getTranslation('name') ?? '-',
             ])
             ->unique('id')
             ->values();
@@ -1842,8 +1842,8 @@ class ReportController extends Controller
                     ->map(function ($interview) {
                         $to = $interview->toMembers->first();
 
-                        $interview->interviewee_name = $to?->delegate?->name_en 
-                            ?? $interview->otherMember?->name_en 
+                        $interview->interviewee_name = $to?->delegate?->getTranslation('name')  
+                            ?? $interview->otherMember?->getTranslation('name') 
                             ?? 'Unknown';
 
                         return $interview;
