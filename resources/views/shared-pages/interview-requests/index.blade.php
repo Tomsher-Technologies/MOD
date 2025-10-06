@@ -121,8 +121,8 @@
                                         '</a>';
                                 }
 
-                                $names = $row->interviewMembers
-                                    ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                                $names = $row->toMembers
+                                    ->map(fn($member) => '<span class="block">' . e($member?->delegate?->getTranslation('name') ?? '') . '</span>')
                                     ->implode('');
 
                                 return $with . $names;
