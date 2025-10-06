@@ -163,7 +163,9 @@ class DriverController extends Controller
             ->select('drivers.*')  
             ->groupBy('drivers.id')
             ->orderByRaw('CASE WHEN dd.driver_id IS NULL THEN 0 ELSE 1 END') 
-            ->orderBy('drivers.military_number');
+            ->orderByRaw('CAST(drivers.military_number AS UNSIGNED) ASC');
+
+
 
         $limit = $request->limit ?: 20;
 
