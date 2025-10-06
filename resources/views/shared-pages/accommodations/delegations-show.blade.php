@@ -1129,6 +1129,76 @@
                         toastr.error('{{ __db('room_not_available') }}');
                     } else if (res.success === 3) {
                         toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                    } else if (res.success === 5) {
+                        let existingUsersHtml = '';
+                        if (res.existing_users && res.existing_users.length > 0) {
+                            res.existing_users.forEach(function(user) {
+                                existingUsersHtml += `<div>${user.name} (${user.type})</div>`;
+                            });
+                        } else {
+                            existingUsersHtml = '<div>{{ __db('unknown_user') }}</div>';
+                        }
+                        
+                        Swal.fire({
+                            title: "{{ __db('confirm_room_assignment') }}",
+                            html: `<p>{{ __db('room_already_assigned_to_users') }}:</p>
+                                   <div class="text-left bg-gray-100 p-3 rounded mt-2">${existingUsersHtml}</div>
+                                   <p class="mt-3"><strong>{{ __db('hotel') }}:</strong> ${res.hotel_name}</p>
+                                   <p><strong>{{ __db('room_number') }}:</strong> ${res.room_number}</p>
+                                   <p><strong>{{ __db('room_type') }}:</strong> ${res.room_type}</p>
+                                   <p class="text-red-600 font-bold mt-3">{{ __db('confirm_proceed_assignment') }}</p>`,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: "{{ __db('yes_proceed') }}",
+                            cancelButtonText: "{{ __db('cancel') }}",
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                                cancelButton: 'px-4 rounded-lg'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.post("{{ route('accommodation.assign-rooms') }}", {
+                                    _token: '{{ csrf_token() }}',
+                                    assignable_id: delegateId,
+                                    assignable_type: 'Delegate',
+                                    hotel_id: hotelId,
+                                    room_type_id: roomTypeId,
+                                    room_number: roomNumber,
+                                    delegation_id: {{ $delegation->id }},
+                                    confirm_duplicate: 1  
+                                }, function(res2) {
+                                    if (res2.success === 1) {
+                                        row.css('background-color', '#acf3bc');
+                                        toastr.success('{{ __db('room_assigned') }}');
+
+                                        let actionCellDel = row.find('td').last();
+                                        if (actionCellDel.find('.remove-room-assignment').length === 0) {
+                                            let removeBtnHtml = `
+                                                <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res2.assignment_id}">
+                                                    {{ __db('remove') }}
+                                                </a>`;
+                                            actionCellDel.append(removeBtnHtml);
+                                        } else {
+                                            actionCellDel.find('.remove-room-assignment').show();
+                                        }
+                                    } else {
+                                        if (res2.success === 2) {
+                                            toastr.error('{{ __db('room_not_available') }}');
+                                        } else if (res2.success === 3) {
+                                            toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                                        }
+                                    }
+                                    checkboxDel.prop('checked', false);
+
+                                    if ($('#hotelDelegate').val() == hotelId) {
+                                        hotelData(hotelId, 'Delegate');
+                                    }
+                                });
+                            }
+                        });
                     }
                     checkboxDel.prop('checked', false);
 
@@ -1227,6 +1297,79 @@
                         toastr.error('{{ __db('room_not_available') }}');
                     } else if (res.success === 3) {
                         toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                    } else if (res.success === 5) {
+                        // Show confirmation dialog when room is already assigned to other users
+                        let existingUsersHtml = '';
+                        if (res.existing_users && res.existing_users.length > 0) {
+                            res.existing_users.forEach(function(user) {
+                                existingUsersHtml += `<div>${user.name} (${user.type})</div>`;
+                            });
+                        } else {
+                            existingUsersHtml = '<div>{{ __db('unknown_user') }}</div>';
+                        }
+                        
+                        Swal.fire({
+                            title: "{{ __db('confirm_room_assignment') }}",
+                            html: `<p>{{ __db('room_already_assigned_to_users') }}:</p>
+                                   <div class="text-left bg-gray-100 p-3 rounded mt-2">${existingUsersHtml}</div>
+                                   <p class="mt-3"><strong>{{ __db('hotel') }}:</strong> ${res.hotel_name}</p>
+                                   <p><strong>{{ __db('room_number') }}:</strong> ${res.room_number}</p>
+                                   <p><strong>{{ __db('room_type') }}:</strong> ${res.room_type}</p>
+                                   <p class="text-red-600 font-bold mt-3">{{ __db('confirm_proceed_assignment') }}</p>`,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: "{{ __db('yes_proceed') }}",
+                            cancelButtonText: "{{ __db('cancel') }}",
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                                cancelButton: 'px-4 rounded-lg'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Proceed with the reassignment by making the same call but with confirmation parameter
+                                $.post("{{ route('accommodation.assign-rooms') }}", {
+                                    _token: '{{ csrf_token() }}',
+                                    assignable_id: idEscort,
+                                    assignable_type: 'Escort',
+                                    hotel_id: hotelIdEscort,
+                                    room_type_id: roomTypeIdEscort,
+                                    room_number: roomNumberEscort,
+                                    delegation_id: {{ $delegation->id }},
+                                    confirm_duplicate: 1  // Add confirmation flag
+                                }, function(res2) {
+                                    if (res2.success === 1) {
+                                        escortrow.css('background-color', '#acf3bc');
+                                        toastr.success('{{ __db('room_assigned') }}');
+
+                                        let actionCellEsc = escortrow.find('td').last();
+                                        if (actionCellEsc.find('.remove-room-assignment').length === 0) {
+                                            let removeBtnHtml = `
+                                                <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res2.assignment_id}">
+                                                    {{ __db('remove') }}
+                                                </a>`;
+                                            actionCellEsc.append(removeBtnHtml);
+                                        } else {
+                                            actionCellEsc.find('.remove-room-assignment').show();
+                                        }
+
+                                    } else {
+                                        // Handle any errors in reassignment
+                                        if (res2.success === 2) {
+                                            toastr.error('{{ __db('room_not_available') }}');
+                                        } else if (res2.success === 3) {
+                                            toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                                        }
+                                    }
+                                    checkboxEscort.prop('checked', false);
+                                    if ($('#hotelEscort').val() == hotelIdEscort) {
+                                        hotelData(hotelIdEscort, 'Escort');
+                                    }
+                                });
+                            }
+                        });
                     }
                     checkboxEscort.prop('checked', false);
                     if ($('#hotelEscort').val() == hotelIdEscort) {
@@ -1324,6 +1467,79 @@
                         toastr.error('{{ __db('room_not_available') }}');
                     } else if (res.success === 3) {
                         toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                    } else if (res.success === 5) {
+                        // Show confirmation dialog when room is already assigned to other users
+                        let existingUsersHtml = '';
+                        if (res.existing_users && res.existing_users.length > 0) {
+                            res.existing_users.forEach(function(user) {
+                                existingUsersHtml += `<div>${user.name} (${user.type})</div>`;
+                            });
+                        } else {
+                            existingUsersHtml = '<div>{{ __db('unknown_user') }}</div>';
+                        }
+                        
+                        Swal.fire({
+                            title: "{{ __db('confirm_room_assignment') }}",
+                            html: `<p>{{ __db('room_already_assigned_to_users') }}:</p>
+                                   <div class="text-left bg-gray-100 p-3 rounded mt-2">${existingUsersHtml}</div>
+                                   <p class="mt-3"><strong>{{ __db('hotel') }}:</strong> ${res.hotel_name}</p>
+                                   <p><strong>{{ __db('room_number') }}:</strong> ${res.room_number}</p>
+                                   <p><strong>{{ __db('room_type') }}:</strong> ${res.room_type}</p>
+                                   <p class="text-red-600 font-bold mt-3">{{ __db('confirm_proceed_assignment') }}</p>`,
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: "{{ __db('yes_proceed') }}",
+                            cancelButtonText: "{{ __db('cancel') }}",
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]',
+                                cancelButton: 'px-4 rounded-lg'
+                            },
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Proceed with the reassignment by making the same call but with confirmation parameter
+                                $.post("{{ route('accommodation.assign-rooms') }}", {
+                                    _token: '{{ csrf_token() }}',
+                                    assignable_id: idDriver,
+                                    assignable_type: 'Driver',
+                                    hotel_id: hotelIdDriver,
+                                    room_type_id: roomTypeIdDriver,
+                                    room_number: roomNumberDriver,
+                                    delegation_id: {{ $delegation->id }},
+                                    confirm_duplicate: 1  // Add confirmation flag
+                                }, function(res2) {
+                                    if (res2.success === 1) {
+                                        driverrow.css('background-color', '#acf3bc');
+                                        toastr.success('{{ __db('room_assigned') }}');
+
+                                        let actionCell = driverrow.find('td').last();
+                                        if (actionCell.find('.remove-room-assignment').length === 0) {
+                                            let removeBtnHtml = `
+                                                <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-driver-id="${idDriver}" data-assignment-id="${res2.assignment_id}">
+                                                    {{ __db('remove') }}
+                                                </a>`;
+                                            actionCell.append(removeBtnHtml);
+                                        } else {
+                                            actionCell.find('.remove-room-assignment').show();
+                                        }
+                                    } else {
+                                        // Handle any errors in reassignment
+                                        if (res2.success === 2) {
+                                            toastr.error('{{ __db('room_not_available') }}');
+                                        } else if (res2.success === 3) {
+                                            toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                                        }
+                                    }
+                                    checkboxDriver.prop('checked', false);
+
+                                    if ($('#hotelDriver').val() == hotelIdDriver) {
+                                        hotelData(hotelIdDriver, 'Driver');
+                                    }
+                                });
+                            }
+                        });
                     }
                     checkboxDriver.prop('checked', false);
 

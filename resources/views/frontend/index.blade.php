@@ -8,15 +8,20 @@
             Your browser does not support the video tag.
         </video>
         <!-- Top Gradient -->
-        <div class="absolute top-0 left-0 w-full h-[40%] 
-                bg-gradient-to-b from-white/100 via-white/40 to-transparent z-10"></div>
+        <div
+            class="absolute top-0 left-0 w-full h-[40%] 
+                bg-gradient-to-b from-white/100 via-white/40 to-transparent z-10">
+        </div>
         <!-- Bottom Gradient -->
-        <div class="absolute bottom-0 left-0 w-full h-[80%] 
-                bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10"></div>
+        <div
+            class="absolute bottom-0 left-0 w-full h-[80%] 
+                bg-gradient-to-t from-black/80 via-black/30 to-transparent z-10">
+        </div>
         <!-- Text Content -->
         <div class="absolute inset-0 z-20 flex justify-start items-end px-6 pb-[80px]">
             <div class="container mx-auto">
-                <h2 class="text-[80px] md:text-6xl font-bold text-white mb-4">{{ $page?->getTranslation('title1', $lang) }}</h2>
+                <h2 class="text-[80px] md:text-6xl font-bold text-white mb-4">{{ $page?->getTranslation('title1', $lang) }}
+                </h2>
                 <p class="text-white text-[28px] mb-6">
                     {{ $page?->getTranslation('title2', $lang) }}
                 </p>
@@ -34,64 +39,72 @@
 
 
 
-@php
-    $floorPlans = getFloorPlans();
-    
-@endphp
+    @php
+        $floorPlans = getFloorPlans();
 
-<section class="py-[100px] bg-[#f2f2f2]">
-    <div class="container mx-auto">
-        <div class="text-center mb-12">
-            <h2 class="text-[40px] text-[#744e2e] font-bold">Floor Plans</h2>
-            <p class="text-lg text-gray-500 mt-2 max-w-2xl mx-auto">
-                Explore our versatile spaces. Select a plan to view details and download files.
-            </p>
-        </div>
+    @endphp
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section class="py-[100px] bg-[#f2f2f2]">
+        <div class="container mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-[40px] text-[#744e2e] font-bold">Floor Plans</h2>
+                <p class="text-lg text-gray-500 mt-2 max-w-2xl mx-auto">
+                    Explore our versatile spaces. Select a plan to view details and download files.
+                </p>
+            </div>
 
-            @foreach ($floorPlans as $plan)
-                <div class="relative flex flex-col justify-between p-6 h-40 rounded-lg overflow-hidden bg-gradient-to-br from-white to-gray-50
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                @foreach ($floorPlans as $plan)
+                    <div
+                        class="relative flex flex-col justify-between p-6 h-40 rounded-lg overflow-hidden bg-gradient-to-br from-white to-gray-50
                              shadow-lg group transform hover:-translate-y-2 transition-all duration-300 ease-in-out border border-transparent hover:border-[#b68a35]">
-                    
-                    <div class="absolute top-4 right-4 text-gray-200/50 transition-colors duration-300 group-hover:text-[#b68a35]/20">
-                        <svg class="w-24 h-24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                        </svg>
-                    </div>
 
-                    <div class="relative z-10">
-                        <h3 class="text-2xl font-bold text-[#744e2e] mb-3">{{ $plan->title }}</h3>
-                    </div>
+                        <div
+                            class="absolute top-4 right-4 text-gray-200/50 transition-colors duration-300 group-hover:text-[#b68a35]/20">
+                            <svg class="w-24 h-24" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                            </svg>
+                        </div>
 
-                    <div class="relative z-10">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            @php
-                                $files = $plan->file_paths;
-                            @endphp
-                            @foreach ($files as $file)
-                                <a href="{{ asset('storage/' . $file) }}" target="_blank" rel="noopener noreferrer"
-                                   class="flex items-center gap-2 bg-gray-100 text-[#797E86] text-sm font-semibold px-3 py-1.5 rounded-full border border-gray-200 hover:bg-[#b68a35] hover:text-white hover:border-[#b68a35] transition-colors duration-200">
-                                    
-                                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                                    
-                                    <span>{{ __db('pdf') }}</span>
-                                </a>
-                            @endforeach
+                        <div class="relative z-10">
+                            <h3 class="text-2xl font-bold text-[#744e2e] mb-3">{{ $plan->title }}</h3>
+                        </div>
+
+                        <div class="relative z-10">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                @php
+                                    $files = $plan->file_paths;
+                                @endphp
+                                @foreach ($files as $file)
+                                    <a href="{{ asset('storage/' . $file) }}" target="_blank" rel="noopener noreferrer"
+                                        class="flex items-center gap-2 bg-gray-100 text-[#797E86] text-sm font-semibold px-3 py-1.5 rounded-full border border-gray-200 hover:bg-[#b68a35] hover:text-white hover:border-[#b68a35] transition-colors duration-200">
+
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                        </svg>
+
+                                        <span>{{ __db('pdf') }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
 
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
 
 
 
 
-    
+
 
 
 
@@ -192,7 +205,8 @@
             </div>
         </div>
     </section>
-    <section class="py-[160px]  bg-cover bg-center relative" style="background-image: url('{{ asset($page?->getTranslation('image', $lang)) }}');">
+    <section class="py-[160px]  bg-cover bg-center relative"
+        style="background-image: url('{{ asset($page?->getTranslation('image', $lang)) }}');">
         <div class="container mx-auto relative z-10">
             <h2 class="text-[40px] text-[#744e2e] mb-2">{!! $page?->getTranslation('content3', $lang) !!}</h2>
             <p class="text-[#797E86]">{!! $page?->getTranslation('content4', $lang) !!}
@@ -210,7 +224,9 @@
                 @foreach ($news as $new)
                     <div class="p-4 rounded-lg  border border-gray-200">
                         <a href="{{ route('news-details', base64_encode($new->id)) }}">
-                            <img src="{{ asset(getUploadedImage($new->image)) }}" alt="{{ $new->getTranslation('title', $lang) }}" class="w-full h-70 object-cover rounded mb-3">
+                            <img src="{{ asset(getUploadedImage($new->image)) }}"
+                                alt="{{ $new->getTranslation('title', $lang) }}"
+                                class="w-full h-70 object-cover rounded mb-3">
                             <h3 class="text-sm text-[#b68a35]">{{ date('M d, Y', strtotime($new->news_date)) }}</h3>
                             <p class="text-[20px] leading-[25px] font-medium mt-1 text-[#797E86]">
                                 {{ $new->getTranslation('title', $lang) }}
@@ -227,5 +243,4 @@
             </div>
         </div>
     </section>
-
 @endsection

@@ -158,7 +158,7 @@ class EscortController extends Controller
             })
             ->select('escorts.*') 
             ->orderByRaw('CASE WHEN de.escort_id IS NULL THEN 0 ELSE 1 END')  
-            ->orderBy('escorts.military_number')
+            ->orderByRaw('CAST(escorts.military_number AS UNSIGNED) ASC')
             ->orderBy('rankings.sort_order');
 
         $limit = $request->limit ? $request->limit : 20;
