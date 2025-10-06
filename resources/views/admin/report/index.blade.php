@@ -20,15 +20,15 @@
                             ],
                             ['slug' => 'view_delegations_head_departure','name' => __db('delegations_heads_departure'),'url' => route('report.heads-departure')],
 
-                            ['slug' => 'view_delegations_cars','name' => __db('delegations_cars_report'), 'url' => route('reports-delegations')],
+                            ['slug' => 'view_delegations_cars','name' => __db('delegations_cars_report'), 'url' => route('report.delegation-cars')],
 
                             ['slug' => 'view_delegations_escort','name' =>  __db('delegations_escort_report'),'url' => route('reports-delegations')],
 
                             ['slug' => 'view_delegations_members','name' => __db('delegations_members_report'),'url' => route('report.delegation-members')],
 
-                            ['slug' => 'view_delegations_without_escort','name' => __db('delegations_without_escort_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_delegations_without_escort','name' => __db('delegations_without_escort_report'),'url' => route('report.without-escorts')],
 
-                            ['slug' => 'view_departures_report','name' => __db('departures_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_departures_report','name' => __db('departures_report'),'url' => route('report.delegation-departures')],
 
                             ['slug' => 'view_drivers_report','name' => __db('drivers_report'),'url' => route('report.drivers')],
 
@@ -44,9 +44,9 @@
 
                             ['slug' => 'view_wives','name' => __db('wives_report'),'url' => route('report.wives')],
 
-                            ['slug' => 'view_arrivals_report','name' => __db('arrivals_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_arrivals_report','name' => __db('arrivals_report'),'url' => route('report.delegation-arrivals')],
 
-                            ['slug' => 'view_arrival_hotels','name' => __db('arrival_hotels_report'),'url' => route('reports-delegations')],
+                            ['slug' => 'view_arrival_hotels','name' => __db('arrival_hotels_report'),'url' => route('report.hotels-arrivals')],
 
                             ['slug' => 'view_delegation_head_invitations','name' => __db('delegation_head_invitations_report'),'url' => route('report.heads-invitations')]
                         ];

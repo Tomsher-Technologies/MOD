@@ -35,7 +35,7 @@ Route::prefix('mod-admin')->group(function () {
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
 });
 
-Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
+Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])->group(function () {
     Route::get('/clear-cache', function () {
         Artisan::call('optimize:clear');
         return back()->with('success', 'All cache cleared successfully!');
@@ -287,6 +287,26 @@ Route::prefix('mod-events')->middleware(['web', 'auth'])->group(function () {
     // Delegation Members Report
     Route::get('/reports/delegation-members', [ReportController::class, 'delegationMembersReport'])->name('report.delegation-members');
     Route::post('/delegation-members/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationMembersPdf'])->name('delegation-members.bulk-exportPdf');
+
+    // Delegation Members Report
+    Route::get('/reports/without-escorts', [ReportController::class, 'delegationWithoutEscortsReport'])->name('report.without-escorts');
+    Route::post('/without-escorts/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationWithoutEscortsPdf'])->name('without-escorts.bulk-exportPdf');
+
+    // Delegation Cars Report
+    Route::get('/reports/delegation-cars', [ReportController::class, 'delegationCarsReport'])->name('report.delegation-cars');
+    Route::post('/delegation-cars/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationCarsPdf'])->name('delegation-cars.bulk-exportPdf');
+
+    // Delegation Arrivals Report
+    Route::get('/reports/delegation-arrivals', [ReportController::class, 'delegationArrivalsReport'])->name('report.delegation-arrivals');
+    Route::post('/delegation-arrivals/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationArrivalsPdf'])->name('delegation-arrivals.bulk-exportPdf');
+
+    // Delegation Departures Report
+    Route::get('/reports/delegation-departures', [ReportController::class, 'delegationDeparturesReport'])->name('report.delegation-departures');
+    Route::post('/delegation-departures/bulk-export-pdf', [ReportController::class, 'exportBulkDelegationDeparturesPdf'])->name('delegation-departures.bulk-exportPdf');
+
+    // Hotels Arrivals Report
+    Route::get('/reports/hotels-arrivals', [ReportController::class, 'hotelsArrivalsReport'])->name('report.hotels-arrivals');
+    Route::post('/hotels-arrivals/bulk-export-pdf', [ReportController::class, 'exportBulkHotelsArrivalsPdf'])->name('hotels-arrivals.bulk-exportPdf');
 
     // Import Logs
     Route::get('/import-logs', [ImportLogController::class, 'index'])->name('admin.import-logs.index');
