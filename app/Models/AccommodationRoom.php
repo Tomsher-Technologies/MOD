@@ -21,4 +21,9 @@ class AccommodationRoom extends Model
             });
     }
 
+    public function roomAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class, 'room_type_id');
+    }
+
 }

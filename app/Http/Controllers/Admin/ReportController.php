@@ -1872,4 +1872,81 @@ class ReportController extends Controller
         $reportName = 'interviews_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');                    
     }
+
+    public function hotelsDelegationsReport(Request $request) {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $hotels = Accommodation::where('event_id', $currentEventId)
+                                ->where('status', 1)
+                                ->orderBy('hotel_name', 'asc')
+                                ->get();
+
+        $filters = request()->only(['hotel']);
+
+       $hotelsData = Accommodation::with([
+                    'rooms.roomAssignments' => function ($q) use ($currentEventId) {
+                        $q->with(['delegation', 'delegation.country', 'assignable'])
+                        ->where('active_status', 1)
+                        ->where('assignable_type', 'App\\Models\\Delegate') // ONLY delegates
+                        ->whereHas('delegation', function ($q2) use ($currentEventId) {
+                            $q2->where('event_id', $currentEventId)
+                                ->whereHas('invitationStatus', fn($q3) => $q3->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
+                        });
+                    }
+                ])
+                ->where('event_id', $currentEventId)
+                ->when(!empty($filters['hotel']), function ($q) use ($filters) {
+                            $q->whereIn('id', $filters['hotel']);
+                        })
+                ->orderBy('hotel_name', 'asc')
+                ->get();
+
+        return view('admin.report.hotel_delegations', compact('hotelsData','hotels'));
+    }
+
+    public function exportBulkHotelsDelegationsPdf(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['hotel']);
+
+        $hotelsData = Accommodation::with([
+                    'rooms.roomAssignments' => function ($q) use ($currentEventId) {
+                        $q->with(['delegation', 'delegation.country', 'assignable'])
+                        ->where('active_status', 1)
+                        ->where('assignable_type', 'App\\Models\\Delegate') // ONLY delegates
+                        ->whereHas('delegation', function ($q2) use ($currentEventId) {
+                            $q2->where('event_id', $currentEventId)
+                                ->whereHas('invitationStatus', fn($q3) => $q3->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
+                        });
+                    }
+                ])
+                ->where('event_id', $currentEventId)
+                ->when(!empty($filters['hotel']), function ($q) use ($filters) {
+                            $q->whereIn('id', $filters['hotel']);
+                        })
+                ->orderBy('hotel_name', 'asc')
+                ->get();
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'hotel_delegations_report';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+
+        $html = view('admin.report.pdf.hotel_delegations-bulk', compact('hotelsData'))->render();
+
+        $mpdf->WriteHTML($html);
+        $reportName = 'hotel_delegations_report'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');  
+    }
 }
