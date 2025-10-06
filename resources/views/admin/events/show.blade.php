@@ -44,11 +44,11 @@
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="font-semibold">{{ __db('start_date') }} :</span>
-                                    <span>{{ $event->start_date }}</span>
+                                    <span>{{ date('Y-m-d h:i A', strtotime($event->start_date)) }}</span>
                                 </div>
                                 <div class="flex justify-between">
                                     <span class="font-semibold">{{ __db('end_date') }} :</span>
-                                    <span>{{ $event->end_date }}</span>
+                                    <span>{{ date('Y-m-d h:i A', strtotime($event->end_date)) }}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold">{{ __db('status') }} :</span>
