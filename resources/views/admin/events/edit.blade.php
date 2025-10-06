@@ -64,7 +64,7 @@
 
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('start_date') }} <span class="text-red-600">*</span></label>
-                                <input type="date" name="start_date" id="start_date" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('start_date',$event->start_date) }}">
+                                <input type="datetime-local" name="start_date" id="start_date" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('start_date',$event->start_date) }}">
                                 @error('start_date')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
@@ -72,7 +72,7 @@
 
                             <div class="col-span-3">
                                 <label class="form-label">{{ __db('end_date') }} <span class="text-red-600">*</span></label>
-                                <input type="date" name="end_date" id="end_date" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('end_date', $event->end_date) }}">
+                                <input type="datetime-local" name="end_date" id="end_date" class=" p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0" value="{{ old('end_date', $event->end_date) }}">
                                 @error('end_date')
                                     <div class="text-red-600">{{ $message }}</div>
                                 @enderror
