@@ -566,12 +566,8 @@
                         </span>
                     </a>
                 </li>
-
+                <hr>
             @enddirectCanany
-
-
-
-            <hr>
 
             <li>
                 <a href="{{ route('account') }}"
