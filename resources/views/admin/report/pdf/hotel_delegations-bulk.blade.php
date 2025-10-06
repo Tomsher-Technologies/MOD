@@ -34,7 +34,7 @@
                 @endphp
 
                 @if($delegations->count() > 0)
-                    <div style="display: flex; align-items: center; gap: 20px; justify-content: end; font-weight: bold; margin-top:20px;">
+                    <div style="display: flex; align-items: center; gap: 20px; justify-content: end; font-weight: bold; margin-top:20px;font-size: 16px;">
                         <h4>{{ $hotel->hotel_name }}</h4>
                         <h4>: {{ __('Hotel') }}</h4>
                     </div>
