@@ -84,7 +84,7 @@
 
                 @if($delegations->count() > 0)
                     <div style="display: flex; align-items: center; gap: 20px; justify-content: end; font-weight: bold; margin-top:20px;font-size: 18px;">
-                        <h4>{{ $hotel->hotel_name }}</h4>
+                        <h4 style="float: right">{{ $hotel->hotel_name }}</h4>
                         <h4>: {{ __('Hotel') }}</h4>
                     </div>
          
@@ -119,15 +119,15 @@
                                             <td style="border:2px solid black; padding:5px; text-align:center;">{{ $assignment->room_number }}</td>
 
                                             <td style="border:2px solid black; padding:5px; text-align:center;">
-                                                {{ $assignment->roomType?->roomType?->value ?? $assignment->room_type_id }}
+                                                {{ $assignment->roomType?->roomType?->value ?? '' }}
                                             </td>
 
-                                            <td style="border:2px solid black; padding:5px; text-align:center;">
+                                            <td style="border:2px solid black; padding:5px; text-align:center;@if($assignment->assignable?->team_head === true) color: red; @endif">
                                                 {{ $assignment->assignable?->internalRanking?->value ?? '' }}
                                             </td>
 
-                                            <td style="border:2px solid black; padding:5px; text-align:center;">
-                                                {{ $assignment->assignable?->getTranslation('title') ?? '' .' '.$assignment->assignable?->getTranslation('name') ?? '' }}
+                                            <td style="border:2px solid black; padding:5px; text-align:center; @if($assignment->assignable?->team_head === true) color: red; @endif">
+                                                {{ $assignment->assignable?->getTranslation('title') .' '.$assignment->assignable?->getTranslation('name') }}
                                             </td>
 
                                             @if($index == 0)
@@ -147,14 +147,14 @@
                                             @endphp
                                             <tr>
                                                 <td style="padding: 6px; border: 0px;" colspan="2">
-                                                    {{ $roomEscort?->room_number }} - {{ $roomEscort?->hotel?->hotel_name }} 
+                                                    {{ $roomEscort?->room_number }} - {{ $roomEscort?->roomType?->roomType?->value ?? ''  }} - {{ $roomEscort?->hotel?->hotel_name }} 
                                                     <strong> : {{ __db('accommodation') }}</strong>
                                                 </td>
                                                 <td style="padding: 6px; border: 0px;" colspan="2">
                                                     {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
                                                 </td>
                                                 <td style="padding: 6px; border: 0px;text-align: right;" colspan="3">
-                                                    {{ $escort?->internalRanking?->value }} {{ $escort?->name }} - {{ $escort?->military_number }}  
+                                                    <span style="{{ $key != 0 ? 'margin-right: 40px;' : '' }}">{{ $escort?->internalRanking?->value }} {{ $escort?->name }} - {{ $escort?->military_number }}  <span>
                                                     @if($key == 0) <strong> : {{ __db('escort') }}</strong> @endif
                                                 </td>
                                             </tr>
