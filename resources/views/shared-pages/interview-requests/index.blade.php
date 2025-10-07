@@ -7,6 +7,15 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class=" mb-4 flex items-center justify-between gap-3">
                     <form class="w-[50%] me-4" action="{{ route('delegations.interviewsIndex') }}" method="GET">
+                        @foreach (request()->except(['search', 'page']) as $k => $v)
+                            @if (is_array($v))
+                                @foreach ($v as $vv)
+                                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                            @endif
+                        @endforeach
                         <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +131,11 @@
                                 }
 
                                 $names = $row->toMembers
-                                    ->map(fn($member) => '<span class="block">' . e($member?->delegate?->getTranslation('name') ?? '') . '</span>')
+                                    ->map(
+                                        fn($member) => '<span class="block">' .
+                                            e($member?->delegate?->getTranslation('name') ?? '') .
+                                            '</span>',
+                                    )
                                     ->implode('');
 
                                 return $with . $names;
@@ -176,35 +189,17 @@
     </button>
 
     <form action="{{ route('delegations.interviewsIndex') }}" method="GET">
+        @foreach (request()->except(['status_id', 'page']) as $k => $v)
+            @if (is_array($v))
+                @foreach ($v as $vv)
+                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                @endforeach
+            @else
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endif
+        @endforeach
+
         <div class="flex flex-col gap-4 mt-4">
-
-            <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('continents') }}</label>
-                <select multiple name="continent_id[]" id="continent-select" data-placeholder="{{ __db('select') }}"
-                    class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                    <option value="">{{ __db('select') }}</option>
-                    @foreach (getDropDown('continents')->options as $continent)
-                        <option value="{{ $continent->id }}"
-                            {{ is_array(request('continent_id')) && in_array($continent->id, request('continent_id')) ? 'selected' : '' }}>
-                            {{ $continent->value }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('countries') }}</label>
-                <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
-                    class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                    <option value="">{{ __db('select') }}</option>
-                    @foreach (getAllCountries() as $option)
-                        <option value="{{ $option->id }}"
-                            {{ is_array(request('country_id')) && in_array($option->id, request('country_id')) ? 'selected' : '' }}>
-                            {{ $option->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
 
             <div class="flex flex-col">
                 <label class="form-label block text-gray-700 font-medium">{{ __db('status') }}</label>

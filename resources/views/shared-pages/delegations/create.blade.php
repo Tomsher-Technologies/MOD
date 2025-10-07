@@ -361,7 +361,7 @@
 
                             <!-- Title ar -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('title') . ' ' . __db('ar') }}</label>
+                                <label class="form-label">{{ __db('title_ar') }}</label>
                                 <input type="text" :name="`delegates[${index}][title_ar]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.title_ar">
@@ -399,7 +399,7 @@
 
                             <!-- Title en -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('title') }}</label>
+                                <label class="form-label">{{ __db('title_en') }}</label>
                                 <input type="text" :name="`delegates[${index}][title_en]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.title_en">
@@ -516,11 +516,15 @@
                             </div>
 
                             <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3" x-show="!delegates.some(d => d.team_head) || delegate.team_head">
+
                                     <input type="checkbox" :id="`team-head-${index}`"
                                         :name="`delegates[${index}][team_head]`" value="1"
-                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                        x-model="delegate.team_head" />
+                                        x-model="delegate.team_head"
+                                        x-show="!delegates.some(d => d.team_head) || delegate.team_head"
+                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+
+
                                     <label :for="`team-head-${index}`"
                                         class="text-sm text-gray-700">{{ __db('team_head') }}</label>
 

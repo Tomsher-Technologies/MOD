@@ -52,6 +52,20 @@
                             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
                             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
                         @endif
+
+                        @foreach (request()->except(['search', 'page']) as $k => $v)
+                            @if (in_array($k, ['delegation_id', 'assignment_mode']) && isset($$k))
+                                @continue
+                            @endif
+                            @if (is_array($v))
+                                @foreach ($v as $vv)
+                                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                            @endif
+                        @endforeach
+
                         <div class="relative">
 
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -115,6 +129,13 @@
                             'key' => 'name',
                             'render' => fn($driver) => e($driver->getTranslation('name')),
                         ],
+
+                        [
+                            'label' => __db('unit'),
+                            'key' => 'unit',
+                            'render' => fn($driver) => '<span dir="ltr">' . e($driver?->unit?->value) . '</span>',
+                        ],
+
                         [
                             'label' => __db('phone_number'),
                             'key' => 'phone_number',
@@ -334,6 +355,20 @@
             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
         @endif
+
+        @foreach (request()->except(['assigned', 'unit_id', 'car_type', 'car_number', 'capacity', 'delegation_id', 'page']) as $k => $v)
+            @if (in_array($k, ['delegation_id', 'assignment_mode']) && isset($$k))
+                @continue
+            @endif
+            @if (is_array($v))
+                @foreach ($v as $vv)
+                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                @endforeach
+            @else
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endif
+        @endforeach
+
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
@@ -360,32 +395,6 @@
                     @endforeach
                 </select>
             </div>
-
-            {{-- <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
-                <select multiple name="title_en[]"
-                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
-                    data-placeholder="{{ __db('select') }}">
-                    <option value="">{{ __db('all') }}</option>
-                    @foreach ($titleEns as $titleEn)
-                        <option value="{{ $titleEn }}" @if (is_array(request('title_en', [])) && in_array($titleEn, request('title_en', []))) selected @endif>
-                            {{ $titleEn }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
-                <select multiple name="title_ar[]"
-                    class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
-                    data-placeholder="{{ __db('select') }}">
-                    <option value="">{{ __db('all') }}</option>
-                    @foreach ($titleArs as $titleAr)
-                        <option value="{{ $titleAr }}" @if (is_array(request('title_ar', [])) && in_array($titleAr, request('title_ar', []))) selected @endif>
-                            {{ $titleAr }}</option>
-                    @endforeach
-                </select>
-            </div> --}}
 
             <div class="flex flex-col">
                 <label

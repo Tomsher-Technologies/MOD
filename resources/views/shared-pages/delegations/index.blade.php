@@ -15,6 +15,15 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class=" mb-4 flex items-center justify-between gap-3">
                     <form class="w-[50%] me-4" action="{{ route('delegations.index') }}" method="GET">
+                        @foreach (request()->except(['search', 'page']) as $k => $v)
+                            @if (is_array($v))
+                                @foreach ($v as $vv)
+                                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                            @endif
+                        @endforeach
                         <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -330,6 +339,7 @@
         tabindex="-1" aria-labelledby="drawer-label">
         <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
             {{ __db('filter') }}</h5>
+            
         <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -341,6 +351,16 @@
         </button>
 
         <form action="{{ route('delegations.index') }}" method="GET">
+            @foreach (request()->except(['invitation_from', 'continent_id', 'country_id', 'invitation_status_id', 'participation_status_id', 'page']) as $k => $v)
+                @if (is_array($v))
+                    @foreach ($v as $vv)
+                        <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                @endif
+            @endforeach
+
             <div class="flex flex-col gap-2 mt-2">
 
                 <div class="flex flex-col">
@@ -545,38 +565,38 @@
                 allowClear: true
             });
 
-            let initiallySelectedCountries = $('#country-select').val() || [];
+            const preselectedContinents = @json(request('continent_id') ?? []);
+            const preselectedCountries = @json(request('country_id') ?? []);
 
-            $('#continent-select').on('change', function() {
-                const continentId = $(this).val();
-                const countrySelect = $('#country-select');
+            const $continentSelect = $('#continent-select');
+            const $countrySelect = $('#country-select');
 
-                countrySelect.find('option[value!=""]').remove();
+            $continentSelect.on('change', function() {
+                const continentIds = $(this).val();
+                $countrySelect.find('option').remove();
 
-                if (continentId) {
+                if (continentIds && continentIds.length > 0) {
                     $.get('{{ route('countries.by-continent') }}', {
-                        continent_ids: continentId
+                        continent_ids: continentIds
                     }, function(data) {
                         $.each(data, function(index, country) {
-                            const isSelected = initiallySelectedCountries.includes(country
-                                .id.toString());
-
-                            countrySelect.append(new Option(country.name, country.id, false,
-                                isSelected));
+                            const isSelected = preselectedCountries.includes(country.id
+                                .toString());
+                            $countrySelect.append(new Option(country.name, country.id,
+                                false, isSelected));
                         });
 
-                        countrySelect.trigger('change');
+                        $countrySelect.trigger('change.select2');
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });
                 } else {
-                    countrySelect.val(null).trigger('change');
+                    $countrySelect.val(null).trigger('change.select2');
                 }
             });
 
-            const selectedContinent = $('#continent-select').val();
-            if (selectedContinent && selectedContinent.length > 0) {
-                $('#continent-select').trigger('change');
+            if (preselectedContinents.length > 0) {
+                $continentSelect.val(preselectedContinents).trigger('change');
             }
         });
     </script>

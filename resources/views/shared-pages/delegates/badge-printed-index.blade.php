@@ -1,16 +1,12 @@
 <div x-data="{
     badgePrintedFilter: '{{ request('badge_printed', '') }}',
     init() {
-        // Initialize the filter value
         this.badgePrintedFilter = '{{ request('badge_printed', '') }}';
     },
     handleBadgePrintedChange(delegateId, isChecked) {
-        // Only update immediately if we're unchecking a previously checked delegate
         if (!isChecked && originalBadgePrintedStatus[delegateId]) {
             updateBadgePrintedStatus(delegateId, isChecked);
         }
-        // For all other cases, we don't update immediately
-        // The status will be updated when exporting
     }
 }">
 
@@ -39,6 +35,17 @@
 
 
                     <form class="flex gap-4 w-full" action="{{ route('delegates.badgePrintedIndex') }}" method="GET">
+
+                        @foreach (request()->except(['search_key', 'badge_printed', 'page']) as $k => $v)
+                            @if (is_array($v))
+                                @foreach ($v as $vv)
+                                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                            @endif
+                        @endforeach
+
                         <div class="flex-1">
                             <div class="relative">
                                 <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -244,19 +251,19 @@
                     </div>
                 </div>
 
-              
+
             </div>
         </div>
     </div>
 
-    <div id="filter-drawer"
+   <div id="filter-drawer"
         class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
-        tabindex="-1">
-        <h5 class="text-base font-semibold text-gray-900">
-            {{ __db('filter') }}
-        </h5>
+        tabindex="-1" aria-labelledby="drawer-label">
+        <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
+            {{ __db('filter') }}</h5>
+            
         <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
-            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 right-2.5 inline-flex items-center justify-center">
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                 viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -264,8 +271,20 @@
             </svg>
             <span class="sr-only">{{ __db('close_menu') }}</span>
         </button>
+        
         <div class="border-t border-gray-200 mt-4">
             <form action="{{ route('delegates.badgePrintedIndex') }}" method="GET" class="space-y-4">
+
+                @foreach (request()->except(['continent_id', 'country_id', 'invitation_from', 'page']) as $k => $v)
+                    @if (is_array($v))
+                        @foreach ($v as $vv)
+                            <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                        @endforeach
+                    @else
+                        <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                    @endif
+                @endforeach
+
                 @if (request('search_key'))
                     <input type="hidden" name="search_key" value="{{ request('search_key') }}">
                 @endif
@@ -278,7 +297,6 @@
                     <select multiple name="continent_id[]" id="continent-select"
                         data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                        <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('continents')->options as $continent)
                             <option value="{{ $continent->id }}"
                                 {{ is_array(request('continent_id')) && in_array($continent->id, request('continent_id')) ? 'selected' : '' }}>
@@ -292,13 +310,6 @@
                     <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
                     <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                        <option value="">{{ __db('select') }}</option>
-                        @foreach (getAllCountries() as $option)
-                            <option value="{{ $option->id }}"
-                                {{ is_array(request('country_id')) && in_array($option->id, request('country_id')) ? 'selected' : '' }}>
-                                {{ $option->name }}
-                            </option>
-                        @endforeach
                     </select>
                 </div>
 
@@ -519,38 +530,38 @@
                 allowClear: true
             });
 
-            let initiallySelectedCountries = $('#country-select').val() || [];
+            const preselectedContinents = @json(request('continent_id') ?? []);
+            const preselectedCountries = @json(request('country_id') ?? []);
 
-            $('#continent-select').on('change', function() {
-                const continentId = $(this).val();
-                const countrySelect = $('#country-select');
+            const $continentSelect = $('#continent-select');
+            const $countrySelect = $('#country-select');
 
-                countrySelect.find('option[value!=""]').remove();
+            $continentSelect.on('change', function() {
+                const continentIds = $(this).val();
+                $countrySelect.find('option').remove();
 
-                if (continentId) {
+                if (continentIds && continentIds.length > 0) {
                     $.get('{{ route('countries.by-continent') }}', {
-                        continent_ids: continentId
+                        continent_ids: continentIds
                     }, function(data) {
                         $.each(data, function(index, country) {
-                            const isSelected = initiallySelectedCountries.includes(country
-                                .id.toString());
-
-                            countrySelect.append(new Option(country.name, country.id, false,
-                                isSelected));
+                            const isSelected = preselectedCountries.includes(country.id
+                                .toString());
+                            $countrySelect.append(new Option(country.name, country.id,
+                                false, isSelected));
                         });
 
-                        countrySelect.trigger('change');
+                        $countrySelect.trigger('change.select2');
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });
                 } else {
-                    countrySelect.val(null).trigger('change');
+                    $countrySelect.val(null).trigger('change.select2');
                 }
             });
 
-            const selectedContinent = $('#continent-select').val();
-            if (selectedContinent && selectedContinent.length > 0) {
-                $('#continent-select').trigger('change');
+            if (preselectedContinents.length > 0) {
+                $continentSelect.val(preselectedContinents).trigger('change');
             }
         });
     </script>
