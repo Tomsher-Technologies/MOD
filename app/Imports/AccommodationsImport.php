@@ -27,6 +27,7 @@ class AccommodationsImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
+        $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
         $roomTypeOption = DropdownOption::whereHas('dropdown', function ($q) {
             $q->where('code', 'room_type');
         })->pluck('id')->toArray();
@@ -37,9 +38,12 @@ class AccommodationsImport implements ToCollection, WithHeadingRow
             $rowNumber++;
 
             try {
-                $existingHotel = Accommodation::where('hotel_name', trim($row['hotel_name_en']))
-                    ->orWhere('hotel_name_ar', trim($row['hotel_name_ar']))
-                    ->first();
+                $existingHotel = Accommodation::where('event_id', $currentEventId)
+                                        ->where(function ($q) use ($row) {
+                                            $q->where('hotel_name', trim($row['hotel_name_en']))
+                                            ->orWhere('hotel_name_ar', trim($row['hotel_name_ar']));
+                                        })
+                                        ->first();
 
                 if ($existingHotel) {
                     $this->importLogService->logError('hotels', $this->fileName, $rowNumber, 'Hotel already exists: ' . trim($row['hotel_name_en'] ?? $row['hotel_name_ar']), $row->toArray());
@@ -47,6 +51,7 @@ class AccommodationsImport implements ToCollection, WithHeadingRow
                 }
 
                 $accommodation = Accommodation::create([
+                    'event_id'       => $currentEventId,
                     'hotel_name'     => trim($row['hotel_name_en']) ?? null,
                     'hotel_name_ar'  => trim($row['hotel_name_ar']) ?? null,
                     'contact_number' => $row['contact_number'] ?? null,
