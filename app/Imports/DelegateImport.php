@@ -117,6 +117,16 @@ class DelegateImport implements ToCollection, WithHeadingRow
             'badge_printed' => !empty($row['delegate_badge_printed']) && strtolower($row['delegate_badge_printed']) === 'yes' ? 1 : 0,
         ];
 
+        if ($delegateData['team_head']) {
+            $existingTeamHead = Delegate::where('delegation_id', $delegationId)
+                ->where('team_head', true)
+                ->first();
+
+            if ($existingTeamHead) {
+                $existingTeamHead->team_head = false;
+                $existingTeamHead->save();
+            }
+        }
 
         if (!empty($row['delegate_gender_code'])) {
             $gender = DropdownOption::whereHas('dropdown', function ($q) {
@@ -126,7 +136,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($gender) {
                 $delegateData['gender_id'] = $gender->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_gender_code: ' . $row['delegate_gender_code'], $row->toArray());
+                throw new \Exception("Invalid delegate_gender_code: {$row['delegate_gender_code']} (Row {$rowNumber})");
             }
         }
 
@@ -138,7 +148,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($relationship) {
                 $delegateData['relationship_id'] = $relationship->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_relationship_code: ' . $row['delegate_relationship_code'], $row->toArray());
+                throw new \Exception("Invalid delegate_relationship_code: {$row['delegate_relationship_code']} (Row {$rowNumber})");
             }
         }
 
@@ -150,7 +160,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($ranking) {
                 $delegateData['internal_ranking_id'] = $ranking->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid delegate_internal_ranking_code: ' . $row['delegate_internal_ranking_code'], $row->toArray());
+                throw new \Exception("Invalid delegate_internal_ranking_code: {$row['delegate_internal_ranking_code']} (Row {$rowNumber})");
             }
         }
 
@@ -162,7 +172,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
             if ($parentDelegate) {
                 $delegateData['parent_id'] = $parentDelegate->id;
             } else {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Parent delegate not found with code: ' . $row['delegate_parent_code'], $row->toArray());
+                throw new \Exception("Parent delegate not found with code: {$row['delegate_parent_code']} (Row {$rowNumber})");
             }
         }
 

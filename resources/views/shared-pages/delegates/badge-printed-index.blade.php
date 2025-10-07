@@ -244,9 +244,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    {{ $delegates->links() }}
-                </div>
+              
             </div>
         </div>
     </div>
