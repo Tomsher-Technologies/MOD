@@ -1,31 +1,21 @@
-#!/usr/bin/env python3
-"""
-Delegations and Delegates Data Generator
-
-This script generates sample data for delegations and delegates in Excel format
-that can be used with the import functionality of the application.
-"""
 import pandas as pd
 import random
 from datetime import datetime, timedelta
 import argparse
-import os
 
-
-def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
+def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10, code_prefix="DA28", start_sequence=1):
     """
     Generate sample delegations and delegates data for Excel import
     
     Args:
         num_delegations: Number of delegations to generate
         num_delegates_per_delegation: Number of delegates per delegation
+        code_prefix: Static prefix for delegation code (e.g., DA28)
     
     Returns:
         tuple: (delegations_df, delegates_df)
     """
     
-    # Dropdown value mappings based on the actual database values - using codes instead of IDs
-    # Continent codes from dropdown_options table where dropdown_id = 3 (Continents)
     continents = [
         {'code': '1', 'name': 'Asia'},
         {'code': '2', 'name': 'Africa'},
@@ -131,22 +121,20 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
         {'code': '12', 'name': 'MOD Human Resources'}  # Added from actual dropdown
     ]
     
+    
     # Generate delegations data
     delegations_data = []
     for i in range(1, num_delegations + 1):
         continent = random.choice(continents)
-        # Find a country that matches the selected continent code
         continent_countries = [c for c in countries if c['continent_code'] == continent['code']]
-        if continent_countries:
-            country = random.choice(continent_countries)
-        else:
-            # Fallback to any country if no match found
-            country = random.choice(countries)
-        
+        country = random.choice(continent_countries) if continent_countries else random.choice(countries)
         invitation_from = random.choice(invitation_froms)
         
+        # Generate delegation code using prefix and sequence
+        delegation_code = f"{code_prefix}-{i:04d}"
+        
         delegation = {
-            'code': f'DLG{i:04d}',
+            'code': delegation_code,
             'invitation_from_code': invitation_from['code'],
             'continent_code': continent['code'],
             'country_code': country['code'],
@@ -161,7 +149,9 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
     delegates_data = []
     delegate_counter = 1
     
-    for i, delegation in enumerate(delegations_data):
+    for delegation in delegations_data:
+        delegation_code = delegation['code']
+        
         for j in range(num_delegates_per_delegation):
             gender = random.choice(genders)
             relationship = random.choice(relationships)
@@ -181,15 +171,17 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
             arabic_last_names = ['السعود', 'الفهد', 'الثاني', 'المكتوم', 'الملك', 'النمر', 'الراشد', 'الغامدي']
             arabic_full_name = f"{random.choice(arabic_first_names)} {random.choice(arabic_last_names)}"
             
-            # Designations
             designations = ['Minister', 'Ambassador', 'Director', 'Advisor', 'Deputy Minister', 'Counselor', 
                            'Attaché', 'Consul', 'Representative', 'Head of Delegation', 'Deputy Head of Delegation',
                            'Technical Advisor', 'Policy Advisor', 'Legal Advisor', 'Economic Advisor']
             designation_en = random.choice(designations)
             designation_ar = 'وزير' if 'Minister' in designation_en else 'سفير' if 'Ambassador' in designation_en else 'ممثل'
             
+            delegate_code = f"{delegation_code}-D{j+1:02d}"
+            
             delegate = {
-                'delegation_code': delegation['code'],  # Link to delegation by code
+                'delegation_code': delegation_code,  # Link to delegation by code
+                'delegate_code': delegate_code,      # Unique delegate code
                 'delegate_title_en': random.choice([t['name'] for t in titles]),
                 'delegate_title_ar': 'السيد' if gender['name'] == 'Male' else 'السيدة',
                 'delegate_name_en': full_name,
@@ -200,19 +192,17 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
                 'delegate_note': f'Note for delegate {delegate_counter}',
                 'delegate_relationship_code': relationship['code'],
                 'delegate_internal_ranking_code': internal_ranking['code'],
-                'delegate_team_head': 'Yes' if j == 0 else 'No',  # First delegate is team head
-                'delegate_accommodation': 'Yes' if random.choice([True, False, False]) else 'No',  # 1/3 get accommodation
-                'delegate_badge_printed': 'No',  # Badge not printed by default
-                'delegate_parent_code': None,  # Parent relationship not set by default
+                'delegate_team_head': 'Yes' if j == 0 else 'No',
+                'delegate_accommodation': 'Yes' if random.choice([True, False, False]) else 'No',
+                'delegate_badge_printed': 'No',
+                'delegate_parent_code': None,
             }
             
-            # Add some parent relationships for family members
-            if j > 0 and random.choice([True, False]):  # 50% chance for family relationship
-                # Link to a previous delegate in the same delegation
-                delegate['delegate_parent_code'] = f'DLG{i:04d}-D{random.randint(1, j):02d}'
+            if j > 0 and random.choice([True, False]):
+                delegate['delegate_parent_code'] = f"{delegation_code}-D{random.randint(1, j):02d}"
             
-            # Add transport information
-            if random.choice([True, False]):  # 50% chance of having arrival info
+            # Arrival and departure info same as before...
+            if random.choice([True, False]):
                 arrival_date = (datetime.now() + timedelta(days=random.randint(1, 10))).strftime('%Y-%m-%d %H:%M:%S')
                 delegate.update({
                     'arrival_mode': 'flight',
@@ -223,7 +213,7 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
                     'arrival_comment': f'Arrival comment for delegate {delegate_counter}'
                 })
             
-            if random.choice([True, False]):  # 50% chance of having departure info
+            if random.choice([True, False]):
                 departure_date = (datetime.now() + timedelta(days=random.randint(11, 20))).strftime('%Y-%m-%d %H:%M:%S')
                 delegate.update({
                     'departure_mode': 'flight',
@@ -239,37 +229,34 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
     
     return pd.DataFrame(delegations_data), pd.DataFrame(delegates_data)
 
-
 def main():
     parser = argparse.ArgumentParser(description='Generate delegations and delegates data for import')
-    parser.add_argument('--delegations', type=int, default=10, help='Number of delegations to generate (default: 10)')
-    parser.add_argument('--delegates-per-delegation', type=int, default=5, help='Number of delegates per delegation (default: 5)')
-    parser.add_argument('--output', type=str, default='delegations_delegates_data.xlsx', help='Output Excel file name (default: delegations_delegates_data.xlsx)')
-    
+    parser.add_argument('--delegations', type=int, default=10, help='Number of delegations to generate')
+    parser.add_argument('--delegates-per-delegation', type=int, default=5, help='Number of delegates per delegation')
+    parser.add_argument('--prefix', type=str, default='DA28', help='Delegation code prefix (e.g., DA28)')
+    parser.add_argument('--start-sequence', type=int, default=1, help='Starting sequence number for delegation codes')
+    parser.add_argument('--output', type=str, default='delegations_delegates_data.xlsx', help='Output Excel file name')
+
     args = parser.parse_args()
-    
+
     print(f"Generating {args.delegations} delegations with {args.delegates_per_delegation} delegates each...")
-    
-    delegations_df, delegates_df = generate_sample_data(args.delegations, args.delegates_per_delegation)
-    
-    # Create Excel file with multiple sheets
+    print(f"Using code prefix: {args.prefix} (starting from {args.start_sequence:04d})")
+
+    delegations_df, delegates_df = generate_sample_data(
+        args.delegations,
+        args.delegates_per_delegation,
+        args.prefix,
+        args.start_sequence
+    )
+
     with pd.ExcelWriter(args.output, engine='openpyxl') as writer:
         delegations_df.to_excel(writer, sheet_name='Delegations', index=False)
         delegates_df.to_excel(writer, sheet_name='Delegates', index=False)
-    
-    print(f"Data generated successfully!")
-    print(f"Output file: {args.output}")
-    print(f"Delegations: {len(delegations_df)} records")
-    print(f"Delegates: {len(delegates_df)} records")
-    
-    # Print column information for reference
-    print("\nDelegations columns:")
-    for col in delegations_df.columns:
-        print(f"  - {col}")
-    
-    print("\nDelegates columns:")
-    for col in delegates_df.columns:
-        print(f"  - {col}")
+
+    print(f"✅ Data generated successfully!")
+    print(f"📁 Output file: {args.output}")
+    print(f"🧾 Delegations: {len(delegations_df)} records")
+    print(f"👥 Delegates: {len(delegates_df)} records")
 
 
 if __name__ == "__main__":
