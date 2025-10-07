@@ -241,7 +241,7 @@
                                 'label' => __db('accommodation'),
                                 'render' => function ($row) {
                                     if (!$row->assignable?->accommodation) {
-                                        return 'Not Required';
+                                        return __db('not_required');
                                     }
                                     $room = $row->assignable?->currentRoomAssignment ?? null;
                                     $accommodation = $row->assignable?->current_room_assignment_id

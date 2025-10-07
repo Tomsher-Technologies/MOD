@@ -27,7 +27,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
         $this->fileName = $fileName;
         $this->importLogService->clearLogs('delegations');
     }
-    
+
     public function collection(Collection $rows)
     {
 
@@ -35,16 +35,16 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
         try {
             $rowNumber = 1;
-            
+
             foreach ($rows as $row) {
                 $rowNumber++;
-                
+
                 try {
                     if (empty($row['invitation_from_code'])) {
                         $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing invitation_from_code', $row->toArray());
                         continue;
                     }
-                    
+
                     if (empty($row['country_code'])) {
                         $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Missing country_code', $row->toArray());
                         continue;
@@ -63,13 +63,12 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
                     $delegation = Delegation::create($delegationData);
 
                     $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
-                    
+
                     $this->importLogService->logSuccess('delegations', $this->fileName, $rowNumber, $row->toArray());
                     // }
                 } catch (\Exception $e) {
                     Log::error('Delegation Only Import Error: ' . $e->getMessage());
                     $this->importLogService->logError('delegations', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
-
                 }
             }
 
@@ -101,7 +100,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($invitationFrom) {
                 $delegationData['invitation_from_id'] = $invitationFrom->id;
             } else {
-                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid invitation_from_code: ' . $row['invitation_from_code'], $row->toArray());
+                throw new \Exception("Invalid invitation_from_code: {$row['invitation_from_code']} (Row {$rowNumber})");
             }
         }
 
@@ -113,7 +112,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($continent) {
                 $delegationData['continent_id'] = $continent->id;
             } else {
-                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid continent_code: ' . $row['continent_code'], $row->toArray());
+                throw new \Exception("Invalid continent_code: {$row['continent_code']} (Row {$rowNumber})");
             }
         }
 
@@ -123,7 +122,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($country) {
                 $delegationData['country_id'] = $country->id;
             } else {
-                $this->importLogService->logError('delegations', $this->fileName, $rowNumber, 'Invalid country_code: ' . $row['country_code'], $row->toArray());
+                throw new \Exception("Invalid country_code: {$row['country_code']} (Row {$rowNumber})");
             }
         }
 
@@ -135,11 +134,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             if ($invitationStatus) {
                 $delegationData['invitation_status_id'] = $invitationStatus->id;
             } else {
-                $defaultInvitationStatus = DropdownOption::whereHas('dropdown', function ($q) {
-                    $q->where('code', 'invitation_status');
-                })->where('code', '1')->first();
-
-                $delegationData['invitation_status_id'] = $defaultInvitationStatus->id;
+                throw new \Exception("Invalid invitation_status_code: {$row['invitation_status_code']} (Row {$rowNumber})");
             }
         } else {
             $defaultInvitationStatus = DropdownOption::whereHas('dropdown', function ($q) {
