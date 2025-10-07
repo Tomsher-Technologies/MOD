@@ -135,7 +135,7 @@
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $delegateRoom ? $delegateRoom?->room_number : '-' }}</td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $delegateRoom?->roomType?->roomType?->value }}</td>
                                 <td style="padding: 8px; border: 2px solid #000;">
-                                    {{ $delegateRoom?->hotel?->hotel_name ?? 'Not Required'}}
+                                    {{ $delegateRoom?->hotel?->hotel_name ?? __db('not_required') }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $departure?->flight_no ?? '-' }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
