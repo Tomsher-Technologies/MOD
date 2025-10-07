@@ -12,7 +12,7 @@ import argparse
 import os
 
 
-def generate_sample_data(num_delegations=10, num_delegates_per_delegation=5):
+def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10):
     """
     Generate sample delegations and delegates data for Excel import
     
@@ -168,7 +168,6 @@ def generate_sample_data(num_delegations=10, num_delegates_per_delegation=5):
             title = random.choice(titles)
             internal_ranking = random.choice(internal_rankings)
             
-            # Generate names in both English and Arabic
             first_names = ['Mohammed', 'Ahmed', 'Omar', 'Ali', 'Khalid', 'Sara', 'Fatima', 'Aisha', 'Layla', 'Noura',
                           'John', 'Robert', 'Michael', 'David', 'James', 'Mary', 'Jennifer', 'Linda', 'Patricia', 'Elizabeth']
             last_names = ['Al-Saud', 'Al-Fahd', 'Al-Thani', 'Al-Maktoum', 'Smith', 'Johnson', 'Williams', 'Brown', 
@@ -178,7 +177,6 @@ def generate_sample_data(num_delegations=10, num_delegates_per_delegation=5):
             last_name = random.choice(last_names)
             full_name = f"{first_name} {last_name}"
             
-            # Arabic names
             arabic_first_names = ['محمد', 'أحمد', 'عمر', 'علي', 'خالد', 'سارة', 'فاطمة', 'عائشة', 'ليلى', 'نورا']
             arabic_last_names = ['السعود', 'الفهد', 'الثاني', 'المكتوم', 'الملك', 'النمر', 'الراشد', 'الغامدي']
             arabic_full_name = f"{random.choice(arabic_first_names)} {random.choice(arabic_last_names)}"
@@ -218,7 +216,7 @@ def generate_sample_data(num_delegations=10, num_delegates_per_delegation=5):
                 arrival_date = (datetime.now() + timedelta(days=random.randint(1, 10))).strftime('%Y-%m-%d %H:%M:%S')
                 delegate.update({
                     'arrival_mode': 'flight',
-                    'arrival_airport_code': f'{random.choice(["DXB", "AUH", "JFK", "LHR", "CDG", "FRA"])}',
+                    'arrival_airport_code': f'{random.choice(["1", "2", "3", "4", "5", "6"])}',
                     'arrival_flight_no': f'{random.choice(["EK", "EY", "AA", "BA", "AF"])}{random.randint(100, 999)}',
                     'arrival_flight_name': f'Flight {random.randint(100, 999)}',
                     'arrival_date_time': arrival_date,
@@ -229,7 +227,7 @@ def generate_sample_data(num_delegations=10, num_delegates_per_delegation=5):
                 departure_date = (datetime.now() + timedelta(days=random.randint(11, 20))).strftime('%Y-%m-%d %H:%M:%S')
                 delegate.update({
                     'departure_mode': 'flight',
-                    'departure_airport_code': f'{random.choice(["DXB", "AUH", "JFK", "LHR", "CDG", "FRA"])}',
+                    'departure_airport_code': f'{random.choice(["1", "2", "3", "4", "5", "6"])}',
                     'departure_flight_no': f'{random.choice(["EK", "EY", "AA", "BA", "AF"])}{random.randint(100, 999)}',
                     'departure_flight_name': f'Flight {random.randint(100, 999)}',
                     'departure_date_time': departure_date,
