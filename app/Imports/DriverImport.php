@@ -49,6 +49,11 @@ class DriverImport implements ToCollection, WithHeadingRow
                     'status' => 1,
                 ];
 
+                if (empty($row['name_en']) && empty($row['name_ar'])) {
+                    $this->importLogService->logError('drivers', $this->fileName, $rowNumber, 'Invalid name', $row->toArray());
+                    continue;
+                }
+
                 if (!empty($row['unit_code'])) {
                     $unit = DropdownOption::whereHas('dropdown', function ($q) {
                         $q->where('code', 'unit');

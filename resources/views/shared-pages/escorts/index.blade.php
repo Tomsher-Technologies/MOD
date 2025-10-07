@@ -50,6 +50,17 @@
                             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
                             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
                         @endif
+
+                        @foreach (request()->except(['search', 'page']) as $k => $v)
+                            @continue(in_array($k, ['delegation_id', 'assignment_mode']) && isset($$k))
+                            @if (is_array($v))
+                                @foreach ($v as $vv)
+                                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                            @endif
+                        @endforeach
                         <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -303,6 +314,20 @@
             <input type="hidden" name="delegation_id" value="{{ $delegationId }}">
             <input type="hidden" name="assignment_mode" value="{{ $assignmentMode }}">
         @endif
+
+        @foreach (request()->except(['internal_ranking_id', 'assigned', 'gender_id', 'language_id', 'delegation_id', 'page']) as $k => $v)
+            @if (in_array($k, ['delegation_id', 'assignment_mode']) && isset($$k))
+                @continue
+            @endif
+            @if (is_array($v))
+                @foreach ($v as $vv)
+                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                @endforeach
+            @else
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endif
+        @endforeach
+
         <div class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col">
                 <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('rank') }}</label>
@@ -322,8 +347,10 @@
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
                     <option value="">{{ __db('all') }}</option>
-                    <option value="assigned" @if (request('assigned') == 'assigned') selected @endif>{{ __db('assigned') }}</option>
-                    <option value="unassigned" @if (request('assigned') == 'unassigned') selected @endif>{{ __db('unassigned') }}</option>
+                    <option value="assigned" @if (request('assigned') == 'assigned') selected @endif>{{ __db('assigned') }}
+                    </option>
+                    <option value="unassigned" @if (request('assigned') == 'unassigned') selected @endif>
+                        {{ __db('unassigned') }}</option>
                 </select>
             </div>
 

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -271,6 +272,9 @@ class DelegationController extends Controller
                     })
                     ->orWhereHas('toMembers.otherMember', function ($otherMemberQuery) use ($search) {
                         $otherMemberQuery->where('name_en', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('interviewWithDelegation', function ($otherMemberQuery) use ($search) {
+                        $otherMemberQuery->where('code', 'like', "%{$search}%");
                     });
             });
         }
@@ -308,6 +312,7 @@ class DelegationController extends Controller
         $interviews = $query->orderBy('id', 'desc')->paginate($limit);
 
         $request->session()->put('show_delegations_last_url', url()->full());
+        $request->session()->put('edit_interviews_last_url', url()->full());
         $request->session()->put('other_interview_member_show_last_url', url()->full());
         $request->session()->put('add_interview_last_url', url()->full());
         $request->session()->put('other_interview_member_show_last_url', url()->full());
@@ -360,6 +365,8 @@ class DelegationController extends Controller
         $request->session()->put('show_drivers_last_url', url()->full());
 
         $request->session()->put('other_interview_member_show_last_url', url()->full());
+
+        $request->session()->put('edit_interviews_last_url', url()->full());
 
         return view('admin.delegations.edit', [
             'delegation' => $delegation,
@@ -1547,6 +1554,7 @@ class DelegationController extends Controller
                     submoduleId: $newInterview->id,
                     delegationId: $delegation->id
                 );
+                
 
                 return response()->json([
                     'status' => 'success',
@@ -1657,7 +1665,7 @@ class DelegationController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => __db('updated_successfully'),
-                'redirect_url' => route('delegations.show', $delegation->id),
+                'redirect_url' => Session::has('edit_interviews_last_url') ? Session::get('edit_interviews_last_url') : route('delegations.show', $delegation->id),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -361,7 +361,7 @@
 
                             <!-- Title ar -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('title') . ' ' . __db('ar') }}</label>
+                                <label class="form-label">{{ __db('title_ar') }}</label>
                                 <input type="text" :name="`delegates[${index}][title_ar]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.title_ar">
@@ -399,7 +399,7 @@
 
                             <!-- Title en -->
                             <div class="col-span-3">
-                                <label class="form-label">{{ __db('title') }}</label>
+                                <label class="form-label">{{ __db('title_en') }}</label>
                                 <input type="text" :name="`delegates[${index}][title_en]`"
                                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm text-neutral-600"
                                     x-model="delegate.title_en">

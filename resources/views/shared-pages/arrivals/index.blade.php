@@ -1,6 +1,15 @@
 <div x-data="{ isArrivalEditModalOpen: false }">
     <div class="flex items-center justify-between gap-4 mb-4">
         <form class="flex gap-4 w-full" action="{{ route('delegations.arrivalsIndex') }}" method="GET">
+            @foreach (request()->except(['date_range', 'search_key', 'page']) as $k => $v)
+                @if (is_array($v))
+                    @foreach ($v as $vv)
+                        <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                @endif
+            @endforeach
             <div class="flex flex-col">
                 <input type="text" class="form-control date-range" id="date_range" name="date_range"
                     placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
@@ -49,7 +58,8 @@
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
                         <img src="{{ getAdminEventLogo() }}" alt="" class="max-h-[100px]">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[100px]" alt="Logo">
+                        <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[100px]"
+                            alt="Logo">
                     </div>
 
                     <a href="#" id="fullscreenToggleBtn"
@@ -183,6 +193,17 @@
     </button>
 
     <form action="{{ route('delegations.arrivalsIndex') }}" method="GET">
+
+        @foreach (request()->except(['invitation_from', 'continent_id', 'country_id', 'airport_id', 'status', 'page']) as $k => $v)
+            @if (is_array($v))
+                @foreach ($v as $vv)
+                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                @endforeach
+            @else
+                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+            @endif
+        @endforeach
+
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
@@ -291,40 +312,40 @@
                 allowClear: true
             });
 
-            let initiallySelectedCountries = $('#country-select').val() || [];
+            const preselectedContinents = @json(request('continent_id') ?? []);
+            const preselectedCountries = @json(request('country_id') ?? []);
 
-            $('#continent-select').on('change', function() {
-                const continentId = $(this).val();
-                const countrySelect = $('#country-select');
+            const $continentSelect = $('#continent-select');
+            const $countrySelect = $('#country-select');
 
-                countrySelect.find('option[value!=""]').remove();
+            $continentSelect.on('change', function() {
+                const continentIds = $(this).val();
+                $countrySelect.find('option').remove();
 
-                if (continentId) {
+                if (continentIds && continentIds.length > 0) {
                     $.get('{{ route('countries.by-continent') }}', {
-                        continent_ids: continentId
+                        continent_ids: continentIds
                     }, function(data) {
                         $.each(data, function(index, country) {
-                            const isSelected = initiallySelectedCountries.includes(country
-                                .id.toString());
-
-                            countrySelect.append(new Option(country.name, country.id, false,
-                                isSelected));
+                            const isSelected = preselectedCountries.includes(country.id
+                                .toString());
+                            $countrySelect.append(new Option(country.name, country.id,
+                                false, isSelected));
                         });
 
-                        countrySelect.trigger('change');
+                        $countrySelect.trigger('change.select2');
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });
                 } else {
-                    countrySelect.val(null).trigger('change');
+                    $countrySelect.val(null).trigger('change.select2');
                 }
             });
 
-            const selectedContinent = $('#continent-select').val();
-            if (selectedContinent && selectedContinent.length > 0) {
-                $('#continent-select').trigger('change');
+            if (preselectedContinents.length > 0) {
+                $continentSelect.val(preselectedContinents).trigger('change');
             }
-            
+
             const arrivalDateTimeInput = document.getElementById('arrival_datetime');
             if (arrivalDateTimeInput) {
                 $(arrivalDateTimeInput).datetimepicker({
@@ -337,7 +358,7 @@
                 });
             }
         });
-        
+
         function bindArrivalEditButtons() {
             document.querySelectorAll('.edit-arrival-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -348,7 +369,7 @@
                 });
             });
         }
-        
+
         document.addEventListener('DOMContentLoaded', bindArrivalEditButtons);
     </script>
 @endsection

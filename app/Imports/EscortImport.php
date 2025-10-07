@@ -28,27 +28,26 @@ class EscortImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
-        $rowNumber = 1; 
-        
+        $rowNumber = 1;
+
         foreach ($rows as $row) {
             $rowNumber++;
-            
-            try {
-                // $existingEscort = Escort::where('code', trim($row['code']))
-                //                     ->first();
 
+            try {
                 $escortData = [
                     'name_en' => trim($row['name_en']) ?? null,
                     'name_ar' => trim($row['name_ar']) ?? null,
                     'military_number' => trim($row['military_number']) ?? null,
                     'phone_number' => trim($row['phone_number']) ?? null,
-                    'email' => trim($row['email']) ?? null,
                     'internal_ranking_id' => null,
                     'unit_id' => null,
-                    // 'title_en' => trim($row['title_en']) ?? null,
-                    // 'title_ar' => trim($row['title_ar']) ?? null,
                     'status' => 1,
                 ];
+
+                if (empty($row['name_en']) && empty($row['name_ar'])) {
+                    $this->importLogService->logError('escorts', $this->fileName, $rowNumber, 'Invalid name', $row->toArray());
+                    continue;
+                }
 
                 if (!empty($row['gender_code'])) {
                     $gender = DropdownOption::whereHas('dropdown', function ($q) {
@@ -94,9 +93,9 @@ class EscortImport implements ToCollection, WithHeadingRow
                     $validLanguageIds = [];
 
                     foreach ($languageCodes as $languageCode) {
-                        
+
                         $lang = DropdownOption::whereHas('dropdown', function ($q) {
-                            $q->where('code', 'language');
+                            $q->where('code', 'spoken_languages');
                         })->where('code', trim($languageCode))->first();
 
                         if ($lang) {
@@ -113,19 +112,6 @@ class EscortImport implements ToCollection, WithHeadingRow
                     $escortData['phone_number'] = $escortData['phone_number'];
                 }
 
-                // if ($existingEscort) {
-                //     $existingEscort->update($escortData);
-
-                //     $this->logActivity(
-                //         module: 'Escorts',
-                //         action: 'update-excel',
-                //         model: $existingEscort,
-                //         submodule: 'managing_members',
-                //         submoduleId: $existingEscort->id
-                //     );
-                //     
-                //     $this->importLogService->logSuccess('escorts', $this->fileName, $rowNumber, $row->toArray());
-                // } else {
                 $escort = Escort::create($escortData);
 
                 $this->logActivity(
@@ -135,9 +121,8 @@ class EscortImport implements ToCollection, WithHeadingRow
                     submodule: 'managing_members',
                     submoduleId: $escort->id
                 );
-                
+
                 $this->importLogService->logSuccess('escorts', $this->fileName, $rowNumber, $row->toArray());
-                // }
             } catch (\Exception $e) {
                 Log::error('Escort Import Error: ' . $e->getMessage());
                 $this->importLogService->logError('escorts', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
