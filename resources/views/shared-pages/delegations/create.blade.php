@@ -516,11 +516,15 @@
                             </div>
 
                             <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-3" x-show="!delegates.some(d => d.team_head) || delegate.team_head">
+
                                     <input type="checkbox" :id="`team-head-${index}`"
                                         :name="`delegates[${index}][team_head]`" value="1"
-                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                        x-model="delegate.team_head" />
+                                        x-model="delegate.team_head"
+                                        x-show="!delegates.some(d => d.team_head) || delegate.team_head"
+                                        class="h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+
+
                                     <label :for="`team-head-${index}`"
                                         class="text-sm text-gray-700">{{ __db('team_head') }}</label>
 
