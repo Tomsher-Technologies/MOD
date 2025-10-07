@@ -181,7 +181,6 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10, c
             
             delegate = {
                 'delegation_code': delegation_code,  # Link to delegation by code
-                'delegate_code': delegate_code,      # Unique delegate code
                 'delegate_title_en': random.choice([t['name'] for t in titles]),
                 'delegate_title_ar': 'السيد' if gender['name'] == 'Male' else 'السيدة',
                 'delegate_name_en': full_name,
