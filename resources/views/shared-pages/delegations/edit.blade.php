@@ -326,8 +326,9 @@
                                     </div>
 
                                     <div class="col-span-3">
-                                        <label class="form-label">{{ __db('file') }}</label>
-                                        <input
+                                        <label class="form-label">{{ __db('file') }}<span
+                                                class="text-red-600">*</span></label>
+                                        <input required
                                             class="h-[46px] block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
                                             type="file" :name="`attachments[${index}][file]`"
                                             @change="e => { 
