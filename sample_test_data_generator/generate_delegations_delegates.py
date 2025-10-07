@@ -27,16 +27,16 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10, c
     ]
     
     countries = [
-        {'code': '1', 'name': 'Kingdom of Saudi Arabia', 'continent_code': '1'},
-        {'code': '2', 'name': 'State of Kuwait', 'continent_code': '1'},
-        {'code': '3', 'name': 'Sultanate of Oman', 'continent_code': '1'},
-        {'code': '4', 'name': 'State of Qatar', 'continent_code': '1'},
-        {'code': '5', 'name': 'Kingdom of Bahrain', 'continent_code': '1'},
-        {'code': '6', 'name': 'Egypt Arab Republic', 'continent_code': '2'},
-        {'code': '7', 'name': 'Republic of Tunisia', 'continent_code': '2'},
-        {'code': '8', 'name': 'Hashimite Kingdom of Jordan', 'continent_code': '1'},
-        {'code': '9', 'name': 'Democratic People\'s Republic of Algeria', 'continent_code': '2'},
-        {'code': '10', 'name': 'Syrian Arab Republic', 'continent_code': '1'}
+        {'code': '1', 'name': 'Kingdom of Saudi Arabia', 'continent_code': '17'},
+        {'code': '2', 'name': 'State of Kuwait', 'continent_code': '17'},
+        {'code': '3', 'name': 'Sultanate of Oman', 'continent_code': '17'},
+        {'code': '4', 'name': 'State of Qatar', 'continent_code': '17'},
+        {'code': '5', 'name': 'Kingdom of Bahrain', 'continent_code': '17'},
+        {'code': '6', 'name': 'Egypt Arab Republic', 'continent_code': '18'},
+        {'code': '7', 'name': 'Republic of Tunisia', 'continent_code': '18'},
+        {'code': '8', 'name': 'Hashimite Kingdom of Jordan', 'continent_code': '17'},
+        {'code': '9', 'name': 'Democratic People\'s Republic of Algeria', 'continent_code': '18'},
+        {'code': '10', 'name': 'Syrian Arab Republic', 'continent_code': '17'}
     ]
     
     invitation_statuses = [
