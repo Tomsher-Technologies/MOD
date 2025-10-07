@@ -25,6 +25,7 @@ class CountriesExport implements FromCollection, WithHeadings, WithMapping, With
             'Short Code',
             'Code',
             'Continent',
+            'Continent ID',
             'Sort Order',
             'Status',
             'Created At'
@@ -40,6 +41,7 @@ class CountriesExport implements FromCollection, WithHeadings, WithMapping, With
             $country->short_code,
             $country->code ?? '',
             $country->continent->value ?? '',
+            $country->continent->id ?? '',
             $country->sort_order ?? 0,
             $country->status ? 'Active' : 'Inactive',
             $country->created_at->format('Y-m-d H:i:s')
