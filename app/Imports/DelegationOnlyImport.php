@@ -61,12 +61,12 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
                     $this->importLogService->logSuccess('delegations', $this->fileName, $rowNumber, $row->toArray());
 
-                    $this->logActivity(
-                        module: 'Delegation',
-                        action: 'create',
-                        model: $delegation,
-                        delegationId: $delegation->id
-                    );
+                    // $this->logActivity(
+                    //     module: 'Delegation',
+                    //     action: 'create',
+                    //     model: $delegation,
+                    //     delegationId: $delegation->id
+                    // );
             
                 } catch (\Exception $e) {
                     Log::error('Delegation Only Import Error: ' . $e->getMessage());
@@ -126,7 +126,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
                 $delegationData['country_id'] = $country->id;
             } else {
                 throw new \Exception("Invalid country_code: {$row['country_code']} (Row {$rowNumber})");
-            }
+            }   
         }
 
         if (!empty($row['invitation_status_code'])) {

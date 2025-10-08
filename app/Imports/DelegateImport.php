@@ -73,18 +73,18 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
                     $processedDelegations[$delegation->id] = $delegation;
 
-                    $this->logActivity(
-                        module: 'Delegation',
-                        submodule: 'delegate',
-                        action: 'create-excel',
-                        model: $delegate,
-                        submoduleId: $delegate->id,
-                        delegationId: $delegation->id,
-                        message: [
-                            'en' => auth()->user()->name . " " .  __db('delegate_created_excel'),
-                            'ar' => auth()->user()->name . " " .  __db('delegate_created_excel')
-                        ]
-                    );
+                    // $this->logActivity(
+                    //     module: 'Delegation',
+                    //     submodule: 'delegate',
+                    //     action: 'create-excel',
+                    //     model: $delegate,
+                    //     submoduleId: $delegate->id,
+                    //     delegationId: $delegation->id,
+                    //     message: [
+                    //         'en' => auth()->user()->name . " " .  __db('delegate_created_excel'),
+                    //         'ar' => auth()->user()->name . " " .  __db('delegate_created_excel')
+                    //     ]
+                    // );
 
                     $this->importLogService->logSuccess('delegates', $this->fileName, $rowNumber, $row->toArray());
                 } catch (\Exception $e) {
