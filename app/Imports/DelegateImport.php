@@ -233,7 +233,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
             })->where('code', trim($transportData['airport_code']))->first();
 
             if (!$airport) {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid ' . $type . ' airport_code: ' . $transportData['airport_code'], $row->toArray());
+                throw new \Exception("No airports found with code: {$transportData['airport_code']} (Row {$rowNumber})");
+                
                 $transportData['airport_id'] = null;
                 unset($transportData['airport_code']);
             } else {
