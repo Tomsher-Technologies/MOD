@@ -16,6 +16,7 @@ class Delegation extends Model
 
     protected $fillable = [
         'code',
+        'import_code',
         'updated_by',
         'invitation_from_id',
         'continent_id',
