@@ -1554,7 +1554,7 @@ class DelegationController extends Controller
                     submoduleId: $newInterview->id,
                     delegationId: $delegation->id
                 );
-                
+
 
                 return response()->json([
                     'status' => 'success',
@@ -2573,8 +2573,8 @@ class DelegationController extends Controller
                 model: $delegation,
                 delegationId: $delegation->id,
                 message: [
-                    'en' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed'),
-                    'ar' => auth()->user()->name . __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
+                    'en' => auth()->user()->name . " " .  __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed'),
+                    'ar' => auth()->user()->name . " " .  __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
                 ]
             );
             $delegation->delegates()->delete();

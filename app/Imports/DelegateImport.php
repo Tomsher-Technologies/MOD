@@ -45,17 +45,17 @@ class DelegateImport implements ToCollection, WithHeadingRow
                 $rowNumber++;
 
                 try {
-                    $delegationCode = trim($row['delegation_code'] ?? '');
+                    $importCode = trim($row['import_code'] ?? trim($row['delegation_code'] ?? ''));
 
-                    if (empty($delegationCode)) {
-                        $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Missing delegation_code', $row->toArray());
+                    if (empty($delegationCode) && empty($importCode)) {
+                        $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Missing delegation_code and import_code', $row->toArray());
                         continue;
                     }
 
-                    $delegation = Delegation::where('code', $delegationCode)->first();
+                    $delegation = Delegation::where('code', $importCode)->orWhere('import_code', $importCode)->first();
 
                     if (!$delegation) {
-                        $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Delegation not found with code: ' . $delegationCode, $row->toArray());
+                        $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Delegation not found with code or import code: ' . $importCode, $row->toArray());
                         continue;
                     }
 
@@ -79,7 +79,11 @@ class DelegateImport implements ToCollection, WithHeadingRow
                         action: 'create-excel',
                         model: $delegate,
                         submoduleId: $delegate->id,
-                        delegationId: $delegation->id
+                        delegationId: $delegation->id,
+                        message: [
+                            'en' => auth()->user()->name . " " .  __db('delegate_created_excel'),
+                            'ar' => auth()->user()->name . " " .  __db('delegate_created_excel')
+                        ]
                     );
 
                     $this->importLogService->logSuccess('delegates', $this->fileName, $rowNumber, $row->toArray());
@@ -229,7 +233,8 @@ class DelegateImport implements ToCollection, WithHeadingRow
             })->where('code', trim($transportData['airport_code']))->first();
 
             if (!$airport) {
-                $this->importLogService->logError('delegates', $this->fileName, $rowNumber, 'Invalid ' . $type . ' airport_code: ' . $transportData['airport_code'], $row->toArray());
+                throw new \Exception("No airports found with code: {$transportData['airport_code']} (Row {$rowNumber})");
+                
                 $transportData['airport_id'] = null;
                 unset($transportData['airport_code']);
             } else {

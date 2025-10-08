@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Http\Traits\HandlesUpdateConfirmation;
 use App\Models\Delegation;
 use App\Models\DropdownOption;
 use App\Models\Country;
@@ -28,6 +29,8 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
         $this->importLogService->clearLogs('delegations');
     }
 
+    use HandlesUpdateConfirmation;
+
     public function collection(Collection $rows)
     {
 
@@ -52,20 +55,19 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
 
                     $delegationData = $this->processDelegationData($row, $rowNumber);
 
-                    // $existingDelegation = Delegation::where('code', trim($row['code']))->first();
-
-                    // if ($existingDelegation) {
-                    //     $existingDelegation->update($delegationData);
-                    //     $delegation = $existingDelegation;
-                    //     
-                    //     $this->importLogService->logSuccess('delegations', $this->fileName, $rowNumber, $row->toArray());
-                    // } else {
                     $delegation = Delegation::create($delegationData);
 
                     $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
 
                     $this->importLogService->logSuccess('delegations', $this->fileName, $rowNumber, $row->toArray());
-                    // }
+
+                    $this->logActivity(
+                        module: 'Delegation',
+                        action: 'create',
+                        model: $delegation,
+                        delegationId: $delegation->id
+                    );
+            
                 } catch (\Exception $e) {
                     Log::error('Delegation Only Import Error: ' . $e->getMessage());
                     $this->importLogService->logError('delegations', $this->fileName, $rowNumber, $e->getMessage(), $row->toArray());
@@ -88,6 +90,7 @@ class DelegationOnlyImport implements ToCollection, WithHeadingRow
             'country_id' => null,
             'invitation_status_id' => null,
             'participation_status_id' => null,
+            'import_code' => trim($row['import_code']) ?? null,
             'note1' => trim($row['note1']) ?? null,
             'note2' => trim($row['note2']) ?? null,
         ];
