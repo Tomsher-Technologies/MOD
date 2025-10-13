@@ -73,18 +73,18 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
                     $processedDelegations[$delegation->id] = $delegation;
 
-                    $this->logActivity(
-                        module: 'Delegation',
-                        submodule: 'delegate',
-                        action: 'create-excel',
-                        model: $delegate,
-                        submoduleId: $delegate->id,
-                        delegationId: $delegation->id,
-                        message: [
-                            'en' => auth()->user()->name . " " .  __db('delegate_created_excel'),
-                            'ar' => auth()->user()->name . " " .  __db('delegate_created_excel')
-                        ]
-                    );
+                    // $this->logActivity(
+                    //     module: 'Delegation',
+                    //     submodule: 'delegate',
+                    //     action: 'create-excel',
+                    //     model: $delegate,
+                    //     submoduleId: $delegate->id,
+                    //     delegationId: $delegation->id,
+                    //     message: [
+                    //         'en' => auth()->user()->name . " " .  __db('delegate_created_excel'),
+                    //         'ar' => auth()->user()->name . " " .  __db('delegate_created_excel')
+                    //     ]
+                    // );
 
                     $this->importLogService->logSuccess('delegates', $this->fileName, $rowNumber, $row->toArray());
                 } catch (\Exception $e) {
@@ -189,7 +189,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
 
         $hasData = false;
         foreach (['mode', 'airport_code', 'flight_no', 'flight_name', 'date_time', 'comment'] as $field) {
-            if (!empty($row[$fieldPrefix . $field])) {
+            if (!empty(trim($row[$fieldPrefix . $field])) && (trim($row[$fieldPrefix . $field]) !== '') && (trim($row[$fieldPrefix . $field]) !== NULL)) {
                 $hasData = true;
                 break;
             }
@@ -200,7 +200,7 @@ class DelegateImport implements ToCollection, WithHeadingRow
         }
 
         $transportData = [
-            'mode' => trim($row[$fieldPrefix . 'mode'] ?? '') ?: null,
+            'mode' => strtolower(trim($row[$fieldPrefix . 'mode'] ?? '')) ?: null,
             'airport_code' => !empty($row[$fieldPrefix . 'airport_code']) ? trim($row[$fieldPrefix . 'airport_code']) : null,
             'airport_id' => null,
             'flight_no' => trim($row[$fieldPrefix . 'flight_no'] ?? '') ?: null,
@@ -218,30 +218,27 @@ class DelegateImport implements ToCollection, WithHeadingRow
                     $transportData['date_time'] = $row[$fieldPrefix . 'date_time'];
                 } elseif (is_numeric($row[$fieldPrefix . 'date_time'])) {
                     $transportData['date_time'] = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[$fieldPrefix . 'date_time'])->format('Y-m-d H:i:s');
-                } else {
-                    $dateTime = new \DateTime($row[$fieldPrefix . 'date_time']);
-                    $transportData['date_time'] = $dateTime->format('Y-m-d H:i:s');
-                }
+                } 
             } catch (\Exception $e) {
                 $transportData['date_time'] = null;
             }
         }
 
-        if (!empty($transportData['mode']) && $transportData['mode'] === 'flight' && !empty($transportData['airport_code'])) {
+        if (!empty($transportData['mode']) && strtolower($transportData['mode']) === 'flight' && !empty($transportData['airport_code'])) {
             $airport = DropdownOption::whereHas('dropdown', function ($q) {
                 $q->where('code', 'airports');
             })->where('code', trim($transportData['airport_code']))->first();
 
             if (!$airport) {
                 throw new \Exception("No airports found with code: {$transportData['airport_code']} (Row {$rowNumber})");
-                
+
                 $transportData['airport_id'] = null;
                 unset($transportData['airport_code']);
             } else {
                 $transportData['airport_id'] = $airport->id;
                 unset($transportData['airport_code']);
             }
-        } elseif ($transportData['mode'] !== 'flight') {
+        } elseif (strtolower($transportData['mode']) !== 'flight') {
             $transportData['airport_id'] = null;
             unset($transportData['airport_code']);
         }
