@@ -19,24 +19,19 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10, c
     continents = [
         {'code': '1', 'name': 'Asia'},
         {'code': '2', 'name': 'Africa'},
-        {'code': '3', 'name': 'Europe'},
-        {'code': '4', 'name': 'America'},
-        {'code': '5', 'name': 'Other'},
-        {'code': '6', 'name': 'Australia'},
-        {'code': '7', 'name': 'Organizations'}
     ]
     
     countries = [
-        {'code': '1', 'name': 'Kingdom of Saudi Arabia', 'continent_code': '17'},
-        {'code': '2', 'name': 'State of Kuwait', 'continent_code': '17'},
-        {'code': '3', 'name': 'Sultanate of Oman', 'continent_code': '17'},
-        {'code': '4', 'name': 'State of Qatar', 'continent_code': '17'},
-        {'code': '5', 'name': 'Kingdom of Bahrain', 'continent_code': '17'},
-        {'code': '6', 'name': 'Egypt Arab Republic', 'continent_code': '18'},
-        {'code': '7', 'name': 'Republic of Tunisia', 'continent_code': '18'},
-        {'code': '8', 'name': 'Hashimite Kingdom of Jordan', 'continent_code': '17'},
-        {'code': '9', 'name': 'Democratic People\'s Republic of Algeria', 'continent_code': '18'},
-        {'code': '10', 'name': 'Syrian Arab Republic', 'continent_code': '17'}
+        {'code': '1', 'name': 'Kingdom of Saudi Arabia', 'continent_code': '1'},
+        {'code': '1', 'name': 'State of Kuwait', 'continent_code': '1'},
+        {'code': '1', 'name': 'Sultanate of Oman', 'continent_code': '1'},
+        {'code': '1', 'name': 'State of Qatar', 'continent_code': '1'},
+        {'code': '1', 'name': 'Kingdom of Bahrain', 'continent_code': '1'},
+        {'code': '2', 'name': 'Egypt Arab Republic', 'continent_code': '2'},
+        {'code': '2', 'name': 'Republic of Tunisia', 'continent_code': '2'},
+        {'code': '1', 'name': 'Hashimite Kingdom of Jordan', 'continent_code': '1'},
+        {'code': '2', 'name': 'Democratic People\'s Republic of Algeria', 'continent_code': '2'},
+        {'code': '1', 'name': 'Syrian Arab Republic', 'continent_code': '1'}
     ]
     
     invitation_statuses = [
@@ -132,9 +127,11 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10, c
         
         # Generate delegation code using prefix and sequence
         delegation_code = f"{code_prefix}-{i:04d}"
+        import_code = i
         
         delegation = {
-            'code': delegation_code,
+            'code': delegation_code, 
+            'import_code': import_code,
             'invitation_from_code': invitation_from['code'],
             'continent_code': continent['code'],
             'country_code': country['code'],
@@ -180,7 +177,7 @@ def generate_sample_data(num_delegations=300, num_delegates_per_delegation=10, c
             delegate_code = f"{delegation_code}-D{j+1:02d}"
             
             delegate = {
-                'delegation_code': delegation_code,  # Link to delegation by code
+                'import_code': delegation['import_code'],
                 'delegate_title_en': random.choice([t['name'] for t in titles]),
                 'delegate_title_ar': 'السيد' if gender['name'] == 'Male' else 'السيدة',
                 'delegate_name_en': full_name,
