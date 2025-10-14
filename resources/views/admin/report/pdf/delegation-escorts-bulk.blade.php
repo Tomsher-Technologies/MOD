@@ -341,7 +341,9 @@
                 <div style="page-break-after: always;"></div>
             @endif
 
-             <!--SPLIT-->
+            @if($loop->iteration % 10 == 0)
+                <!--CHUNKHTML-->
+            @endif
         @endforeach
     </div>
         
