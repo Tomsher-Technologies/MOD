@@ -106,7 +106,7 @@
                                 {{ $del->delegation?->delegates?->count() ?? '0' }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                {{ $del->internalRanking?->value ?? '-' }}
+                                {{ $del?->getTranslation('designation') ?? '-' }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {{ $del->getTranslation('title') }}
