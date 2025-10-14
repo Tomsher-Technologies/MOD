@@ -96,7 +96,7 @@
                             @endforeach
                         </tr>
 
-                        @if($loop->iteration % 10 == 0)
+                        @if($loop->iteration % 50 == 0)
                             <!--CHUNKHTML-->
                         @endif
                     @endforeach
