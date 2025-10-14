@@ -70,6 +70,7 @@
 
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" dir="ltr">
             <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; gap: 20px;">
+               
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9; font-size: 13px">
