@@ -25,7 +25,7 @@
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
             @foreach($interviews as $intervieweeName => $group)
-                <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                <table style="width: 100%; margin-top: 20px;margin-bottom: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; white-space: nowrap;">
                                 {{ $intervieweeName }} : {{ __('interview_with') }}
