@@ -25,10 +25,13 @@
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
             @foreach($interviews as $intervieweeName => $group)
-                <div style="display: flex; align-items: center; gap: 20px; justify-content: end;font-weight: bold">
-                    <h4>{{ $intervieweeName }}</h4>
-                    <h4>: {{ __db('interview_with') }}</h4>
-                </div>
+                <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; white-space: nowrap;">
+                                {{ $intervieweeName }} : {{ __('interview_with') }}
+                            </td>
+                        </tr>
+                    </table>
 
                 <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
                     <thead>
@@ -81,6 +84,10 @@
                         @endforeach
                     </tbody>
                 </table>
+
+                @if($loop->iteration % 5 == 0)
+                    <!--CHUNKHTML-->
+                @endif
             @endforeach
         </div>
     </div>
