@@ -116,6 +116,9 @@
                     </tr>
                 </thead>
                 <tbody style="text-align: center;">
+                     @php
+                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                    @endphp
                     @forelse ($delegation->delegates as $key => $delegate)
                         @php
                             $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -154,7 +157,7 @@
                                 {{ $delegate?->getTranslation('designation') ?? $relation }}
                             </td>
                             <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif  font-bold">
-                                {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
+                                {{ $delegate->getTranslation('title').''.$separator.' '.$delegate->getTranslation('name') }}
                             </td>
                             <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $key + 1 }}</td>
                         </tr>
