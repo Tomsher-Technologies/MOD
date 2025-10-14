@@ -67,7 +67,7 @@
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">{{ $i + 1 }}</td>
                             </tr>
                             
-                            @if($loop->iteration % 4 == 0)
+                            @if($loop->iteration % 50 == 0)
                                 <!--CHUNKHTML-->
                             @endif
                         @endforeach
@@ -107,7 +107,7 @@
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">{{ $i + 1 }}</td>
                             </tr>
 
-                            @if($loop->iteration % 4 == 0)
+                            @if($loop->iteration % 50 == 0)
                                 <!--CHUNKHTML-->
                             @endif
                         @endforeach
