@@ -197,6 +197,9 @@
                     </div>
                 @endif
             
+                @if($loop->iteration % 5 == 0)
+                    <!--CHUNKHTML-->
+                @endif
             @endforeach
         </div>
     </div>
