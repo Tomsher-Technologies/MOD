@@ -200,7 +200,17 @@ class AdminDashboardController extends Controller
 
         $airports = DropdownOption::whereHas('dropdown', function ($query) {
                         $query->where('code', 'airports');
-                    })->where('status', 1)->orderBy('sort_order','asc')->select('id', 'sort_order','value as transport_point', DB::raw("'flight' as mode"));
+                    })->where('status', 1)->orderBy('sort_order','asc')
+                    ->select(
+                        'id',
+                        'sort_order',
+                        DB::raw("'flight' as mode"),
+                        DB::raw(
+                            $lang === 'ar'
+                                ? "CASE WHEN value_ar IS NOT NULL AND value_ar != '' THEN value_ar ELSE value END as transport_point"
+                                : "value as transport_point"
+                        )
+                    );
 
 
         $static = DB::table(DB::raw("(SELECT NULL as id, 100 as sort_order, 'Sea' as transport_point, 'sea' as mode 
@@ -469,7 +479,7 @@ class AdminDashboardController extends Controller
         $data['totalHotels'] = $totalHotels;
         $data['delegatesByDivision'] = ['labels' => $labelsDelegatesByDivision, 'series' => $seriesDelegatesByDivision];
         // echo '<pre>';
-        // print_r($data);
+        // print_r($summary);
         // echo '</pre>';
         // exit;
         return view('admin.dashboard', compact('data'));
