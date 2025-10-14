@@ -793,7 +793,13 @@ class ReportController extends Controller
 
         $delegates = $newQuery->get();
 
-        return view('admin.report.vip_report', compact('delegates'));
+        $internalRankName = '';
+        if($request->has('internal_ranking') && $request->internal_ranking != 'all'){
+            $drop = DropdownOption::where('id', $request->internal_ranking)->first();
+            $internalRankName = $drop?->value;
+        }
+
+        return view('admin.report.vip_report', compact('delegates','internalRankName'));
     }
 
     public function exportBulkVipPdf(Request $request){
@@ -850,6 +856,12 @@ class ReportController extends Controller
 
         $delegates = $newQuery->get();
 
+        $internalRankName = '';
+        if($request->has('internal_ranking') && $request->internal_ranking != 'all'){
+            $drop = DropdownOption::where('id', $request->internal_ranking)->first();
+            $internalRankName = $drop?->value;
+        }
+        
         $today = date('Y-m-d-H-i');
         $reportName = 'vip_report';
         $mpdf = new Mpdf([
@@ -861,14 +873,18 @@ class ReportController extends Controller
             'default_font' => 'amiri'
         ]);
 
-        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName','internalRankName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
         $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
 
-        $html = view('admin.report.pdf.vip_report-bulk', compact('delegates'))->render();
+        $html = view('admin.report.pdf.vip_report-bulk', compact('delegates','internalRankName'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'vip_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
