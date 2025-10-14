@@ -84,8 +84,12 @@
 
             </div>
             <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
-                <button type="submit"
-                    class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12">{{ __db('assign') }}</button>
+
+                <button type="submit" id="assignBtn" disabled
+                    class="btn text-md rounded-lg h-12 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-[#B68A35] enabled:text-white">
+                    {{ __db('assign') }}
+                </button>
+
             </div>
         </form>
     </div>
@@ -117,6 +121,8 @@
             const delegationCodeInput = document.getElementById('delegation_code');
             const countryIdInput = document.getElementById('country_id');
             const delegationTableBody = document.querySelector('#delegationTable tbody');
+            const assignBtn = document.getElementById('assignBtn');
+
 
             const pageRoutes = {
                 delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
@@ -134,6 +140,12 @@
             delegationModal.addEventListener('click', function(e) {
                 if (e.target === delegationModal) {
                     delegationModal.classList.add('hidden');
+                }
+            });
+
+            delegationTableBody.addEventListener('change', function(e) {
+                if (e.target.type === 'radio' && e.target.name === 'delegation_id') {
+                    assignBtn.disabled = false;
                 }
             });
 
@@ -286,7 +298,6 @@
                         if (data.success) {
                             let delegations = data.delegations || (data.delegation ? [data.delegation] :
                                 []);
-                            console.log("delegations", delegations);
 
                             if (delegations.length > 0) {
                                 delegations.forEach(delegation => {

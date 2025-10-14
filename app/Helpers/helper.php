@@ -586,7 +586,15 @@ if (!function_exists('getRouteForPage')) {
 
 function getAllCountries()
 {
-    return Country::where('status', 1)->orderBy('sort_order', 'asc')->get();
+    $lang = getActiveLanguage();
+
+    $orderColumn = $lang === 'en' ? 'name' : 'name_ar';
+
+    $countries = Country::where('status', 1)
+        ->orderBy($orderColumn, 'asc')
+        ->get();
+
+    return $countries;
 }
 
 
@@ -604,17 +612,6 @@ if (! function_exists('getAllEscorts')) {
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         return Escort::where('event_id', $currentEventId)->where('status', 1)->orderBy('code')
-            ->get();
-    }
-}
-
-
-if (! function_exists('getCountriesByContinent')) {
-    function getCountriesByContinent($continentId)
-    {
-        return Country::where('continent_id', $continentId)
-            ->where('status', 1)
-            ->orderBy('sort_order', 'asc')
             ->get();
     }
 }

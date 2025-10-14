@@ -1,4 +1,3 @@
-
 <div class="bg-white h-full w-full rounded-lg border-0 p-6">
     @props(['driver'])
 
@@ -84,8 +83,11 @@
 
         </div>
         <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
-            <button type="button" id="assignBtn"
-                class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 hidden">{{ __db('assign') }}</button>
+
+            <button type="submit" id="assignBtn" disabled
+                class="btn text-md rounded-lg h-12 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-[#B68A35] enabled:text-white">
+                {{ __db('assign') }}
+            </button>
 
         </div>
     </form>
@@ -137,8 +139,7 @@
                 class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
                 {{ __db('reassign') }}
             </button>
-            <button type="button" id="replaceBtn"
-                class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
+            <button type="button" id="replaceBtn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
                 {{ __db('replace') }}
             </button>
         </div>
@@ -159,6 +160,13 @@
             delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
             delegationSearch: "{{ route('delegations.search') }}",
         };
+
+
+        delegationTableBody.addEventListener('change', function(e) {
+            if (e.target.type === 'radio' && e.target.name === 'delegation_id') {
+                assignBtn.disabled = false;
+            }
+        });
 
         searchBtn.addEventListener('click', function() {
             const delegationCode = delegationCodeInput.value.trim();
@@ -213,7 +221,6 @@
                                 delegationTableBody.innerHTML += row;
                             });
 
-                            assignBtn.classList.remove('hidden');
                         } else {
                             delegationTableBody.innerHTML =
                                 '<tr><td colspan="5" class="text-center py-4">{{ __db('no_delegations_found') }}</td></tr>';
