@@ -341,7 +341,7 @@
                 <div style="page-break-after: always;"></div>
             @endif
 
-            @if($loop->iteration % 5 == 0)
+            @if($loop->iteration % 2 == 0)
                 <!--CHUNKHTML-->
             @endif
         @endforeach
