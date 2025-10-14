@@ -61,6 +61,9 @@
                             </thead>
                             <tbody>
                                 <tbody>
+                                     @php
+                                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                                    @endphp
                                     @foreach($assignments as $index => $assignment)
                                         <tr>
                                             
@@ -77,11 +80,11 @@
                                             </td>
 
                                             <td style="border:2px solid black; padding:5px; text-align:center;@if($assignment->assignable?->team_head === true) color: red; @endif">
-                                                {{ $assignment->assignable?->internalRanking?->value ?? '' }}
+                                                {{ $assignment->assignable?->getTranslation('designation') ?? '' }}
                                             </td>
 
                                             <td style="border:2px solid black; padding:5px; text-align:center; @if($assignment->assignable?->team_head === true) color: red; @endif">
-                                                {{ $assignment->assignable?->getTranslation('title') .' '.$assignment->assignable?->getTranslation('name') }}
+                                                {{ $assignment->assignable?->getTranslation('title') .''.$separator.' '.$assignment->assignable?->getTranslation('name') }}
                                             </td>
 
                                             @if($index == 0)

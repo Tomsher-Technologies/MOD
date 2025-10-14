@@ -38,6 +38,9 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 12px">
+                     @php
+                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                    @endphp
                     @foreach ($delegations as $i => $del)
                         @php
                             $delegates = $positions = '';
@@ -45,8 +48,8 @@
 
                         @foreach ($del->delegates as $member)
                             @php
-                                $delegates .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member->getTranslation('title').' '.$member?->getTranslation('name').'</span><br>';
-                                $positions .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member?->internalRanking?->value .'</span><br>';
+                                $delegates .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member->getTranslation('title').''.$separator.' '.$member?->getTranslation('name').'</span><br>';
+                                $positions .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member?->getTranslation('designation') .'</span><br>';
                             @endphp
                         @endforeach
                         <tr>

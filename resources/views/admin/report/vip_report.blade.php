@@ -85,6 +85,9 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
+                         @php
+                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                        @endphp
                         @foreach ($delegates as $i => $del)
                             @php
                                 $arrival_date = $departure_date = '';
@@ -114,10 +117,10 @@
                                     {{ $escort?->phone_number }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $del->internalRanking?->value ?? '-' }}
+                                    {{ $del?->getTranslation('designation') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $del->getTranslation('title') }}
+                                    {{ $del->getTranslation('title') }} {{ $separator }}
                                     {{ $del->getTranslation('name') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">

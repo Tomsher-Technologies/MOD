@@ -113,6 +113,9 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 12px; text-align: center;">
+                    @php
+                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                    @endphp
                     @forelse ($delegation->delegates as $key => $delegate)
                         @php
                             $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -148,10 +151,10 @@
                                 {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : __db('not_required')}}
                             </td>
                             <td style="padding: 8px; border: 1px solid #000;">
-                                {{ $delegate->internalRanking?->value ?? $relation }}
+                                {{ $delegate?->getTranslation('designation') ?? $relation }}
                             </td>
                             <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) text-report-red @endif  font-bold">
-                                {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
+                                {{ $delegate->getTranslation('title').''.$separator.' '.$delegate->getTranslation('name') }}
                             </td>
                             <td style="padding: 8px; border: 1px solid #000;">{{ $key + 1 }}</td>
                         </tr>

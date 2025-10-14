@@ -104,20 +104,23 @@
                 <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; border-bottom: 0;">
                     <thead>
                         <tr style="background-color: #d9d9d9;">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('room') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('room_type') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('hotel') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('time') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('date') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('flight_number') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('flight_name') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('airport') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('position') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('delegations') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: left;">{{ __db('sl_no') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room_type') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('hotel') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('date') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_number') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight_name') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('airport') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('delegations') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
                     <tbody style="text-align: center;">
+                         @php
+                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                        @endphp
                         @forelse ($delegates as $key => $delegate)
                             @php
                                 $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -148,10 +151,10 @@
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->flight_name ?? '-' }}</td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $delegate->internalRanking?->value ?? $relation }}</td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $delegate?->getTranslation('designation') ?? $relation }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
                                     <strong>
-                                        {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
+                                        {{ $delegate->getTranslation('title').''.$separator.' '.$delegate->getTranslation('name') }}
                                     </strong>
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000;">{{ $key + 1 }}</td>

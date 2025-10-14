@@ -93,6 +93,9 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
+                        @php
+                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                        @endphp
                         @foreach ($delegates as $i => $del)
                             @php
                                 $arrival_date = $departure_date = '';
@@ -114,7 +117,7 @@
                                 foreach ($drivers as $driver) {
                                     $driverNames .= '<li style="' . $liStyle . '">' 
                                         . ($driver?->military_number ?? '') . ' - ' 
-                                        . ($driver?->getTranslation('title') ?? '') . ' ' 
+                                        . ($driver?->getTranslation('title') ?? '') . '' . $separator . ' ' 
                                         . ($driver?->getTranslation('name') ?? '-') 
                                         . '</li>';
 
@@ -154,10 +157,10 @@
                                     {{ $del->delegation?->delegates?->count() ?? '0' }}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                    {{ $del->internalRanking?->value ?? '-' }}
+                                    {{ $del?->getTranslation('designation') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                    {{ $del->getTranslation('title') }}
+                                    {{ $del->getTranslation('title') }} {{ $separator }}
                                     {{ $del->getTranslation('name') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000; ">
