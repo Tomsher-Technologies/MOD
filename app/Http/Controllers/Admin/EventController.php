@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\User;
 use App\Models\EventPage;
 use App\Models\EventUserRole;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -86,7 +87,7 @@ class EventController extends Controller
         // $data['code'] =  generateEventCode();
 
         $event = Event::create($data);
-        $defaultSlugs = ['home','about-us','committee'];
+        $defaultSlugs = ['home', 'about-us', 'committee'];
 
         $pages = [];
         if ($event) {
@@ -96,8 +97,8 @@ class EventController extends Controller
                     ['status' => 1]
                 );
 
-                foreach(['en','ar'] as $lang){
-                    if(!$page->translations()->where('lang',$lang)->exists()){
+                foreach (['en', 'ar'] as $lang) {
+                    if (!$page->translations()->where('lang', $lang)->exists()) {
                         $page->translations()->create([
                             'lang' => $lang,
                             'title1' => '',
@@ -184,7 +185,7 @@ class EventController extends Controller
         }
 
         $event->update($data);
-        
+
         return redirect()->route('events.edit', ['id' => base64_encode($event->id)])
             ->with('success', __db('event') . __db('updated_successfully'));
     }
@@ -251,5 +252,47 @@ class EventController extends Controller
         $eventUser->status = $status;
         $eventUser->save();
         return 1;
+    }
+
+    public function clearNotifications(Event $event)
+    {
+        try {
+            $notificationsCount = Notification::where('event_id', $event->id)
+                ->whereNull('alert_id')
+                ->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => __db('notifications_cleared_successfully'),
+                'count' => $notificationsCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __db('something_went_wrong')
+            ], 500);
+        }
+    }
+
+    public function clearAlerts(Event $event)
+    {
+        try {
+            $notificationsCount = Notification::whereNotNull('alert_id')
+                ->where('event_id', $event->id)
+                ->delete();
+
+            $alerts = \App\Models\Alert::where('event_id', $event->id)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => __db('alerts_cleared_successfully'),
+                'count' => $notificationsCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __db('something_went_wrong')
+            ], 500);
+        }
     }
 }

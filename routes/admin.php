@@ -90,6 +90,8 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::post('/events/{event}/unassign-user/{assigned}', [EventController::class, 'unassignUser'])->name('events.unassignUser');
     Route::post('/set-current-event', [EventController::class, 'setCurrentEvent'])->name('events.setCurrentEvent');
     Route::post('/event/user/status', [EventController::class, 'updateEventUserStatus'])->name('event.user.status');
+    Route::post('/events/{event}/clear-notifications', [EventController::class, 'clearNotifications'])->name('events.clearNotifications');
+    Route::post('/events/{event}/clear-alerts', [EventController::class, 'clearAlerts'])->name('events.clearAlerts');
 
     // Manage Other Interview Members
     Route::resource('other-interview-members', OtherMemberController::class);

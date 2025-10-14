@@ -788,5 +788,185 @@
 -- ('top-management', 207, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
 -- ('top-management', 207, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
 
+-- alter table delegations add column import_code varchar(255) after code; 
 
-alter table delegations add column import_code varchar(255) after code; 
+
+alter table delegations add column accomodation_status tinyint(1) after import_code;
+ALTER TABLE `delegations` CHANGE `accomodation_status` `accomodation_status` TINYINT(1) NULL DEFAULT '0' COMMENT '(0 - Not accomodated, 1 - Fully Accomodated, 2 - Partially Accomodated)'; 
+UPDATE `delegations` SET `accomodation_status`='0' where accomodation_status IS NULL;
+
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'delegate', NULL, 'delegate_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'delegate', '242', 'delegate_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'escort', NULL, 'escort_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'escort', '244', 'escort_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', NULL, 'driver_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', '246', 'driver_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', NULL, 'hotel_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '248', 'hotel_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'top-management', NULL, 'top-management_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'top-management', '250', 'top-management_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+
+
+
+  INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('hotel', NULL, 'manage_reports', 'Manage Reports', 'web', 1, NULL, '2025-09-27 11:16:37'),
+('hotel', 252, 'view_delegations_head_arrival', 'View Delegations Head Arrival', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegations_head_arrival', 'Export Delegations Head Arrival', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_delegations_head_departure', 'View Delegations Head Departure', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegations_head_departure', 'Export Delegations Head Departure', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_delegations_cars', 'View Delegations Cars', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegations_cars', 'Export Delegations Cars', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_delegations_escort', 'View Delegations Escort', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegations_escort', 'Export Delegations Escort', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_delegations_members', 'View Delegations Members', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegations_members', 'Export Delegations Members', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_delegations_without_escort', 'View Delegations Without Escort', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegations_without_escort', 'Export Delegations Without Escort', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_departures_report', 'View Departures Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_departures_report', 'Export Departures Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_drivers_report', 'View Drivers Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_drivers_report', 'Export Drivers Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_escorts_report', 'View Escorts Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_escorts_report', 'Export Escorts Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_hotel_room_vacancies', 'View Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_hotel_room_vacancies', 'Export Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_hotel_delegations', 'View Hotel Delegations', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_hotel_delegations', 'Export Hotel Delegations', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_interviews_reports', 'View Interviews Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_interviews_reports', 'Export Interviews Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_vip', 'View VIP', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_vip', 'Export VIP', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_wives', 'View Wives', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_wives', 'Export Wives', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_arrivals_report', 'View Arrivals Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_arrivals_report', 'Export Arrivals Report', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_arrival_hotels', 'View Arrival Hotels', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_arrival_hotels', 'Export Arrival Hotels', 'web', 1, NULL, NULL),
+('hotel', 252, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
+('hotel', 252, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
+
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('delegate', NULL, 'manage_reports', 'Manage Reports', 'web', 1, NULL, '2025-09-27 11:16:37'),
+('delegate', 287, 'view_delegations_head_arrival', 'View Delegations Head Arrival', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegations_head_arrival', 'Export Delegations Head Arrival', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_delegations_head_departure', 'View Delegations Head Departure', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegations_head_departure', 'Export Delegations Head Departure', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_delegations_cars', 'View Delegations Cars', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegations_cars', 'Export Delegations Cars', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_delegations_escort', 'View Delegations Escort', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegations_escort', 'Export Delegations Escort', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_delegations_members', 'View Delegations Members', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegations_members', 'Export Delegations Members', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_delegations_without_escort', 'View Delegations Without Escort', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegations_without_escort', 'Export Delegations Without Escort', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_departures_report', 'View Departures Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_departures_report', 'Export Departures Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_drivers_report', 'View Drivers Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_drivers_report', 'Export Drivers Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_escorts_report', 'View Escorts Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_escorts_report', 'Export Escorts Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_hotel_room_vacancies', 'View Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_hotel_room_vacancies', 'Export Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_hotel_delegations', 'View Hotel Delegations', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_hotel_delegations', 'Export Hotel Delegations', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_interviews_reports', 'View Interviews Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_interviews_reports', 'Export Interviews Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_vip', 'View VIP', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_vip', 'Export VIP', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_wives', 'View Wives', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_wives', 'Export Wives', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_arrivals_report', 'View Arrivals Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_arrivals_report', 'Export Arrivals Report', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_arrival_hotels', 'View Arrival Hotels', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_arrival_hotels', 'Export Arrival Hotels', 'web', 1, NULL, NULL),
+('delegate', 287, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
+('delegate', 287, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('escort', NULL, 'manage_reports', 'Manage Reports', 'web', 1, NULL, '2025-09-27 11:16:37'),
+('escort', 322, 'view_delegations_head_arrival', 'View Delegations Head Arrival', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegations_head_arrival', 'Export Delegations Head Arrival', 'web', 1, NULL, NULL),
+('escort', 322, 'view_delegations_head_departure', 'View Delegations Head Departure', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegations_head_departure', 'Export Delegations Head Departure', 'web', 1, NULL, NULL),
+('escort', 322, 'view_delegations_cars', 'View Delegations Cars', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegations_cars', 'Export Delegations Cars', 'web', 1, NULL, NULL),
+('escort', 322, 'view_delegations_escort', 'View Delegations Escort', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegations_escort', 'Export Delegations Escort', 'web', 1, NULL, NULL),
+('escort', 322, 'view_delegations_members', 'View Delegations Members', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegations_members', 'Export Delegations Members', 'web', 1, NULL, NULL),
+('escort', 322, 'view_delegations_without_escort', 'View Delegations Without Escort', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegations_without_escort', 'Export Delegations Without Escort', 'web', 1, NULL, NULL),
+('escort', 322, 'view_departures_report', 'View Departures Report', 'web', 1, NULL, NULL),
+('escort', 322, 'export_departures_report', 'Export Departures Report', 'web', 1, NULL, NULL),
+('escort', 322, 'view_drivers_report', 'View Drivers Report', 'web', 1, NULL, NULL),
+('escort', 322, 'export_drivers_report', 'Export Drivers Report', 'web', 1, NULL, NULL),
+('escort', 322, 'view_escorts_report', 'View Escorts Report', 'web', 1, NULL, NULL),
+('escort', 322, 'export_escorts_report', 'Export Escorts Report', 'web', 1, NULL, NULL),
+('escort', 322, 'view_hotel_room_vacancies', 'View Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('escort', 322, 'export_hotel_room_vacancies', 'Export Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('escort', 322, 'view_hotel_delegations', 'View Hotel Delegations', 'web', 1, NULL, NULL),
+('escort', 322, 'export_hotel_delegations', 'Export Hotel Delegations', 'web', 1, NULL, NULL),
+('escort', 322, 'view_interviews_reports', 'View Interviews Report', 'web', 1, NULL, NULL),
+('escort', 322, 'export_interviews_reports', 'Export Interviews Report', 'web', 1, NULL, NULL),
+('escort', 322, 'view_vip', 'View VIP', 'web', 1, NULL, NULL),
+('escort', 322, 'export_vip', 'Export VIP', 'web', 1, NULL, NULL),
+('escort', 322, 'view_wives', 'View Wives', 'web', 1, NULL, NULL),
+('escort', 322, 'export_wives', 'Export Wives', 'web', 1, NULL, NULL),
+('escort', 322, 'view_arrivals_report', 'View Arrivals Report', 'web', 1, NULL, NULL),
+('escort', 322, 'export_arrivals_report', 'Export Arrivals Report', 'web', 1, NULL, NULL),
+('escort', 322, 'view_arrival_hotels', 'View Arrival Hotels', 'web', 1, NULL, NULL),
+('escort', 322, 'export_arrival_hotels', 'Export Arrival Hotels', 'web', 1, NULL, NULL),
+('escort', 322, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
+('escort', 322, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
+
+
+INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+('driver', NULL, 'manage_reports', 'Manage Reports', 'web', 1, NULL, '2025-09-27 11:16:37'),
+('driver', 357, 'view_delegations_head_arrival', 'View Delegations Head Arrival', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegations_head_arrival', 'Export Delegations Head Arrival', 'web', 1, NULL, NULL),
+('driver', 357, 'view_delegations_head_departure', 'View Delegations Head Departure', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegations_head_departure', 'Export Delegations Head Departure', 'web', 1, NULL, NULL),
+('driver', 357, 'view_delegations_cars', 'View Delegations Cars', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegations_cars', 'Export Delegations Cars', 'web', 1, NULL, NULL),
+('driver', 357, 'view_delegations_escort', 'View Delegations Escort', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegations_escort', 'Export Delegations Escort', 'web', 1, NULL, NULL),
+('driver', 357, 'view_delegations_members', 'View Delegations Members', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegations_members', 'Export Delegations Members', 'web', 1, NULL, NULL),
+('driver', 357, 'view_delegations_without_escort', 'View Delegations Without Escort', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegations_without_escort', 'Export Delegations Without Escort', 'web', 1, NULL, NULL),
+('driver', 357, 'view_departures_report', 'View Departures Report', 'web', 1, NULL, NULL),
+('driver', 357, 'export_departures_report', 'Export Departures Report', 'web', 1, NULL, NULL),
+('driver', 357, 'view_drivers_report', 'View Drivers Report', 'web', 1, NULL, NULL),
+('driver', 357, 'export_drivers_report', 'Export Drivers Report', 'web', 1, NULL, NULL),
+('driver', 357, 'view_escorts_report', 'View Escorts Report', 'web', 1, NULL, NULL),
+('driver', 357, 'export_escorts_report', 'Export Escorts Report', 'web', 1, NULL, NULL),
+('driver', 357, 'view_hotel_room_vacancies', 'View Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('driver', 357, 'export_hotel_room_vacancies', 'Export Hotel Room Vacancies', 'web', 1, NULL, NULL),
+('driver', 357, 'view_hotel_delegations', 'View Hotel Delegations', 'web', 1, NULL, NULL),
+('driver', 357, 'export_hotel_delegations', 'Export Hotel Delegations', 'web', 1, NULL, NULL),
+('driver', 357, 'view_interviews_reports', 'View Interviews Report', 'web', 1, NULL, NULL),
+('driver', 357, 'export_interviews_reports', 'Export Interviews Report', 'web', 1, NULL, NULL),
+('driver', 357, 'view_vip', 'View VIP', 'web', 1, NULL, NULL),
+('driver', 357, 'export_vip', 'Export VIP', 'web', 1, NULL, NULL),
+('driver', 357, 'view_wives', 'View Wives', 'web', 1, NULL, NULL),
+('driver', 357, 'export_wives', 'Export Wives', 'web', 1, NULL, NULL),
+('driver', 357, 'view_arrivals_report', 'View Arrivals Report', 'web', 1, NULL, NULL),
+('driver', 357, 'export_arrivals_report', 'Export Arrivals Report', 'web', 1, NULL, NULL),
+('driver', 357, 'view_arrival_hotels', 'View Arrival Hotels', 'web', 1, NULL, NULL),
+('driver', 357, 'export_arrival_hotels', 'Export Arrival Hotels', 'web', 1, NULL, NULL),
+('driver', 357, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
+('driver', 357, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);

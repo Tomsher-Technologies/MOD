@@ -71,7 +71,7 @@ class DriverController extends Controller
         }
 
         $query = Driver::with('delegations')
-            ->select('drivers.*')  
+            ->select('drivers.*')
             ->where('drivers.event_id', $currentEventId);
 
         $delegationId = $request->input('delegation_id');
@@ -156,13 +156,13 @@ class DriverController extends Controller
             }
         }
 
-        $query->leftJoin('delegation_drivers as dd', function($join) {
-                $join->on('drivers.id', '=', 'dd.driver_id')
-                     ->where('dd.status', '=', 1);
-            })
-            ->select('drivers.*')  
+        $query->leftJoin('delegation_drivers as dd', function ($join) {
+            $join->on('drivers.id', '=', 'dd.driver_id')
+                ->where('dd.status', '=', 1);
+        })
+            ->select('drivers.*')
             ->groupBy('drivers.id')
-            ->orderByRaw('CASE WHEN dd.driver_id IS NULL THEN 0 ELSE 1 END') 
+            ->orderByRaw('CASE WHEN dd.driver_id IS NULL THEN 0 ELSE 1 END')
             ->orderByRaw('CAST(drivers.military_number AS UNSIGNED) ASC');
 
 
@@ -567,6 +567,8 @@ class DriverController extends Controller
             ]);
         }
 
+        getRoomAssignmentStatus($delegationId);
+
         $this->logActivity(
             module: 'Drivers',
             submodule: 'assignment',
@@ -647,6 +649,8 @@ class DriverController extends Controller
             $driver->current_room_assignment_id = null;
             $driver->save();
         }
+
+        getRoomAssignmentStatus($delegationId);
 
         return redirect()->back()->with('success', __db('updated_successfully'));
     }

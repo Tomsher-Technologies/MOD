@@ -1776,6 +1776,8 @@ class DelegationController extends Controller
                     delegationId: $delegation->id
                 );
 
+                getRoomAssignmentStatus($delegation->id);
+
                 return response()->json([
                     'status' => 'success',
                     'message' => __db('created_successfully'),
@@ -1904,6 +1906,8 @@ class DelegationController extends Controller
 
             DB::commit();
 
+            getRoomAssignmentStatus($delegation->id);
+
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
@@ -1998,6 +2002,8 @@ class DelegationController extends Controller
             $delegate->delete();
 
             $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
+
+            getRoomAssignmentStatus($delegation->id);
 
             return redirect()
                 ->route('delegations.edit', $delegation->id)

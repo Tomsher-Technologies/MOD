@@ -267,40 +267,40 @@
                         <thead>
 
                             <tr class="text-[13px]">
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('sl_no') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegation') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('continent') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('country') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegates') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('escort') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('driver') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('airport') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('time') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('flight_number') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('flight_name') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] no-print">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71] no-print">
                                     {{ __db('action') }}
                                 </th>
 
@@ -309,31 +309,31 @@
                         <tbody>
                             @forelse ($data['upcomming_arrivals'] as $akey => $row)
                                 <tr class="text-[12px] align-middle  align-center">
-                                    <td class="px-2 py-2 border border-gray-200">{{ $akey + 1 }}</td>
-                                    <td class="px-2 py-2 border border-gray-200]">
+                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $akey + 1 }}</td>
+                                    <td class="text-center px-2 py-2 border border-gray-200]">
 
                                         <a href="{{ route('delegations.show', $row->delegate->delegation_id) }}">
                                             {{ $row->delegate->delegation->code ?? '-' }}
                                         </a>
 
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $row->delegate->delegation->continent->value ?? '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $row->delegate->delegation->country->value ?? '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         <span class="block">{{ $row->delegate->name_en ?? '-' }}</span>
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         @if($row->delegate->delegation->escorts->isNotEmpty())
                                             @foreach ($row->delegate->delegation->escorts as $escort)
                                                 <span class="">{{ $escort->code }}</span><br>
                                             @endforeach
                                         @endif
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         @if($row->delegate->delegation->drivers->isNotEmpty())
                                             @foreach ($row->delegate->delegation->drivers as $driver)
                                                 <span class="">{{ $driver->code }}</span><br>
@@ -341,17 +341,17 @@
                                         @endif
                                     </td>
 
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $row->airport->value ?? '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $row->date_time ? \Carbon\Carbon::parse($row->date_time)->format('h:i A') : '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">{{ $row->flight_no ?? '-' }}</td>
-                                    <td class="px-2 py-2 border border-gray-200">{{ $row->flight_name ?? '-' }}</td>
+                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $row->flight_no ?? '-' }}</td>
+                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $row->flight_name ?? '-' }}</td>
 
 
-                                    <td class="px-2 py-2 border border-gray-200 no-print">
+                                    <td class="text-center px-2 py-2 border border-gray-200 no-print">
                                         <div class="flex items-center gap-5">
                                             <a href="{{ route('delegations.show', $row->delegate->delegation_id) }}"
                                                 class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">
@@ -410,40 +410,40 @@
                     <table class="table-auto mb-0 !border-[#F9F7ED] w-full" id="print_area_departure">
                         <thead>
                             <tr class="text-[13px]">
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('sl_no') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegation') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('continent') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('country') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegates') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('escort') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('driver') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('airport') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('time') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('flight_number') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('flight_name') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] no-print">
+                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71] no-print">
                                     {{ __db('action') }}
                                 </th>
 
@@ -452,29 +452,29 @@
                         <tbody>
                             @forelse ($data['upcomming_departures'] as $dkey => $drow)
                                 <tr class="text-[12px] align-middle  align-center">
-                                    <td class="px-2 py-2 border border-gray-200">{{ $dkey + 1 }}</td>
-                                    <td class="px-2 py-2 border border-gray-200]">
+                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $dkey + 1 }}</td>
+                                    <td class="text-center px-2 py-2 border border-gray-200]">
                                         <a href="{{ route('delegations.show', $drow->delegate->delegation_id) }}">
                                             {{ $drow->delegate->delegation->code ?? '-' }}
                                         </a>
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $drow->delegate->delegation->continent->value ?? '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $drow->delegate->delegation->country->value ?? '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         <span class="block">{{ $drow->delegate->name_en ?? '-' }}</span>
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         @if($drow->delegate->delegation->escorts->isNotEmpty())
                                             @foreach ($drow->delegate->delegation->escorts as $escort)
                                                 <span class="">{{ $escort->code }}</span><br>
                                             @endforeach
                                         @endif
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         @if($drow->delegate->delegation->drivers->isNotEmpty())
                                             @foreach ($drow->delegate->delegation->drivers as $driver)
                                                 <span class="">{{ $driver->code }}</span> <br>
@@ -482,15 +482,15 @@
                                         @endif
                                     </td>
 
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $drow->airport->value ?? '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $drow->date_time ? \Carbon\Carbon::parse($drow->date_time)->format('h:i A') : '-' }}
                                     </td>
-                                    <td class="px-2 py-2 border border-gray-200">{{ $drow->flight_no ?? '-' }}</td>
-                                    <td class="px-2 py-2 border border-gray-200">{{ $drow->flight_name ?? '-' }}</td>
-                                    <td class="px-2 py-2 border border-gray-200  no-print">
+                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $drow->flight_no ?? '-' }}</td>
+                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $drow->flight_name ?? '-' }}</td>
+                                    <td class="text-center px-2 py-2 border border-gray-200  no-print">
                                         <div class="flex items-center gap-5">
                                             <a href="{{ route('delegations.show', $drow->delegate->delegation_id) }}"
                                                 class="w-10 h-10  text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center">

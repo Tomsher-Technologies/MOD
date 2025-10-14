@@ -19,6 +19,7 @@ class Delegation extends Model
         'import_code',
         'updated_by',
         'invitation_from_id',
+        'accomodation_status', //To check if the delegation is fully or partially accomodated (0 - Not accomodated, 1 - Fully Accomodated, 2 - Partially Accomodated)
         'continent_id',
         'country_id',
         'invitation_status_id',

@@ -4,15 +4,37 @@
     <div class="">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6 mb-10">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('event_details') }}</h2>
-            <a href="{{ Session::has('events_last_url') ? Session::get('events_last_url') : route('events.index') }}"
-                id="add-attachment-btn"
-                class="float-left btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12">
-                <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m14 0-4 4m4-4-4-4" />
-                </svg>
-                <span>{{ __db('back') }}</span>
-            </a>
+            <div class="flex gap-2">
+                <button type="button" 
+                    id="clear-notifications-btn"
+                    class="btn text-md mb-[-10px] bg-[#B68A35] text-white border !border-red-500  rounded-lg h-12 flex items-center px-4"
+                    title="{{ __db('clear_event_notifications') }}">
+                    <svg class="w-5 h-5 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>{{ __db('clear_event_notifications') }}</span>
+                </button>
+                <button type="button" 
+                    id="clear-alerts-btn"
+                    class="btn text-md mb-[-10px] border bg-[#B68A35] text-white !border-orange-500  rounded-lg h-12 flex items-center px-4"
+                    title="{{ __db('clear_event_alerts') }}">
+                    <svg class="w-5 h-5 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span>{{ __db('clear_event_alerts') }}</span>
+                </button>
+                <a href="{{ Session::has('events_last_url') ? Session::get('events_last_url') : route('events.index') }}"
+                    id="add-attachment-btn"
+                    class="btn text-md mb-[-10px] border !border-[#B68A35] !text-[#B68A35] rounded-lg h-12 flex items-center px-4">
+                    <svg class="w-6 h-6 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m14 0-4 4m4-4-4-4" />
+                    </svg>
+                    <span>{{ __db('back') }}</span>
+                </a>
+            </div>
         </div>
 
         <div class=" mx-auto px-4 sm:px-6 lg:px-0 py-8 space-y-8">
@@ -303,6 +325,83 @@
                 });
             });
 
+            // Clear event notifications button
+            document.getElementById('clear-notifications-btn').addEventListener('click', function() {
+                Swal.fire({
+                    title: "{{ __db('are_you_sure') }}",
+                    text: "{{ __db('clear_event_notifications_confirm') }}",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: "{{ __db('yes_clear') }}",
+                    cancelButtonText: '{{ __db('cancel') }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('events.clearNotifications', $event->id) }}",
+                            type: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]')
+                                    .attr('content'),
+                                'Accept': 'application/json'
+                            },
+                            success: function(data) {
+                                if (data.success) {
+                                    toastr.success(data.message || "{{ __db('notifications_cleared_successfully') }}");
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    toastr.error(data.message || "{{ __db('something_went_wrong') }}");
+                                }
+                            },
+                            error: function(xhr) {
+                                toastr.error("{{ __db('something_went_wrong') }}");
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Clear event alerts button
+            document.getElementById('clear-alerts-btn').addEventListener('click', function() {
+                Swal.fire({
+                    title: "{{ __db('are_you_sure') }}",
+                    text: "{{ __db('clear_event_alerts_confirm') }}",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: "{{ __db('yes_clear') }}",
+                    cancelButtonText: '{{ __db('cancel') }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('events.clearAlerts', $event->id) }}",
+                            type: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]')
+                                    .attr('content'),
+                                'Accept': 'application/json'
+                            },
+                            success: function(data) {
+                                if (data.success) {
+                                    toastr.success(data.message || "{{ __db('alerts_cleared_successfully') }}");
+                                    setTimeout(function() {
+                                        window.location.reload();
+                                    }, 2000);
+                                } else {
+                                    toastr.error(data.message || "{{ __db('something_went_wrong') }}");
+                                }
+                            },
+                            error: function(xhr) {
+                                toastr.error("{{ __db('something_went_wrong') }}");
+                            }
+                        });
+                    }
+                });
+            });
 
             // Open modal buttons
             document.querySelectorAll('.openAssignModalBtn').forEach(btn => {
