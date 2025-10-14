@@ -406,11 +406,12 @@
                                 @enddirectCanany
                                 <td class="px-1 py-2 border border-gray-200">{{ $keyEscort + 1 }}</td>
                                 <td class="px-1 border border-gray-200 py-3">
-                                    <div class="block">{{ $rowEscort->name_en ?? ($rowEscort->name_ar ?? '-') }}
-                                        {{ $rowEscort->title_en }} </div>
+                                    {{ $rowEscort->military_number ?? '-' }}
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
-                                    {{ $rowEscort->military_number ?? '-' }}
+                                    <div class="block">
+                                        {{ $rowEscort->getTranslation('title') . ' ' . $rowEscort->getTranslation('name') }}
+                                    </div>
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     {{ $rowEscort->phone_number ?? '-' }}
@@ -616,12 +617,14 @@
                                     </td>
                                 @enddirectCanany
                                 <td class="px-1 py-2 border border-gray-200">{{ $keyDriver + 1 }}</td>
-                                <td class="px-1 border border-gray-200 py-3">
-                                    <div class="block">{{ $rowDriver->name_en ?? ($rowDriver->name_ar ?? '-') }}
-                                        {{ $rowDriver->title_en }} </div>
-                                </td>
+
                                 <td class="px-1 border border-gray-200 py-3">
                                     {{ $rowDriver->military_number ?? '-' }}
+                                </td>
+                                <td class="px-1 border border-gray-200 py-3">
+                                    <div class="block">
+                                        {{ $rowDriver->getTranslation('title') . ' ' . $rowDriver->getTranslation('name') }}
+                                    </div>
                                 </td>
                                 <td class="px-1 border border-gray-200 py-3">
                                     {{ $rowDriver->phone_number ?? '-' }}
@@ -1133,12 +1136,13 @@
                         let existingUsersHtml = '';
                         if (res.existing_users && res.existing_users.length > 0) {
                             res.existing_users.forEach(function(user) {
-                                existingUsersHtml += `<div>${user.name} (${user.type})</div>`;
+                                existingUsersHtml +=
+                                    `<div>${user.name} (${user.type})</div>`;
                             });
                         } else {
                             existingUsersHtml = '<div>{{ __db('unknown_user') }}</div>';
                         }
-                        
+
                         Swal.fire({
                             title: "{{ __db('confirm_room_assignment') }}",
                             html: `<p>{{ __db('room_already_assigned_to_users') }}:</p>
@@ -1168,27 +1172,36 @@
                                     room_type_id: roomTypeId,
                                     room_number: roomNumber,
                                     delegation_id: {{ $delegation->id }},
-                                    confirm_duplicate: 1  
+                                    confirm_duplicate: 1
                                 }, function(res2) {
                                     if (res2.success === 1) {
                                         row.css('background-color', '#acf3bc');
-                                        toastr.success('{{ __db('room_assigned') }}');
+                                        toastr.success(
+                                            '{{ __db('room_assigned') }}');
 
                                         let actionCellDel = row.find('td').last();
-                                        if (actionCellDel.find('.remove-room-assignment').length === 0) {
+                                        if (actionCellDel.find(
+                                                '.remove-room-assignment')
+                                            .length === 0) {
                                             let removeBtnHtml = `
                                                 <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res2.assignment_id}">
                                                     {{ __db('remove') }}
                                                 </a>`;
                                             actionCellDel.append(removeBtnHtml);
                                         } else {
-                                            actionCellDel.find('.remove-room-assignment').show();
+                                            actionCellDel.find(
+                                                    '.remove-room-assignment')
+                                                .show();
                                         }
                                     } else {
                                         if (res2.success === 2) {
-                                            toastr.error('{{ __db('room_not_available') }}');
+                                            toastr.error(
+                                                '{{ __db('room_not_available') }}'
+                                            );
                                         } else if (res2.success === 3) {
-                                            toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                                            toastr.error(
+                                                '{{ __db('room_already_booked_by_external_member') }}'
+                                            );
                                         }
                                     }
                                     checkboxDel.prop('checked', false);
@@ -1302,12 +1315,13 @@
                         let existingUsersHtml = '';
                         if (res.existing_users && res.existing_users.length > 0) {
                             res.existing_users.forEach(function(user) {
-                                existingUsersHtml += `<div>${user.name} (${user.type})</div>`;
+                                existingUsersHtml +=
+                                    `<div>${user.name} (${user.type})</div>`;
                             });
                         } else {
                             existingUsersHtml = '<div>{{ __db('unknown_user') }}</div>';
                         }
-                        
+
                         Swal.fire({
                             title: "{{ __db('confirm_room_assignment') }}",
                             html: `<p>{{ __db('room_already_assigned_to_users') }}:</p>
@@ -1338,29 +1352,40 @@
                                     room_type_id: roomTypeIdEscort,
                                     room_number: roomNumberEscort,
                                     delegation_id: {{ $delegation->id }},
-                                    confirm_duplicate: 1  // Add confirmation flag
+                                    confirm_duplicate: 1 // Add confirmation flag
                                 }, function(res2) {
                                     if (res2.success === 1) {
-                                        escortrow.css('background-color', '#acf3bc');
-                                        toastr.success('{{ __db('room_assigned') }}');
+                                        escortrow.css('background-color',
+                                            '#acf3bc');
+                                        toastr.success(
+                                            '{{ __db('room_assigned') }}');
 
-                                        let actionCellEsc = escortrow.find('td').last();
-                                        if (actionCellEsc.find('.remove-room-assignment').length === 0) {
+                                        let actionCellEsc = escortrow.find('td')
+                                            .last();
+                                        if (actionCellEsc.find(
+                                                '.remove-room-assignment')
+                                            .length === 0) {
                                             let removeBtnHtml = `
                                                 <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-assignment-id="${res2.assignment_id}">
                                                     {{ __db('remove') }}
                                                 </a>`;
                                             actionCellEsc.append(removeBtnHtml);
                                         } else {
-                                            actionCellEsc.find('.remove-room-assignment').show();
+                                            actionCellEsc.find(
+                                                    '.remove-room-assignment')
+                                                .show();
                                         }
 
                                     } else {
                                         // Handle any errors in reassignment
                                         if (res2.success === 2) {
-                                            toastr.error('{{ __db('room_not_available') }}');
+                                            toastr.error(
+                                                '{{ __db('room_not_available') }}'
+                                            );
                                         } else if (res2.success === 3) {
-                                            toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                                            toastr.error(
+                                                '{{ __db('room_already_booked_by_external_member') }}'
+                                            );
                                         }
                                     }
                                     checkboxEscort.prop('checked', false);
@@ -1451,7 +1476,7 @@
                         toastr.success('{{ __db('room_assigned') }}');
 
                         let actionCell = driverrow.find('td')
-                    .last(); // assuming last cell is action
+                            .last(); // assuming last cell is action
                         if (actionCell.find('.remove-room-assignment').length === 0) {
                             let removeBtnHtml = `
                                 <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-driver-id="${idDriver}" data-assignment-id="${res.assignment_id}">
@@ -1472,12 +1497,13 @@
                         let existingUsersHtml = '';
                         if (res.existing_users && res.existing_users.length > 0) {
                             res.existing_users.forEach(function(user) {
-                                existingUsersHtml += `<div>${user.name} (${user.type})</div>`;
+                                existingUsersHtml +=
+                                    `<div>${user.name} (${user.type})</div>`;
                             });
                         } else {
                             existingUsersHtml = '<div>{{ __db('unknown_user') }}</div>';
                         }
-                        
+
                         Swal.fire({
                             title: "{{ __db('confirm_room_assignment') }}",
                             html: `<p>{{ __db('room_already_assigned_to_users') }}:</p>
@@ -1508,28 +1534,39 @@
                                     room_type_id: roomTypeIdDriver,
                                     room_number: roomNumberDriver,
                                     delegation_id: {{ $delegation->id }},
-                                    confirm_duplicate: 1  // Add confirmation flag
+                                    confirm_duplicate: 1 // Add confirmation flag
                                 }, function(res2) {
                                     if (res2.success === 1) {
-                                        driverrow.css('background-color', '#acf3bc');
-                                        toastr.success('{{ __db('room_assigned') }}');
+                                        driverrow.css('background-color',
+                                            '#acf3bc');
+                                        toastr.success(
+                                            '{{ __db('room_assigned') }}');
 
-                                        let actionCell = driverrow.find('td').last();
-                                        if (actionCell.find('.remove-room-assignment').length === 0) {
+                                        let actionCell = driverrow.find('td')
+                                            .last();
+                                        if (actionCell.find(
+                                                '.remove-room-assignment')
+                                            .length === 0) {
                                             let removeBtnHtml = `
                                                 <a href="#" class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-3 ml-2" data-driver-id="${idDriver}" data-assignment-id="${res2.assignment_id}">
                                                     {{ __db('remove') }}
                                                 </a>`;
                                             actionCell.append(removeBtnHtml);
                                         } else {
-                                            actionCell.find('.remove-room-assignment').show();
+                                            actionCell.find(
+                                                    '.remove-room-assignment')
+                                                .show();
                                         }
                                     } else {
                                         // Handle any errors in reassignment
                                         if (res2.success === 2) {
-                                            toastr.error('{{ __db('room_not_available') }}');
+                                            toastr.error(
+                                                '{{ __db('room_not_available') }}'
+                                            );
                                         } else if (res2.success === 3) {
-                                            toastr.error('{{ __db('room_already_booked_by_external_member') }}');
+                                            toastr.error(
+                                                '{{ __db('room_already_booked_by_external_member') }}'
+                                            );
                                         }
                                     }
                                     checkboxDriver.prop('checked', false);

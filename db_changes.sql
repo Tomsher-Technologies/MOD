@@ -787,6 +787,9 @@
 -- ('top-management', 207, 'export_arrival_hotels', 'Export Arrival Hotels', 'web', 1, NULL, NULL),
 -- ('top-management', 207, 'view_delegation_head_invitations', 'View Delegation Head Invitations', 'web', 1, NULL, NULL),
 -- ('top-management', 207, 'export_delegation_head_invitations', 'Export Delegation Head Invitations', 'web', 1, NULL, NULL);
+-- alter table delegations add column import_code varchar(255) after code; 
 
 
-alter table delegations add column import_code varchar(255) after code; 
+alter table delegations add column accomodation_status tinyint(1) after import_code;
+ALTER TABLE `delegations` CHANGE `accomodation_status` `accomodation_status` TINYINT(1) NULL DEFAULT '0' COMMENT '(0 - Not accomodated, 1 - Fully Accomodated, 2 - Partially Accomodated)'; 
+UPDATE `delegations` SET `accomodation_status`='0' where accomodation_status IS NULL;

@@ -8,6 +8,7 @@ use App\Models\Driver;
 use App\Models\Event;
 use App\Models\Language;
 use App\Models\Accommodation;
+use App\Models\Delegation;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Request;
@@ -662,6 +663,8 @@ function isHotel()
 
 function getRoomAssignmentStatus($delegationId)
 {
+    $delegation = Delegation::find($delegationId);
+
     $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)
         ->pluck('current_room_assignment_id');
 
@@ -683,20 +686,28 @@ function getRoomAssignmentStatus($delegationId)
 
     $all = $delegates->merge($escorts)->merge($drivers);
 
+    $accomodationStatus = 0;
+
     if ($all->count() === 0) {
-        return 0;
+        $accomodationStatus = 0;
     }
 
     $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
     $totalCount    = $all->count();
 
     if ($assignedCount === 0) {
-        return 0;
+        $accomodationStatus = 0;
     } elseif ($assignedCount === $totalCount) {
-        return 1;
+        $accomodationStatus = 1;
     } else {
-        return 2;
+        $accomodationStatus = 2;
     }
+
+    $delegation->accomodation_status = $accomodationStatus;
+
+    $delegation->save();
+
+    return $accomodationStatus;
 }
 
 function shadeColor($hex, $percent)
@@ -757,5 +768,3 @@ function getFloorPlans()
 
     return $floorPlans;
 }
-
-

@@ -152,12 +152,12 @@ class EscortController extends Controller
         }
 
         $query->leftJoin('dropdown_options as rankings', 'escorts.internal_ranking_id', '=', 'rankings.id')
-            ->leftJoin('delegation_escorts as de', function($join) {
+            ->leftJoin('delegation_escorts as de', function ($join) {
                 $join->on('escorts.id', '=', 'de.escort_id')
-                     ->where('de.status', '=', 1);
+                    ->where('de.status', '=', 1);
             })
-            ->select('escorts.*') 
-            ->orderByRaw('CASE WHEN de.escort_id IS NULL THEN 0 ELSE 1 END')  
+            ->select('escorts.*')
+            ->orderByRaw('CASE WHEN de.escort_id IS NULL THEN 0 ELSE 1 END')
             ->orderByRaw('CAST(escorts.military_number AS UNSIGNED) ASC')
             ->orderBy('rankings.sort_order');
 
@@ -508,6 +508,8 @@ class EscortController extends Controller
         $escort->delegation_id = $delegationId;
         $escort->save();
 
+        getRoomAssignmentStatus($delegationId);
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'assignment',
@@ -545,6 +547,7 @@ class EscortController extends Controller
 
         $escort->delegation_id = null;
 
+
         $this->logActivity(
             module: 'Escorts',
             submodule: 'assignment',
@@ -581,6 +584,8 @@ class EscortController extends Controller
 
             $escort->current_room_assignment_id = null;
         }
+
+        getRoomAssignmentStatus($delegationId);
 
         $escort->save();
 
