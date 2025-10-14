@@ -75,10 +75,14 @@
             <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; gap: 20px;">
 
                 @foreach($interviews as $intervieweeName => $group)
-                    <div style="display: flex; align-items: center; gap: 20px; justify-content: end;font-weight: bold">
-                        <h4>{{ $intervieweeName }}</h4>
-                        <h4>: {{ __db('interview_with') }}</h4>
-                    </div>
+                   
+                    <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; white-space: nowrap;">
+                                {{ $intervieweeName }} : {{ __('interview_with') }}
+                            </td>
+                        </tr>
+                    </table>
 
                     <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
                         <thead>

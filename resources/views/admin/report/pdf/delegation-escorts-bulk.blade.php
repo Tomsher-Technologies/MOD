@@ -340,6 +340,10 @@
             @if(!$loop->last)
                 <div style="page-break-after: always;"></div>
             @endif
+
+            @if($loop->iteration % 2 == 0)
+                <!--CHUNKHTML-->
+            @endif
         @endforeach
     </div>
         

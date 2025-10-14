@@ -19,6 +19,13 @@
                 <div style="font-size: 14px; font-weight: bold; color: #cc0000;">
                     {!! __db($reportName) ?? $reportName !!}
                 </div>
+
+                @if(isset($internalRankName))
+                    <div style="font-size: 14px; font-weight: bold;">
+                        {!! $internalRankName !!}
+                    </div>
+                @endif
+                
             </td>
 
             <!-- Right Logo -->

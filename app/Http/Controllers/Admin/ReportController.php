@@ -269,7 +269,11 @@ class ReportController extends Controller
         $html = view('admin.report.pdf.delegation-escorts-bulk', compact('delegations'))->render();
 
         $reportName = 'delegations_escort_report'.$today.'.pdf';
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $mpdf->Output($reportName, 'D');
     }
 
@@ -341,7 +345,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.hotel-rooms-bulk', compact('accommodations'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'hotel_rooms_vacancies_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -411,7 +419,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.escorts-bulk', compact('assignedEscorts', 'unassignedEscorts'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'escorts_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -475,7 +487,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.drivers-bulk', compact('assignedDrivers', 'unassignedDrivers'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'drivers_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -718,7 +734,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.head_invitations_bulk', compact('invitations'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'delegation_head_invitations_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -777,7 +797,13 @@ class ReportController extends Controller
 
         $delegates = $newQuery->get();
 
-        return view('admin.report.vip_report', compact('delegates'));
+        $internalRankName = '';
+        if($request->has('internal_ranking') && $request->internal_ranking != 'all'){
+            $drop = DropdownOption::where('id', $request->internal_ranking)->first();
+            $internalRankName = $drop?->value;
+        }
+
+        return view('admin.report.vip_report', compact('delegates','internalRankName'));
     }
 
     public function exportBulkVipPdf(Request $request){
@@ -834,6 +860,12 @@ class ReportController extends Controller
 
         $delegates = $newQuery->get();
 
+        $internalRankName = '';
+        if($request->has('internal_ranking') && $request->internal_ranking != 'all'){
+            $drop = DropdownOption::where('id', $request->internal_ranking)->first();
+            $internalRankName = $drop?->value;
+        }
+        
         $today = date('Y-m-d-H-i');
         $reportName = 'vip_report';
         $mpdf = new Mpdf([
@@ -845,14 +877,18 @@ class ReportController extends Controller
             'default_font' => 'amiri'
         ]);
 
-        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName','internalRankName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
         $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
 
-        $html = view('admin.report.pdf.vip_report-bulk', compact('delegates'))->render();
+        $html = view('admin.report.pdf.vip_report-bulk', compact('delegates','internalRankName'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'vip_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -946,7 +982,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.wives_report-bulk', compact('delegates'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'wives_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -1024,7 +1064,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.delegations_members-bulk', compact('delegations'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'delegations_members_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
 
@@ -1100,7 +1144,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.without_escorts-bulk', compact('delegations'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'delegations_without_escort_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
 
@@ -1237,7 +1285,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.delegations-cars-bulk', compact('delegates'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'delegations_cars_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -1385,7 +1437,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.delegation-arrivals-bulk', compact('formattedGroups'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'arrivals_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -1533,7 +1589,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.delegation-departure-bulk', compact('formattedGroups'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'departures_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -1713,7 +1773,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.hotels-arrivals-bulk', compact('formattedGroups'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'arrival_hotels_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -1868,7 +1932,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.interviews-bulk', compact('interviews'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'interviews_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');                    
     }
@@ -1945,7 +2013,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.hotel_delegations-bulk', compact('hotelsData'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'hotel_delegations_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');  
     }
