@@ -7,12 +7,14 @@
     $columns = [
         [
             'label' => __db('sl_no'),
+            // 'class' => 'text-[16px]',
             'render' => fn($row, $key) => $key +
                 1 +
                 (($paginator ?? $arrivals)->currentPage() - 1) * ($paginator ?? $arrivals)->perPage(),
         ],
         [
             'label' => __db('delegation'),
+            // 'class' => 'text-[16px]',
             'render' => function ($row) {
                 $delegationId = $row['delegation']->id ?? null;
                 $delegationCode = $row['delegation']->code ?? '-';
@@ -31,11 +33,13 @@
         ],
         [
             'label' => __db('continent'),
+            // 'class' => 'text-[16px]',
             'render' => fn($row) => $row['delegation']->continent->value ?? '-',
         ],
         [
             'label' => __db('country'),
             'key' => 'country',
+            // 'class' => 'text-[16px]',
             'render' => function ($row) {
                 if (!$row['delegation']->country) {
                     return '-';
@@ -56,10 +60,12 @@
         ],
         [
             'label' => __db('invitation_from'),
+            // 'class' => 'text-[16px]',
             'render' => fn($row) => $row['delegation']->invitationFrom->value ?? '-',
         ],
         [
             'label' => __db('delegates'),
+            // 'class' => 'text-[16px]',
             'render' => function ($row) {
                 $delegation = $row['delegation'] ?? null;
 
@@ -71,21 +77,15 @@
                             break;
                         }
                     }
-                    
+
                     if ($teamHead) {
-                        return e(
-                            $teamHead->getTranslation('title') .
-                                '. ' .
-                                $teamHead->getTranslation('name'),
-                        );
+                        return e($teamHead->getTranslation('title') . '. ' . $teamHead->getTranslation('name'));
                     }
-                    
+
                     $firstDelegate = collect($row['delegates'])->first();
                     if ($firstDelegate) {
                         return e(
-                            $firstDelegate->getTranslation('title') .
-                                '. ' .
-                                $firstDelegate->getTranslation('name'),
+                            $firstDelegate->getTranslation('title') . '. ' . $firstDelegate->getTranslation('name'),
                         );
                     }
                 }
@@ -96,6 +96,7 @@
 
         [
             'label' => __db('escorts'),
+            // 'class' => 'text-[16px]',
             'render' => function ($row) {
                 return $row['delegation']->escorts->isNotEmpty()
                     ? $row['delegation']->escorts->map(fn($escort) => e($escort->code))->implode('<br>')
@@ -104,37 +105,45 @@
         ],
         [
             'label' => __db('drivers'),
+            // 'class' => 'text-[16px]',
             'render' => function ($row) {
                 return $row['delegation']->drivers->isNotEmpty()
-                    ? $row['delegation']->drivers
-                        ->map(fn($drivers) => e($drivers->code))
-                        ->implode('<br>')
+                    ? $row['delegation']->drivers->map(fn($drivers) => e($drivers->code))->implode('<br>')
                     : '-';
             },
         ],
-        ['label' => __db('to_airport'), 'render' => fn($row) => $row['airport']->value ?? '-'],
+        [
+            'label' => __db('to_airport'),
+            // 'class' => 'text-[16px]',
+            'render' => fn($row) => $row['airport']->value ?? '-',
+        ],
         [
             'label' => __db('date_time'),
+            // 'class' => 'text-[16px]',
             'render' => fn($row) => $row['date_time']
                 ? \Carbon\Carbon::parse($row['date_time'])->format('Y-m-d H:i')
                 : '-',
         ],
         [
             'label' => __db('flight') . ' ' . __db('number'),
+            // 'class' => 'text-[16px]',
             'render' => fn($row) => $row['flight_no'] ?? '-',
         ],
         [
             'label' => __db('flight') . ' ' . __db('name'),
+            // 'class' => 'text-[16px]',
             'render' => fn($row) => $row['flight_name'] ?? '-',
         ],
         [
             'label' => __db('arrival') . ' ' . __db('status'),
+            // 'class' => 'text-[16px]',
             'render' => function ($row) use ($statusLabels) {
                 return $row['status'] ?? '-';
             },
         ],
         [
             'label' => __db('actions'),
+            // 'class' => 'text-[16px]',
             'permission' => ['add_travels', 'delegate_add_delegates'],
             'render' => function ($row) {
                 $transportIds = collect($row['transports'])->pluck('id')->toArray();
@@ -193,9 +202,7 @@
         $now = \Carbon\Carbon::now();
 
         $statusName =
-            is_object($row['status']) && isset($row['status']->value)
-                ? $row['status']->value
-                : $row['status'];
+            is_object($row['status']) && isset($row['status']->value) ? $row['status']->value : $row['status'];
 
         if (!$row['date_time']) {
             return $bgClass[$statusName] ?? 'bg-[#fff]';
@@ -222,8 +229,8 @@
 @endphp
 
 <div id="arrivals-table-container">
-    <x-reusable-table :columns="$columns" :enableRowLimit="true" :enableColumnListBtn="true" table-id="arrivals-table"
-        :data="$paginator" :row-class="$rowClass" />
+    <x-reusable-table :columns="$columns" :enableRowLimit="true" :enableColumnListBtn="true" table-id="arrivals-table" :data="$paginator"
+        :row-class="$rowClass" />
 </div>
 
 <div class="mt-3 flex items-center flex-wrap gap-4">

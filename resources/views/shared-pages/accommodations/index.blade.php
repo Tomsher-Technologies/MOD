@@ -107,35 +107,35 @@
                 <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                     <thead>
                         <tr class="text-[13px]">
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}
                             </th>
                             <th scope="col"
-                                class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 w-[15%] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('hotel_name') }} ({{ __db('english') }})
                             </th>
                             <th scope="col"
-                                class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 w-[15%] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('hotel_name') }} ({{ __db('arabic') }})
                             </th>
                             <th scope="col"
-                                class="p-3 w-[15%] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 w-[15%] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('address') }}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('contact_number') }}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('contact_point') }}
                             </th>
 
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('room_type') }}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('total_capacity') }}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('actions') }}
                             </th>
                         </tr>
@@ -143,10 +143,10 @@
                     <tbody>
                         @forelse ( $accommodations as $key => $hotel )
                             <tr class="text-[12px] align-[middle]">
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     {{ $accommodations->firstItem() + $key }}
                                 </td>
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     @directCanany(['view_accommodations', 'delegate_view_accommodations', 'escort_view_accommodations','driver_view_accommodations','hotel_view_accommodations'])
                                         <a href="{{ route('accommodations.show', base64_encode($hotel->id)) }}" class="text-[#B68A35] hover:underline">
                                             
@@ -159,7 +159,7 @@
                                     @enddirectCanany
                                 </td>
 
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     @directCanany(['view_accommodations', 'delegate_view_accommodations', 'escort_view_accommodations','driver_view_accommodations','hotel_view_accommodations'])
                                         <a href="{{ route('accommodations.show', base64_encode($hotel->id)) }}" class="text-[#B68A35] hover:underline">
                                             
@@ -172,13 +172,13 @@
                                     @enddirectCanany
                                 </td>
 
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     {{ $hotel->address ?? '-' }}
                                 </td>
-                                <td class="px-3 py-3 text-end border border-gray-200" dir="ltr">
+                                <td class="text-center px-3 py-3 border border-gray-200" dir="ltr">
                                     {{ $hotel->contact_number ?? '-' }}
                                 </td>
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     @if ($hotel->contacts)
                                         @foreach ($hotel->contacts as $contact_person)
                                             <div class="mb-2">{{ $contact_person->name }} -
@@ -187,7 +187,7 @@
                                     @endif
                                 </td>
 
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     @php
                                         $total_rooms = 0;
                                         $assigned_rooms = 0;
@@ -204,11 +204,11 @@
                                     @endif
 
                                 </td>
-                                <td class="px-3 py-3 border border-gray-200">
+                                <td class="text-center px-3 py-3 border border-gray-200">
                                     {{ $assigned_rooms }}/{{ $total_rooms }}
                                 </td>
 
-                                <td class="px-3 py-2 border border-gray-200">
+                                <td class="text-center px-3 py-2 border border-gray-200">
                                     <div class="flex align-center gap-1">
                                         @directCanany(['edit_accommodations', 'hotel_edit_accommodations'])
                                             <a href="{{ route('accommodations.edit', ['id' => base64_encode($hotel->id)]) }}"
@@ -246,7 +246,7 @@
                             </tr>
                         @empty
                             <tr class="border-t">
-                                <td class="px-3 py-3 text-center " colspan="5" dir="ltr">
+                                <td class="text-center px-3 py-3" colspan="5" dir="ltr">
                                     {{ __db('no_data_found') }}
                                 </td>
                             </tr>

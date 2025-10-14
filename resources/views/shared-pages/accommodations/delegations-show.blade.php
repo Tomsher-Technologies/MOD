@@ -354,34 +354,42 @@
                     <thead>
                         <tr class="text-[13px]">
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
-                                <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                <th scope="col"
+                                    class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 </th>
                             @enddirectCanany
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('military_number') }}</th>
 
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('name') }}
                             </th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('mobile') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('gender') }}</th>
-                            <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('hotel') }}</th>
-                            <th scope="col" class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                            <th scope="col"
+                                class="p-2 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
-                                class="p-2 w-[115px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-2 w-[115px] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('room_number') }}</th>
 
 
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                 <th scope="col"
-                                    class="p-2 w-[60px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    class="p-2 w-[60px] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('action') }} </th>
                             @enddirectCanany
                         </tr>
@@ -398,29 +406,29 @@
                             <tr data-id="{{ $rowEscort->id }}"
                                 class="escort-row text-[12px] align-[middle] @if ($roomEscort) bg-[#acf3bc] @endif">
                                 @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
-                                    <td class="px-1 py-2 border border-gray-200">
+                                    <td class="text-center px-1 py-2 border border-gray-200">
                                         <input type="checkbox" class="assign-hotel-checkbox-escort"
                                             data-escort-id="{{ $rowEscort->id }}"
                                             class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
                                     </td>
                                 @enddirectCanany
-                                <td class="px-1 py-2 border border-gray-200">{{ $keyEscort + 1 }}</td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 py-2 border border-gray-200">{{ $keyEscort + 1 }}</td>
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     {{ $rowEscort->military_number ?? '-' }}
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     <div class="block">
                                         {{ $rowEscort->getTranslation('title') . ' ' . $rowEscort->getTranslation('name') }}
                                     </div>
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     {{ $rowEscort->phone_number ?? '-' }}
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     {{ $rowEscort->gender?->value ?? '-' }}
                                 </td>
 
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <span
                                             class="hotel_name_escort">{{ $roomEscort?->hotel?->hotel_name ?? '' }}</span>
@@ -432,7 +440,7 @@
                                         {{ $roomEscort?->hotel?->hotel_name ?? '' }}
                                     @endif
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         @php
                                             $optionsEscort = '';
@@ -466,7 +474,7 @@
                                     @endif
                                 </td>
 
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <input type="text" name="room_number_escort" id="room_number_escort"
                                             class="room-number-input-escort w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
@@ -477,7 +485,7 @@
                                 </td>
 
                                 @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
-                                    <td class="px-1 py-3 border border-gray-200">
+                                    <td class="text-center px-1 py-3 border border-gray-200">
                                         <div class="flex items-center gap-1">
                                             <a href="#" id="add-attachment-btn"
                                                 class="save-room-assignment-escort text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
@@ -561,39 +569,39 @@
                         <tr class="text-[13px]">
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                 <th scope="col"
-                                    class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 </th>
                             @enddirectCanany
                             <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('sl_no') }}</th>
                             <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('military_number') }}</th>
 
                             <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('name') }}
                             </th>
                             <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('mobile') }}</th>
 
                             <th scope="col"
-                                class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('hotel') }}</th>
                             <th scope="col"
-                                class="p-2 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-2 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
-                                class="p-2 w-[115px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                class="p-2 w-[115px] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('room_number') }}</th>
 
 
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                 <th scope="col"
-                                    class="p-2 w-[60px] !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                                    class="p-2 w-[60px] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('action') }} </th>
                             @enddirectCanany
                         </tr>
@@ -610,27 +618,27 @@
                             <tr data-id="{{ $rowDriver->id }}"
                                 class="driver-row text-[12px] align-[middle] @if ($roomDriver) bg-[#acf3bc] @endif">
                                 @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
-                                    <td class="px-1 py-2 border border-gray-200">
+                                    <td class="text-center px-1 py-2 border border-gray-200">
                                         <input type="checkbox" class="assign-hotel-checkbox-driver"
                                             data-driver-id="{{ $rowDriver->id }}"
                                             class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
                                     </td>
                                 @enddirectCanany
-                                <td class="px-1 py-2 border border-gray-200">{{ $keyDriver + 1 }}</td>
+                                <td class="text-center px-1 py-2 border border-gray-200">{{ $keyDriver + 1 }}</td>
 
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     {{ $rowDriver->military_number ?? '-' }}
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     <div class="block">
                                         {{ $rowDriver->getTranslation('title') . ' ' . $rowDriver->getTranslation('name') }}
                                     </div>
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     {{ $rowDriver->phone_number ?? '-' }}
                                 </td>
 
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <span
                                             class="hotel_name_driver">{{ $roomDriver?->hotel?->hotel_name ?? '' }}</span>
@@ -642,7 +650,7 @@
                                         {{ $roomDriver?->hotel?->hotel_name ?? '' }}
                                     @endif
                                 </td>
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         @php
                                             $optionsDriver = '';
@@ -676,7 +684,7 @@
                                     @endif
                                 </td>
 
-                                <td class="px-1 border border-gray-200 py-3">
+                                <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <input type="text" name="room_number_driver" id="room_number_driver"
                                             class="room-number-input-driver w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
@@ -687,7 +695,7 @@
                                 </td>
 
                                 @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
-                                    <td class="px-1 py-3 border border-gray-200">
+                                    <td class="text-center px-1 py-3 border border-gray-200">
                                         <div class="flex items-center gap-1">
                                             <a href="#" id="add-attachment-btn"
                                                 class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
