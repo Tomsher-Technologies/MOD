@@ -248,7 +248,7 @@
                                 'hotel_view_delegations',
                             ],
                             'render' => function ($delegation) {
-                                $buttons = '';
+                               $buttons = '<div class="flex items-center">';
 
                                 if (
                                     can([
@@ -294,6 +294,7 @@
                                     </button>';
                                 }
 
+                                $buttons .= '</div>';
                                 return $buttons;
                             },
                         ],
