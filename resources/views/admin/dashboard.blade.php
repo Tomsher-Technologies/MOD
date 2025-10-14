@@ -524,8 +524,7 @@
 
         @php
             $colors = [
-                '#ce89de','#de8989','#dbde89','#898dde','#BFFAFF','#D9FFBA' ,'#D5BAFF','#8994de','#deda89',
-                '#A8E6CF','#FFB3BA',
+                '#ce89de','#de8989','#dbde89','#BFFAFF','#D9FFBA' ,'#D5BAFF','#8994de','#deda89','#A8E6CF','#FFB3BA',
                 '#FFD8A8','#FFDAC1', '#F5F5DC','#C19A6B','#FFE5B4','#B0E0E6','#BAE1FF','#FFC1E3','#FFFFBA','#D7CCC8','#FFE29F',
                 '#E0B0FF','#D3D3D3','#AEEEEE','#DFFFBA','#99E6E6','#ffaded', '#acbff7',
             ];
