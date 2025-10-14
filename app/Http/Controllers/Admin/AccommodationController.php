@@ -496,13 +496,11 @@ class AccommodationController extends Controller
 
         if (!$current || $confirmedDuplicate) {
             $alreadyAssignedExternal = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type_id)
                 ->where('room_number', $request->room_number)
                 ->where('active_status', 1)
                 ->exists();
 
             $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type_id)
                 ->where('room_number', $request->room_number)
                 ->where('assignable_id', '!=', $user->id)
                 ->where('active_status', 1)
@@ -519,7 +517,6 @@ class AccommodationController extends Controller
                 $existingUsers = [];
                 
                 $allExistingAssignments = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                    ->where('room_type_id', $request->room_type_id)
                     ->where('room_number', $request->room_number)
                     ->where('assignable_id', '!=', $user->id)
                     ->where('active_status', 1)

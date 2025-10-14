@@ -116,7 +116,7 @@
                                     : '';
                                 $name = $row->name_ar;
                                 $title = $row->title_ar;
-                                return $badge . '<div class="block">' . e($title . ' ' . $name) . '</div>';
+                                return $badge . '<div class="block">' . e($title . ' / ' . $name) . '</div>';
                             },
                         ],
                         [

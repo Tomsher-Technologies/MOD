@@ -222,7 +222,7 @@
 @endphp
 
 <div id="arrivals-table-container">
-    <x-reusable-table :columns="$columns" :enableRowLimit="true" table-id="arrivals-table"
+    <x-reusable-table :columns="$columns" :enableRowLimit="true" :enableColumnListBtn="true" table-id="arrivals-table"
         :data="$paginator" :row-class="$rowClass" />
 </div>
 

@@ -3,12 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const isDeparturesPage = document.getElementById('fullDiv1') !== null;
 
     if (!isArrivalsPage && !isDeparturesPage) {
-        return; 
+        return;
     }
 
     function refreshData() {
         console.log("refreshing");
-        
+
         const currentUrl = new URL(window.location.href);
         const url = currentUrl.toString();
 
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         if (newTable) {
                             newTable.classList.remove('hidden');
-                            
+
                             const currentTable = tableContainer.querySelector('table');
                             if (currentTable) {
                                 currentTable.replaceWith(newTable);
@@ -53,15 +53,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     tableContainer.parentNode.insertBefore(newLegend, tableContainer.nextSibling);
                                 }
                             }
-                            
-                            if (columnVisibilityModal) {
-                                const currentModal = document.querySelector('[id$="-table-column-visibility-modal"]');
-                                if (currentModal) {
-                                    currentModal.replaceWith(columnVisibilityModal);
-                                } else {
-                                    document.body.appendChild(columnVisibilityModal);
-                                }
-                            }
+
+                            applySavedColumnVisibility();
 
                             setTimeout(() => {
                                 if (typeof $ !== 'undefined' && $.fn.select2) {
@@ -72,8 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
 
                                 bindEditButtons();
-                                
-                                initColumnVisibility();
                             }, 100);
                         }
                     }
@@ -115,26 +106,29 @@ document.addEventListener('DOMContentLoaded', function () {
             fullscreenToggleBtn1.addEventListener('click', toggleFullscreen);
         }
     }
-    
-    function initColumnVisibility() {
-        document.querySelectorAll('.column-toggle-checkbox').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const columnKey = this.value;
-                const tableId = this.closest('[id$="-table-column-toggles"]').id.replace('-column-toggles', '');
-                const table = document.getElementById(tableId);
-                
-                if (table) {
-                    // Toggle visibility using the display style as in the reusable table component
-                    const isVisible = this.checked;
+
+    function applySavedColumnVisibility() {
+        document.querySelectorAll('[id$="-column-toggles"]').forEach(toggleContainer => {
+            const tableId = toggleContainer.id.replace('-column-toggles', '');
+            const storageKey = tableId + '_column_visibility';
+            const savedPrefs = JSON.parse(localStorage.getItem(storageKey));
+
+            if (savedPrefs) {
+                Object.keys(savedPrefs).forEach(columnKey => {
+                    const isVisible = savedPrefs[columnKey];
                     document.querySelectorAll(
                         `#${tableId} th[data-column-key='${columnKey}'], #${tableId} td[data-column-key='${columnKey}']`
                     ).forEach(el => {
                         el.style.display = isVisible ? '' : 'none';
                     });
-                }
-            });
+
+                    const checkbox = toggleContainer.querySelector(`.column-toggle-checkbox[value="${columnKey}"]`);
+                    if (checkbox) checkbox.checked = isVisible;
+                });
+            }
         });
     }
+
 
     function toggleFullscreen() {
         const elem = document.getElementById('fullDiv') || document.getElementById('fullDiv1');
@@ -164,9 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     bindEditButtons();
-    initColumnVisibility();
+    applySavedColumnVisibility();
 
-    setInterval(refreshData, 5000);
+    setInterval(refreshData, 60000);
 
     console.log('Auto-refresh initialized for ' + (isArrivalsPage ? 'arrivals' : 'departures') + ' page');
 });

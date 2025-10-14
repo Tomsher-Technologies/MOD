@@ -92,11 +92,23 @@
                             'key' => 'team_head',
                             'render' => function ($delegation) {
                                 $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
-                                return $teamHeads->isNotEmpty()
-                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
-                                    : '-';
+
+                                if ($teamHeads->isEmpty()) {
+                                    return '-';
+                                }
+
+                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
+
+                                return $teamHeads
+                                    ->map(function ($head) use ($separator) {
+                                        return e(
+                                            $head->getTranslation('title') . $separator . $head->getTranslation('name'),
+                                        );
+                                    })
+                                    ->implode('<br>');
                             },
                         ],
+
                         [
                             'label' => __db('designation'),
                             'key' => 'team_head_designation',
@@ -205,7 +217,7 @@
                 @endphp
 
                 <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :row-class="$rowClass"
-                    :enableColumnListBtn="true"  :columns="$columns" :no-data-message="__db('no_data_found')" />
+                    :enableColumnListBtn="true" :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 <div class="flex items-center justify-start gap-6 mt-4">
                     <div class="mt-3 flex items-center justify-start gap-3 ">

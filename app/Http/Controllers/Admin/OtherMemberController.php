@@ -20,13 +20,11 @@ class OtherMemberController extends Controller
 
     public function index(Request $request)
     {
-        $eventId = session('current_event_id', null);
+        $eventId = session('current_event_id', getDefaultEventId());
 
         $query = OtherInterviewMember::with('event')->orderBy('id', 'desc');
 
-        if ($eventId) {
-            $query->where('event_id', $eventId);
-        }
+        $query->where('event_id', $eventId);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
