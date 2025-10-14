@@ -95,7 +95,10 @@
                                 </td>
                             @endforeach
                         </tr>
-                        
+
+                        @if($loop->iteration % 10 == 0)
+                            <!--CHUNKHTML-->
+                        @endif
                     @endforeach
                 </tbody>
             </table>
