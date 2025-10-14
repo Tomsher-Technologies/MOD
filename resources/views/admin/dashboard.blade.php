@@ -771,7 +771,7 @@
                return {
                      name: label,
                      y: series[i],
-                     color: colors[i] || '#B68A35' // fallback color
+                     color: colors[i % colors.length] // fallback color
                };
             });
 
