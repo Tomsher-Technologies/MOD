@@ -113,6 +113,9 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
+                         @php
+                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                        @endphp
                         @foreach ($headsDeparture as $i => $departure)
                             <tr>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
@@ -143,7 +146,7 @@
                                     {{ $departure?->delegate?->getTranslation('designation') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $departure?->delegate?->getTranslation('title') }}
+                                    {{ $departure?->delegate?->getTranslation('title') }} {{ $separator }}
                                     {{ $departure?->delegate?->getTranslation('name') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">

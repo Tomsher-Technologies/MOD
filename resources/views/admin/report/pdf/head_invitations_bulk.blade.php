@@ -37,6 +37,9 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
+                         @php
+                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                        @endphp
                         @foreach ($invitations as $i => $invt)
                       
                             <tr>
@@ -58,7 +61,7 @@
                                     {{ $invt->getTranslation('designation') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $invt->getTranslation('title') }}
+                                    {{ $invt->getTranslation('title') }} {{ $separator }}
                                     {{ $invt->getTranslation('name') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
