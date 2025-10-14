@@ -123,6 +123,7 @@
             const delegationTableBody = document.querySelector('#delegationTable tbody');
             const assignBtn = document.getElementById('assignBtn');
 
+            const lang = '{{ getActiveLanguage() }}';
 
             const pageRoutes = {
                 delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
@@ -171,6 +172,7 @@
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
+
                                 let detailsHtml = `
                             <div class="mb-6">
                                 <h3 class="text-lg font-semibold mb-3">{{ __db('delegation_information') }}</h3>
@@ -181,19 +183,19 @@
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('country') }}:</p>
-                                        <p>${data.delegation.country?.name || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.country?.name_ar, data.delegation.country?.name) || '-'}</p>
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('continent') }}:</p>
-                                        <p>${data.delegation.continent?.value || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.continent?.value_ar, data.delegation.continent?.value) || '-'}</p>
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('invitation_from') }}:</p>
-                                        <p>${data.delegation.invitation_from?.value_ar || data.delegation.invitation_from?.value || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.invitation_from?.value_ar, data.delegation.invitation_from?.value) || '-'}</p>
                                     </div>
                                      <div>
                                         <p class="font-medium">{{ __db('invitation_status') }}:</p>
-                                        <p>${data.delegation.invitation_status?.value_ar || data.delegation.invitation_status?.value || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.invitation_status?.value_ar, data.delegation.invitation_status?.value) || '-'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -222,21 +224,20 @@
 
                                 if (data.delegation.delegates && data.delegation.delegates.length > 0) {
                                     data.delegation.delegates.forEach(delegate => {
-                                        console.log("data.delegation", data.delegation);
 
                                         detailsHtml += `
                                     <tr>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.name_en || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_ar || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internalRanking?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.gender?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_ar || delegate?.parent?.name_en || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.internal_ranking?.value_ar, delegate?.internal_ranking?.value) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.gender?.value_ar, delegate?.gender?.value) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.parent?.name_ar, delegate?.parent?.name_en) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.relationship?.value_ar, delegate?.relationship?.value) || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.badge_printed || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.participation_status || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.designation_ar || delegate?.designation_en || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.team_head ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.accommodation ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.designation_ar, delegate?.designation_en) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.team_head ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.accommodation ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
                                     </tr>
                                 `;
                                     });
@@ -314,9 +315,9 @@
                                                 ${delegation.code}
                                             </a>
                                         </td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${getLanguageValue(lang, delegation.continent?.value_ar, delegation.continent?.value) || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${getLanguageValue(lang, delegation.country?.name_ar, delegation.country?.name) || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${getLanguageValue(lang, delegation.delegates.find((delegate) => delegate.team_head === true )?.name_ar, delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en) || ''}</td>
                                     </tr>
                                 `;
                                     delegationTableBody.innerHTML += row;

@@ -765,3 +765,22 @@ function getFloorPlans()
 
     return $floorPlans;
 }
+
+function getNotNullLanguageValues($dataField, $arabicFieldName, $englishFieldName)
+{
+    if ($dataField) {
+        $lang =  getActiveLanguage();
+
+        $finalValue = $lang == 'ar' ? $dataField[$arabicFieldName] : $dataField[$englishFieldName];
+        $finalValue = trim($finalValue);
+        if ($finalValue == null && $lang == 'ar') {
+            $finalValue = $dataField[$englishFieldName];
+        } else if ($finalValue == null && $lang == 'en') {
+            $finalValue = $dataField[$arabicFieldName];
+        }
+
+        return $finalValue;
+    }
+
+    return " - ";
+}
