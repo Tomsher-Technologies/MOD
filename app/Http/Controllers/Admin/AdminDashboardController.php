@@ -200,11 +200,12 @@ class AdminDashboardController extends Controller
 
         $airports = DropdownOption::whereHas('dropdown', function ($query) {
                         $query->where('code', 'airports');
-                    })->where('status', 1)->select('id', 'value as transport_point', DB::raw("'flight' as mode"));
+                    })->where('status', 1)->orderBy('sort_order','asc')->select('id', 'sort_order','value as transport_point', DB::raw("'flight' as mode"));
 
-        $static = DB::table(DB::raw("(SELECT NULL as id, 'Sea' as transport_point, 'sea' as mode 
+
+        $static = DB::table(DB::raw("(SELECT NULL as id, 100 as sort_order, 'Sea' as transport_point, 'sea' as mode 
             UNION ALL 
-            SELECT NULL, 'Land', 'land') as s"));
+            SELECT NULL, 101, 'Land', 'land') as s"));
 
         $base = $airports->unionAll($static);
 
@@ -221,7 +222,7 @@ class AdminDashboardController extends Controller
                         DB::raw("SUM(CASE WHEN dt.type = 'departure' AND DATE(dt.date_time) = CURDATE() THEN 1 ELSE 0 END) as departure_count")
                     )
                     ->groupBy('tp.transport_point', 'tp.mode')
-                    ->orderByRaw("
+                    ->orderByRaw("tp.sort_order,
                         CASE 
                             WHEN tp.mode = 'flight' THEN 1
                             WHEN tp.mode = 'land' THEN 2
@@ -230,29 +231,12 @@ class AdminDashboardController extends Controller
                     ")
                     ->get();
 
-            //          $summary =  DelegateTransport::query()
-            // ->selectRaw("
-            //                 CASE 
-            //                     WHEN delegate_transports.mode = 'flight' THEN dropdown_options.value 
-            //                     WHEN delegate_transports.mode = 'sea' THEN 'Sea' 
-            //                     WHEN delegate_transports.mode = 'land' THEN 'Land' 
-            //                 END AS transport_point,
-            //                 SUM(CASE WHEN delegate_transports.type = 'arrival' THEN 1 ELSE 0 END) AS arrival_count,
-            //                 SUM(CASE WHEN delegate_transports.type = 'departure' THEN 1 ELSE 0 END) AS departure_count
-            //             ")
-            // ->leftJoin('dropdown_options', function ($join) {
-            //     $join->on('delegate_transports.airport_id', '=', 'dropdown_options.id')
-            //         ->where('delegate_transports.mode', '=', 'flight');
-            // })
-            // ->whereDate('delegate_transports.date_time', now()->toDateString())
-            // ->groupBy('transport_point')
-            // ->get();
-
         // Delegates By Invitation Status
         $departments = DB::table('dropdown_options as d')
             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
             ->where('dropdowns.code', 'departments')
             ->where('d.status', 1)
+            ->orderBy('d.sort_order', 'asc')
             ->select('d.id', DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
             ->get();
 
@@ -260,6 +244,7 @@ class AdminDashboardController extends Controller
             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
             ->where('dropdowns.code', 'invitation_status')
             ->where('d.status', 1)
+            ->orderBy('d.sort_order', 'asc')
             ->select('d.id', 'd.code',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
             ->get();
 
@@ -475,7 +460,6 @@ class AdminDashboardController extends Controller
             ->orderBy('date_time', 'asc');
         $data['upcomming_departures'] = $departure_query->get();
 
-
         $data['arr_dep_summary'] = $summary;
 
 
@@ -501,6 +485,7 @@ class AdminDashboardController extends Controller
             ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
             ->where('dropdowns.code', 'departments')
             ->where('d.status', 1)
+            ->orderBy('d.sort_order', 'asc')
             ->select('d.id',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
             ->get();
 
@@ -511,6 +496,7 @@ class AdminDashboardController extends Controller
                 ->join('dropdowns', 'd.dropdown_id', '=', 'dropdowns.id')
                 ->where('dropdowns.code', 'invitation_status')
                 ->where('d.status', 1)
+                ->orderBy('d.sort_order', 'asc')
                 ->select('d.id','d.code',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                 ->get();
 
