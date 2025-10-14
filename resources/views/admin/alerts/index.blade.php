@@ -1,11 +1,18 @@
 @extends('layouts.admin_account', ['title' => __db('alerts')])
 
 @section('content')
-    <div  >
+    <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('alerts') }}</h2>
 
-            @directCanany(['add_alerts'])
+            @directCanany([
+                'add_alerts',
+                'hotel_add_alerts',
+                'delegate_add_alerts',
+                'escort_add_alerts',
+                'driver_add_alerts',
+                'top-management_manage_alerts'
+            ])
                 <a href="{{ route('alerts.create') }}"
                     class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
                     <svg class="w-6 h-6 text-white me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
@@ -46,7 +53,7 @@
                                 <div class="flex gap-2">
                                     <a href="{{ route('alerts.show', $alert) }}"
                                         class="btn text-sm !bg-[#B68A35] flex items-center text-white rounded-lg py-2 px-3">
-                                        
+
                                         <span>{{ __db('view_details') }}</span>
                                     </a>
                                 </div>
@@ -59,7 +66,14 @@
                     {{ $alerts->links() }}
                 </div>
             @else
-                @directCanany(['add_alerts'])
+                @directCanany([
+                    'add_alerts',
+                    'hotel_add_alerts',
+                    'delegate_add_alerts',
+                    'escort_add_alerts',
+                    'driver_add_alerts',
+                    'top-management_manage_alerts'
+                ])
                     <div class="text-center py-12">
                         <svg class="mx-auto h-12 w-12 text-neutral-400" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">

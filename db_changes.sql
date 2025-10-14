@@ -793,3 +793,24 @@
 alter table delegations add column accomodation_status tinyint(1) after import_code;
 ALTER TABLE `delegations` CHANGE `accomodation_status` `accomodation_status` TINYINT(1) NULL DEFAULT '0' COMMENT '(0 - Not accomodated, 1 - Fully Accomodated, 2 - Partially Accomodated)'; 
 UPDATE `delegations` SET `accomodation_status`='0' where accomodation_status IS NULL;
+
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'delegate', NULL, 'delegate_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'delegate', '242', 'delegate_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'escort', NULL, 'escort_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'escort', '244', 'escort_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', NULL, 'driver_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', '246', 'driver_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', NULL, 'hotel_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '248', 'hotel_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+    INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'top-management', NULL, 'top-management_manage_alerts', 'Manage Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+  INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'top-management', '250', 'top-management_add_alerts', 'Add Alerts', 'web', '1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
