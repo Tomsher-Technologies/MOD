@@ -479,7 +479,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.drivers-bulk', compact('assignedDrivers', 'unassignedDrivers'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'drivers_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
