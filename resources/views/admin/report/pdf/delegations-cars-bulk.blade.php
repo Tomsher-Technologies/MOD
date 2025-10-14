@@ -190,7 +190,9 @@
                         @if($isPageBreak)
                                 </tbody>
                             </table>
+                            
                             <div style="page-break-after: always;"></div>
+                            <!--CHUNKHTML-->
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
                                         <tr style="background-color: #d9d9d9; font-size: 12px">
