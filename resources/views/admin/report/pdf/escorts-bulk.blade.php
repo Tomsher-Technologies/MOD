@@ -61,7 +61,7 @@
                                 
                             </tr>
 
-                            @if($loop->iteration % 4 == 0)
+                            @if($loop->iteration % 50 == 0)
                                 <!--CHUNKHTML-->
                             @endif
                         @endforeach
@@ -106,7 +106,7 @@
                                 
                             </tr>
 
-                            @if($loop->iteration % 4 == 0)
+                            @if($loop->iteration % 50 == 0)
                                 <!--CHUNKHTML-->
                             @endif
                         @endforeach
