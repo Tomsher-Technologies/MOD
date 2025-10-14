@@ -106,6 +106,10 @@
                         </tr>
                     </table>
                 </div>
+
+                @if($loop->iteration % 20 == 0)
+                    <!--CHUNKHTML-->
+                @endif
             @endforeach
         </div>
     </div>
