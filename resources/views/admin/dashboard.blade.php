@@ -523,15 +523,14 @@
         </div>
 
         @php
-            $colors = [
-    '#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', // soft pastel base
-    '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', // light brights
-    '#BDB2FF', '#FFC6FF', '#D0F4DE', '#FFADAD', '#FFDAC1', // warm mix
-    '#E2F0CB', '#C7CEEA', '#F1C0E8', '#C2F0FC', '#FFF5BA', // fresh tones
-    '#F8C8DC', '#C1E1C1', '#E0BBE4', '#D5F4E6', '#FFB7B2', // calm hues
-    '#B5EAD7', '#E2F0D9', '#F1E3DD', '#D4A5A5', '#C9BBCF'  // neutral balance
+         $colors = [
+    '#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF',
+    '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF',
+    '#BDB2FF', '#FFC6FF', '#D0F4DE', '#FFADAD', '#FFDAC1',
+    '#E2F0CB', '#C7CEEA', '#F1C0E8', '#C2F0FC', '#FFF5BA',
+    '#F8C8DC', '#C1E1C1', '#E0BBE4', '#D5F4E6', '#FFB7B2',
+    '#B5EAD7', '#E2F0D9', '#F1E3DD', '#D4A5A5', '#C9BBCF'
 ];
-
         @endphp
     </div>
 @endsection
