@@ -181,7 +181,7 @@
                             {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : __db('not_required') }}
                         </td>
                         <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif ">
-                            {{ $delegate->internalRanking?->value ?? $relation }}
+                            {{ $delegate?->getTranslation('designation') ?? $relation }}
                         </td>
                         <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) color: red; @endif  font-bold">
                             {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}

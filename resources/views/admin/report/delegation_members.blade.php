@@ -121,7 +121,7 @@
                                 $delegates = $positions = '';
                                 foreach ($del->delegates as $member) {
                                     $delegates .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member->getTranslation('title').' '.$member?->getTranslation('name').'</span><br>';
-                                    $positions .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member?->internalRanking?->value .'</span><br>';
+                                    $positions .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member?->getTranslation('designation') .'</span><br>';
                                 }
                                 $escortsData = '';
                                 foreach($del->escorts as $escort){

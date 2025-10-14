@@ -66,7 +66,7 @@
 
                     @foreach ($reports as $index => $report)
                         @if (in_array($report['slug'], $permissions))
-                            <a href="{{ $report['url'] }}" class="block rounded-2xl {{ $gradientPastels[$index % count($gradientPastels)] }} backdrop-blur-lg border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-300 p-6 text-center hover:scale-105">
+                            <a href="{{ $report['url'] }}" class="block rounded-2xl bg-[#fce9c857] backdrop-blur-lg border border-white/20 shadow-lg hover:shadow-2xl transition-all duration-300 p-6 text-center hover:scale-105">
                                     <h2 class="text-gray-900 text-lg font-semibold">{{ $report['name'] }}</h2>
                                 </a>
                         @endif
