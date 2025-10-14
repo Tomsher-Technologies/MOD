@@ -119,7 +119,7 @@
                                             {{ $interview->date_time ? date('H:i', strtotime($interview->date_time)) : '-' }}
                                         </td>
                                         <td style="padding:8px;border:2px solid #000;">
-                                            {{ $member->delegate?->designation_en ?? '' }}
+                                            {{ $member->delegate?->getTranslation('designation') ?? '' }}
                                         </td>
                                         <td style="padding:8px;border:2px solid #000;">
                                             <strong>{{ ($member->delegate) ? $member->delegate?->getTranslation('title').' '.$member->delegate?->getTranslation('name') : $member->otherMember?->getTranslation('name') }}</strong>

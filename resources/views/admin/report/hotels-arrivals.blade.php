@@ -219,7 +219,7 @@
                                 <td style="padding: 8px; border: 2px solid #000;">
                                     {{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}
                                 </td>
-                                <td style="padding: 8px; border: 2px solid #000;">{{ $delegate->internalRanking?->value ?? $relation }}</td>
+                                <td style="padding: 8px; border: 2px solid #000;">{{ $delegate?->getTranslation('designation') ?? $relation }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; @if($delegate->team_head === true) color: red; @endif">
                                     <strong>
                                         {{ $delegate->getTranslation('title').' '.$delegate->getTranslation('name') }}
