@@ -734,7 +734,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.head_invitations_bulk', compact('invitations'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'delegation_head_invitations_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
@@ -1769,7 +1773,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.hotels-arrivals-bulk', compact('formattedGroups'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'arrival_hotels_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
