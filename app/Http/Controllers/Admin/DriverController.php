@@ -43,6 +43,11 @@ class DriverController extends Controller
         ]);
 
 
+        $this->middleware('permission:import_drivers', [
+            'only' => ['exportExcel']
+        ]);
+
+
         $this->middleware('permission:edit_drivers|driver_edit_drivers', [
             'only' => ['edit', 'update']
         ]);
@@ -676,5 +681,15 @@ class DriverController extends Controller
             Log::error('Driver Import Error: ' . $e->getMessage());
             return back()->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $event = \App\Models\Event::find($currentEventId);
+        
+        $fileName = $event ? $event->code . '_drivers_report.xlsx' : 'drivers_report.xlsx';
+        
+        return Excel::download(new \App\Exports\DriverExport, $fileName);
     }
 }

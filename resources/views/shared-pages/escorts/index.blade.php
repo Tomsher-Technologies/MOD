@@ -11,6 +11,17 @@
                 </a>
             @enddirectCanany
 
+            {{-- @directCanany(['import_escorts'])
+                <a href="{{ route('escorts.exportExcel') }}"
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#28a745] text-white rounded-lg "
+                    type="button">
+                    <svg class="w-5 h-5 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {{ __db('export') . ' ' . __db('escorts') }}
+                </a>
+            @enddirectCanany --}}
+
             @if (
                 (isset($delegationId) &&
                     isset($assignmentMode) &&
