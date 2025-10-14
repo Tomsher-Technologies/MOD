@@ -690,6 +690,7 @@ class ReportController extends Controller
                         ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
                             $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
                         })
+                        ->select('delegates.*')
                         ->orderBy('country_sort.sort_order', 'asc')
                         ->orderBy('invitation_from_sort.sort_order', 'asc')
                         ->orderBy('invitation_status_sort.sort_order', 'asc')
