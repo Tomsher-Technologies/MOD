@@ -34,10 +34,13 @@
                 @endphp
 
                 @if($delegations->count() > 0)
-                    <div style="display: flex; align-items: center; gap: 20px; justify-content: end; font-weight: bold; margin-top:20px;font-size: 16px;">
-                        <h4 >{{ $hotel->hotel_name }}</h4>
-                        <h4>: {{ __('Hotel') }}</h4>
-                    </div>
+                    <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                        <tr>
+                            <td style="text-align: right; white-space: nowrap;">
+                                {{ $hotel->hotel_name }} : {{ __('Hotel') }}
+                            </td>
+                        </tr>
+                    </table>
          
                     @foreach($delegations as $delegationId => $assignments)
                         @php
