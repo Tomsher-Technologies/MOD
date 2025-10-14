@@ -415,7 +415,11 @@ class ReportController extends Controller
 
         $html = view('admin.report.pdf.escorts-bulk', compact('assignedEscorts', 'unassignedEscorts'))->render();
 
-        $mpdf->WriteHTML($html);
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
         $reportName = 'escorts_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');
     }
