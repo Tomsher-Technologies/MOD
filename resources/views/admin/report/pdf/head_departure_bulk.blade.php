@@ -82,6 +82,9 @@
                             </td>
                         </tr>
                         
+                        @if($loop->iteration % 40 == 0)
+                            <!--CHUNKHTML-->
+                        @endif
                     @endforeach
                 </tbody>
             </table>
