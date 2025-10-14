@@ -92,11 +92,23 @@
                             'key' => 'team_head',
                             'render' => function ($delegation) {
                                 $teamHeads = $delegation->delegates->filter(fn($d) => $d->team_head);
-                                return $teamHeads->isNotEmpty()
-                                    ? $teamHeads->map(fn($head) => e($head->name_en))->implode('<br>')
-                                    : '-';
+
+                                if ($teamHeads->isEmpty()) {
+                                    return '-';
+                                }
+
+                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
+
+                                return $teamHeads
+                                    ->map(function ($head) use ($separator) {
+                                        return e(
+                                            $head->getTranslation('title') . $separator . $head->getTranslation('name'),
+                                        );
+                                    })
+                                    ->implode('<br>');
                             },
                         ],
+
                         [
                             'label' => __db('designation'),
                             'key' => 'team_head_designation',
@@ -193,7 +205,7 @@
                     ];
 
                     $rowClass = function ($row) {
-                        $status = getRoomAssignmentStatus($row->id);
+                        $status = $row->accomodation_status;
                         if ($status == 1) {
                             return 'bg-[#acf3bc]';
                         } elseif ($status == 2) {
@@ -205,7 +217,7 @@
                 @endphp
 
                 <x-reusable-table :data="$delegations" :enableRowLimit="true" table-id="delegationsTable" :row-class="$rowClass"
-                    :enableColumnListBtn="true"  :columns="$columns" :no-data-message="__db('no_data_found')" />
+                    :enableColumnListBtn="true" :columns="$columns" :no-data-message="__db('no_data_found')" />
 
                 <div class="flex items-center justify-start gap-6 mt-4">
                     <div class="mt-3 flex items-center justify-start gap-3 ">
@@ -259,8 +271,7 @@
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('continents')->options as $continent)
-                            <option value="{{ $continent->id }}"
-                                {{ is_array(request('continent_id')) && in_array($continent->id, request('continent_id')) ? 'selected' : '' }}>
+                            <option value="{{ $continent->id }}" @if (in_array($continent->id, request('continent_id', []))) selected @endif>
                                 {{ $continent->value }}
                             </option>
                         @endforeach
@@ -273,8 +284,7 @@
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getAllCountries() as $option)
-                            <option value="{{ $option->id }}"
-                                {{ is_array(request('country_id')) && in_array($option->id, request('country_id')) ? 'selected' : '' }}>
+                            <option value="{{ $option->id }}" @if (in_array($option->id, request('country_id', []))) selected @endif>
                                 {{ $option->name }}
                             </option>
                         @endforeach
@@ -284,12 +294,11 @@
                 <div class="flex flex-col">
                     <label
                         class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
-                    <select multiple name="invitation_status_id" data-placeholder="{{ __db('select') }}"
+                    <select multiple name="invitation_status_id[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $status)
-                            <option value="{{ $status->id }}"
-                                {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
+                            <option value="{{ $status->id }}" @if (in_array($status->id, request('invitation_status_id', []))) selected @endif>
                                 {{ $status->value }}
                             </option>
                         @endforeach
@@ -299,17 +308,35 @@
                 <div class="flex flex-col">
                     <label
                         class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
-                    <select multiple name="participation_status_id" data-placeholder="{{ __db('select') }}"
+                    <select multiple name="participation_status_id[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('participation_status')->options as $status)
-                            <option value="{{ $status->id }}"
-                                {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
+                            <option value="{{ $status->id }}" @if (in_array($status->id, request('participation_status_id', []))) selected @endif>
                                 {{ $status->value }}
                             </option>
                         @endforeach
                     </select>
                 </div>
+
+                <div class="flex flex-col">
+                    <label
+                        class="form-label block text-gray-700 font-medium">{{ __db('accomodation_status') }}</label>
+                    <select multiple name="accomodation_status[]" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        <option value='0' @if (in_array('0', request('accomodation_status', []))) selected @endif>
+                            {{ __db('not_accomodated') }}
+                        </option>
+                        <option value="1" @if (in_array('1', request('accomodation_status', []))) selected @endif>
+                            {{ __db('fully_accomodated') }}
+                        </option>
+                        <option value="2" @if (in_array('2', request('accomodation_status', []))) selected @endif>
+                            {{ __db('partially_accomodated') }}
+                        </option>
+                    </select>
+                </div>
+
                 {{-- <select name="hotel_name"
                     class="w-full rounded-lg border border-gray-300 text-sm">
                     <option value="">{{ __db('select') }}</option>

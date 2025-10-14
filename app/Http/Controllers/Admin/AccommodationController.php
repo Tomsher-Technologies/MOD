@@ -208,7 +208,6 @@ class AccommodationController extends Controller
             })
             ->when($delegationId, function ($q) use ($delegationId) {
                 $q->where('room_assignments.delegation_id', $delegationId);
-                   
             })
             ->leftJoin('delegations', 'room_assignments.delegation_id', '=', 'delegations.id')
 
@@ -293,7 +292,7 @@ class AccommodationController extends Controller
         try {
             $fileName = $request->file('file')->getClientOriginalName();
             Excel::import(new AccommodationsImport($fileName), $request->file('file'));
-            
+
             return redirect()->route('admin.import-logs.index', ['import_type' => 'hotels'])
                 ->with('success', __db('accommodations_imported_successfully'));
         } catch (\Exception $e) {
@@ -318,9 +317,9 @@ class AccommodationController extends Controller
             'escorts',
             'drivers'
         ])
-        ->whereHas('invitationStatus', function ($q) {
-            $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
-        });
+            ->whereHas('invitationStatus', function ($q) {
+                $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+            });
 
         $query->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
             ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
@@ -423,6 +422,11 @@ class AccommodationController extends Controller
             $query->whereIn('delegations.participation_status_id', $participationStatusId);
         }
 
+        if ($accomodationStatus = $request->input('accomodation_status')) {
+            $query->whereIn('delegations.accomodation_status', $accomodationStatus);
+        }
+
+
         $limit = $request->limit ? $request->limit : 20;
 
         $delegations = $query->paginate($limit);
@@ -477,6 +481,7 @@ class AccommodationController extends Controller
         ]);
 
         $delegation = Delegation::find($request->delegation_id);
+
         if (!$delegation || !$delegation->canAssignServices()) {
             return response()->json(['success' => 4, 'message' => 'Hotel assignments can only be made for delegations with status Accepted or Accepted with Secretary.']);
         }
@@ -496,18 +501,16 @@ class AccommodationController extends Controller
 
         if (!$current || $confirmedDuplicate) {
             $alreadyAssignedExternal = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type_id)
                 ->where('room_number', $request->room_number)
                 ->where('active_status', 1)
                 ->exists();
 
             $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type_id)
                 ->where('room_number', $request->room_number)
                 ->where('assignable_id', '!=', $user->id)
                 ->where('active_status', 1)
                 ->exists();
-                
+
             $roomType = AccommodationRoom::with('roomType')->find($request->room_type_id);
             $availableRooms = $roomType->available_rooms;
 
@@ -517,9 +520,8 @@ class AccommodationController extends Controller
 
             if ($alreadyAssigned && !$confirmedDuplicate) {
                 $existingUsers = [];
-                
+
                 $allExistingAssignments = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                    ->where('room_type_id', $request->room_type_id)
                     ->where('room_number', $request->room_number)
                     ->where('assignable_id', '!=', $user->id)
                     ->where('active_status', 1)
@@ -530,19 +532,19 @@ class AccommodationController extends Controller
                     $existingUserModel = $existingModel::find($assignment->assignable_id);
                     if ($existingUserModel) {
                         $existingUserName = $existingUserModel->name_en ?? $existingUserModel->name_ar ?? $existingUserModel->name ?? 'Unknown';
-                        $existingUserType = class_basename($existingModel); 
+                        $existingUserType = class_basename($existingModel);
                         $existingUsers[] = [
                             'name' => $existingUserName,
                             'type' => $existingUserType
                         ];
                     }
                 }
-                
+
                 $hotel = Accommodation::findOrFail($request->hotel_id);
-                
+
                 return response()->json([
-                    'success' => 5, 
-                    'message' => 'Room already assigned to other users. Do you want to proceed?', 
+                    'success' => 5,
+                    'message' => 'Room already assigned to other users. Do you want to proceed?',
                     'existing_users' => $existingUsers,
                     'hotel_name' => $hotel->hotel_name ?? 'Unknown',
                     'room_number' => $request->room_number ?? 'Unknown',
@@ -613,6 +615,10 @@ class AccommodationController extends Controller
                 'hotel_name' => $hotel->hotel_name ?? NULL,
                 'room_number' => $request->room_number ?? NULL,
             ];
+
+            // To check if the delegation is fully or partially accomodated (0 - Not accomodated, 1 - Fully Accomodated, 2 - Partially Accomodated)
+            getRoomAssignmentStatus($request->delegation_id);
+
             $this->logActivity(
                 module: 'Accommodations',
                 action: 'assign-room',
@@ -835,7 +841,7 @@ class AccommodationController extends Controller
                 }
             }
 
-            if ($externalMember && ((($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id == $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) == strtolower($request->room_number))) )  ) {
+            if ($externalMember && ((($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id == $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) == strtolower($request->room_number))))) {
                 $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
                 if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                     $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
@@ -958,6 +964,8 @@ class AccommodationController extends Controller
                 $delegate->current_room_assignment_id = NULL;
                 $delegate->save();
             }
+
+            getRoomAssignmentStatus($assignment->delegation_id);
 
             return response()->json(['success' => 1]);
         }

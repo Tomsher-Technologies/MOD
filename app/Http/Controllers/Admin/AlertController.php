@@ -20,7 +20,7 @@ class AlertController extends Controller
     {
         $this->middleware('auth');
 
-        $this->middleware('permission:add_alerts', [
+        $this->middleware('permission:add_alerts|hotel_add_alerts|delegate_add_alerts|escort_add_alerts|driver_add_alerts|top-management_manage_alerts', [
             'only' => ['store', 'create']
         ]);
     }

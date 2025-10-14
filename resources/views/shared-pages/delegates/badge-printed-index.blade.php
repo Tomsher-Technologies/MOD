@@ -150,9 +150,12 @@
                         [
                             'label' => __db('delegate_name'),
                             'render' => function ($row) {
-                                return $row->getTranslation('title') . '. ' . $row->getTranslation('name') ?? '-';
+                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
+
+                                return $row->getTranslation('title') . $separator . $row->getTranslation('name') ?? '-';
                             },
                         ],
+
                         [
                             'label' => __db('user_type'),
                             'render' => function ($row) {
@@ -256,12 +259,12 @@
         </div>
     </div>
 
-   <div id="filter-drawer"
+    <div id="filter-drawer"
         class="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80"
         tabindex="-1" aria-labelledby="drawer-label">
         <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
             {{ __db('filter') }}</h5>
-            
+
         <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -271,7 +274,7 @@
             </svg>
             <span class="sr-only">{{ __db('close_menu') }}</span>
         </button>
-        
+
         <div class="border-t border-gray-200 mt-4">
             <form action="{{ route('delegates.badgePrintedIndex') }}" method="GET" class="space-y-4">
 

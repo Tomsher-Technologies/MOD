@@ -80,7 +80,7 @@
                 @endphp
                 @if (!$colPermissions || can($colPermissions))
                     <th scope="col"
-                        class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
+                        class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
                         data-column-key="{{ $column['key'] }}">
                         {!! $column['label'] !!}
                     </th>
@@ -120,7 +120,7 @@
                                     : null;
                             @endphp
                             @if (!$colPermissions || can($colPermissions))
-                                <td class="px-4 py-2 border {{ $rowClass ? $rowClass($row) : 'border-gray-200' }}"
+                                <td class="px-4 text-center py-2 border {{ $rowClass ? $rowClass($row) : 'border-gray-200' }} {{ isset($column['class']) ? $column['class'] : '' }}"
                                     data-column-key="{{ $column['key'] }}">
                                     {!! $column['render']($row, $key) !!}
                                 </td>

@@ -81,25 +81,25 @@
             <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                 <thead>
                     <tr class="text-[13px]">
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('sl_no') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('name') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('coming_from') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('hotel') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('room_type') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('room_number') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
+                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('actions') }}
                         </th>
                     </tr>
@@ -107,23 +107,23 @@
                 <tbody>
                     @forelse ($externalMembers as $key => $member)
                         <tr class="text-[12px] align-[middle]">
-                            <td class="px-4 py-2 border border-gray-200">{{ $externalMembers->firstItem() + $key }}</td>
-                            <td class="px-4 py-3 border border-gray-200">
+                            <td class="text-center px-4 py-2 border border-gray-200">{{ $externalMembers->firstItem() + $key }}</td>
+                            <td class="text-center px-4 py-3 border border-gray-200">
                                 {{ $member->name ?? '' }}
                             </td>
-                            <td class="px-4 py-3 border border-gray-200">
+                            <td class="text-center px-4 py-3 border border-gray-200">
                                 {{ $member->coming_from ?? '' }}
                             </td>
-                            <td class="px-4 py-3 border border-gray-200">
+                            <td class="text-center px-4 py-3 border border-gray-200">
                                 {{ $member->hotel?->hotel_name ?? '' }}
                             </td>
-                            <td class="px-4 border border-gray-200 py-3">
+                            <td class="text-center px-4 border border-gray-200 py-3">
                                 {{ $member->roomType?->roomType?->value ?? '' }}
                             </td>
-                            <td class="px-4 border border-gray-200 py-3">
+                            <td class="text-center px-4 border border-gray-200 py-3">
                                 {{ $member->room_number ?? '' }}
                             </td>
-                            <td class="px-4 py-3 border border-gray-200">
+                            <td class="text-center px-4 py-3 border border-gray-200">
                                 <div class="flex items-center gap-5">
                                     @directCanany(['assign_external_members','hotel_assign_external_members'])
                                         <a href="{{ route('external-members.edit', $member->id) }}">

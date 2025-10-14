@@ -1,7 +1,7 @@
 @extends('layouts.admin_account', ['title' => __db('alert_details')])
 
 @section('content')
-    <div  >
+    <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('alert_details') }}</h2>
             <a href="{{ route('alerts.index') }}"
@@ -38,7 +38,14 @@
                     <span>{{ __db('created_by') }}: {{ $alert->creator->name }}</span>
                     <span>{{ $alert->created_at->format('M d, Y H:i') }}</span>
 
-                    @directCanany(['add_alerts'])
+                    @directCanany([
+                        'add_alerts',
+                        'hotel_add_alerts',
+                        'delegate_add_alerts',
+                        'escort_add_alerts',
+                        'driver_add_alerts',
+                        'top-management_manage_alerts'
+                    ])
                         <span>
                             @if ($alert->send_to_all)
                                 {{ __db('sent_to_all_users') }}
@@ -51,7 +58,14 @@
             </div>
         </div>
 
-        @directCanany(['add_alerts'])
+        @directCanany([
+            'add_alerts',
+            'hotel_add_alerts',
+            'delegate_add_alerts',
+            'escort_add_alerts',
+            'driver_add_alerts',
+            'top-management_manage_alerts'
+        ])
             <div class="bg-white h-full w-full rounded-lg border-0 p-6">
                 <h3 class="text-lg font-semibold mb-4">{{ __db('recipients') }}</h3>
 
