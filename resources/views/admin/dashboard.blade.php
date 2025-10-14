@@ -524,10 +524,14 @@
 
         @php
             $colors = [
-                '#ce89de','#de8989','#dbde89','#BFFAFF','#D9FFBA' ,'#D5BAFF','#8994de','#deda89','#A8E6CF','#FFB3BA',
-                '#FFD8A8','#FFDAC1', '#F5F5DC','#C19A6B','#FFE5B4','#B0E0E6','#BAE1FF','#FFC1E3','#FFFFBA','#D7CCC8','#FFE29F',
-                '#E0B0FF','#D3D3D3','#AEEEEE','#DFFFBA','#99E6E6','#ffaded', '#acbff7',
-            ];
+    '#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', // soft pastel base
+    '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF', // light brights
+    '#BDB2FF', '#FFC6FF', '#D0F4DE', '#FFADAD', '#FFDAC1', // warm mix
+    '#E2F0CB', '#C7CEEA', '#F1C0E8', '#C2F0FC', '#FFF5BA', // fresh tones
+    '#F8C8DC', '#C1E1C1', '#E0BBE4', '#D5F4E6', '#FFB7B2', // calm hues
+    '#B5EAD7', '#E2F0D9', '#F1E3DD', '#D4A5A5', '#C9BBCF'  // neutral balance
+];
+
         @endphp
     </div>
 @endsection
