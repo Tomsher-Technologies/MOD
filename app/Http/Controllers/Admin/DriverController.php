@@ -77,14 +77,14 @@ class DriverController extends Controller
         $delegationId = $request->input('delegation_id');
         $assignmentMode = $request->input('assignment_mode');
 
-        if ($delegationId && $assignmentMode === 'driver') {
-            $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
-                $q->where('delegations.id', $delegationId)
-                    ->where('delegation_drivers.status', 1);
-            });
+        // if ($delegationId && $assignmentMode === 'driver') {
+        //     $query->whereDoesntHave('delegations', function ($q) use ($delegationId) {
+        //         $q->where('delegations.id', $delegationId)
+        //             ->where('delegation_drivers.status', 1);
+        //     });
 
-            $query->where('drivers.status', 1);
-        }
+        //     $query->where('drivers.status', 1);
+        // }
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
