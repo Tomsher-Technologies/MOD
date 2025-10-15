@@ -216,12 +216,10 @@ class ReportController extends Controller
             'default_font' => 'amiri'
         ]);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.delegation-escorts', compact('delegation'))->render();
         $mpdf->WriteHTML($html);
-
-        $mpdf->SetFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
 
         $mpdf->Output("delegation-report-{$delegation->id}.pdf", 'D');
     }
@@ -264,7 +262,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.delegation-escorts-bulk', compact('delegations'))->render();
 
@@ -341,7 +339,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.hotel-rooms-bulk', compact('accommodations'))->render();
 
@@ -415,7 +413,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.escorts-bulk', compact('assignedEscorts', 'unassignedEscorts'))->render();
 
@@ -483,7 +481,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.drivers-bulk', compact('assignedDrivers', 'unassignedDrivers'))->render();
 
@@ -570,7 +568,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.head_arrivals_bulk', compact('headsArrivals'))->render();
 
@@ -656,7 +654,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.head_departure_bulk', compact('headsDeparture'))->render();
 
@@ -739,7 +737,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.head_invitations_bulk', compact('invitations'))->render();
 
@@ -889,7 +887,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName','internalRankName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.vip_report-bulk', compact('delegates','internalRankName'))->render();
 
@@ -987,7 +985,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.wives_report-bulk', compact('delegates'))->render();
 
@@ -1069,7 +1067,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.delegations_members-bulk', compact('delegations'))->render();
 
@@ -1149,7 +1147,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.without_escorts-bulk', compact('delegations'))->render();
 
@@ -1290,7 +1288,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.delegations-cars-bulk', compact('delegates'))->render();
 
@@ -1442,7 +1440,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.delegation-arrivals-bulk', compact('formattedGroups'))->render();
 
@@ -1594,7 +1592,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.delegation-departure-bulk', compact('formattedGroups'))->render();
 
@@ -1778,7 +1776,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.hotels-arrivals-bulk', compact('formattedGroups'))->render();
 
@@ -1937,7 +1935,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.interviews-bulk', compact('interviews'))->render();
 
@@ -2018,7 +2016,7 @@ class ReportController extends Controller
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
         $mpdf->SetHTMLHeader($headerHtml);
 
-        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">'.__db('page').' {PAGENO} '.__db('of').' {nb}</div>');
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
 
         $html = view('admin.report.pdf.hotel_delegations-bulk', compact('hotelsData'))->render();
 
