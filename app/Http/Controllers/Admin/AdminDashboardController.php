@@ -333,8 +333,9 @@ class AdminDashboardController extends Controller
                 'delegates.participation_status',
                 DB::raw('COUNT(delegates.id) as total')
             )
+
             ->whereIN('delegations.invitation_status_id', [41, 42])
-            ->groupBy('delegates.participation_status')
+            ->groupBy('delegates.participation_status', 'delegations.invitation_from_id')
             ->get();
 
         $departmentsIds = $departments->pluck('id');
@@ -620,7 +621,7 @@ class AdminDashboardController extends Controller
                     DB::raw('COUNT(delegates.id) as total')
                 )
                 ->whereIN('delegations.invitation_status_id', [41, 42])
-                ->groupBy('delegates.participation_status')
+                ->groupBy('delegates.participation_status', 'delegations.invitation_from_id')
                 ->get();
               
             $departmentsIds   = $departments->pluck('id');
