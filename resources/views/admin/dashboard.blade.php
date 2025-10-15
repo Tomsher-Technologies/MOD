@@ -524,13 +524,8 @@
 
         @php
          $colors = [
-    '#FFB3BA', '#FFDFBA',  '#BAFFC9', '#BAE1FF',
-    '#FFD6A5', '#FDFFB6', '#CAFFBF', '#9BF6FF', '#A0C4FF',
-    '#BDB2FF', '#FFC6FF', '#D0F4DE', '#FFADAD', '#FFDAC1',
-    '#E2F0CB', '#C7CEEA', '#F1C0E8', '#C2F0FC', '#FFF5BA',
-    '#F8C8DC', '#C1E1C1', '#E0BBE4', '#D5F4E6', '#FFB7B2',
-    '#B5EAD7', '#E2F0D9', '#F1E3DD', '#D4A5A5', '#C9BBCF'
-];
+                '#06b6d482','#7fffd4','#deb887','#a9a9a9','#bdb76b', '#d2a3ff','#f18989','#90f790','#f7d28e','#f3acf3','#f7f779','#f96565','#a6a6ee','#daa9b2','#b8860b','#9acd32','#059ab3', '#902fec','#ff0000','#008000','#ffa500','#ff00ff','#caca03','#a52a2a', '#5f5ff3','#e36179',
+                ];
         @endphp
     </div>
 @endsection
@@ -773,7 +768,7 @@
                return {
                      name: label,
                      y: series[i],
-                     color: colors[i % colors.length] // fallback color
+                     color: colors[i] || '#B68A35' // fallback color
                };
             });
 
