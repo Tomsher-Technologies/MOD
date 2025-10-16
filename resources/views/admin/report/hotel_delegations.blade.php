@@ -171,21 +171,25 @@
                                     @endphp
                                     <tr>
                                         <td style="padding: 6px; border: 0px;" colspan="2">
-                                            {{ $roomEscort?->room_number }} -
-                                            {{ $roomEscort?->roomType?->roomType?->value ?? '' }} -
-                                            {{ $roomEscort?->hotel?->hotel_name }}
+                                            <span>{{ $roomEscort?->room_number }}</span>&nbsp; - &nbsp;<span>{{ $roomEscort?->roomType?->roomType?->value ?? '' }}</span>&nbsp; - &nbsp;<span>{{ $roomEscort?->hotel?->hotel_name }}</span>
                                             <strong> : {{ __db('accommodation') }}</strong>
                                         </td>
                                         <td style="padding: 6px; border: 0px;" colspan="2">
-                                            {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                                            <span>{{ $escort?->phone_number }}</span> <strong> : {{ __db('mobile') }} </strong>
                                         </td>
                                         <td style="padding: 6px; border: 0px;text-align: right;" colspan="3">
-                                            <span
-                                                style="{{ $key != 0 ? 'margin-right: 40px;' : '' }}">{{ $escort?->internalRanking?->value }}
-                                                {{ $escort?->name }} - {{ $escort?->military_number }} <span>
-                                                    @if ($key == 0)
-                                                        <strong> : {{ __db('escort') }}</strong>
-                                                    @endif
+                                            
+                                            @if (getActiveLanguage() == 'en')
+                                                <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                            @else
+                                                <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                            @endif
+                                                    
+                                            @if ($key == 0)
+                                                <strong> : {{ __db('escort') }}</strong>
+                                            @else
+                                                <strong style="margin-right: 42px;"></strong>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

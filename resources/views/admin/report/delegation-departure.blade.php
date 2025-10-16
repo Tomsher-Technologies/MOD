@@ -82,40 +82,36 @@
                         <tr>
                             <td style="width:40%; padding: 3px; border: 0px;">
                                 <div style="">
-                                    {{ $delegation?->country?->name ?? '-' }}                                    
+                                    <span>{{ $delegation?->country?->name ?? '-' }}  </span>                                 
                                     <strong> : {{ __db('country') }}</strong>
                                 </div>
                             
                             </td>
-                            <td style="width:15%; padding: 3px; border: 0px;">
+                            <td style="width:5%; padding: 3px; border: 0px;">
                                 
                             </td>
 
                             <td style="width:55%; padding: 3px; border: 0px;text-align: right;">
                                 <div style="">
-                                    {{ $delegation->invitationFrom?->value ?? '-' }}
+                                    <span>{{ $delegation->invitationFrom?->value ?? '-' }} </span>
                                     <strong> : {{ __db('invitation_from') }}</strong>
                                 </div>
                                 
                             </td>
                         </tr>
                         <tr>
-                            <td style="width:40%; padding: 6px; border: 0px;">
+                            <td style="width:20%; padding: 6px; border: 0px;">
                             
-                                <div style="margin-bottom: 5px;">
-                                    {{ $delegation?->note2 ?? '-' }}
-                                    <strong> : {{ __db('note_2') }}</strong>
-                                </div>
                             </td>
-                            <td style="width:15%; padding: 6px; border: 0px;">
+                            <td style="width:5%; padding: 6px; border: 0px;">
                                 
                             </td>
 
-                            <td style="width:55%; padding: 6px; border: 0px;text-align: right;">
+                            <td style="width:75%; padding: 6px; border: 0px;text-align: right;">
                             
                                 <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                                    <span>{{ $delegation?->note1 ?? '-' }}</span>
-                                    <strong style="width: 22%;"> : {{ __db('note_1') }}</strong>
+                                    <span>{{ $delegation?->note2 ?? '-' }}</span>
+                                    <strong style="width: 22%;"> : {{ __db('note') }}</strong>
                                 </div>
                             </td>
                         </tr>
@@ -131,14 +127,27 @@
                             @endphp
 
                             <tr>
-                                <td style="padding: 6px; border: 0px;">
-                                    {{ $roomEscort?->room_number }} - {{ $roomEscort?->hotel?->hotel_name }} <strong> : {{ __db('accommodation') }}</strong>
+                                <td style="padding: 6px; border: 0px;text-align: left;">
+                                    <span>{{ $roomEscort?->room_number }}</span>&nbsp; - &nbsp; <span>{{ $roomEscort?->hotel?->hotel_name }} </span>
+                                    <strong> : {{ __db('accommodation') }}</strong>
                                 </td>
                                 <td style="padding: 6px; border: 0px;">
-                                    {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                                    <span>{{ $escort?->phone_number }} </span>
+                                    <strong> : {{ __db('mobile') }} </strong>
                                 </td>
                                 <td style="padding: 6px; border: 0px;text-align: right;">
-                                    {{ $escort?->internalRanking?->value }} {{ $escort?->name }} - {{ $escort?->military_number }}  @if($key == 0) <strong> : {{ __db('escort') }}</strong> @else <strong style="margin-right: 45px;"></strong> @endif
+                                  
+                                    @if (getActiveLanguage() == 'en')
+                                        <span>{{ $escort?->military_number }}</span>&nbsp; - &nbsp;<span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                    @else
+                                        <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>&nbsp; - &nbsp;<span>{{ $escort?->military_number }}</span>
+                                    @endif
+
+                                    @if($key == 0) 
+                                        <strong> : {{ __db('escort') }}</strong> 
+                                    @else 
+                                        <strong style="margin-right: 45px;"></strong>
+                                    @endif
                                         
                                 </td>
                             </tr>
@@ -225,7 +234,13 @@
                                         <strong> : {{ __db('mobile') }}</strong>
                                     </td>
                                     <td style="padding:6px;text-align:right;width: 40%;">
-                                        <span >{{ $driver?->getTranslation('name') }} {{ $driver?->getTranslation('title') }} - {{ $driver?->military_number }}</span>
+
+                                        @if (getActiveLanguage() == 'en')
+                                            <span>{{ $driver?->military_number }}</span>&nbsp; - &nbsp;<span>{{ $driver?->getTranslation('title') .' '. $driver?->getTranslation('name') }}</span>
+                                        @else
+                                            <span>{{ $driver?->getTranslation('title') .' '. $driver?->getTranslation('name') }}</span>&nbsp; - &nbsp;<span>{{ $driver?->military_number }}</span>
+                                        @endif
+
                                         <strong> : {{ __db('driver') }}{{ $index+1 }}</strong>
                                     </td>
                                 </tr>

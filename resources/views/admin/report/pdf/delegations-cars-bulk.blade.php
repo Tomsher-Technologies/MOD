@@ -85,14 +85,11 @@
                             $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '';
 
                             foreach ($drivers as $driver) {
-                                $driverNames .=
-                                    ($driver?->military_number ?? '') .
-                                    ' - ' .
-                                    getLangTitleSeperator(
-                                        $driver?->getTranslation('title'),
-                                        $driver?->getTranslation('name'),
-                                    ) .
-                                    '<br>';
+                                 if (getActiveLanguage() == 'en'){
+                                    $driverNames .= '<li style="' . $liStyle . '"> <span> '.$driver?->military_number .'</span> - <span>'. getLangTitleSeperator($driver?->getTranslation('title'),$driver?->getTranslation('name')) .'</span></li>';
+                                }else{
+                                    $driverNames .= '<li style="' . $liStyle . '"> <span> '.getLangTitleSeperator($driver?->getTranslation('title'),$driver?->getTranslation('name')).'</span> - <span>'.$driver?->military_number .'</span></li>';
+                                }
 
                                 $driverPhones .= ($driver?->phone_number ?? '-') . '<br>';
                                 $driverCarNos .= ($driver?->car_number ?? '-') . '<br>';
@@ -169,30 +166,31 @@
                                     <tr>
                                         <!-- Departure Date -->
                                         <td style="width: 20%; padding: 4px; vertical-align: bottom; text-align: left;">
-                                            {{ $departure_date ? \Carbon\Carbon::parse($departure_date)?->format('d-m-Y') : '-' }}
+                                            <span>{{ $departure_date ? \Carbon\Carbon::parse($departure_date)?->format('d-m-Y') : '-' }}</span>
                                             <strong> : {{ __db('head_departure_date') }}</strong>
                                         </td>
 
                                         <!-- Arrival Date -->
                                         <td style="width: 25%; padding: 4px; vertical-align: bottom; text-align: left;">
-                                            {{ $arrival_date ? \Carbon\Carbon::parse($arrival_date)?->format('H:i d-m-Y') : '-' }}
+                                            <span>{{ $arrival_date ? \Carbon\Carbon::parse($arrival_date)?->format('H:i d-m-Y') : '-' }}</span>
                                             <strong> : {{ __db('head_arrival_date') }}</strong>
                                         </td>
 
                                         <!-- Mobile -->
                                         @php $escort = $del?->delegation?->escorts?->first(); @endphp
-                                        <td
-                                            style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
-                                            {{ $escort?->phone_number ?? '-' }}
+                                        <td style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
+                                            <span>{{ $escort?->phone_number ?? '-' }}</span>
                                             <strong> : {{ __db('mobile') }}</strong>
                                         </td>
 
                                         <!-- Escort -->
-                                        <td
-                                            style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
-                                            {{ $escort?->military_number ? $escort->military_number . ' - ' : '' }}
-                                            {{ $escort?->internalRanking?->value ?? '' }}
-                                            {{ $escort?->name ?? '-' }}
+                                        <td style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
+                                            
+                                            @if (getActiveLanguage() == 'en')
+                                                <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                            @else
+                                                <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                            @endif
                                             <strong> : {{ __db('escort') }}</strong>
                                         </td>
                                     </tr>

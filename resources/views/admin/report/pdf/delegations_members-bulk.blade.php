@@ -79,15 +79,11 @@
                             }
                             $escortsData = '';
                             foreach ($del->escorts as $escort) {
-                                $escortsData .=
-                                    $escort?->military_number .
-                                    ' - ' .
-                                    $escort?->internalRanking?->value .
-                                    ' ' .
-                                    $escort?->name .
-                                    '<br>' .
-                                    $escort?->phone_number .
-                                    '<br>';
+                                if (getActiveLanguage() == 'en'){
+                                    $escortsData .= '<span>'.$escort?->military_number .'</span> - <span>'.$escort?->internalRanking?->value .' '. $escort?->name.'</span><br>'.$escort?->phone_number.'<br>';
+                                }else{
+                                    $escortsData .= '<span>'.$escort?->internalRanking?->value .' '. $escort?->name .'</span> - <span>'.$escort?->military_number .'</span><br>'.$escort?->phone_number.'<br>';
+                                }
                             }
                         @endphp
                         <tr>
