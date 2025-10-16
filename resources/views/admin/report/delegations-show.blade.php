@@ -122,10 +122,13 @@
                             $assignedHotels[] = $delegateRoom?->hotel_id ?? null;
                             if($delegate->team_head == 1){
                                 $departure = $delegate->delegateTransports->where('type', 'departure')->first();
+
+                                $deptTime = ($departure?->date_time) ? date('H:i', strtotime($departure->date_time)) : '';
+                                $deptDate = ($departure?->date_time) ? date('d-m-Y', strtotime($departure->date_time)) : '';
                         
                                 $teamHead.= '<tr>                                    
-                                    <td style="padding: 8px; border: 1px solid #000;">'.date('H:i', strtotime($departure?->date_time)).'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
+                                    <td style="padding: 8px; border: 1px solid #000;">'.$deptTime.'</td>
+                                    <td style="padding: 8px; border: 1px solid #000;">'. $deptDate.'</td>
                                     <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
                                     <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_no).'</td>
                                     <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_name).'</td>
@@ -311,8 +314,8 @@
 
                                 <tr>
                                     <td  style="padding: 8px; border: 1px solid #000;">-</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ date('H:i', strtotime($row->date_time)) }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000;">{{ ($row->date_time) ? date('H:i', strtotime($row->date_time)) : '' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000;">{{ ($row->date_time) ? date('d-m-Y', strtotime($row->date_time)) : '' }}</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{!! $interviewMembers !!}</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ $in + 1 }}</td>
                                 </tr>

@@ -156,12 +156,15 @@
                         if($delegate->team_head == 1){
                             $departure = $delegate->delegateTransports->where('type', 'departure')->first();
                     
-                            $teamHead.= '<tr style="border: 1px solid #000;">                                    
-                                <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.date('H:i', strtotime($departure?->date_time)).'</td>
-                                <td style="padding: 8px; border: 1px solid #000; text-align: center;">'. date('d-m-Y', strtotime($departure?->date_time)) .'</td>
-                                <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
-                                <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_no).'</td>
-                                <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_name).'</td>
+                            $deptTime = ($departure?->date_time) ? date('H:i', strtotime($departure->date_time)) : '';
+                            $deptDate = ($departure?->date_time) ? date('d-m-Y', strtotime($departure->date_time)) : '';
+                    
+                            $teamHead.= '<tr>                                    
+                                <td style="padding: 8px; border: 1px solid #000;">'.$deptTime.'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'. $deptDate.'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_no).'</td>
+                                <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_name).'</td>
                             </tr>';
                         }
                     @endphp
@@ -351,8 +354,8 @@
 
                             <tr>
                                 <td  style="padding: 8px; border: 1px solid #000; text-align: center;">-</td>
-                                <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ date('H:i', strtotime($row->date_time)) }}</td>
-                                <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ date('d-m-Y', strtotime($row->date_time)) }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ ($row->date_time) ? date('H:i', strtotime($row->date_time)) : '' }}</td>
+                                <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ ($row->date_time) ? date('d-m-Y', strtotime($row->date_time)) : '' }}</td>
                                 <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{!! $interviewMembers !!}</td>
                                 <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $in + 1 }}</td>
                             </tr>
