@@ -787,8 +787,8 @@ function getNotNullLanguageValues($dataField, $arabicFieldName, $englishFieldNam
 
 function getLangTitleSeperator($fieldOne, $fieldTwo)
 {
-    $arabicSeperator = ' / ';
-    $englishSeperator = ' . ';
+    $arabicSeperator = '/ ';
+    $englishSeperator = '. ';
 
     if (trim($fieldOne) == '' && trim($fieldTwo) == '') {
         return '';
