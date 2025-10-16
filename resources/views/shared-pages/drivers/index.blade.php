@@ -93,6 +93,10 @@
                             <button type="submit"
                                 class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">{{ __db('search') }}</button>
 
+                            <a href="{{ route('drivers.index') }}"
+                                class="absolute end-[85px] bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                                {{ __db('reset') }}</a>
+
                         </div>
                     </form>
 
@@ -289,14 +293,14 @@
                                             $output .=
                                                 '
                                             <form action="' .
-                                                                            $assignUrl .
-                                                                            '" method="POST" class="assign-form" style="display:inline;">
+                                                $assignUrl .
+                                                '" method="POST" class="assign-form" style="display:inline;">
                                                 ' .
-                                                                            csrf_field() .
-                                                                            '
+                                                csrf_field() .
+                                                '
                                                 <input type="hidden" name="delegation_id" value="' .
-                                                                            $delegationId .
-                                                                            '" />
+                                                $delegationId .
+                                                '" />
                                                 <input type="hidden" name="action" value="reassign" />
                                                 <input type="hidden" name="start_date" class="start-date-input" value="" />
                                                 <button type="submit" class="assign-btn flex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
@@ -304,8 +308,8 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                                 </svg>
                                                     <span>' .
-                                                                            __db('assign') .
-                                                                            '</span>
+                                                __db('assign') .
+                                                '</span>
                                                 </button>
                                             </form>';
                                         }
