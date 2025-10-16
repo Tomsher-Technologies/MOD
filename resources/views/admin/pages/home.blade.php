@@ -1,10 +1,10 @@
-@extends('layouts.admin_account', ['title' => __db('edit') . ' ' . __db('about_us') .' '. __db('page')])
+@extends('layouts.admin_account', ['title' => __db('edit') . ' ' . __db('home') .' '. __db('page')])
 
 @section('content')
 <div class="space-y-6">
 
     <div class="flex items-center justify-between gap-2 mb-6">
-        <h2 class="font-semibold text-2xl">{{ __db('edit') . ' ' . __db('about_us') .' '. __db('page') }} - {{ $page->event?->getTranslation('name') }}</h2>
+        <h2 class="font-semibold text-2xl">{{ __db('edit') . ' ' . __db('home') .' '. __db('page') }} - {{ $page->event?->getTranslation('name') }}</h2>
         <a href="{{ route('event_pages.index') }}"
             class="flex items-center bg-[#B68A35] text-white rounded-lg py-2 px-3 text-sm">
             <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
