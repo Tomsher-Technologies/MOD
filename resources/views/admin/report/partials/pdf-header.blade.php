@@ -21,7 +21,7 @@
                 </div>
 
                 @if(isset($internalRankName))
-                    <div style="font-size: 14px; font-weight: 600;">
+                    <div style="font-size: 14px; font-weight: bold;">
                         {!! $internalRankName !!}
                     </div>
                 @endif
@@ -37,6 +37,6 @@
         </tr>
     </table>
 
-    <div style="text-align: right; font-size: 0.9em; margin-top:5px; margin-bottom:5px;">{{ date('d-m-Y H:i A') }}</div>
+    <div style="text-align: right; font-size: 0.9em; margin-top:5px;">{{ date('d-m-Y H:i A') }}</div>
 
 </div>
