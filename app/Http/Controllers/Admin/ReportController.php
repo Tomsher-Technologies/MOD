@@ -812,7 +812,8 @@ class ReportController extends Controller
         $delegates = $newQuery->get();
 
         $internalRankName = '';
-        if($request->has('internal_ranking') && $request->internal_ranking != 'all'){
+       
+        if($request->has('internal_ranking') && count($request->internal_ranking) == 1){
             $drop = DropdownOption::where('id', $request->internal_ranking)->first();
             $internalRankName = $drop?->value;
         }
@@ -875,7 +876,7 @@ class ReportController extends Controller
         $delegates = $newQuery->get();
 
         $internalRankName = '';
-        if($request->has('internal_ranking') && $request->internal_ranking != 'all'){
+        if($request->has('internal_ranking') && count($request->internal_ranking) == 1){
             $drop = DropdownOption::where('id', $request->internal_ranking)->first();
             $internalRankName = $drop?->value;
         }
