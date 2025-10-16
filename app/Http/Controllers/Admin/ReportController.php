@@ -880,7 +880,7 @@ class ReportController extends Controller
         if($request->has('internal_ranking') && count($request->internal_ranking) == 1){
             $drop = DropdownOption::where('id', $request->internal_ranking)->first();
             $internalRankName = $drop?->value;
-            $headerHeight = 80;
+            $headerHeight = 60;
         }
      
         $today = date('Y-m-d-H-i');
