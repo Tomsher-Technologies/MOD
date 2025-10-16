@@ -39,6 +39,10 @@
                                 placeholder="{{ __db('delegation_search_placeholder') }}" />
                             <button type="submit"
                                 class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+                                
+                            <a href="{{ route('delegations.index') }}"
+                                class="absolute end-[85px] bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                                {{ __db('reset') }}</a>
                         </div>
                     </form>
 
@@ -47,8 +51,9 @@
                             <form method="POST" id="bulkExportForm" action="{{ route('delegations.bulk-exportPdf') }}">
                                 @csrf
                                 <input type="hidden" name="export_pdf" id="export_pdf" value="[]">
-                                <button class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
-                                    type="submit" >
+                                <button
+                                    class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                                    type="submit">
                                     <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                         width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
@@ -115,7 +120,9 @@
                             'render' => function ($row) {
                                 return '
                                 <input type="checkbox" 
-                                    data-delegation-id="' . $row->id . '" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 delegation-checkbox">
+                                    data-delegation-id="' .
+                                    $row->id .
+                                    '" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 delegation-checkbox">
                             ';
                             },
                         ],
@@ -324,9 +331,14 @@
                                     </button>';
                                 }
 
-                                if(can(['export_delegations_escort'])){
-                                    $buttons .='<a href="'.route("delegations.exportPdf", ["id" => base64_encode($delegation->id)]).'" class
-                                    "w-8 h-8 text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center" style="margin-top:6px;" title="'.__db('export_pdf').'">
+                                if (can(['export_delegations_escort'])) {
+                                    $buttons .=
+                                        '<a href="' .
+                                        route('delegations.exportPdf', ['id' => base64_encode($delegation->id)]) .
+                                        '" class
+                                    "w-8 h-8 text-primary-600 dark:text-primary-400 rounded-full inline-flex items-center justify-center" style="margin-top:6px;" title="' .
+                                        __db('export_pdf') .
+                                        '">
                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C5E24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                             <polyline points="14 2 14 8 20 8"></polyline>
@@ -335,7 +347,6 @@
                                             <line x1="10" y1="9" x2="9" y2="9"></line>
                                         </svg>
                                     </a>';
-
                                 }
 
                                 $buttons .= '</div>';
@@ -544,7 +555,7 @@
                 const selected = JSON.parse(exportInput.value || '[]');
 
                 if (selected.length === 0) {
-                    e.preventDefault(); 
+                    e.preventDefault();
                     toastr.error("{{ __db('select_at_least_one_delegation') }}");
                 }
             });
