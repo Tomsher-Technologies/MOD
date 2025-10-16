@@ -24,7 +24,7 @@
                             placeholder="{{ __db('search_by_title') }}" />
 
                         <div class="flex">
-                            <a href="{{ route('news.index') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                            <a href="{{ route('news.index') }}"  class="absolute end-[85px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                     {{ __db('reset') }}</a>
 
                             <button type="submit"
