@@ -88,14 +88,13 @@
                                 $attendees = $row->fromMembers;
                                 $names = $attendees
                                     ->map(function ($im) use ($row) {
-                                        $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
-
                                         $member = $im->resolveMemberForInterview($row);
                                         return $member
                                             ? e(
-                                                $member->getTranslation('title') .
-                                                    $separator .
+                                                getLangTitleSeperator(
+                                                    $member->getTranslation('title'),
                                                     $member->getTranslation('name'),
+                                                ),
                                             )
                                             : '-';
                                     })
@@ -132,15 +131,14 @@
                                         '</a>';
                                 }
 
-                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
-
                                 $names = $row->toMembers
                                     ->map(
                                         fn($member) => '<span class="block">' .
                                             e(
-                                                ($member?->delegate?->getTranslation('title') ?? '') .
-                                                    $separator .
-                                                    ($member?->delegate?->getTranslation('name') ?? ''),
+                                                getLangTitleSeperator(
+                                                    $member?->delegate?->getTranslation('title'),
+                                                    $member?->delegate?->getTranslation('name'),
+                                                ),
                                             ) .
                                             '</span>',
                                     )

@@ -11,6 +11,17 @@
                 </a>
             @enddirectCanany
 
+            {{-- @directCanany(['import_drivers'])
+                <a href="{{ route('drivers.exportExcel') }}"
+                    class="flex text-center items-center px-4 py-2 text-md  !bg-[#28a745] text-white rounded-lg "
+                    type="button">
+                    <svg class="w-5 h-5 me-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    {{ __db('export') . ' ' . __db('driver') }}
+                </a>
+            @enddirectCanany --}}
+
             @if (
                 (isset($delegationId) &&
                     isset($assignmentMode) &&
@@ -267,32 +278,37 @@
 
                                 if (isset($delegationId) && isset($assignmentMode) && $assignmentMode == 'driver') {
                                     if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
-                                        $assignUrl = route('drivers.assign', $driver->id);
-                                        $hasAssignment = $driver->delegations()->wherePivot('status', 1)->exists();
-                                        $output .=
-                                            '
-                                <form action="' .
-                                            $assignUrl .
-                                            '" method="POST" class="assign-form" style="display:inline;" data-has-assignment="' .
-                                            ($hasAssignment ? 'true' : 'false') .
-                                            '">
-                                    ' .
-                                            csrf_field() .
-                                            '
-                                    <input type="hidden" name="delegation_id" value="' .
-                                            $delegationId .
-                                            '" />
-                                    <input type="hidden" name="action" value="reassign" />
-                                    <input type="hidden" name="start_date" class="start-date-input" value="" />
-                                    <button type="submit" class="assign-btn lex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
-                                       <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                                    </svg>
-                                        <span>' .
-                                            __db('assign') .
-                                            '</span>
-                                    </button>
-                                </form>';
+                                        $isCurrentDelegationAssigned = $driver
+                                            ->delegations()
+                                            ->wherePivot('delegation_id', $delegationId)
+                                            ->wherePivot('status', 1)
+                                            ->exists();
+
+                                        if (!$isCurrentDelegationAssigned) {
+                                            $assignUrl = route('drivers.assign', $driver->id);
+                                            $output .=
+                                                '
+                                            <form action="' .
+                                                                            $assignUrl .
+                                                                            '" method="POST" class="assign-form" style="display:inline;">
+                                                ' .
+                                                                            csrf_field() .
+                                                                            '
+                                                <input type="hidden" name="delegation_id" value="' .
+                                                                            $delegationId .
+                                                                            '" />
+                                                <input type="hidden" name="action" value="reassign" />
+                                                <input type="hidden" name="start_date" class="start-date-input" value="" />
+                                                <button type="submit" class="assign-btn flex items-center gap-2 px-3 py-1 rounded-lg !bg-[#B68A35] !text-white text-sm">
+                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                                </svg>
+                                                    <span>' .
+                                                                            __db('assign') .
+                                                                            '</span>
+                                                </button>
+                                            </form>';
+                                        }
                                     }
                                 } else {
                                     if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {

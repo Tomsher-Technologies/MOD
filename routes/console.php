@@ -11,7 +11,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command('check:vendor-expiry')->daily();
 Schedule::command('subscriptions:check-expiry')->daily();
-Schedule::command('membership:send-expiry-reminders')->everyMinute();
+// Schedule::command('membership:send-expiry-reminders')->everyMinute();
 Schedule::command('queue:work --stop-when-empty')
         ->everyMinute()
         ->withoutOverlapping();

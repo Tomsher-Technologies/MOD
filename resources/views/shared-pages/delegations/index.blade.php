@@ -15,7 +15,7 @@
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
                 <div class=" mb-4 flex items-center justify-between gap-3">
                     <form class="w-[50%] me-4" action="{{ route('delegations.index') }}" method="GET">
-                        
+
                         @foreach (request()->except(['search', 'page']) as $k => $v)
                             @if (is_array($v))
                                 @foreach ($v as $vv)
@@ -25,7 +25,7 @@
                                 <input type="hidden" name="{{ $k }}" value="{{ $v }}">
                             @endif
                         @endforeach
-                        
+
                         <div class="relative">
                             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +166,10 @@
                                     ? $teamHeads
                                         ->map(
                                             fn($head) => e(
-                                                $head->getTranslation('title') . ' ' . $head->getTranslation('name'),
+                                                getLangTitleSeperator(
+                                                    $head->getTranslation('title'),
+                                                    $head->getTranslation('name'),
+                                                ),
                                             ),
                                         )
                                         ->implode('<br>')
@@ -275,7 +278,7 @@
                                 'hotel_view_delegations',
                             ],
                             'render' => function ($delegation) {
-                               $buttons = '<div class="flex items-center">';
+                                $buttons = '<div class="flex items-center">';
 
                                 if (
                                     can([
@@ -383,7 +386,7 @@
         tabindex="-1" aria-labelledby="drawer-label">
         <h5 id="drawer-label" class="inline-flex items-center mb-4 text-base font-semibold text-gray-500">
             {{ __db('filter') }}</h5>
-            
+
         <button type="button" data-drawer-hide="filter-drawer" aria-controls="filter-drawer"
             class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center">
             <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -395,7 +398,7 @@
         </button>
 
         <form action="{{ route('delegations.index') }}" method="GET">
-           
+
             @foreach (request()->except(['invitation_from', 'continent_id', 'country_id', 'invitation_status_id', 'participation_status_id', 'page']) as $k => $v)
                 @if (is_array($v))
                     @foreach ($v as $vv)

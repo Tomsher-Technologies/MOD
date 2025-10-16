@@ -118,7 +118,6 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::get('/delegations/delete/{id}', [DelegationController::class, 'edit'])->name('delegations.delete');
     Route::delete('/delegations/{delegation}', [DelegationController::class, 'destroy'])->name('delegations.destroy');
 
-
     // Delegate
     Route::get('/delegations/add-delegate/{id}', [DelegationController::class, 'addDelegate'])->name('delegations.addDelegate');
     Route::get('/delegations/edit-delegate/{delegation}/{delegate}', [DelegationController::class, 'editDelegate'])->name('delegations.editDelegate');
@@ -152,20 +151,20 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::get('/escorts/import', [EscortController::class, 'showImportForm'])->name('escorts.import.form');
     Route::post('/escorts/import', [EscortController::class, 'import'])->name('escorts.import');
     Route::get('/escorts/search', [EscortController::class, 'search'])->name('escorts.search');
+    Route::get('/escorts/export-excel', [EscortController::class, 'exportExcel'])->name('escorts.exportExcel');
 
     Route::resource('escorts', EscortController::class);
     Route::post('/escorts/status', [EscortController::class, 'updateStatus'])->name('escorts.status');
     Route::get('/escorts/assign/{escort}', [EscortController::class, 'assignIndex'])->name('escorts.assignIndex');
 
-
     Route::post('escorts/{escort}/assign', [EscortController::class, 'assign'])->name('escorts.assign');
     Route::post('escorts/{escort}/unassign', [EscortController::class, 'unassign'])->name('escorts.unassign');
 
     // Drivers
-
     Route::get('/drivers/import', [DriverController::class, 'showImportForm'])->name('drivers.import.form');
     Route::post('/drivers/import', [DriverController::class, 'import'])->name('drivers.import');
     Route::get('/drivers/search', [DriverController::class, 'search'])->name('drivers.search');
+    Route::get('/drivers/export-excel', [DriverController::class, 'exportExcel'])->name('drivers.exportExcel');
 
     Route::resource('drivers', DriverController::class);
     Route::post('/drivers/status', [DriverController::class, 'updateStatus'])->name('drivers.status');
@@ -210,7 +209,6 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::get('/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('notifications.count');
     Route::get('/alerts/count', [AlertController::class, 'getUnreadCount'])->name('alerts.count');
     Route::get('/alerts/latest', [AlertController::class, 'getLatest'])->name('alerts.latest');
-
 
     // Alerts
     Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
