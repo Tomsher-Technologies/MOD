@@ -784,3 +784,33 @@ function getNotNullLanguageValues($dataField, $arabicFieldName, $englishFieldNam
 
     return " - ";
 }
+
+function getLangTitleSeperator($fieldOne, $fieldTwo)
+{
+    $arabicSeperator = ' / ';
+    $englishSeperator = ' . ';
+
+    if (trim($fieldOne) == '' && trim($fieldTwo) == '') {
+        return '';
+    }
+
+    if (trim($fieldOne) == '') {
+        return $fieldTwo;
+    }
+
+    if (trim($fieldTwo) == '') {
+        return $fieldOne;
+    }
+
+    if (isArabicOnly($fieldOne) && isArabicOnly($fieldTwo)) {
+        return $fieldOne . $arabicSeperator . $fieldTwo;
+    } else {
+        return $fieldOne . $englishSeperator . $fieldTwo;
+    }
+}
+
+
+function isArabicOnly($text)
+{
+    return preg_match('/^[\p{Arabic}\s]+$/u', $text) > 0;
+}

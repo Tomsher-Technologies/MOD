@@ -97,12 +97,13 @@
                                     return '-';
                                 }
 
-                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
-
                                 return $teamHeads
-                                    ->map(function ($head) use ($separator) {
+                                    ->map(function ($head) {
                                         return e(
-                                            $head->getTranslation('title') . $separator . $head->getTranslation('name'),
+                                            getLangTitleSeperator(
+                                                $head->getTranslation('title'),
+                                                $head->getTranslation('name'),
+                                            ),
                                         );
                                     })
                                     ->implode('<br>');

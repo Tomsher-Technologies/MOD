@@ -150,9 +150,10 @@
                         [
                             'label' => __db('delegate_name'),
                             'render' => function ($row) {
-                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
-
-                                return $row->getTranslation('title') . $separator . $row->getTranslation('name') ?? '-';
+                                return getLangTitleSeperator(
+                                    $row->getTranslation('title'),
+                                    $row->getTranslation('name'),
+                                );
                             },
                         ],
 

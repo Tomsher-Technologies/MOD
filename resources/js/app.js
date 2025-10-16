@@ -166,9 +166,6 @@ window.getLocalized = getLocalized;
 const getLanguageValue = (lang, arField, enField) => {
     let value = lang === 'ar' ? arField : enField;
 
-    console.log("valuevalue",lang);
-    
-
     if (!value || value.trim() === '') {
         value = lang === 'ar' ? enField : arField;
     }

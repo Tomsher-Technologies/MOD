@@ -67,13 +67,21 @@
                     }
 
                     if ($teamHead) {
-                        return e($teamHead->getTranslation('title') . '. ' . $teamHead->getTranslation('name'));
+                        return e(
+                            getLangTitleSeperator(
+                                $teamHead->getTranslation('title'),
+                                $teamHead->getTranslation('name'),
+                            ),
+                        );
                     }
 
                     $firstDelegate = collect($row['delegates'])->first();
                     if ($firstDelegate) {
                         return e(
-                            $firstDelegate->getTranslation('title') . '. ' . $firstDelegate->getTranslation('name'),
+                            getLangTitleSeperator(
+                                $firstDelegate->getTranslation('title'),
+                                $firstDelegate->getTranslation('name'),
+                            ),
                         );
                     }
                 }
