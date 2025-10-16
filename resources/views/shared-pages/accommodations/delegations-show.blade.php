@@ -1218,6 +1218,9 @@
                                         hotelData(hotelId, 'Delegate');
                                     }
                                 });
+                            } else if (result.isDismissed) {
+                                row.find('.room-type-dropdown').val('').trigger('change');
+                                row.find('.room-number-input').val('');
                             }
                         });
                     }

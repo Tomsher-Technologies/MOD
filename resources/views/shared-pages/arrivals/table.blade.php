@@ -1,9 +1,4 @@
 @php
-    $statusLabels = [
-        'arrived' => __db('arrived'),
-        'to_be_arrived' => __db('to_be_arrived'),
-    ];
-
     $columns = [
         [
             'label' => __db('sl_no'),
@@ -147,8 +142,8 @@
         [
             'label' => __db('arrival') . ' ' . __db('status'),
             // 'class' => 'text-[16px]',
-            'render' => function ($row) use ($statusLabels) {
-                return $row['status'] ?? '-';
+            'render' => function ($row) {
+                return __db($row['status']) ?? '-';
             },
         ],
         [

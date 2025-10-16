@@ -125,7 +125,7 @@
         ],
         [
             'label' => __db('departure') . ' ' . __db('status'),
-            'render' => fn($row) => $row['status'] ?? '-',
+            'render' => fn($row) => __db($row['status']) ?? '-',
         ],
         [
             'label' => __db('actions'),
