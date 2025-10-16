@@ -1,4 +1,3 @@
-
 <div class="bg-white h-full w-full rounded-lg border-0 p-6">
     @props(['driver'])
 
@@ -84,8 +83,11 @@
 
         </div>
         <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
-            <button type="button" id="assignBtn"
-                class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 hidden">{{ __db('assign') }}</button>
+
+            <button type="submit" id="assignBtn" disabled
+                class="btn text-md rounded-lg h-12 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-[#B68A35] enabled:text-white">
+                {{ __db('assign') }}
+            </button>
 
         </div>
     </form>
@@ -137,8 +139,7 @@
                 class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
                 {{ __db('reassign') }}
             </button>
-            <button type="button" id="replaceBtn"
-                class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
+            <button type="button" id="replaceBtn" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
                 {{ __db('replace') }}
             </button>
         </div>
@@ -159,6 +160,14 @@
             delegationSearchByCode: "{{ route('delegations.searchByCode') }}",
             delegationSearch: "{{ route('delegations.search') }}",
         };
+
+        const lang = '{{ getActiveLanguage() }}';
+
+        delegationTableBody.addEventListener('change', function(e) {
+            if (e.target.type === 'radio' && e.target.name === 'delegation_id') {
+                assignBtn.disabled = false;
+            }
+        });
 
         searchBtn.addEventListener('click', function() {
             const delegationCode = delegationCodeInput.value.trim();
@@ -188,7 +197,6 @@
                     if (data.success) {
                         let delegations = data.delegations || (data.delegation ? [data.delegation] :
                             []);
-                        console.log("delegations", delegations);
 
                         if (delegations.length > 0) {
                             delegations.forEach(delegation => {
@@ -205,15 +213,14 @@
                                                 ${delegation.code}
                                             </a>
                                         </td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.continent?.value_ar || delegation.continent?.value || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.country?.name_ar || delegation.country?.name || ''}</td>
-                                        <td class="px-4 py-2 border border-gray-200">${delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${getLanguageValue(lang, delegation.continent?.value_ar, delegation.continent?.value) || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${getLanguageValue(lang, delegation.country?.name_ar, delegation.country?.name) || ''}</td>
+                                        <td class="px-4 py-2 border border-gray-200">${getLanguageValue(lang, delegation.delegates.find((delegate) => delegate.team_head === true )?.name_ar, delegation.delegates.find((delegate) => delegate.team_head === true )?.name_en) || ''}</td>
                                     </tr>
                                 `;
                                 delegationTableBody.innerHTML += row;
                             });
 
-                            assignBtn.classList.remove('hidden');
                         } else {
                             delegationTableBody.innerHTML =
                                 '<tr><td colspan="5" class="text-center py-4">{{ __db('no_delegations_found') }}</td></tr>';
@@ -266,6 +273,7 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
+                            
                             let detailsHtml = `
                             <div class="mb-6">
                                 <h3 class="text-lg font-semibold mb-3">{{ __db('delegation_information') }}</h3>
@@ -276,22 +284,23 @@
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('country') }}:</p>
-                                        <p>${data.delegation.country?.name_ar || data.delegation.country?.name || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.country?.name_ar, data.delegation.country?.name) || '-'}</p>
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('continent') }}:</p>
-                                        <p>${data.delegation.continent?.value_ar || data.delegation.continent?.value || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.continent?.value_ar, data.delegation.continent?.value) || '-'}</p>
                                     </div>
                                     <div>
                                         <p class="font-medium">{{ __db('invitation_from') }}:</p>
-                                        <p>${data.delegation.invitation_from?.value_ar || data.delegation.invitation_from?.value || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.invitation_from?.value_ar, data.delegation.invitation_from?.value) || '-'}</p>
                                     </div>
                                      <div>
                                         <p class="font-medium">{{ __db('invitation_status') }}:</p>
-                                        <p>${data.delegation.invitation_status?.value_ar || data.delegation.invitation_status?.value || '-'}</p>
+                                        <p>${getLanguageValue(lang, data.delegation.invitation_status?.value_ar, data.delegation.invitation_status?.value) || '-'}</p>
                                     </div>
                                 </div>
                             </div>
+                            
                             
                             <div>
                                 <h3 class="text-lg font-semibold mb-3">{{ __db('delegates') }}</h3>
@@ -317,19 +326,20 @@
 
                             if (data.delegation.delegates && data.delegation.delegates.length > 0) {
                                 data.delegation.delegates.forEach(delegate => {
+
                                     detailsHtml += `
-                                     <tr>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.name_en || '-'}</td>
+                                    <tr>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_en || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.name_ar || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.internal_ranking?.value_ar || delegate?.internal_ranking?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.gender?.value || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.parent?.name_ar || delegate?.parent?.name_en || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.relationship_value_ar || delegate?.relationship_value || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.internal_ranking?.value_ar, delegate?.internal_ranking?.value) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.gender?.value_ar, delegate?.gender?.value) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.parent?.name_ar, delegate?.parent?.name_en) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.relationship?.value_ar, delegate?.relationship?.value) || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.badge_printed || '-'}</td>
                                         <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.participation_status || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.designation_ar || delegate?.designation_en || '-'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.team_head ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
-                                        <td class="px-4 py-2 border border-gray-200 text-center">${delegate?.accommodation ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ getLanguageValue(lang, delegate?.designation_ar, delegate?.designation_en) || '-'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.team_head ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
+                                        <td class="px-4 py-2 border border-gray-200 text-center">${ delegate?.accommodation ? '{{ __db('yes') }}' : '{{ __db('no') }}'}</td>
                                     </tr>
                                 `;
                                 });

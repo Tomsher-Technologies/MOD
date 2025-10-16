@@ -42,7 +42,7 @@ class Delegate extends Model
                 if ($delegation) {
                     $latestDelegate = self::where('delegation_id', $delegate->delegation_id)->latest('id')->first();
                     $newId = $latestDelegate ? (int)substr(strrchr($latestDelegate->code, '-'), 1) + 1 : 1;
-                    
+
                     $delegate->code = $delegation->code . '-' . str_pad($newId, 2, '0', STR_PAD_LEFT);
                 } else {
                     $latestDelegate = self::latest('id')->first();
@@ -149,13 +149,13 @@ class Delegate extends Model
     public function arrivalsFiltered($filters = [])
     {
         return $this->hasMany(DelegateTransport::class, 'delegate_id')
-                    ->where('type', 'arrival')
-                    ->when(!empty($filters['date_range']), function($q) use ($filters) {
-                        [$start, $end] = array_map('trim', explode(' - ', $filters['date_range']));
-                        $start = \Carbon\Carbon::parse($start)->startOfDay();
-                        $end = \Carbon\Carbon::parse($end)->endOfDay();
-                        $q->whereBetween('date_time', [$start->toDateTimeString(), $end->toDateTimeString()]);
-                        // $q->whereBetween('date_time', [$start, $end]);
-                    });
+            ->where('type', 'arrival')
+            ->when(!empty($filters['date_range']), function ($q) use ($filters) {
+                [$start, $end] = array_map('trim', explode(' - ', $filters['date_range']));
+                $start = \Carbon\Carbon::parse($start)->startOfDay();
+                $end = \Carbon\Carbon::parse($end)->endOfDay();
+                $q->whereBetween('date_time', [$start->toDateTimeString(), $end->toDateTimeString()]);
+                // $q->whereBetween('date_time', [$start, $end]);
+            });
     }
 }

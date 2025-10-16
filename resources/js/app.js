@@ -161,3 +161,17 @@ export function getLocalized(obj, ...fields) {
 
 
 window.getLocalized = getLocalized;
+
+
+const getLanguageValue = (lang, arField, enField) => {
+    let value = lang === 'ar' ? arField : enField;
+
+    if (!value || value.trim() === '') {
+        value = lang === 'ar' ? enField : arField;
+    }
+
+
+    return value || '-';
+};
+
+window.getLanguageValue = getLanguageValue;

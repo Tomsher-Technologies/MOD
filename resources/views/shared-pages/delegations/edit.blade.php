@@ -448,7 +448,10 @@
                                 return $badge . '<div class="block">' . e($title . ' / ' . $name) . '</div>';
                             },
                         ],
-
+                        [
+                            'label' => __db('designation'),
+                            'render' => fn($row) => $row->getTranslation('designation') ?? '-',
+                        ],
                         [
                             'label' => __db('internal_ranking'),
                             'render' => fn($row) => $row->internalRanking->value ?? '-',

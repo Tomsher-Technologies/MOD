@@ -1,9 +1,4 @@
 @php
-    $statusLabels = [
-        'arrived' => __db('arrived'),
-        'to_be_arrived' => __db('to_be_arrived'),
-    ];
-
     $columns = [
         [
             'label' => __db('sl_no'),
@@ -79,13 +74,23 @@
                     }
 
                     if ($teamHead) {
-                        return e($teamHead->getTranslation('title') . '. ' . $teamHead->getTranslation('name'));
+                        return e(
+                            getLangTitleSeperator(
+                                $teamHead->getTranslation('title'),
+                                $teamHead->getTranslation('name'),
+                            ),
+                        );
                     }
 
                     $firstDelegate = collect($row['delegates'])->first();
                     if ($firstDelegate) {
                         return e(
-                            $firstDelegate->getTranslation('title') . '. ' . $firstDelegate->getTranslation('name'),
+                            $firstDelegate->getTranslation('title') .
+                                getLangTitleSeperator(
+                                    $firstDelegate->getTranslation('title'),
+                                    $firstDelegate->getTranslation('name'),
+                                ) .
+                                $firstDelegate->getTranslation('name'),
                         );
                     }
                 }
@@ -137,8 +142,8 @@
         [
             'label' => __db('arrival') . ' ' . __db('status'),
             // 'class' => 'text-[16px]',
-            'render' => function ($row) use ($statusLabels) {
-                return $row['status'] ?? '-';
+            'render' => function ($row) {
+                return __db($row['status']) ?? '-';
             },
         ],
         [

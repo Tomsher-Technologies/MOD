@@ -106,9 +106,6 @@
                     }
                 @endphp
 
-                 @php
-                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
-                    @endphp
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9; font-size: 13px">
@@ -124,7 +121,7 @@
                             @php
                                 $delegates = $positions = '';
                                 foreach ($del->delegates as $member) {
-                                    $delegates .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member->getTranslation('title').''.$separator.' '.$member?->getTranslation('name').'</span><br>';
+                                    $delegates .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.getLangTitleSeperator($member->getTranslation('title'), $member?->getTranslation('name')).'</span><br>';
                                     $positions .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member?->getTranslation('designation') .'</span><br>';
                                 }
                                 $escortsData = '';

@@ -43,11 +43,17 @@ class AlertController extends Controller
 
         $event = Event::findOrFail($currentEventId);
 
-        $assignedUsers = EventUserRole::with('user')
+        $eventUsers = EventUserRole::with('user')
             ->where('event_id', $event->id)
             ->get()
             ->pluck('user')
             ->unique('id');
+
+
+        $adminOrStaffUsers = \App\Models\User::whereIn('user_type', ['admin', 'staff'])
+            ->get();
+
+        $assignedUsers = $eventUsers->merge($adminOrStaffUsers)->unique('id');
 
         $modules = [
             'delegate' => 'Delegate Module',
@@ -106,11 +112,16 @@ class AlertController extends Controller
         ]);
 
         if ($request->recipient_type === 'all') {
-            $recipients = EventUserRole::with('user')
+            $users = EventUserRole::with('user')
                 ->where('event_id', $event->id)
                 ->get()
                 ->pluck('user')
                 ->unique('id');
+
+            $adminOrStaffUsers = \App\Models\User::whereIn('user_type', ['admin', 'staff'])
+                ->get();
+
+            $recipients = $users->merge($adminOrStaffUsers)->unique('id');
         } elseif ($request->recipient_type === 'module') {
             $recipients = EventUserRole::with('user')
                 ->where('event_id', $event->id)

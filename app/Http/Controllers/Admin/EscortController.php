@@ -44,6 +44,11 @@ class EscortController extends Controller
         ]);
 
 
+        $this->middleware('permission:import_escorts', [
+            'only' => ['exportExcel']
+        ]);
+
+
         $this->middleware('permission:edit_escorts|escort_edit_escorts', [
             'only' => ['edit', 'update']
         ]);
@@ -613,5 +618,15 @@ class EscortController extends Controller
             Log::error('Escort Import Error: ' . $e->getMessage());
             return back()->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $event = \App\Models\Event::find($currentEventId);
+        
+        $fileName = $event ? $event->code . '_escorts_report.xlsx' : 'escorts_report.xlsx';
+        
+        return Excel::download(new \App\Exports\EscortExport, $fileName);
     }
 }

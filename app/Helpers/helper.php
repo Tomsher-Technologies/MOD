@@ -586,7 +586,15 @@ if (!function_exists('getRouteForPage')) {
 
 function getAllCountries()
 {
-    return Country::where('status', 1)->orderBy('sort_order', 'asc')->get();
+    $lang = getActiveLanguage();
+
+    $orderColumn = $lang === 'en' ? 'name' : 'name_ar';
+
+    $countries = Country::where('status', 1)
+        ->orderBy($orderColumn, 'asc')
+        ->get();
+
+    return $countries;
 }
 
 
@@ -604,17 +612,6 @@ if (! function_exists('getAllEscorts')) {
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         return Escort::where('event_id', $currentEventId)->where('status', 1)->orderBy('code')
-            ->get();
-    }
-}
-
-
-if (! function_exists('getCountriesByContinent')) {
-    function getCountriesByContinent($continentId)
-    {
-        return Country::where('continent_id', $continentId)
-            ->where('status', 1)
-            ->orderBy('sort_order', 'asc')
             ->get();
     }
 }
@@ -767,4 +764,53 @@ function getFloorPlans()
     $floorPlans = \App\Models\FloorPlan::where('event_id', getDefaultEventId())->get();
 
     return $floorPlans;
+}
+
+function getNotNullLanguageValues($dataField, $arabicFieldName, $englishFieldName)
+{
+    if ($dataField) {
+        $lang =  getActiveLanguage();
+
+        $finalValue = $lang == 'ar' ? $dataField[$arabicFieldName] : $dataField[$englishFieldName];
+        $finalValue = trim($finalValue);
+        if ($finalValue == null && $lang == 'ar') {
+            $finalValue = $dataField[$englishFieldName];
+        } else if ($finalValue == null && $lang == 'en') {
+            $finalValue = $dataField[$arabicFieldName];
+        }
+
+        return $finalValue;
+    }
+
+    return " - ";
+}
+
+function getLangTitleSeperator($fieldOne, $fieldTwo)
+{
+    $arabicSeperator = '/ ';
+    $englishSeperator = '. ';
+
+    if (trim($fieldOne) == '' && trim($fieldTwo) == '') {
+        return '';
+    }
+
+    if (trim($fieldOne) == '') {
+        return $fieldTwo;
+    }
+
+    if (trim($fieldTwo) == '') {
+        return $fieldOne;
+    }
+
+    if (isArabicOnly($fieldOne) && isArabicOnly($fieldTwo)) {
+        return $fieldOne . $arabicSeperator . $fieldTwo;
+    } else {
+        return $fieldOne . $englishSeperator . $fieldTwo;
+    }
+}
+
+
+function isArabicOnly($text)
+{
+    return preg_match('/^[\p{Arabic}\s]+$/u', $text) > 0;
 }

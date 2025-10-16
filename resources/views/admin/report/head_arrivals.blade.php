@@ -1,29 +1,35 @@
 @extends('layouts.admin_account', ['title' => __db('reports')])
 
 @section('content')
-<style>
-    .select2-container--default .select2-selection--multiple {
-        min-height: 2rem !important;
-        /* height: 40px !important; */
-        padding: 0.2rem 0.75rem;
-    }
-</style>
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            min-height: 2rem !important;
+            /* height: 40px !important; */
+            padding: 0.2rem 0.75rem;
+        }
+    </style>
     <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('delegations_heads_arrival') }}</h2>
         </div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            
-             <form class="w-[75%] me-4"  method="GET"> 
+
+            <form class="w-[75%] me-4" method="GET">
                 <div class="flex relative">
-                    
+
                     <div class="flex flex-row w-[70%] gap-4">
                         <div class="w-[50%]">
-                            <input type="text" class="block w-full text-secondary-light text-sm !border-[#d1d5db] rounded-lg date-range" id="date_range" name="date_range" placeholder="DD-MM-YYYY - DD-MM-YYYY" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off" value="{{ request('date_range') }}">
+                            <input type="text"
+                                class="block w-full text-secondary-light text-sm !border-[#d1d5db] rounded-lg date-range"
+                                id="date_range" name="date_range" placeholder="DD-MM-YYYY - DD-MM-YYYY"
+                                data-time-picker="true" data-format="DD-MM-Y HH:mm:ss" data-separator=" to "
+                                autocomplete="off" value="{{ request('date_range') }}">
                         </div>
 
                         <div class="w-[50%]">
-                            <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }} {{ __db('invitation_from') }}" class="select2 rounded-lg border border-gray-300 text-sm w-full">
+                            <select name="invitation_from[]" multiple
+                                data-placeholder="{{ __db('select') }} {{ __db('invitation_from') }}"
+                                class="select2 rounded-lg border border-gray-300 text-sm w-full">
                                 <option value="">{{ __db('select') }} {{ __db('invitation_from') }}</option>
                                 @foreach (getDropDown('departments')->options as $option)
                                     <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
@@ -35,13 +41,14 @@
                     </div>
 
 
-                    <div class="w-[30%]"> 
-                        <button type="submit" class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+                    <div class="w-[30%]">
+                        <button type="submit"
+                            class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
 
                         <a href="{{ route('report.heads-arrivals') }}"
                             class=" end-[80px]  bottom-[3px] mr-2 border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">{{ __db('reset') }}</a>
                     </div>
-                        
+
                 </div>
             </form>
 
@@ -95,23 +102,26 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9; font-size: 13px">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('invitation_from') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                {{ __db('invitation_from') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('hotel') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('time') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('arrival') }} </th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('arrival') }}
+                            </th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('flight') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('airport') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('airport') }}
+                            </th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('escort') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('delegation_head') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}
+                            </th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                {{ __db('delegation_head') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}
+                            </th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
-                         @php
-                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
-                        @endphp
                         @foreach ($headsArrivals as $i => $arrival)
                             <tr>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
@@ -126,7 +136,8 @@
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $arrival?->date_time ? \Carbon\Carbon::parse($arrival?->date_time)?->format('d-m-Y') : '-' }}
                                 </td>
-                                <td style="padding: 8px; border: 2px solid #000; text-align: center;">{{ $arrival?->flight_no ?? '-' }}</td>
+                                <td style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                    {{ $arrival?->flight_no ?? '-' }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}
                                 </td>
@@ -134,7 +145,7 @@
                                     @php
                                         $escort = $arrival?->delegate?->delegation?->escorts?->first();
                                     @endphp
-                                    {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
+                                    {{ $escort?->military_number . ' - ' . $escort?->internalRanking?->value . ' ' . $escort?->name }}
                                     <br>
                                     {{ $escort?->phone_number }}
                                 </td>
@@ -142,9 +153,8 @@
                                     {{ $arrival?->delegate?->getTranslation('designation') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                   
-                                    {{ $arrival?->delegate?->getTranslation('title') }} {{ $separator }}
-                                    {{ $arrival?->delegate?->getTranslation('name') ?? '-' }}
+
+                                    {{ getLangTitleSeperator($arrival?->delegate?->getTranslation('title'), $arrival?->delegate?->getTranslation('name')) }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $arrival?->delegate?->delegation?->country?->name ?? '-' }}
@@ -153,7 +163,6 @@
                                     {{ $i + 1 }}
                                 </td>
                             </tr>
-                            
                         @endforeach
                     </tbody>
                 </table>

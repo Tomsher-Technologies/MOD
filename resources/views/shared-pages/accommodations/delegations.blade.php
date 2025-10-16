@@ -97,12 +97,13 @@
                                     return '-';
                                 }
 
-                                $separator = getActiveLanguage() === 'ar' ? ' / ' : ' ';
-
                                 return $teamHeads
-                                    ->map(function ($head) use ($separator) {
+                                    ->map(function ($head) {
                                         return e(
-                                            $head->getTranslation('title') . $separator . $head->getTranslation('name'),
+                                            getLangTitleSeperator(
+                                                $head->getTranslation('title'),
+                                                $head->getTranslation('name'),
+                                            ),
                                         );
                                     })
                                     ->implode('<br>');
@@ -283,11 +284,11 @@
                     <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
-                        @foreach (getAllCountries() as $option)
+                        {{-- @foreach (getAllCountries() as $option)
                             <option value="{{ $option->id }}" @if (in_array($option->id, request('country_id', []))) selected @endif>
                                 {{ $option->name }}
                             </option>
-                        @endforeach
+                        @endforeach --}}
                     </select>
                 </div>
 
