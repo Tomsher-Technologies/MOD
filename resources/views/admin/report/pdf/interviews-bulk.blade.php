@@ -48,9 +48,6 @@
                     </thead>
                     <tbody style="font-size: 12px">
                         @php $ser = 1; @endphp
-                         @php
-                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
-                        @endphp
                         @foreach($group as $interview)
                             @foreach($interview->fromMembers as $member)
                                 <tr style="text-align: center;">
@@ -74,7 +71,7 @@
                                         {{ $member->delegate?->getTranslation('designation') ?? '' }}
                                     </td>
                                     <td style="padding:8px;border:2px solid #000;text-align: center;">
-                                        <strong>{{ ($member->delegate) ? $member->delegate?->getTranslation('title').''.$separator.' '.$member->delegate?->getTranslation('name') : $member->otherMember?->getTranslation('name') }}</strong>
+                                        <strong>{{ ($member->delegate) ?  getLangTitleSeperator($member->delegate?->getTranslation('title'), $member->delegate?->getTranslation('name')) : $member->otherMember?->getTranslation('name') }}</strong>
                                     </td>
                                     <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $member->delegate?->delegation?->country?->name ?? '' }}

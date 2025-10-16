@@ -56,9 +56,7 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 12px">
-                    @php
-                        $separator = getActiveLanguage() === 'ar' ? ' / ' : ' . ';
-                    @endphp
+                  
                     @foreach ($delegations as $i => $del)
                         @php
                             $delegates = $positions = '';

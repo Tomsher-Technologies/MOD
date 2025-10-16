@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ __db('delegations_cars_report') }}</title>
@@ -12,15 +13,19 @@
             /* margin: 20px; */
             text-align: right;
         }
-    * { box-sizing: border-box; }
-    table {
-        border-collapse: collapse;
-        border-spacing: 0;   
-        width: 100%;
-    }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+        }
     </style>
 </head>
+
 <body style="margin: 0; font-size: 10px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
@@ -60,9 +65,7 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 10px">
-                    @php
-                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
-                    @endphp
+                    
                     @foreach ($delegates as $idel => $del)
                         @php
                             $arrival_date = $departure_date = '';
@@ -82,9 +85,14 @@
                             $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '';
 
                             foreach ($drivers as $driver) {
-                                $driverNames .= ($driver?->military_number ?? '') . ' - ' 
-                                    . ($driver?->getTranslation('title') ?? '') . '' . $separator . ' ' 
-                                    . ($driver?->getTranslation('name') ?? '-') . '<br>';
+                                $driverNames .=
+                                    ($driver?->military_number ?? '') .
+                                    ' - ' .
+                                    getLangTitleSeperator(
+                                        $driver?->getTranslation('title'),
+                                        $driver?->getTranslation('name'),
+                                    ) .
+                                    '<br>';
 
                                 $driverPhones .= ($driver?->phone_number ?? '-') . '<br>';
                                 $driverCarNos .= ($driver?->car_number ?? '-') . '<br>';
@@ -92,7 +100,9 @@
                             }
                         @endphp
                         <tr>
-                            <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;"></td>
+                            <td
+                                style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;">
+                            </td>
                             <td style="padding: 8px; text-align: center; border-right: 2px solid #000;">
                                 {!! $driverCarTypes !!}
                             </td>
@@ -100,7 +110,7 @@
                                 {!! $driverCarNos !!}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                {!! $driverPhones !!}                                    
+                                {!! $driverPhones !!}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {!! $driverNames !!}
@@ -112,8 +122,7 @@
                                 {{ $del?->getTranslation('designation') ?? '-' }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                {{ $del->getTranslation('title') }} {{ $separator }}
-                                {{ $del->getTranslation('name') ?? '-' }}
+                                {{ getLangTitleSeperator($del?->getTranslation('title'), $del?->getTranslation('name')) }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000; ">
                                 {{ $del->delegation?->country?->name ?? '-' }}
@@ -128,26 +137,27 @@
                             $rowsPerDriver = 2; // 2 rows per driver
 
                             if ($driverCount === 0) {
-                                $totalRows = $minDrivers * $rowsPerDriver; 
+                                $totalRows = $minDrivers * $rowsPerDriver;
                             } else {
                                 $totalRows = max($driverCount * $rowsPerDriver, $minDrivers * $rowsPerDriver);
                                 if ($driverCount >= $minDrivers) {
-                                    $totalRows = 3; 
-                                }else{
+                                    $totalRows = 3;
+                                } else {
                                     $totalRows = ($minDrivers - $driverCount) * $rowsPerDriver;
                                 }
                             }
 
-                            $totalCols = 10; 
+                            $totalCols = 10;
                         @endphp
 
                         @for ($i = 0; $i < $totalRows; $i++)
                             <tr>
                                 @for ($j = 0; $j < $totalCols; $j++)
                                     @php
-                                        $style = 'padding: 8px; text-align: center; border-left: 2px solid #000; border-right: 2px solid #000;';
-                                            
-                                    @endphp 
+                                        $style =
+                                            'padding: 8px; text-align: center; border-left: 2px solid #000; border-right: 2px solid #000;';
+
+                                    @endphp
                                     <td style="{{ $style }}"> </td>
                                 @endfor
                             </tr>
@@ -171,13 +181,15 @@
 
                                         <!-- Mobile -->
                                         @php $escort = $del?->delegation?->escorts?->first(); @endphp
-                                        <td style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
+                                        <td
+                                            style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
                                             {{ $escort?->phone_number ?? '-' }}
                                             <strong> : {{ __db('mobile') }}</strong>
                                         </td>
 
                                         <!-- Escort -->
-                                        <td style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
+                                        <td
+                                            style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
                                             {{ $escort?->military_number ? $escort->military_number . ' - ' : '' }}
                                             {{ $escort?->internalRanking?->value ?? '' }}
                                             {{ $escort?->name ?? '-' }}
@@ -190,53 +202,54 @@
 
                         @php $isPageBreak = ($idel + 1) % 2 == 0 && !$loop->last; @endphp
 
-                        @if($isPageBreak)
-                                </tbody>
-                            </table>
-                            
-                            <div style="page-break-after: always;"></div>
-                                <!--CHUNKHTML-->
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <thead>
-                                        <tr style="background-color: #d9d9d9; font-size: 12px">
-                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('driver') }}{{ __db('notes') }}
-                                            </th>
-                                            <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('car_type') }}
-                                            </th>
-                                            <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('car_number') }}
-                                            </th>
-                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('driver') }} {{ __db('mobile_number') }}
-                                            </th>
-                                            <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('driver') }}
-                                            </th>
-                                            <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('no_of_delegates') }}
-                                            </th>
-                                            <th style="width: 11%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('position') }}
-                                            </th>
-                                            <th style="width: 16%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('delegation_head') }}
-                                            </th>
-                                            <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('country') }}
-                                            </th>
-                                            <th style="width: 4%; padding: 8px; border: 2px solid #000; text-align: center;">
-                                                {{ __db('sl_no') }}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="font-size: 10px">
-                        @endif
+                        @if ($isPageBreak)
+                </tbody>
+            </table>
+
+            <div style="page-break-after: always;"></div>
+            <!--CHUNKHTML-->
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background-color: #d9d9d9; font-size: 12px">
+                        <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('driver') }}{{ __db('notes') }}
+                        </th>
+                        <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('car_type') }}
+                        </th>
+                        <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('car_number') }}
+                        </th>
+                        <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('driver') }} {{ __db('mobile_number') }}
+                        </th>
+                        <th style="width: 15%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('driver') }}
+                        </th>
+                        <th style="width: 8%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('no_of_delegates') }}
+                        </th>
+                        <th style="width: 11%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('position') }}
+                        </th>
+                        <th style="width: 16%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('delegation_head') }}
+                        </th>
+                        <th style="width: 10%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('country') }}
+                        </th>
+                        <th style="width: 4%; padding: 8px; border: 2px solid #000; text-align: center;">
+                            {{ __db('sl_no') }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody style="font-size: 10px">
+                    @endif
                     @endforeach
                 </tbody>
             </table>
         </div>
     </div>
 </body>
+
 </html>
