@@ -21,8 +21,8 @@
 
     </style>
 </head>
-<body style="margin-top: 3%; font-size: 12px;">
-    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
+<body style="margin-top: 20px; font-size: 12px;">
+    <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" style="margin-top:20px;">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:5%;">
             <table style="width: 100%; border-collapse: collapse;">
                     <thead>

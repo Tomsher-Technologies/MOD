@@ -21,7 +21,7 @@
                 </div>
 
                 @if(isset($internalRankName))
-                    <div style="font-size: 14px; font-weight: bold;">
+                    <div style="font-size: 13px; font-weight: 600;">
                         {!! $internalRankName !!}
                     </div>
                 @endif
