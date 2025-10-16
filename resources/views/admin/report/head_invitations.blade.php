@@ -117,9 +117,9 @@
                                     @endphp
                                   
                                     @if (getActiveLanguage() == 'en')
-                                        <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                        <span>{{ $escort?->military_number }}</span>&nbsp; - &nbsp;<span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
                                     @else
-                                        <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                        <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>&nbsp; - &nbsp;<span>{{ $escort?->military_number }}</span>
                                     @endif
                                     <br>
                                     {{ $escort?->phone_number }}
