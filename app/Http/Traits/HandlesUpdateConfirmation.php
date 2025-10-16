@@ -295,7 +295,7 @@ trait HandlesUpdateConfirmation
         try {
             $activity = $activityModelClass::create($activityData);
 
-            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room', 'delete-delegation'])) {
+            if (in_array($action, ['create', 'create-excel', 'assign-escorts', 'unassign-escorts', 'assign-drivers', 'unassign-drivers', 'assign-room', 'delete-delegation', 'delete-delegate'])) {
                 $this->sendNotification($activity, $action, $module, $delegationId);
             } elseif ($action === 'update' && !empty($fieldsToNotify) && !empty($changedFields)) {
                 $notifiedChanges = array_intersect_key($changedFields, array_flip($fieldsToNotify));
