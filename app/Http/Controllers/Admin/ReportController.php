@@ -876,11 +876,11 @@ class ReportController extends Controller
         $delegates = $newQuery->get();
 
         $internalRankName = '';
-        $headerHeight = 60; 
+        $headerHeight = 40; 
         if($request->has('internal_ranking') && count($request->internal_ranking) == 1){
             $drop = DropdownOption::where('id', $request->internal_ranking)->first();
             $internalRankName = $drop?->value;
-            $headerHeight = 60;
+            $headerHeight = 50;
         }
      
         $today = date('Y-m-d-H-i');
