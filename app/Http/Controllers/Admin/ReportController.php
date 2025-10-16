@@ -30,6 +30,12 @@ class ReportController extends Controller
 {
     const UNASSIGNABLE_STATUS_CODES = [3, 9];
     const ASSIGNABLE_STATUS_CODES = [2, 10];
+
+    public function __construct()
+    {
+        ini_set('memory_limit', '2048M');
+        ini_set('max_execution_time', 300);
+    }
     public function index()
     {
         return view('admin.report.index');
@@ -1959,9 +1965,9 @@ class ReportController extends Controller
 
         $filters = request()->only(['hotel']);
 
-       $hotelsData = Accommodation::with([
+        $hotelsData = Accommodation::with([
                     'rooms.roomAssignments' => function ($q) use ($currentEventId) {
-                        $q->with(['delegation', 'delegation.country', 'assignable'])
+                        $q->with([ 'delegation','delegation.country', 'assignable'])
                         ->where('active_status', 1)
                         ->where('assignable_type', 'App\\Models\\Delegate') // ONLY delegates
                         ->whereHas('delegation', function ($q2) use ($currentEventId) {
@@ -1977,6 +1983,17 @@ class ReportController extends Controller
                 ->orderBy('hotel_name', 'asc')
                 ->get();
 
+        $hotelsData->each(function ($hotel) {
+            $hotel->rooms->each(function ($room) {
+                $room->roomAssignments = $room->roomAssignments
+                    ->sortBy([
+                        fn($a, $b) => ($a->delegation->country->sort_order ?? 9999) <=> ($b->delegation->country->sort_order ?? 9999),
+                        fn($a, $b) => ($a->delegation->invitationFrom->sort_order ?? 9999) <=>  ($b->delegation->invitationFrom->sort_order ?? 9999),
+                    ])
+                    ->values();
+            });
+        });
+       
         return view('admin.report.hotel_delegations', compact('hotelsData','hotels'));
     }
 
@@ -1985,9 +2002,9 @@ class ReportController extends Controller
 
         $filters = request()->only(['hotel']);
 
-        $hotelsData = Accommodation::with([
+         $hotelsData = Accommodation::with([
                     'rooms.roomAssignments' => function ($q) use ($currentEventId) {
-                        $q->with(['delegation', 'delegation.country', 'assignable'])
+                        $q->with([ 'delegation','delegation.country', 'assignable'])
                         ->where('active_status', 1)
                         ->where('assignable_type', 'App\\Models\\Delegate') // ONLY delegates
                         ->whereHas('delegation', function ($q2) use ($currentEventId) {
@@ -2002,6 +2019,17 @@ class ReportController extends Controller
                         })
                 ->orderBy('hotel_name', 'asc')
                 ->get();
+
+        $hotelsData->each(function ($hotel) {
+            $hotel->rooms->each(function ($room) {
+                $room->roomAssignments = $room->roomAssignments
+                    ->sortBy([
+                        fn($a, $b) => ($a->delegation->country->sort_order ?? 9999) <=> ($b->delegation->country->sort_order ?? 9999),
+                        fn($a, $b) => ($a->delegation->invitationFrom->sort_order ?? 9999) <=>  ($b->delegation->invitationFrom->sort_order ?? 9999),
+                    ])
+                    ->values();
+            });
+        });
 
         $today = date('Y-m-d-H-i');
         $reportName = 'hotel_delegations_report';

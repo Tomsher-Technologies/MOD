@@ -1,25 +1,26 @@
 @extends('layouts.admin_account', ['title' => __db('reports')])
 
 @section('content')
-<style>
-    .select2-container--default .select2-selection--multiple {
-        min-height: 2rem !important;
-        /* height: 40px !important; */
-        padding: 0.2rem 0.75rem;
-    }
-</style>
+    <style>
+        .select2-container--default .select2-selection--multiple {
+            min-height: 2rem !important;
+            /* height: 40px !important; */
+            padding: 0.2rem 0.75rem;
+        }
+    </style>
     <div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
             <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('wives_report') }}</h2>
         </div>
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            
-             <form class="w-[75%] me-4"  method="GET"> 
+
+            <form class="w-[75%] me-4" method="GET">
                 <div class="flex relative">
-                    
+
                     <div class="flex flex-row w-[70%] gap-4">
                         <div class="w-[50%]">
-                            <select name="country_id[]" multiple data-placeholder="{{ __db('select') }} {{ __db('country') }}" class="select2 rounded-lg border border-gray-300 text-sm w-full" >
+                            <select name="country_id[]" multiple data-placeholder="{{ __db('select') }} {{ __db('country') }}"
+                                class="select2 rounded-lg border border-gray-300 text-sm w-full">
                                 <option value="">{{ __db('select') }} {{ __db('country') }}</option>
                                 @foreach (getAllCountries() as $option)
                                     <option value="{{ $option->id }}"
@@ -31,7 +32,9 @@
                         </div>
 
                         <div class="w-[50%]">
-                            <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }} {{ __db('invitation_from') }}" class="select2 rounded-lg border border-gray-300 text-sm w-full">
+                            <select name="invitation_from[]" multiple
+                                data-placeholder="{{ __db('select') }} {{ __db('invitation_from') }}"
+                                class="select2 rounded-lg border border-gray-300 text-sm w-full">
                                 <option value="">{{ __db('select') }} {{ __db('invitation_from') }}</option>
                                 @foreach (getDropDown('departments')->options as $option)
                                     <option value="{{ $option->id }}" @if (in_array($option->id, request('invitation_from', []))) selected @endif>
@@ -43,13 +46,14 @@
                     </div>
 
 
-                    <div class="w-[30%]"> 
-                        <button type="submit" class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
+                    <div class="w-[30%]">
+                        <button type="submit"
+                            class="!text-[#5D471D] mr-2  end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
 
                         <a href="{{ route('report.wives') }}"
                             class=" end-[80px]  bottom-[3px] mr-2 border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">{{ __db('reset') }}</a>
                     </div>
-                        
+
                 </div>
             </form>
 
@@ -81,23 +85,23 @@
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9; font-size: 13px">
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('guest_type') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('invitation_from') }} </th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('female_escort') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('guest_type') }}
+                            </th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                {{ __db('invitation_from') }} </th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">
+                                {{ __db('female_escort') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('name') }}</th>
-                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}</th>
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}
+                            </th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
-                         @php
-                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
-                    @endphp
                         @foreach ($delegates as $i => $del)
-                           
                             <tr>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $del->relationship?->value ?? __db('guest')}}
+                                    {{ $del->relationship?->value ?? __db('guest') }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $del->delegation->invitationFrom?->value ?? '-' }}
@@ -106,14 +110,13 @@
                                     @php
                                         $escort = $del?->delegation?->escorts?->first();
                                     @endphp
-                                    {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
+                                    {{ $escort?->military_number . ' - ' . $escort?->internalRanking?->value . ' ' . $escort?->name }}
                                     <br>
                                     {{ $escort?->phone_number }}
                                 </td>
-                               
+
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $del->getTranslation('title') }} {{ $separator }}
-                                    {{ $del->getTranslation('name') ?? '-' }}
+                                    {{ getLangTitleSeperator($del?->getTranslation('title'), $del?->getTranslation('name')) }}
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $del->delegation?->country?->name ?? '-' }}
@@ -122,7 +125,6 @@
                                     {{ $i + 1 }}
                                 </td>
                             </tr>
-                            
                         @endforeach
                     </tbody>
                 </table>

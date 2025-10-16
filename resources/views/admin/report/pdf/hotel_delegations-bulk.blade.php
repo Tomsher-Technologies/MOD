@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <title>{{ __db('hotel_delegations_report') }}</title>
@@ -12,111 +13,139 @@
             /* margin: 20px; */
             text-align: right;
         }
-    * { box-sizing: border-box; }
-    table {
-        border-collapse: collapse;
-        border-spacing: 0;   
-        width: 100%;
-    }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+        }
     </style>
 </head>
+
 <body style="margin: 0; font-size: 12px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
-           @foreach($hotelsData as $hotel)
-
+            @foreach ($hotelsData as $hotel)
                 @php
                     $delegations = $hotel->rooms
-                                        ->flatMap(fn($room) => $room->roomAssignments)
-                                        ->groupBy('delegation_id');
+                        ->flatMap(fn($room) => $room->roomAssignments)
+                        ->groupBy('delegation_id');
                     $serial = 1;
                 @endphp
 
-                @if($delegations->count() > 0)
-                    <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                @if ($delegations->count() > 0)
+                    <table
+                        style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; white-space: nowrap;">
                                 {{ $hotel->hotel_name }} : {{ __('Hotel') }}
                             </td>
                         </tr>
                     </table>
-         
-                    @foreach($delegations as $delegationId => $assignments)
+
+                    @foreach ($delegations as $delegationId => $assignments)
                         @php
                             $delegation = $assignments->first()->delegation;
                         @endphp
 
-                        <table style="border: 2px solid black; border-collapse: collapse; width: 100%; margin-bottom: 30px;">
+                        <table
+                            style="border: 2px solid black; border-collapse: collapse; width: 100%; margin-bottom: 30px;">
                             <thead>
                                 <tr>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('invitation_from') }}</th>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('room_number') }}</th>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('room_type') }}</th>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('position') }}</th>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('delegate') }}</th>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('country') }}</th>
-                                    <th style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">{{ __db('sl_no') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('invitation_from') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('room_number') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('room_type') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('position') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('delegate') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('country') }}</th>
+                                    <th
+                                        style="border: 2px solid black; padding:5px; background:#d3d3d3; text-align:center;">
+                                        {{ __db('sl_no') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tbody>
-                                     @php
-                                        $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
+                            <tbody>
+                                @foreach ($assignments as $index => $assignment)
+                                    <tr>
+
+                                        @if ($index == 0)
+                                            <td style="border:2px solid black; padding:5px; text-align:center;"
+                                                rowspan="{{ count($assignments) }}">
+                                                {{ $delegation->invitationFrom?->value ?? '-' }}
+                                            </td>
+                                        @endif
+
+                                        <td style="border:2px solid black; padding:5px; text-align:center;">
+                                            {{ $assignment->room_number }}</td>
+
+                                        <td style="border:2px solid black; padding:5px; text-align:center;">
+                                            {{ $assignment->roomType?->roomType?->value ?? '' }}
+                                        </td>
+
+                                        <td
+                                            style="border:2px solid black; padding:5px; text-align:center;@if ($assignment->assignable?->team_head === true) color: red; @endif">
+                                            {{ $assignment->assignable?->getTranslation('designation') ?? '' }}
+                                        </td>
+
+                                        <td
+                                            style="border:2px solid black; padding:5px; text-align:center; @if ($assignment->assignable?->team_head === true) color: red; @endif">
+                                            {{ getLangTitleSeperator($assignment->assignable?->getTranslation('title'), $assignment->assignable?->getTranslation('name')) }}
+                                        </td>
+
+                                        @if ($index == 0)
+                                            <td style="border:2px solid black; padding:5px; text-align:center;"
+                                                rowspan="{{ count($assignments) }}">
+                                                {{ $delegation->country?->name ?? '' }}
+                                            </td>
+                                            <td style="border:2px solid black; padding:5px; text-align:center;"
+                                                rowspan="{{ count($assignments) }}">
+                                                {{ $serial }}
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
+
+                                @foreach ($delegation->escorts as $key => $escort)
+                                    @php
+                                        $roomEscort = $escort->currentRoomAssignment ?? null;
                                     @endphp
-                                    @foreach($assignments as $index => $assignment)
-                                        <tr>
-                                            
-                                            @if($index == 0)
-                                                <td style="border:2px solid black; padding:5px; text-align:center;" rowspan="{{ count($assignments) }}">
-                                                    {{ $delegation->invitationFrom?->value ?? '-' }}
-                                                </td>
-                                            @endif
-
-                                            <td style="border:2px solid black; padding:5px; text-align:center;">{{ $assignment->room_number }}</td>
-
-                                            <td style="border:2px solid black; padding:5px; text-align:center;">
-                                                {{ $assignment->roomType?->roomType?->value ?? '' }}
-                                            </td>
-
-                                            <td style="border:2px solid black; padding:5px; text-align:center;@if($assignment->assignable?->team_head === true) color: red; @endif">
-                                                {{ $assignment->assignable?->getTranslation('designation') ?? '' }}
-                                            </td>
-
-                                            <td style="border:2px solid black; padding:5px; text-align:center; @if($assignment->assignable?->team_head === true) color: red; @endif">
-                                                {{ $assignment->assignable?->getTranslation('title') .''.$separator.' '.$assignment->assignable?->getTranslation('name') }}
-                                            </td>
-
-                                            @if($index == 0)
-                                                <td style="border:2px solid black; padding:5px; text-align:center;" rowspan="{{ count($assignments) }}">
-                                                    {{ $delegation->country?->name ?? '' }}
-                                                </td>
-                                                <td style="border:2px solid black; padding:5px; text-align:center;" rowspan="{{ count($assignments) }}">
-                                                    {{ $serial }}
-                                                </td>
-                                            @endif
-                                        </tr>
-                                    @endforeach
-
-                                    @foreach ($delegation->escorts as $key => $escort)
-                                            @php
-                                                $roomEscort = $escort->currentRoomAssignment ?? null;
-                                            @endphp
-                                            <tr>
-                                                <td style="padding: 6px; border: 0px;" colspan="2">
-                                                    {{ $roomEscort?->room_number }} - {{ $roomEscort?->roomType?->roomType?->value ?? ''  }} - {{ $roomEscort?->hotel?->hotel_name }} 
-                                                    <strong> : {{ __db('accommodation') }}</strong>
-                                                </td>
-                                                <td style="padding: 6px; border: 0px;" colspan="2">
-                                                    {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
-                                                </td>
-                                                <td style="padding: 6px; border: 0px;text-align: right;" colspan="3">
-                                                    <span style="{{ $key != 0 ? 'margin-right: 40px;' : '' }}">{{ $escort?->internalRanking?->value }} {{ $escort?->name }} - {{ $escort?->military_number }}  <span>
-                                                    @if($key == 0) <strong> : {{ __db('escort') }}</strong> @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                </tbody>
+                                    <tr>
+                                        <td style="padding: 6px; border: 0px;" colspan="2">
+                                            {{ $roomEscort?->room_number }} -
+                                            {{ $roomEscort?->roomType?->roomType?->value ?? '' }} -
+                                            {{ $roomEscort?->hotel?->hotel_name }}
+                                            <strong> : {{ __db('accommodation') }}</strong>
+                                        </td>
+                                        <td style="padding: 6px; border: 0px;" colspan="2">
+                                            {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                                        </td>
+                                        <td style="padding: 6px; border: 0px;text-align: right;" colspan="3">
+                                            <span
+                                                style="{{ $key != 0 ? 'margin-right: 40px;' : '' }}">{{ $escort?->internalRanking?->value }}
+                                                {{ $escort?->name }} - {{ $escort?->military_number }} <span>
+                                                    @if ($key == 0)
+                                                        <strong> : {{ __db('escort') }}</strong>
+                                                    @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
 
 
                             </tbody>
@@ -127,12 +156,13 @@
                         @endphp
                     @endforeach
                 @endif
-                
-                @if($loop->iteration % 5 == 0)
+
+                @if ($loop->iteration % 5 == 0)
                     <!--CHUNKHTML-->
                 @endif
             @endforeach
         </div>
     </div>
 </body>
+
 </html>

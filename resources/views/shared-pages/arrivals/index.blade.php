@@ -53,32 +53,33 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-                <div class="flex items-center justify-between mb-5">
-                    <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('arrivals') }}</h2>
+                <div class="flex items-center justify-between  w-full">
+                    <h2 class="font-semibold mb-0 !text-[22px] hide-when-fullscreen">{{ __db('arrivals') }}</h2>
 
-                    <div class="flex items-center gap-4">
-                        {{-- <div class="flex items-center gap-2">
-                            <label for="font-size" class="text-sm font-medium text-gray-700">{{ __db('font_size') }}:</label>
-                            <select id="font-size" name="font_size" onchange="updateFontSize()"
-                                class="p-2 rounded-lg border text-sm">
-                                <option value="sm" {{ request('font_size') == 'sm' ? 'selected' : '' }}>{{ __db('small') }}</option>
-                                <option value="base" {{ request('font_size') == 'base' ? 'selected' : '' }}>{{ __db('medium') }}</option>
-                                <option value="lg" {{ request('font_size') == 'lg' ? 'selected' : '' }}>{{ __db('large') }}</option>
-                                <option value="xl" {{ request('font_size') == 'xl' ? 'selected' : '' }}>{{ __db('extra_large') }}</option>
-                            </select>
-                        </div> --}}
+                    <div class="flex items-center gap-4  w-full justify-between  mb-5">
 
-                        <div class="full-screen-logo flex items-center gap-8 hidden">
-                            <img src="{{ getAdminEventLogo() }}" alt="" class="max-h-[100px]">
+                        <div class="flex gap-5 items-center ">
+                            <div class="full-screen-logo hidden items-start">
+                                <img src="{{ getAdminEventLogo() }}" alt="" class="max-h-[100px]">
+                            </div>
+                        </div>
+
+                        <h2 class="font-semibold mb-0 !text-[22px] hidden full-screen-logo ">{{ __db('arrivals') }}
+                        </h2>
+
+
+                        <div class="full-screen-logo gap-8 !justify-between hidden items-end ">
                             <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[100px]"
                                 alt="Logo">
                         </div>
-
-                        <a href="#" id="fullscreenToggleBtn"
-                            class="px-4 flex items-center gap-4 py-2 text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
-                            <span>{{ __db('go_fullscreen') }}</span>
-                        </a>
                     </div>
+                </div>
+
+                <div class="flex items-end justify-end mb-3">
+                    <a href="#" id="fullscreenToggleBtn"
+                        class="!px-4 flex items-center gap-4 py-2 text-nowrap text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
+                        <span>{{ __db('go_fullscreen') }}</span>
+                    </a>
                 </div>
 
                 <hr class=" border-neutral-200 h-5 ">

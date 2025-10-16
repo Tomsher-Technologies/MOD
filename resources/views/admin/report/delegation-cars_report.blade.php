@@ -18,7 +18,7 @@
                 <div class="flex relative">
 
                     <div class="flex flex-row w-[70%] gap-4">
-                        
+
                         <div class="w-[90%]">
                             <select name="invitation_status[]" multiple data-placeholder="{{ __db('invitation_status') }}"
                                 class="select2 rounded-lg border border-gray-300 text-sm w-full">
@@ -93,9 +93,6 @@
                         </tr>
                     </thead>
                     <tbody style="font-size: 12px">
-                        @php
-                            $separator = (getActiveLanguage() === 'ar') ? ' / ' : ' . ';
-                        @endphp
                         @foreach ($delegates as $i => $del)
                             @php
                                 $arrival_date = $departure_date = '';
@@ -112,26 +109,30 @@
                                 $ulStyle = 'list-style:none; margin:0; padding:0;';
                                 $liStyle = 'padding:4px 0;';
 
-                                $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '<ul style="' . $ulStyle . '">';
+                                $driverNames = $driverPhones = $driverCarNos = $driverCarTypes =
+                                    '<ul style="' . $ulStyle . '">';
 
                                 foreach ($drivers as $driver) {
-                                    $driverNames .= '<li style="' . $liStyle . '">' 
-                                        . ($driver?->military_number ?? '') . ' - ' 
-                                        . ($driver?->getTranslation('title') ?? '') . '' . $separator . ' ' 
-                                        . ($driver?->getTranslation('name') ?? '-') 
-                                        . '</li>';
+                                    $driverNames .=
+                                        '<li style="' .
+                                        $liStyle .
+                                        '">' .
+                                        ($driver?->military_number ?? '') .
+                                        ' - ' .
+                                        getLangTitleSeperator(
+                                            $driver?->getTranslation('title'),
+                                            $driver?->getTranslation('name'),
+                                        ) .
+                                        '</li>';
 
-                                    $driverPhones .= '<li style="' . $liStyle . '">' 
-                                        . ($driver?->phone_number ?? '-') 
-                                        . '</li>';
+                                    $driverPhones .=
+                                        '<li style="' . $liStyle . '">' . ($driver?->phone_number ?? '-') . '</li>';
 
-                                    $driverCarNos .= '<li style="' . $liStyle . '">' 
-                                        . ($driver?->car_number ?? '-') 
-                                        . '</li>';
+                                    $driverCarNos .=
+                                        '<li style="' . $liStyle . '">' . ($driver?->car_number ?? '-') . '</li>';
 
-                                    $driverCarTypes .= '<li style="' . $liStyle . '">' 
-                                        . ($driver?->car_type ?? '-') 
-                                        . '</li>';
+                                    $driverCarTypes .=
+                                        '<li style="' . $liStyle . '">' . ($driver?->car_type ?? '-') . '</li>';
                                 }
 
                                 $driverNames .= '</ul>';
@@ -140,7 +141,9 @@
                                 $driverCarTypes .= '</ul>';
                             @endphp
                             <tr>
-                                <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;"></td>
+                                <td
+                                    style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;">
+                                </td>
                                 <td style="padding: 8px; text-align: center; border-right: 2px solid #000;">
                                     {!! $driverCarTypes !!}
                                 </td>
@@ -148,7 +151,7 @@
                                     {!! $driverCarNos !!}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                    {!! $driverPhones !!}                                    
+                                    {!! $driverPhones !!}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                     {!! $driverNames !!}
@@ -160,8 +163,7 @@
                                     {{ $del?->getTranslation('designation') ?? '-' }}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                    {{ $del->getTranslation('title') }} {{ $separator }}
-                                    {{ $del->getTranslation('name') ?? '-' }}
+                                    {{ getLangTitleSeperator($del?->getTranslation('title'), $del?->getTranslation('name')) }}
                                 </td>
                                 <td style="padding: 8px;text-align: center; border-right: 2px solid #000; ">
                                     {{ $del->delegation?->country?->name ?? '-' }}
@@ -202,7 +204,9 @@
                             @endfor --}}
 
                             <tr>
-                                <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000; text-align: center;"></td>
+                                <td
+                                    style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000; text-align: center;">
+                                </td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
@@ -214,7 +218,9 @@
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
                             </tr>
                             <tr>
-                                <td style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000; text-align: center;"></td>
+                                <td
+                                    style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000; text-align: center;">
+                                </td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
                                 <td style="padding: 8px; border-right: 2px solid #000; text-align: center;"></td>
@@ -244,13 +250,15 @@
 
                                             <!-- Mobile -->
                                             @php $escort = $del?->delegation?->escorts?->first(); @endphp
-                                            <td style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
+                                            <td
+                                                style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
                                                 {{ $escort?->phone_number ?? '-' }}
                                                 <strong> : {{ __db('mobile') }}</strong>
                                             </td>
 
                                             <!-- Escort -->
-                                            <td style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
+                                            <td
+                                                style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
                                                 {{ $escort?->military_number ? $escort->military_number . ' - ' : '' }}
                                                 {{ $escort?->internalRanking?->value ?? '' }}
                                                 {{ $escort?->name ?? '-' }}
@@ -260,8 +268,6 @@
                                     </table>
                                 </td>
                             </tr>
-
-
                         @endforeach
                     </tbody>
                 </table>
