@@ -876,7 +876,7 @@ class ReportController extends Controller
         $delegates = $newQuery->get();
 
         $internalRankName = '';
-        $headerHeight = 40; 
+        $headerHeight = 45; 
         if($request->has('internal_ranking') && count($request->internal_ranking) == 1){
             $drop = DropdownOption::where('id', $request->internal_ranking)->first();
             $internalRankName = $drop?->value;
