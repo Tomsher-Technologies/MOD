@@ -876,20 +876,22 @@ class ReportController extends Controller
         $delegates = $newQuery->get();
 
         $internalRankName = '';
+        $headerHeight = 45; 
         if($request->has('internal_ranking') && count($request->internal_ranking) == 1){
             $drop = DropdownOption::where('id', $request->internal_ranking)->first();
             $internalRankName = $drop?->value;
+            $headerHeight = 48;
         }
-        
+     
         $today = date('Y-m-d-H-i');
         $reportName = 'vip_report';
         $mpdf = new Mpdf([
             'mode' => 'utf-8',
             // 'format' => 'A4',
             'format' => 'A4-L',
-            'margin_top' => 40,
             'margin_bottom' => 20,
-            'default_font' => 'amiri'
+            'default_font' => 'amiri',
+            'margin_top' => $headerHeight,
         ]);
 
         $headerHtml = view('admin.report.partials.pdf-header', compact('reportName','internalRankName'))->render();
