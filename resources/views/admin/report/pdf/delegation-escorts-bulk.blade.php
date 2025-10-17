@@ -99,25 +99,46 @@
             </table>
 
 
-            <div style="display: flex;font-size: 12px; justify-content: space-between; align-items: start; margin-top: 15px;margin-bottom: 8px; gap: 20px;">
-                <div style="width: 40%;">
-                    <div style="margin-bottom: 5px;"><span>{{ $delegation->invitationFrom?->value ?? ' - ' }}</span> <strong>&nbsp; : &nbsp;{{ __db('invitation_from') }}</strong></div>
-                    <div style="margin-bottom: 5px;"><span>{{ $delegation->participationStatus?->value ?? ' - ' }}</span> <strong>&nbsp; : &nbsp;{{ __db('participation_status') }}</strong></div>
-                </div>
+            <table style="width: 100%; font-size: 12px; border-collapse: collapse; margin-top: 15px; margin-bottom: 8px;">
+                <tr>
+                    <!-- Column 1 -->
+                    <td style="width: 40%; vertical-align: top;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="text-align: left;">
+                                    <span>{{ $delegation->invitationFrom?->value ?? ' - ' }}</span>
+                                    <strong>&nbsp;: &nbsp;{{ __db('invitation_from') }}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <span>{{ $delegation->participationStatus?->value ?? ' - ' }}</span>
+                                    <strong>&nbsp;: &nbsp;{{ __db('participation_status') }}</strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
 
-                <div style="width:15%; text-align: right;">
+                    <td style="width: 15%;"></td>
 
-                </div>
-
-                <div style="width: 55%; text-align: right;">
-                    <div style="margin-bottom: 5px;"><span>{{ $delegation->country?->name ?? ' - ' }}</span> <strong>&nbsp; : &nbsp;{{ __db('country') }}</strong></div>
-                    <div style="margin-bottom: 5px;justify-content: flex-end;">
-                        <span>{{ $delegation->invitationStatus?->value ?? ' - ' }}</span>
-                        <strong style="width: 22%;">&nbsp; : &nbsp;{{ __db('invitation_status') }}</strong>
-                    </div>
-
-                </div>
-            </div>
+                    <td style="width: 45%; vertical-align: top;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="text-align: right;">
+                                    <span>{{ $delegation->country?->name ?? ' - ' }}</span>
+                                    <strong>&nbsp;: &nbsp;{{ __db('country') }}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <span>{{ $delegation->invitationStatus?->value ?? ' - ' }}</span>
+                                    <strong>&nbsp;:&nbsp; {{ __db('invitation_status') }}</strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
             @php
                 $teamHead = '';
             @endphp
