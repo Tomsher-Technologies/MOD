@@ -25,7 +25,7 @@
                 $assignedHotels = [];
             @endphp
 
-            <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:8px; table-layout:fixed;">
+            <table style="width:100%; border-collapse:collapse; font-size: 12px !important; margin-bottom:8px; table-layout:fixed;">
                 <colgroup>
                     <col style="width:40%;">
                     <col style="width:20%;">
@@ -44,9 +44,9 @@
                         $mobileValue = $escort?->phone_number ?? '-';
 
                         if (getActiveLanguage() == 'en') {
-                            $escortValue = '<div style=" display: flex; justify-content: flex-end;font-size: 12px;"><span>'. $escort?->military_number .'</span>&nbsp; - &nbsp;<span>'. $escort?->internalRanking?->value .' '. $escort?->name .'</span></div>';
+                            $escortValue = '<div style=" display: flex; justify-content: flex-end;font-size: 12px !important;"><span>'. $escort?->military_number .'</span>&nbsp; - &nbsp;<span>'. $escort?->internalRanking?->value .' '. $escort?->name .'</span></div>';
                         } else {
-                            $escortValue = '<div style=" display: flex; justify-content: flex-end;font-size: 12px;"><span>'. $escort?->internalRanking?->value .' '. $escort?->name .'</span>&nbsp; - &nbsp;<span>'. $escort?->military_number .'</span></div>';
+                            $escortValue = '<div style=" display: flex; justify-content: flex-end;font-size: 12px !important;"><span>'. $escort?->internalRanking?->value .' '. $escort?->name .'</span>&nbsp; - &nbsp;<span>'. $escort?->military_number .'</span></div>';
                         }
 
                         $accValue = $accValue === '' ? '-' : $accValue;
@@ -55,12 +55,12 @@
 
                     <tr>
                         <td style="vertical-align:top; padding:4px 6px;">
-                            <table style="width:100%; border-collapse:collapse;font-size: 12px;">
+                            <table style="width:100%; border-collapse:collapse;font-size: 12px !important;">
                                 <tr>
-                                    <td style="text-align:left; padding:0; word-wrap:break-word;width:50%;font-size: 12px;">
+                                    <td style="text-align:left; padding:0; word-wrap:break-word;width:50%;font-size: 12px !important;">
                                         {!! e($accValue) !!}
                                     </td>
-                                    <td style="text-align:left; padding:0; white-space:nowrap; width:50%;font-size: 12px;">
+                                    <td style="text-align:left; padding:0; white-space:nowrap; width:50%;font-size: 12px !important;">
                                         <strong>&nbsp; : &nbsp;{!! e(__db('accommodation')) !!}</strong>
                                     </td>
                                 </tr>
@@ -68,12 +68,12 @@
                         </td>
 
                         <td style="vertical-align:top; padding:4px 6px;">
-                            <table style="width:100%; border-collapse:collapse;font-size: 12px;">
+                            <table style="width:100%; border-collapse:collapse;font-size: 12px !important;">
                                 <tr>
-                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;font-size: 12px;">
+                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;font-size: 12px !important;">
                                         {!! e($mobileValue) !!}
                                     </td>
-                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;font-size: 12px;">
+                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;font-size: 12px !important;">
                                         <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
                                     </td>
                                 </tr>
@@ -81,12 +81,12 @@
                         </td>
 
                         <td style="vertical-align:top; padding:4px 6px;">
-                            <table style="width:100%; border-collapse:collapse;font-size: 12px;">
+                            <table style="width:100%; border-collapse:collapse;font-size: 12px !important;">
                                 <tr>
-                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;font-size: 12px;">
+                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;font-size: 12px !important;">
                                         {!! $escortValue !!}
                                     </td>
-                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;font-size: 12px;">
+                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;font-size: 12px !important;">
                                         @if($ekey === 0)
                                             <strong>&nbsp; : &nbsp;{!! e(__db('escort')) !!}</strong>
                                         @endif
@@ -254,17 +254,17 @@
 
                 @endphp
                 
-                 <table style="width:100%; border-collapse: collapse; margin-bottom: 12px;font-size: 12px;">
-                    <tbody style="font-size: 12px;">
+                 <table style="width:100%; border-collapse: collapse; margin-bottom: 12px;font-size: 12px !important;">
+                    <tbody style="font-size: 12px !important;">
                         @foreach($hotelDetails as $key => $hotel)
                             @php
                                 $acc_con = $acc_name = '';
                                 foreach($hotel->contacts as $k => $con){
-                                    $acc_con .= '<div style="margin-bottom: 5px; display: flex;font-size: 12px;">
+                                    $acc_con .= '<div style="margin-bottom: 5px; display: flex;font-size: 12px !important;">
                                                     <span>'.$con->phone.'</span>
                                                     <strong style="width: 30%;">&nbsp; : '. __db('mobile').'</strong>
                                                 </div>';
-                                    $acc_name .= '<div style="margin-bottom: 5px; justify-content: flex-end;font-size: 12px;">
+                                    $acc_name .= '<div style="margin-bottom: 5px; justify-content: flex-end;font-size: 12px !important;">
                                                     <span>'.$con->name.'</span>
                                                     <strong style="width: 22%;">&nbsp; : '. __db('res'.$k).'</strong>
                                                 </div>';
@@ -273,8 +273,8 @@
 
                             <tr>
                                 <!-- Left side (hotel numbers + contacts) -->
-                                <td style="width:30%; vertical-align: top; padding: 6px;font-size: 12px;">
-                                    <div style="margin-bottom: 5px; display: flex;font-size: 12px;">
+                                <td style="width:30%; vertical-align: top; padding: 6px;font-size: 12px !important;">
+                                    <div style="margin-bottom: 5px; display: flex;font-size: 12px !important;">
                                         <span>{{ $hotel->contact_number }}</span>
                                         <strong style="width: 30%;">&nbsp; : {{ __db('hotel_number') }}</strong>
                                     </div>
@@ -282,8 +282,8 @@
                                 </td>
 
                                 <!-- Right side (hotel name + responsible persons) -->
-                                <td style="width:25%; text-align: right; vertical-align: top; padding: 6px;font-size: 12px;">
-                                    <div style="margin-bottom: 5px;  justify-content: flex-end;font-size: 12px;">
+                                <td style="width:25%; text-align: right; vertical-align: top; padding: 6px;font-size: 12px !important;">
+                                    <div style="margin-bottom: 5px;  justify-content: flex-end;font-size: 12px !important;">
                                         <span>{{ $hotel->hotel_name }}</span>
                                         <strong style="width: 22%;">&nbsp; : {{ __db('hotel') }}</strong>
                                     </div>
