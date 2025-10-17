@@ -360,7 +360,7 @@
                                     } else {
                                         $with = 'Delegation ID : ' .$row->interviewWithDelegation->code ?? '';
                                         $names = $row->toMembers
-                                                ->map(fn($member) => '<span class="block">' . e(getLangTitleSeperator($member?->delegate?->getTranslation('title'),$member?->delegate?->getTranslation('name'))) . '</span>')
+                                                ->map(fn($member) => '<br><span class="block">' . e(getLangTitleSeperator($member?->delegate?->getTranslation('title'),$member?->delegate?->getTranslation('name'))) . '</span>')
                                                 ->implode('');
                                     }
 
