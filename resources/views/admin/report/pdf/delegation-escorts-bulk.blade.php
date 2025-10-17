@@ -70,10 +70,10 @@
                         <td style="vertical-align:top; padding:4px 6px;">
                             <table style="width:100%; border-collapse:collapse;">
                                 <tr>
-                                    <td style="text-align:left; padding:0; word-wrap:break-word;">
+                                    <td style="text-align:left; padding:0; word-wrap:break-word;width:90%;">
                                         {!! e($mobileValue) !!}
                                     </td>
-                                    <td style="text-align:left; padding:0; white-space:nowrap;">
+                                    <td style="text-align:left; padding:0; white-space:nowrap;width:10%;">
                                         <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
                                     </td>
                                 </tr>
@@ -191,7 +191,7 @@
                                 }
                                 $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
                             @endphp
-                            <td style="padding: 8px; border: 1px solid #000 !important; text-align: center;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
                             <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
                             <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
                             <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->flight_no ?? '-' }}</td>
@@ -379,7 +379,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" style="padding: 8px; border: 1px solid #000;text-align: center;">
+                                    <td colspan="4" style="padding: 8px; border: 1px solid #000;text-align: center;">
                                         {{ __db('no_record_found') }}
                                     </td>
                                 </tr>
