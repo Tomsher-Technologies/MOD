@@ -59,7 +59,11 @@
                                         {{ $escort?->phone_number ?? '-' }}
                                     </td>
                                     <td style="padding:8px;border:2px solid #000;text-align: center;">
-                                        {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
+                                        @if (getActiveLanguage() == 'en')
+                                            <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                        @else
+                                            <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                        @endif
                                     </td>
                                     <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $interview->date_time ? date('d-m-Y', strtotime($interview->date_time)) : '-' }}
