@@ -60,8 +60,8 @@
             <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:8px; table-layout:fixed;">
                 <colgroup>
                     <col style="width:40%;">
-                    <col style="width:15%;">
-                    <col style="width:45%;">
+                    <col style="width:20%;">
+                    <col style="width:40%;">
                 </colgroup>
 
                 @foreach ($delegation->escorts as $ekey => $escort)
@@ -102,10 +102,10 @@
                         <td style="vertical-align:top; padding:4px 6px;">
                             <table style="width:100%; border-collapse:collapse;">
                                 <tr>
-                                    <td style="text-align:left; padding:0; word-wrap:break-word;width:90%;">
+                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;">
                                         {!! e($mobileValue) !!}
                                     </td>
-                                    <td style="text-align:left; padding:0; white-space:nowrap;width:10%;">
+                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;">
                                         <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
                                     </td>
                                 </tr>
