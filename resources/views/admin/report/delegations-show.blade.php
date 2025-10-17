@@ -59,7 +59,7 @@
                                         {!! e($accValue) !!}
                                     </td>
                                     <td style="text-align:left; padding:0; white-space:nowrap; width:50%;">
-                                        <strong>:{!! e(__db('accommodation')) !!}</strong>
+                                        <strong>&nbsp; : &nbsp;{!! e(__db('accommodation')) !!}</strong>
                                     </td>
                                 </tr>
                             </table>
@@ -72,7 +72,7 @@
                                         {!! e($mobileValue) !!}
                                     </td>
                                     <td style="text-align:left; padding:0; white-space:nowrap;">
-                                        <strong>:{!! e(__db('mobile')) !!}</strong>
+                                        <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
                                     </td>
                                 </tr>
                             </table>
@@ -86,7 +86,7 @@
                                     </td>
                                     <td style="text-align:right; padding:0; white-space:nowrap;width:10%;">
                                         @if($ekey === 0)
-                                            <strong>:{!! e(__db('escort')) !!}</strong>
+                                            <strong>&nbsp; : &nbsp;{!! e(__db('escort')) !!}</strong>
                                         @endif
                                     </td>
                                 </tr>
@@ -99,8 +99,8 @@
 
             <div style="display: flex;font-size: 12px; justify-content: space-between; align-items: start; margin-top: 15px;margin-bottom: 8px; gap: 20px;">
                 <div style="width: 40%;">
-                    <div style="margin-bottom: 5px;"><span>{{ $delegation->invitationFrom?->value ?? ' - ' }}</span> <strong> : {{ __db('invitation_from') }}</strong></div>
-                    <div style="margin-bottom: 5px;"><span>{{ $delegation->participationStatus?->value ?? ' - ' }}</span> <strong> : {{ __db('participation_status') }}</strong></div>
+                    <div style="margin-bottom: 5px;"><span>{{ $delegation->invitationFrom?->value ?? ' - ' }}</span> <strong>&nbsp; : &nbsp;{{ __db('invitation_from') }}</strong></div>
+                    <div style="margin-bottom: 5px;"><span>{{ $delegation->participationStatus?->value ?? ' - ' }}</span> <strong>&nbsp; : &nbsp;{{ __db('participation_status') }}</strong></div>
                 </div>
 
                 <div style="width:15%; text-align: right;">
@@ -108,10 +108,10 @@
                 </div>
 
                 <div style="width: 55%; text-align: right;">
-                    <div style="margin-bottom: 5px;"><span>{{ $delegation->country?->name ?? ' - ' }}</span> <strong> : {{ __db('country') }}</strong></div>
+                    <div style="margin-bottom: 5px;"><span>{{ $delegation->country?->name ?? ' - ' }}</span> <strong>&nbsp; : &nbsp;{{ __db('country') }}</strong></div>
                     <div style="margin-bottom: 5px;justify-content: flex-end;">
                         <span>{{ $delegation->invitationStatus?->value ?? ' - ' }}</span>
-                        <strong style="width: 22%;"> : {{ __db('invitation_status') }}</strong>
+                        <strong style="width: 22%;">&nbsp; : &nbsp;{{ __db('invitation_status') }}</strong>
                     </div>
 
                 </div>
