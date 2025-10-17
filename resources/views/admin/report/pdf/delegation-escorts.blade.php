@@ -102,10 +102,10 @@
                         <td style="vertical-align:top; padding:4px 6px;">
                             <table style="width:100%; border-collapse:collapse;">
                                 <tr>
-                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:50%;">
+                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:70%;">
                                         {!! e($mobileValue) !!}
                                     </td>
-                                    <td style="text-align:right; padding:0; white-space:nowrap;width:50%;">
+                                    <td style="text-align:right; padding:0; white-space:nowrap;width:30%;">
                                         <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
                                     </td>
                                 </tr>
