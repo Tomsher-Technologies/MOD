@@ -119,9 +119,9 @@
                         </table>
                     </td>
 
-                    <td style="width: 15%;"></td>
+                    <td style="width: 20%;"></td>
 
-                    <td style="width: 45%; vertical-align: top;">
+                    <td style="width: 40%; vertical-align: top;">
                         <table style="width: 100%;">
                             <tr>
                                 <td style="text-align: right;">
@@ -312,13 +312,13 @@
                         <tbody style="font-size: 12px;text-align: center;">
                             @forelse ($delegation->drivers as $keyDriver => $rowDriver)
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_number ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_type ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->phone_number ?? '-' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->car_number ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->car_type ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $rowDriver->phone_number ?? '-' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">
                                         {{ getLangTitleSeperator($rowDriver?->getTranslation('title'),$rowDriver?->getTranslation('name')) }}
                                     </td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $keyDriver + 1 }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $keyDriver + 1 }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -372,10 +372,10 @@
                                 @endphp
 
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ ($row->date_time) ? date('H:i', strtotime($row->date_time)) : '' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ ($row->date_time) ? date('d-m-Y', strtotime($row->date_time)) : '' }}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{!! $interviewMembers !!}</td>
-                                    <td  style="padding: 8px; border: 1px solid #000;">{{ $in + 1 }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ ($row->date_time) ? date('H:i', strtotime($row->date_time)) : '' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ ($row->date_time) ? date('d-m-Y', strtotime($row->date_time)) : '' }}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{!! $interviewMembers !!}</td>
+                                    <td  style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $in + 1 }}</td>
                                 </tr>
                             @empty
                                 <tr>
