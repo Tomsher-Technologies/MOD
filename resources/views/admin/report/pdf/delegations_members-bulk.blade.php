@@ -62,8 +62,8 @@
                             $delegates = $positions = '<ul style="list-style:none; margin:0; padding:0;">';
                             foreach ($del->delegates as $member) {
                                 $position = $member->getTranslation('designation') ?: '<strong>-</strong>';
-                                $delegates .= '<li><span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.getLangTitleSeperator($member->getTranslation('title'), $member?->getTranslation('name')).'</span></li>';
-                                $positions .= '<li><span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.($position) .'</span></li>';
+                                $delegates .= '<li style="display:block; list-style:none; margin:0; padding:0;"><span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.getLangTitleSeperator($member->getTranslation('title'), $member?->getTranslation('name')).'</span></li>';
+                                $positions .= '<li style="display:block; list-style:none; margin:0; padding:0;"><span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.($position) .'</span></li>';
                             }
                             $escortsData = '';
                             foreach ($del->escorts as $escort) {
