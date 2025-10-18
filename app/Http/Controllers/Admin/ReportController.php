@@ -2060,4 +2060,163 @@ class ReportController extends Controller
         $reportName = 'hotel_delegations_report'.$today.'.pdf';
         $mpdf->Output($reportName, 'D');  
     }
+
+     public function delegationHeadsInvitationStatistics(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['invitation_from', 'country_id', 'invitation_status']);
+
+        $invitations = Delegate::query()
+                        ->where('team_head', 1)
+                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->leftJoin('dropdown_options as invitation_status_sort', 'delegations.invitation_status_id', '=', 'invitation_status_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                        })
+                        ->select('delegates.*')
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->orderBy('invitation_status_sort.sort_order', 'asc')
+                        ->get();
+
+        $delegateCountsQuery = Delegate::query()
+                                ->where('team_head', 1)
+                                ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                                ->where('delegations.event_id', $currentEventId)
+                                ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                                    $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                                })
+                                ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                                    $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                                })
+                                ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                                    $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                                });
+
+        if (!empty($filters['invitation_from'])) {
+            $delegateCountsQuery->groupBy('delegations.invitation_from_id', 'delegations.invitation_status_id')
+                ->selectRaw('delegations.invitation_from_id, delegations.invitation_status_id, COUNT(*) as count');
+        } else {
+            $delegateCountsQuery->groupBy('delegations.invitation_status_id')
+                ->selectRaw('delegations.invitation_status_id, COUNT(*) as count');
+        }
+
+        $delegateCountsQuery = $delegateCountsQuery->get();
+
+        // Map results
+        $delegateCounts = [];
+        if (!empty($filters['invitation_from'])) {
+            foreach ($delegateCountsQuery as $row) {
+                $delegateCounts[$row->invitation_from_id][$row->invitation_status_id] = $row->count;
+            }
+        } else {
+            foreach ($delegateCountsQuery as $row) {
+                $delegateCounts[$row->invitation_status_id] = $row->count;
+            }
+        }
+
+        // echo '<pre>'; print_r($delegateCounts); echo '</pre>';
+        // die;
+
+        return view('admin.report.head_invitation_statistics', compact('invitations','delegateCounts'));
+    }
+
+    public function exportBulkDelegationHeadsInvitationStatisticsPdf(Request $request){
+        $currentEventId = session('current_event_id', getDefaultEventId());
+
+        $filters = request()->only(['invitation_from', 'country_id', 'invitation_status']);
+
+        $invitations = Delegate::query()
+                        ->where('team_head', 1)
+                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                        ->leftJoin('countries as country_sort', 'delegations.country_id', '=', 'country_sort.id')
+                        ->leftJoin('dropdown_options as invitation_from_sort', 'delegations.invitation_from_id', '=', 'invitation_from_sort.id')
+                        ->leftJoin('dropdown_options as invitation_status_sort', 'delegations.invitation_status_id', '=', 'invitation_status_sort.id')
+                        ->where('delegations.event_id', $currentEventId)
+                        ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                        })
+                        ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                        })
+                        ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                            $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                        })
+                        ->select('delegates.*')
+                        ->orderBy('country_sort.sort_order', 'asc')
+                        ->orderBy('invitation_from_sort.sort_order', 'asc')
+                        ->orderBy('invitation_status_sort.sort_order', 'asc')
+                        ->get();
+
+        $delegateCountsQuery = Delegate::query()
+                                ->where('team_head', 1)
+                                ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                                ->where('delegations.event_id', $currentEventId)
+                                ->when(!empty($filters['country_id']), function ($q) use ($filters) {
+                                    $q->whereIn('delegations.country_id', (array)$filters['country_id']);
+                                })
+                                ->when(!empty($filters['invitation_from']), function ($q) use ($filters) {
+                                    $q->whereIn('delegations.invitation_from_id', (array)$filters['invitation_from']);
+                                })
+                                ->when(!empty($filters['invitation_status']), function ($q) use ($filters) {
+                                    $q->whereIn('delegations.invitation_status_id', (array)$filters['invitation_status']);
+                                });
+
+        if (!empty($filters['invitation_from'])) {
+            $delegateCountsQuery->groupBy('delegations.invitation_from_id', 'delegations.invitation_status_id')
+                ->selectRaw('delegations.invitation_from_id, delegations.invitation_status_id, COUNT(*) as count');
+        } else {
+            $delegateCountsQuery->groupBy('delegations.invitation_status_id')
+                ->selectRaw('delegations.invitation_status_id, COUNT(*) as count');
+        }
+
+        $delegateCountsQuery = $delegateCountsQuery->get();
+
+        // Map results
+        $delegateCounts = [];
+        if (!empty($filters['invitation_from'])) {
+            foreach ($delegateCountsQuery as $row) {
+                $delegateCounts[$row->invitation_from_id][$row->invitation_status_id] = $row->count;
+            }
+        } else {
+            foreach ($delegateCountsQuery as $row) {
+                $delegateCounts[$row->invitation_status_id] = $row->count;
+            }
+        }
+
+        $today = date('Y-m-d-H-i');
+        $reportName = 'delegation_head_invitation_statistics';
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            // 'format' => 'A4',
+            'format' => 'A4-L',
+            'margin_top' => 40,
+            'margin_bottom' => 20,
+            'default_font' => 'amiri'
+        ]);
+
+        $headerHtml = view('admin.report.partials.pdf-header', compact('reportName'))->render();
+        $mpdf->SetHTMLHeader($headerHtml);
+
+        $mpdf->SetHTMLFooter('<div style="padding-top:5px;text-align:center;font-size:10px">{PAGENO} - {nb}</div>');
+
+        $html = view('admin.report.pdf.head_invitation_statistics_bulk', compact('invitations','delegateCounts'))->render();
+
+        $chunks = explode('<!--CHUNKHTML-->', $html);
+
+        foreach ($chunks as $chunk) {
+            $mpdf->WriteHTML($chunk);
+        }
+        $reportName = 'delegation_head_invitation_statistics'.$today.'.pdf';
+        $mpdf->Output($reportName, 'D');
+    }
 }
