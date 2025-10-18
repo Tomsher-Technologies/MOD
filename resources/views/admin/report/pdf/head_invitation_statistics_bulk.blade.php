@@ -136,7 +136,7 @@
                     <tr style="background-color: #d9d9d9; font-size: 13px">
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('invitation_status') }}</th>
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('invitation_from') }}</th>
-                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('escort') }}</th>
+                        <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('note_2') }}</th>
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('position') }}</th>
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('delegation_head') }}</th>
                         <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('country') }}</th>
@@ -154,16 +154,7 @@
                                 {{ $invt->delegation?->invitationFrom?->value ?? '-' }}
                             </td>
                             <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                @php
-                                    $escort = $invt->delegation?->escorts?->first();
-                                @endphp
-                                @if (getActiveLanguage() == 'en')
-                                    <span>{{ $escort?->military_number }}</span>&nbsp; - &nbsp;<span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
-                                @else
-                                    <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>&nbsp; - &nbsp;<span>{{ $escort?->military_number }}</span>
-                                @endif
-                                <br>
-                                {{ $escort?->phone_number }}
+                                {{ $invt->delegation?->note2 ?? '-' }}
                             </td>
                             <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                 {{ $invt->getTranslation('designation') ?? '-' }}
