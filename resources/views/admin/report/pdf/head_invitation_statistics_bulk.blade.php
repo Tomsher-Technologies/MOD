@@ -34,91 +34,97 @@
                                 ->get()->toArray(); // id => value
             @endphp
 
-            <table style="width:100%; border-collapse:collapse; text-align:center;">
-                <tbody  style="font-size: 12px">
+            <table style="width:100%; border-collapse:collapse; text-align:center; font-size:12px;">
+                <tbody>
                     @forelse($filteredInvitationFromIds as $invitationFromId)
                         @php
                             $invitationFromName = \App\Models\DropdownOption::find($invitationFromId)?->value ?? '-';
                             $statusCountsForThis = $delegateCounts[$invitationFromId] ?? [];
                         @endphp
-                        <tr style="text-align: right; margin-top: 10px;">
-                            <td colspan="{{ count($allStatuses) }}">
-                                <strong style="font-size: 13px;">{{ $invitationFromName }}</strong>
+            
+                        {{-- Invitation From Name --}}
+                        <tr>
+                            <td colspan="{{ count($allStatuses) }}" style="padding:8px 0; text-align:right;">
+                                <strong style="font-size:13px; color:#222;">{{ $invitationFromName }}</strong>
                             </td>
                         </tr>
-                        <tr style="text-align: right;line-height: 25px;">
+            
+                        {{-- Status Counts Row --}}
+                        <tr style="line-height:28px;">
                             @foreach($allStatuses as $statusVal)
                                 @php
                                     $statusId = $statusVal['id'];
-
+            
                                     if($statusVal['code'] == '1') { // Waiting
                                         $color = '#b82020';
                                     } elseif($statusVal['code'] == '2') { // Accepted
                                         $color = '#039f03';
-                                    }elseif ($statusVal['code'] == '10') { // Accepted with secretary
+                                    } elseif ($statusVal['code'] == '10') { // Accepted with secretary
                                         $color = 'gray';
-                                    }elseif ($statusVal['code'] == '9') { // Accepted with acting person
+                                    } elseif ($statusVal['code'] == '9') { // Accepted with acting person
                                         $color = '#de6c05';
-                                    }elseif ($statusVal['code'] == '3') { // Rejected
+                                    } elseif ($statusVal['code'] == '3') { // Rejected
                                         $color = '#0e54e5';
-                                    }else{
+                                    } else {
                                         $color = '#E6D7A2'; // default
                                     }
                                 @endphp
-                                <td style="padding:4px;width:{{ count($allStatuses)/100 }}%;">
-                                    <div style="display:flex; align-items:center; gap:5px; justify-content:flex-start; flex-direction: row-reverse;text-align: right;">
-                                        <span style="display:inline-block; width:40px; height:23px; background:{{ $color }}; border-radius:3px; color:#fff; text-align: center !important;font-size: 13px;font-weight: bold;">
-                                            {{ $statusCountsForThis[$statusId] ?? 0 }}
-                                        </span>
-
-                                        <span>
-                                            @if(getActiveLanguage() == 'ar')
-                                                {{ $statusVal['value_ar'] ?? $statusVal['value'] }}
-                                            @else
-                                                {{ $statusVal['value'] ?? $statusVal['value_ar'] }}
-                                            @endif
-                                        </span>
-                                    </div>
+            
+                                <td style="padding:6px 4px;">
+                                    <table style="border-collapse:collapse;">
+                                        <tr>
+                                            <td style="padding-right:10px; white-space:nowrap;text-align:right;">
+                                                @if(getActiveLanguage() == 'ar')
+                                                    {{ $statusVal['value_ar'] ?? $statusVal['value'] }}
+                                                @else
+                                                    {{ $statusVal['value'] ?? $statusVal['value_ar'] }}
+                                                @endif
+                                            </td>
+                                            <td style="width:40px; height:20px; background-color:{{ $color }}; color:#fff; text-align:center; font-weight:bold; font-size:12px; border-radius:4px;">
+                                                {{ $statusCountsForThis[$statusId] ?? 0 }}
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
 
                             @endforeach
                         </tr>
-                        <tr><td colspan="{{ count($allStatuses) }}"></td></tr>
+            
+                        {{-- Spacing Row --}}
+                        <tr><td colspan="{{ count($allStatuses) }}" style="height:8px;"></td></tr>
+            
                     @empty
-                        <tr style="text-align: right;line-height: 25px;">
+                        {{-- No Invitation From Filter --}}
+                        <tr style="line-height:28px;">
                             @foreach($allStatuses as $statusVal)
                                 @php
                                     $statusId = $statusVal['id'];
-
-                                    if($statusVal['code'] == '1') { // Waiting
-                                        $color = '#b82020';
-                                    } elseif($statusVal['code'] == '2') { // Accepted
-                                        $color = '#039f03';
-                                    }elseif ($statusVal['code'] == '10') { // Accepted with secretary
-                                        $color = 'gray';
-                                    }elseif ($statusVal['code'] == '9') { // Accepted with acting person
-                                        $color = '#de6c05';
-                                    }elseif ($statusVal['code'] == '3') { // Rejected
-                                        $color = '#0e54e5';
-                                    }else{
-                                        $color = '#E6D7A2'; // default
-                                    }
+            
+                                    if($statusVal['code'] == '1') { $color = '#b82020';
+                                    } elseif($statusVal['code'] == '2') { $color = '#039f03';
+                                    } elseif ($statusVal['code'] == '10') { $color = 'gray';
+                                    } elseif ($statusVal['code'] == '9') { $color = '#de6c05';
+                                    } elseif ($statusVal['code'] == '3') { $color = '#0e54e5';
+                                    } else { $color = '#E6D7A2'; }
                                 @endphp
-                                <td style="padding:4px;width:{{ count($allStatuses)/100 }}%;">
-                                    <div style="display:flex; align-items:center; gap:5px; justify-content:flex-start; flex-direction: row-reverse;text-align: right;">
-                                        <span style="display:inline-block; width:40px; height:23px; background:{{ $color }}; border-radius:3px; color:#fff; text-align: center !important;font-size: 13px;font-weight: bold;">
-                                            {{ $delegateCounts[$statusId] ?? 0 }}
-                                        </span>
-                                        <span>
-                                            @if(getActiveLanguage() == 'ar')
-                                                {{ $statusVal['value_ar'] ?? $statusVal['value'] }}
-                                            @else
-                                                {{ $statusVal['value'] ?? $statusVal['value_ar'] }}
-                                            @endif
-                                        </span>
-                                    </div>
+            
+                              
+                                <td style="padding:6px 4px;">
+                                    <table style="border-collapse:collapse;">
+                                        <tr>
+                                            <td style="padding-right:10px; white-space:nowrap;text-align:right;">
+                                                @if(getActiveLanguage() == 'ar')
+                                                    {{ $statusVal['value_ar'] ?? $statusVal['value'] }}
+                                                @else
+                                                    {{ $statusVal['value'] ?? $statusVal['value_ar'] }}
+                                                @endif
+                                            </td>
+                                            <td style="width:40px; height:20px; background-color:{{ $color }}; color:#fff; text-align:center; font-weight:bold; font-size:12px; border-radius:4px;">
+                                               {{ $delegateCounts[$statusId] ?? 0 }}
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
-
                             @endforeach
                         </tr>
                     @endforelse
