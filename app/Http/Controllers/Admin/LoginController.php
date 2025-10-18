@@ -14,7 +14,7 @@ class LoginController extends Controller
 
     public function showLoginForm()
     {
-        return view('admin.auth.login');
+        return response()->view('admin.auth.login')->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 
     public function login(Request $request)
