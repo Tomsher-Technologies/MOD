@@ -155,7 +155,7 @@
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     {{ $delegateRoom?->roomType?->roomType?->value }}</td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $delegateRoom?->hotel?->hotel_name ?? __db('not_required') }}
+                                    {{ $delegateRoom?->hotel?->hotel_name ?? '-' }}
                                 </td>
                                 <td
                                     style="padding: 8px; border: 2px solid #000; text-align: center; @if ($delegate->team_head === true) color: red; @endif">
