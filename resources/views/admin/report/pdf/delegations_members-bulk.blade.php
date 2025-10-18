@@ -61,6 +61,7 @@
                         @php
                             $delegates = $positions = '';
                             foreach ($del->delegates as $member) {
+                                $position = $member->getTranslation('designation') ?: '<strong>-</strong>';
                                 $delegates .=
                                     '<span style="' .
                                     ($member?->team_head ? 'color: red; font-weight: 600;' : '') .
@@ -74,20 +75,16 @@
                                     '<span style="' .
                                     ($member?->team_head ? 'color: red; font-weight: 600;' : '') .
                                     '">' .
-                                    $member?->getTranslation('designation') .
+                                    $position .
                                     '</span><br>';
                             }
                             $escortsData = '';
                             foreach ($del->escorts as $escort) {
-                                $escortsData .=
-                                    $escort?->military_number .
-                                    ' - ' .
-                                    $escort?->internalRanking?->value .
-                                    ' ' .
-                                    $escort?->name .
-                                    '<br>' .
-                                    $escort?->phone_number .
-                                    '<br>';
+                                if (getActiveLanguage() == 'en'){
+                                    $escortsData .= '<span>'.$escort?->military_number .'</span> - <span>'.$escort?->internalRanking?->value .' '. $escort?->name.'</span><br>'.$escort?->phone_number.'<br>';
+                                }else{
+                                    $escortsData .= '<span>'.$escort?->internalRanking?->value .' '. $escort?->name .'</span> - <span>'.$escort?->military_number .'</span><br>'.$escort?->phone_number.'<br>';
+                                }
                             }
                         @endphp
                         <tr>

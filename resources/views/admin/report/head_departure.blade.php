@@ -135,7 +135,13 @@
                                     @php
                                         $escort = $departure?->delegate?->delegation?->escorts?->first();
                                     @endphp
-                                    {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
+                                    
+                                    @if (getActiveLanguage() == 'en')
+                                        <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                    @else
+                                        <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                    @endif
+                                    
                                     <br>
                                     {{ $escort?->phone_number }}
                                 </td>

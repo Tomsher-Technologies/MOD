@@ -1948,10 +1948,14 @@ class DelegationController extends Controller
             $this->logActivity(
                 module: 'Delegation',
                 submodule: 'delegate',
-                action: 'delete',
+                action: 'delete-delegate',
                 model: $delegate,
                 submoduleId: $delegate->id,
-                delegationId: $delegation->id
+                delegationId: $delegation->id,
+                message: [
+                    'en' => auth()->user()->name . " " .  __db('delegate_deleted_notification') . ", " . __db('delegate_code') . ": " . $delegate->code . ", " . __db('delegate_name') . ": " . $delegate->getTranslation('name', 'en'),
+                    'ar' => auth()->user()->name . " " .  __db('delegate_deleted_notification') . ", " . __db('delegate_code') . ": " . $delegate->code . ", " . __db('delegate_name') . ": " . $delegate->getTranslation('name', 'ar')
+                ]
             );
 
             if ($delegate->current_room_assignment_id) {
@@ -2579,8 +2583,8 @@ class DelegationController extends Controller
                 model: $delegation,
                 delegationId: $delegation->id,
                 message: [
-                    'en' => auth()->user()->name . " " .  __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed'),
-                    'ar' => auth()->user()->name . " " .  __db('delegation_deleted_notification') . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
+                    'en' => auth()->user()->name . " " .  __db('delegation_deleted_notification') . ", " . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed'),
+                    'ar' => auth()->user()->name . " " .  __db('delegation_deleted_notification') . ", " . $delegation->code . __db('all_assigned_escorts_drivers_hotels_freed')
                 ]
             );
             $delegation->delegates()->delete();

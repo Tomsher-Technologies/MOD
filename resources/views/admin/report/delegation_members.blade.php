@@ -119,15 +119,24 @@
                     <tbody style="font-size: 12px">
                         @foreach ($delegations as $i => $del)
                             @php
-                                $delegates = $positions = '';
+                                $delegates = $positions = '<ul>';
                                 foreach ($del->delegates as $member) {
-                                    $delegates .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.getLangTitleSeperator($member->getTranslation('title'), $member?->getTranslation('name')).'</span><br>';
-                                    $positions .= '<span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.$member?->getTranslation('designation') .'</span><br>';
+                                    $position = $member->getTranslation('designation') ?: '<strong>-</strong>';
+                                    $delegates .= '<li><span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.getLangTitleSeperator($member->getTranslation('title'), $member?->getTranslation('name')).'</span></li>';
+                                    $positions .= '<li><span style="'.($member?->team_head ? 'color: red; font-weight: 600;' : '').'">'.($position) .'</span></li>';
                                 }
                                 $escortsData = '';
                                 foreach($del->escorts as $escort){
-                                    $escortsData .= $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name.'<br>'.$escort?->phone_number.'<br>';
+                                    
+                                    if (getActiveLanguage() == 'en'){
+                                        $escortsData .= '<span>'.$escort?->military_number .'</span> - <span>'.$escort?->internalRanking?->value .' '. $escort?->name.'</span><br>'.$escort?->phone_number.'<br>';
+                                    }else{
+                                        $escortsData .= '<span>'.$escort?->internalRanking?->value .' '. $escort?->name .'</span> - <span>'.$escort?->military_number .'</span><br>'.$escort?->phone_number.'<br>';
+                                    }
                                 }
+
+                                $positions .= '</ul>';
+                                $delegates .= '</ul>';
                             @endphp
                             <tr>
                                 @foreach($columns as $col)

@@ -18,80 +18,125 @@
         </div>
 
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6" dir="ltr">
-            {{-- <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-
-                    <div style="width: auto;">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="{{ env('APP_NAME') }}"
-                            style="height: auto; width: 150px;">
-
-                    </div>
-                    <div style="text-align: center; width: 50%;">
-                        <div style="font-size: 20px; font-weight: bold;">{{ __db('united_arab_emirates') }}</div>
-                        <div style="font-size: 20px; font-weight: bold; margin-top: 5px;">{{ __db('ministry_of_defense') }}</div>
-                        <div style="font-size: 20px; font-weight: bold; color: #cc0000; margin-top: 5px;">{{ __db('delegations_escort_report') }}</div>
-                    </div>
-                    <div style=" width: auto; text-align: right;">
-                        <img src="{{ getAdminEventLogo() }}" alt="{{ getCurrentEventName() }}"
-                            style=" width: 150px; height: auto;">
-                    </div>
-                </div>
-                <div style="text-align: right; font-size: 0.9em; margin-top:10px;">{{ date('d-m-Y H:i A') }}</div>
-
-            </div> --}}
-
+                     
             @php
                 $assignedHotels = [];
-                $escortAccHtml = $escortContactHtml = $escortDetailsHtml = '';
             @endphp
 
-            @foreach ($delegation->escorts as $escort)
-                @php
-                    $roomEscort = $escort->currentRoomAssignment ?? null;
-                    $assignedHotels[] = $roomEscort?->hotel_id ?? null;
+            <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:8px; table-layout:fixed;">
+                <colgroup>
+                    <col style="width:40%;">
+                    <col style="width:20%;">
+                    <col style="width:40%;">
+                </colgroup>
 
-                    $escortAccHtml .= '<div style="margin-bottom: 5px;">' . $roomEscort?->room_number . '-' . $roomEscort?->hotel?->hotel_name. '<strong>:'.__db('accommodation').'</strong></div>';
-            
-                    $escortContactHtml .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;"><span>' . $escort?->phone_number . '</span><strong style="width: 10%;">:'.__db('mobile').'</strong></div>';
-                    
-                    $escortDetailsHtml .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;"><span>' . $escort?->internalRanking?->value.' '.$escort?->name . '-(' . $escort?->military_number . ')</span><strong style="width: 22%;">:'.__db('escort').'</strong></div>';
-                @endphp
+                @foreach ($delegation->escorts as $ekey => $escort)
+                    @php
+                        $roomEscort = $escort->currentRoomAssignment ?? null;
+                        // $assignedHotels[] = $roomEscort?->hotel_id ?? null;
 
-            @endforeach
+                        $accValue = ($roomEscort?->room_number || $roomEscort?->hotel?->hotel_name)
+                                    ? trim(($roomEscort?->room_number ? $roomEscort->room_number . ' - ' : '') . ($roomEscort?->hotel?->hotel_name ?? ''))
+                                    : '-';
 
-            <div style="display: flex;font-size: 12px; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
-                <div style="width: 40%;">
-                    {!! $escortAccHtml !!}
-                </div>
+                        $mobileValue = $escort?->phone_number ?? '-';
 
-                <div style="width:15%; text-align: right;">
-                    {!! $escortContactHtml !!}
-                </div>
+                        if (getActiveLanguage() == 'en') {
+                            $escortValue = '<div style=" display: flex; justify-content: flex-end;"><span>'. $escort?->military_number .'</span>&nbsp; - &nbsp;<span>'. $escort?->internalRanking?->value .' '. $escort?->name .'</span></div>';
+                        } else {
+                            $escortValue = '<div style=" display: flex; justify-content: flex-end;"><span>'. $escort?->internalRanking?->value .' '. $escort?->name .'</span>&nbsp; - &nbsp;<span>'. $escort?->military_number .'</span></div>';
+                        }
 
-                <div style="width: 55%; text-align: right;">
-                    {!! $escortDetailsHtml !!}
-                </div>
-            </div>
+                        $accValue = $accValue === '' ? '-' : $accValue;
+                        $escortValue = $escortValue === '' ? '-' : $escortValue;
+                    @endphp
 
-            <div style="display: flex;font-size: 12px; justify-content: space-between; align-items: start; margin-bottom: 8px; gap: 20px;">
-                <div style="width: 40%;">
-                    <div style="margin-bottom: 5px;">{{ $delegation->invitationFrom?->value ?? '-' }} <strong>:{{ __db('invitation_from') }}</strong></div>
-                    <div style="margin-bottom: 5px;">{{ $delegation->participationStatus?->value ?? '-' }} <strong>:{{ __db('participation_status') }}</strong></div>
-                </div>
+                    <tr>
+                        <td style="vertical-align:top; padding:4px 6px;">
+                            <table style="width:100%; border-collapse:collapse;">
+                                <tr>
+                                    <td style="text-align:left; padding:0; word-wrap:break-word;width:50%;">
+                                        {!! e($accValue) !!}
+                                    </td>
+                                    <td style="text-align:left; padding:0; white-space:nowrap; width:50%;">
+                                        <strong>&nbsp; : &nbsp;{!! e(__db('accommodation')) !!}</strong>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
 
-                <div style="width:15%; text-align: right;">
+                        <td style="vertical-align:top; padding:4px 6px;">
+                            <table style="width:100%; border-collapse:collapse;">
+                                <tr>
+                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;">
+                                        {!! e($mobileValue) !!}
+                                    </td>
+                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;">
+                                        <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
 
-                </div>
+                        <td style="vertical-align:top; padding:4px 6px;">
+                            <table style="width:100%; border-collapse:collapse;">
+                                <tr>
+                                    <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;">
+                                        {!! $escortValue !!}
+                                    </td>
+                                    <td style="text-align:right; padding:0; white-space:nowrap;width:10%;">
+                                        @if($ekey === 0)
+                                            <strong>&nbsp; : &nbsp;{!! e(__db('escort')) !!}</strong>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
 
-                <div style="width: 55%; text-align: right;">
-                    <div style="margin-bottom: 5px;">{{ $delegation->country?->name ?? '-' }} <strong>:{{ __db('country') }}</strong></div>
-                    <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                        <span>{{ $delegation->invitationStatus?->value ?? '-' }}</span>
-                        <strong style="width: 22%;">:{{ __db('invitation_status') }}</strong>
-                    </div>
+            <table style="width: 100%; font-size: 12px; border-collapse: collapse; margin-top: 15px; margin-bottom: 8px;">
+                <tr>
+                    <!-- Column 1 -->
+                    <td style="width: 40%; vertical-align: top;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="text-align: left;">
+                                    <span>{{ $delegation->invitationFrom?->value ?? ' - ' }}</span>
+                                    <strong>&nbsp;: &nbsp;{{ __db('invitation_from') }}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left;">
+                                    <span>{{ $delegation->participationStatus?->value ?? ' - ' }}</span>
+                                    <strong>&nbsp;: &nbsp;{{ __db('participation_status') }}</strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
 
-                </div>
-            </div>
+                    <td style="width: 15%;"></td>
+
+                    <td style="width: 45%; vertical-align: top;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="text-align: right;">
+                                    <span>{{ $delegation->country?->name ?? ' - ' }}</span>
+                                    <strong>&nbsp;: &nbsp;{{ __db('country') }}</strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <span>{{ $delegation->invitationStatus?->value ?? ' - ' }}</span>
+                                    <strong>&nbsp;:&nbsp; {{ __db('invitation_status') }}</strong>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
             @php
                 $teamHead = '';
             @endphp
@@ -116,20 +161,24 @@
                     @forelse ($delegation->delegates as $key => $delegate)
                         @php
                             $delegateRoom = $delegate->currentRoomAssignment ?? null;
-                            $assignedHotels[] = $delegateRoom?->hotel_id ?? null;
+                            
                             if($delegate->team_head == 1){
+                                $assignedHotels[] = $delegateRoom?->hotel_id ?? null;
                                 $departure = $delegate->delegateTransports->where('type', 'departure')->first();
 
                                 $deptTime = ($departure?->date_time) ? date('H:i', strtotime($departure->date_time)) : '';
                                 $deptDate = ($departure?->date_time) ? date('d-m-Y', strtotime($departure->date_time)) : '';
                         
-                                $teamHead.= '<tr>                                    
-                                    <td style="padding: 8px; border: 1px solid #000;">'.$deptTime.'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'. $deptDate.'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_no).'</td>
-                                    <td style="padding: 8px; border: 1px solid #000;">'.($departure?->flight_name).'</td>
-                                </tr>';
+                                if ($departure) {
+                                    $teamHead.= '<tr>                                    
+                                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.$deptTime.'</td>
+                                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">'. $deptDate.'</td>
+                                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->airport?->value ?? ucwords($departure?->mode)) .'</td>
+                                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_no).'</td>
+                                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">'.($departure?->flight_name).'</td>
+                                        </tr>';
+                                }
+                               
                             }
                         @endphp
                         <tr>
@@ -140,23 +189,23 @@
                                 }
                                 $arrival = $delegate->delegateTransports->where('type', 'arrival')->first();
                             @endphp
-                            <td style="padding: 8px; border: 1px solid #000 !important;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $arrival?->flight_no ?? '-' }}</td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('H:i', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->date_time ? date('d-m-Y', strtotime($arrival?->date_time)) : '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->airport?->value ?? ucwords($arrival?->mode) }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $arrival?->flight_no ?? '-' }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
                                 {{ $arrival?->flight_name ?? '-' }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">
-                                {{ $delegateRoom ? $delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name : __db('not_required')}}
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
+                                {{ $delegateRoom ? ($delegateRoom?->room_number .' - '. $delegateRoom?->hotel?->hotel_name) : '-' }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">
                                 {{ $delegate?->getTranslation('designation') ?? $relation }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000; @if($delegate->team_head === true) text-report-red @endif  font-bold">
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center; @if($delegate->team_head === true) text-report-red @endif  font-bold">
                                 {{  getLangTitleSeperator($delegate?->getTranslation('title'), $delegate?->getTranslation('name')) }}
                             </td>
-                            <td style="padding: 8px; border: 1px solid #000;">{{ $key + 1 }}</td>
+                            <td style="padding: 8px; border: 1px solid #000; text-align: center;">{{ $key + 1 }}</td>
                         </tr>
                     @empty
                         <tr class="border-t">
@@ -181,7 +230,16 @@
                     </tr>
                 </thead>
                 <tbody style="font-size: 12px;text-align: center;">
-                    {!! $teamHead !!}
+                    @if($teamHead != '')
+                        {!! $teamHead !!}
+                    @else
+                        <tr class="border-t">
+                            <td colspan="5" style="padding: 8px; border: 1px solid #000; text-center">
+                                {{ __db('no_record_found') }}
+                            </td>
+                        </tr>
+                    @endif
+                    
                 </tbody>
             </table>
 
@@ -202,11 +260,11 @@
                                 foreach($hotel->contacts as $k => $con){
                                     $acc_con .= '<div style="margin-bottom: 5px; display: flex;">
                                                     <span>'.$con->phone.'</span>
-                                                    <strong style="width: 30%;"> : '. __db('mobile').'</strong>
+                                                    <strong style="width: 30%;">&nbsp; : '. __db('mobile').'</strong>
                                                 </div>';
-                                    $acc_name .= '<div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                    $acc_name .= '<div style="margin-bottom: 5px; justify-content: flex-end;">
                                                     <span>'.$con->name.'</span>
-                                                    <strong style="width: 22%;"> : '. __db('res'.$k).'</strong>
+                                                    <strong style="width: 22%;">&nbsp; : '. __db('res'.$k).'</strong>
                                                 </div>';
                                 }
                             @endphp
@@ -216,16 +274,16 @@
                                 <td style="width:30%; vertical-align: top; padding: 6px;">
                                     <div style="margin-bottom: 5px; display: flex;">
                                         <span>{{ $hotel->contact_number }}</span>
-                                        <strong style="width: 30%;"> : {{ __db('hotel_number') }}</strong>
+                                        <strong style="width: 30%;">&nbsp; : {{ __db('hotel_number') }}</strong>
                                     </div>
                                     {!! $acc_con !!}
                                 </td>
 
                                 <!-- Right side (hotel name + responsible persons) -->
                                 <td style="width:25%; text-align: right; vertical-align: top; padding: 6px;">
-                                    <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
+                                    <div style="margin-bottom: 5px;  justify-content: flex-end;">
                                         <span>{{ $hotel->hotel_name }}</span>
-                                        <strong style="width: 22%;"> : {{ __db('hotel') }}</strong>
+                                        <strong style="width: 22%;">&nbsp; : {{ __db('hotel') }}</strong>
                                     </div>
                                     {!! $acc_name !!}
                                 </td>
@@ -256,7 +314,7 @@
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->car_type ?? '-' }}</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ $rowDriver->phone_number ?? '-' }}</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">
-                                        {{ $rowDriver->name ?? '-' }}
+                                        {{ getLangTitleSeperator($rowDriver?->getTranslation('title'),$rowDriver?->getTranslation('name')) }}
                                     </td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ $keyDriver + 1 }}</td>
                                 </tr>
@@ -276,8 +334,6 @@
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr class="bg-gray-200"  style="font-size: 13px;">
-                                <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('notes') }}
-                                </th>
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('time') }}</th>
                                 <th style="padding: 8px; border: 1px solid #000; text-align: center;">{{ __db('date') }}
                                 </th>
@@ -298,19 +354,22 @@
                                         if ($otherMemberId) {
                                             $with = 'Other Member: '.$otherMemberId;
                                         }
+                                        $names = $row->interviewMembers
+                                                    ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
+                                                    ->implode('');
                                     } else {
                                         $with = 'Delegation ID : ' .$row->interviewWithDelegation->code ?? '';
+                                        $names = $row->toMembers
+                                                ->map(fn($member) => '<br><span class="block">' . e(getLangTitleSeperator($member?->delegate?->getTranslation('title'),$member?->delegate?->getTranslation('name'))) . '</span>')
+                                                ->implode('');
                                     }
 
-                                    $names = $row->interviewMembers
-                                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
-                                        ->implode('');
+                                    
 
                                     $interviewMembers =  $with . $names;
                                 @endphp
 
                                 <tr>
-                                    <td  style="padding: 8px; border: 1px solid #000;">-</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ ($row->date_time) ? date('H:i', strtotime($row->date_time)) : '' }}</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{{ ($row->date_time) ? date('d-m-Y', strtotime($row->date_time)) : '' }}</td>
                                     <td  style="padding: 8px; border: 1px solid #000;">{!! $interviewMembers !!}</td>
@@ -318,7 +377,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" style="padding: 8px; border: 1px solid #000;text-align: center;">
+                                    <td colspan="4" style="padding: 8px; border: 1px solid #000;text-align: center;">
                                         {{ __db('no_record_found') }}
                                     </td>
                                 </tr>

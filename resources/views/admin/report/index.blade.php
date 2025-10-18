@@ -48,7 +48,9 @@
 
                             ['slug' => 'view_arrival_hotels','name' => __db('arrival_hotels_report'),'url' => route('report.hotels-arrivals')],
 
-                            ['slug' => 'view_delegation_head_invitations','name' => __db('delegation_head_invitations_report'),'url' => route('report.heads-invitations')]
+                            ['slug' => 'view_delegation_head_invitations','name' => __db('delegation_head_invitations_report'),'url' => route('report.heads-invitations')],
+
+                            ['slug' => 'view_delegation_head_invitation_statistics','name' => __db('delegation_head_invitation_statistics'),'url' => route('report.heads-invitation-statistics')],
                         ];
 
                         $gradientPastels = [

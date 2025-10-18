@@ -44,7 +44,11 @@
                             <tr  style="font-size: 12px">
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;"></td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
-                                    {{ $escort->delegation?->country?->name }} - {{ $escort->delegation?->invitationFrom?->value ?? '-' }}
+                                    @if(getActiveLanguage() == 'en')
+                                        <span>{{ $escort->delegation?->country?->name }}</span> - <span>{{ $escort->delegation?->invitationFrom?->value ?? '-' }}</span>
+                                    @else
+                                        <span>{{ $escort->delegation?->invitationFrom?->value ?? '-' }}</span> - <span>{{ $escort->delegation?->country?->name }}</span>
+                                    @endif
                                 </td>
                                 <td style="padding: 8px; border: 2px solid #000; text-align: center;">
                                     @php

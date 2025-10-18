@@ -452,6 +452,14 @@
                             'label' => __db('designation'),
                             'render' => fn($row) => $row->getTranslation('designation') ?? '-',
                         ],
+                        // [
+                        //     'label' => __db('designation_en'),
+                        //     'render' => fn($row) => $row->designation_en,
+                        // ],
+                        // [
+                        //     'label' => __db('designation_ar'),
+                        //     'render' => fn($row) => $row->designation_ar,
+                        // ],
                         [
                             'label' => __db('internal_ranking'),
                             'render' => fn($row) => $row->internalRanking->value ?? '-',

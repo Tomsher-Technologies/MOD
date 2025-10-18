@@ -23,7 +23,7 @@
 </head>
 <body style="margin: 0; font-size: 12px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
-        <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:5%;">
+        <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
             <table style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="background-color: #d9d9d9; font-size: 13px">
@@ -62,7 +62,13 @@
                                     @php
                                         $escort = $del?->delegation?->escorts?->first();
                                     @endphp
-                                    {{ $escort?->military_number .' - '. $escort?->internalRanking?->value .' '. $escort?->name  }}
+
+                                    @if (getActiveLanguage() == 'en')
+                                        <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                    @else
+                                        <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                    @endif
+                                   
                                     <br>
                                     {{ $escort?->phone_number }}
                                 </td>

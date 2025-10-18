@@ -66,7 +66,13 @@
                                     @php
                                         $delegationData = $driver->delegations->map(function ($delegation) use ($driver) {
                                             if ($delegation->pivot->status === 1) {
-                                            return ($delegation->pivot->end_date ? '('.__db('till').' : ' . $delegation->pivot->end_date . ') ' : '') . $delegation?->country?->name .' - '. $delegation?->invitationFrom?->value;                                         
+                                                if(getActiveLanguage() == 'en'){
+                                                    $delInv = '<span>'.$delegation?->country?->name .' </span> - <span>'. $delegation?->invitationFrom?->value.' </span>';
+                                                }else {
+                                                    $delInv = '<span>'. $delegation?->invitationFrom?->value.' </span> - <span>'.$delegation?->country?->name .'</span>';
+                                                }
+
+                                                return ($delegation->pivot->end_date ? '('.__db('till').' : ' . $delegation->pivot->end_date . ') ' : '') . $delInv;                                         
                                             }
                                             return null;
                                         })
