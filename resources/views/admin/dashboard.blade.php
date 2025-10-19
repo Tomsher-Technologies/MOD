@@ -143,7 +143,7 @@
             <div class="col-span-7 sm:col-span-7 xl:col-span-7">
                <div class="bg-white h-full rounded-lg border-0 p-6">
                   <div class="mb-4 flex items-center justify-start gap-2">
-                        <h6 class="text-xl font-medium mb-0"> {{ __db('members_arrivals_and_departures') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('members_arrivals_and_departures') }}</h6>
                         <span
                            class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                            <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
@@ -203,7 +203,7 @@
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <a href="{{ route("admin.dashboard.tables",["table" => "invitations"]) }}">
-                            <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_invitation_status') }}</h6>
+                            <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('delegates_invitation_status') }}</h6>
                         </a>
                     </div>
                     <div id="InvitationStatus"></div>
@@ -219,7 +219,7 @@
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <a href="{{ route("admin.dashboard.tables",["table" => "participations"]) }}">
-                            <h6 class="!text-[16px] font-medium mb-0">{{ __db('delegates_by_participation_status') }}</h6>
+                            <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('delegates_by_participation_status') }}</h6>
                         </a>
                     </div>
                     <div id="ParticipationStatus"></div>
@@ -233,7 +233,7 @@
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <a href="{{ route("admin.dashboard.tables",["table" => "continents"]) }}">
-                            <h6 class="!text-[16px] font-medium mb-0">{{ __db('accepted_invitations_continents') }}</h6>
+                            <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('accepted_invitations_continents') }}</h6>
                         </a>
                     </div>
                 
@@ -247,7 +247,7 @@
             <div class="xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class=" mb-4 flex items-center justify-start gap-2">
-                        <h6 class="!text-[16px] font-medium mb-0"> {{ __db('upcoming_arrivals') }} </h6>
+                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('upcoming_arrivals') }} </h6>
                         <span
                             class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
@@ -392,7 +392,7 @@
             <div class="xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class=" mb-4 flex items-center justify-start gap-2">
-                        <h6 class="!text-[16px] font-medium mb-0"> {{ __db('upcoming_departures') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('upcoming_departures') }}</h6>
                         <span  class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
                             {{ __db('today') }}
