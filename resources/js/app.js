@@ -59,8 +59,19 @@ import 'tinymce/plugins/wordcount';
 // import 'tinymce/skins/ui/oxide/content.min.css';
 // import 'tinymce/skins/content/default/content.min.css';
 
-import Highcharts from "highcharts";
+import Highcharts from 'highcharts';
+import Exporting from 'highcharts/modules/exporting';
+import ExportData from 'highcharts/modules/export-data';
+import OfflineExporting from 'highcharts/modules/offline-exporting';
+
 window.Highcharts = Highcharts;
+
+// Initialize modules correctly
+Exporting?.default?.(Highcharts);
+ExportData?.default?.(Highcharts);
+OfflineExporting?.default?.(Highcharts);
+
+
 
 import ApexCharts from 'apexcharts';
 window.ApexCharts = ApexCharts;
