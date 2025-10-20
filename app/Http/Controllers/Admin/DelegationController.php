@@ -309,7 +309,7 @@ class DelegationController extends Controller
         }
 
         $limit = $request->limit ? $request->limit : 20;
-        $interviews = $query->orderBy('id', 'desc')->paginate($limit);
+        $interviews = $query->orderBy('date_time', 'desc')->paginate($limit);
 
         $request->session()->put('show_delegations_last_url', url()->full());
         $request->session()->put('edit_interviews_last_url', url()->full());

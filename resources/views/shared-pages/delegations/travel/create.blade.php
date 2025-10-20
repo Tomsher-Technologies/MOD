@@ -145,7 +145,7 @@
                             if ($arrival->airport) {
                                 $flightInfo[] = e($arrival->airport->value);
                             }
-                            $details[] = '<strong>' . __db('arrival') . ':</strong> ' . implode(', ', $flightInfo);
+                            $details[] = '<strong>' . __db('arrival') . ':</strong> ' . implode(', ', $flightInfo) . ", " . $arrival?->date_time;
                         }
 
                         if (isset($existingDepartures[$row->id]) && $showDeparture) {
@@ -160,7 +160,7 @@
                             if ($departure->airport) {
                                 $flightInfo[] = e($departure->airport->value);
                             }
-                            $details[] = '<strong>' . __db('departure') . ':</strong> ' . implode(', ', $flightInfo);
+                            $details[] = '<strong>' . __db('departure') . ':</strong> ' . implode(', ', $flightInfo) . ", " . $departure?->date_time;
                         }
 
                         if (empty($details)) {
