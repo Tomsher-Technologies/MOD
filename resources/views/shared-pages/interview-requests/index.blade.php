@@ -116,15 +116,11 @@
                                     $otherMemberId = $row->other_member_id;
                                     if ($otherMemberId) {
                                         $with =
-                                            '<a href="' .
-                                            route('other-interview-members.show', [
-                                                'other_interview_member' => base64_encode($otherMemberId),
-                                            ]) .
-                                            '" class="!text-[#B68A35]">
-                                <span class="block">Other Member: ' .
+                                            '
+                                            <span class="block">Other Member: ' .
                                             e($row->otherMember?->getTranslation('name')) .
                                             '</span>
-                            </a>';
+                            ';
                                     }
                                 } else {
                                     $with =
