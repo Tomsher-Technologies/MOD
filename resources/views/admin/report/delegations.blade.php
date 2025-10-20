@@ -309,7 +309,7 @@
                 <div class="flex flex-col">
                     <label
                         class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
-                    <select multiple name="invitation_status_id" data-placeholder="{{ __db('select') }}"
+                    <select multiple name="invitation_status_id[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $status)
