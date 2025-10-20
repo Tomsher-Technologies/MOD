@@ -19,20 +19,49 @@
         width: 100%;
     }
 
+        th, td {
+            padding: 5px;
+            text-align: center;
+        }
+
+        /* Direction handling */
+        [lang="ar"], .rtl {
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+        }
+
+        [lang="en"], .ltr {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
+        }
+
+        /* Optional background for headers */
+        thead th {
+            background: #d3d3d3;
+        }
     </style>
 </head>
 <body style="margin: 0; font-size: 12px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style="font-family: Arial, sans-serif;  gap: 20px; align-items: center;margin-top:3%;">
             @foreach($interviews as $intervieweeName => $group)
-                <table style="width: 100%; margin-top: 20px;margin-bottom: 20px; font-weight: bold; font-size: 15px; border-collapse: collapse;">
-                        <tr>
-                            <td style="text-align: right; white-space: nowrap;">
-                                {{ $intervieweeName }} : {{ __('interview_with') }}
-                            </td>
-                        </tr>
-                    </table>
-
+                <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                    <tr>
+                        <td style="text-align: right; white-space: nowrap;">
+                           
+                            <span class="ltr" style="display:inline-block; width:100%;">
+                                <span style="float:left;">
+                                    {{ $intervieweeName }}
+                                </span>
+                                <strong>: {{ __db('interview_with') }}</strong>
+                            </span>
+                        </td>
+                    </tr>
+                    
+                </table>
+             
                 <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
                     <thead>
                         <tr style="background:#d9d9d9; font-size: 13px">
