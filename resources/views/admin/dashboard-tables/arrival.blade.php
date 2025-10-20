@@ -38,7 +38,7 @@
                                 $arrivalData = $data['arrival_status'];
                                 $totalCount = array_sum($arrivalData);
                             @endphp
-                            <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[200px]">
+                            <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[200px]" id="tableContainer">
                                 <thead>
                                     <tr class="text-[13px]">
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('status') }}</th>
@@ -132,7 +132,7 @@
 
         if (chartId) {
             const chart = Highcharts.charts.find(c => c && c.renderTo.id === chartId);
-            if (chart) {
+            if(chart && typeof chart.getSVG === 'function'){
                 const svg = chart.getSVG({
                     exporting: {
                         sourceWidth: chart.chartWidth,
@@ -141,40 +141,83 @@
                 });
 
                 const chartContainer = clonedContent.querySelector(`#${chartId}`);
-                if (chartContainer) {
-                    chartContainer.innerHTML = `
-                        <div style="width:100%; max-width:${chart.chartWidth}px;">
-                            ${svg}
-                        </div>
-                    `;
-                    const svgEl = chartContainer.querySelector('svg');
-                    svgEl.setAttribute('width', '100%');
-                    svgEl.setAttribute('height', 'auto');
+                if(chartContainer){
+                    chartContainer.innerHTML = svg;
                 }
+            } else {
+                console.error('Chart not found or not fully rendered yet.');
             }
         }
 
-        const printWindow = window.open('', 'PRINT', 'height=800,width=1200');
-        printWindow.document.write('<html dir="rtl"><head><title>' + document.title + '</title>');
+        const printWindow = window.open('', 'PRINT', 'height=800,width=1500');
+        printWindow.document.write('<html dir="rtl"><head><title> </title>');
+        printWindow.document.write(`
+        <style>
+        @media print {
+            .no-print { display: none !important; }
 
-        printWindow.document.write('<style>' +
-            '@media print {' +
-            '.no-print { display: none !important; }' +
-            'table { border-collapse: collapse !important; width: 100%; }' +
-            'th, td { border: 1px solid #cbac71 !important; padding: 0.5rem !important; }' +
-            'th, td { text-align: right !important; }' +
-            'th:nth-child(2), td:nth-child(2) { text-align: center !important; }' +
-            'th:nth-child(3), td:nth-child(3) { text-align: center !important; }' +
-            'th {color: #cbac71 !important; }' +
-            'svg { display: block !important; margin: 0 auto !important; max-width: 85% !important; height: auto !important; }' +
-            '}' +
-            '</style>'
-        );
+            table { border-collapse: collapse !important; width: 100%; page-break-inside: avoid; }
+            th, td { border: 1px solid #cbac71 !important; padding: 0.5rem !important; text-align: right !important; }
+            th:nth-child(2), td:nth-child(2) { text-align: center !important; }
+            th:nth-child(3), td:nth-child(3) { text-align: center !important; }
+            th { color: #cbac71 !important; }
+
+            .page-break { page-break-before: always; }
+
+            svg { display: block !important; margin: 0 auto !important; width: 100% !important; height: auto !important; }
+
+            /* Ensure chart page fills the printable page */
+            @page { size: auto; margin: 10mm; }
+
+            
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: center; /* horizontal centering */
+            align-items: center;     /* vertical centering */
+            height: calc(100vh - 40px); /* adjust for margins */
+            width: 100%;
+            box-sizing: border-box; /* include padding/margins in width */
+            padding: 0 10mm; /* give some horizontal padding so SVG doesn't touch edges */
+        }
+
+        .chart-container #userOverviewDonutChart,
+        .chart-container #userOverviewDonutChart svg {
+            display: block !important;
+            margin: 0 auto !important;
+            max-width: 100% !important; /* make sure it does not exceed container */
+            width: auto !important;      /* let Highcharts control width if needed */
+            height: auto !important;
+        }
+        .table-heading { font-size: 22px; font-weight: bold; text-align: right; margin-bottom: 10px; }
+        </style>
+        `);
 
         printWindow.document.write('</head><body>');
-        printWindow.document.write(clonedContent.outerHTML);
-        printWindow.document.write('</body></html>');
 
+        const titleTable = "{{ __db('arrival_status') }}";
+        // 1️⃣ Chart page
+        printWindow.document.write(`
+        <div class="chart-section">
+            <div class="table-heading ">${titleTable}</div>
+            <div class="chart-container">
+                ${clonedContent.querySelector('#userOverviewDonutChart')?.outerHTML || ''}
+            </div>
+        </div>
+        `);
+
+        // 2️⃣ Table page
+        
+        const tableHTML = clonedContent.querySelector('#tableContainer')?.outerHTML || '';
+        printWindow.document.write(`
+        <div class="page-break">
+            <div class="table-heading text-left">${titleTable}</div>
+            ${tableHTML}
+        </div>
+        `);
+
+        printWindow.document.write('</body></html>');
         printWindow.document.close();
         printWindow.focus();
 
@@ -182,6 +225,7 @@
             printWindow.print();
             printWindow.close();
         }, 500);
+
     }
 </script>
 @endsection
