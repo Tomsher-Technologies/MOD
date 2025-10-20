@@ -35,6 +35,44 @@ class ReportController extends Controller
     {
         ini_set('memory_limit', '2048M');
         ini_set('max_execution_time', 300);
+
+        $this->middleware('permission:manage_reports',  ['only' => ['index']]);
+        $this->middleware('permission:view_delegations_head_arrival',  ['only' => ['delegationHeadsArrivals']]);
+        $this->middleware('permission:export_delegations_head_arrival',  ['only' => ['exportBulkDelegationHeadsArrivalsPdf']]);
+        $this->middleware('permission:view_delegations_head_departure',  ['only' => ['delegationHeadsDeparture']]);
+        $this->middleware('permission:export_delegations_head_departure',  ['only' => ['exportBulkDelegationHeadsDeparturePdf']]);
+        $this->middleware('permission:view_delegations_cars',  ['only' => ['delegationCarsReport']]);
+        $this->middleware('permission:export_delegations_cars',  ['only' => ['exportBulkDelegationCarsPdf']]);
+        $this->middleware('permission:view_delegations_escort',  ['only' => ['reportsDelegations','showReportsDelegations']]);
+        $this->middleware('permission:export_delegations_escort',  ['only' => ['exportReportDelegationPdf','exportBulkReportDelegationPdf']]);
+        $this->middleware('permission:view_delegations_members',  ['only' => ['delegationMembersReport']]);
+        $this->middleware('permission:export_delegations_members',  ['only' => ['exportBulkDelegationMembersPdf']]);
+        $this->middleware('permission:view_delegations_without_escort',  ['only' => ['delegationWithoutEscortsReport']]);
+        $this->middleware('permission:export_delegations_without_escort',  ['only' => ['exportBulkDelegationWithoutEscortsPdf']]);
+        $this->middleware('permission:view_departures_report',  ['only' => ['delegationDeparturesReport']]);
+        $this->middleware('permission:export_departures_report',  ['only' => ['exportBulkDelegationDeparturesPdf']]);
+        $this->middleware('permission:view_drivers_report',  ['only' => ['drivers']]);
+        $this->middleware('permission:export_drivers_report',  ['only' => ['exportBulkDriversPdf']]);
+        $this->middleware('permission:view_escorts_report',  ['only' => ['escorts']]);
+        $this->middleware('permission:export_escorts_report',  ['only' => ['exportBulkEscortsPdf']]);
+        $this->middleware('permission:view_hotel_room_vacancies',  ['only' => ['hotelRooms']]);
+        $this->middleware('permission:export_hotel_room_vacancies',  ['only' => ['exportBulkHotelRoomPdf']]);
+        $this->middleware('permission:view_hotel_delegations',  ['only' => ['hotelsDelegationsReport']]);
+        $this->middleware('permission:export_hotel_delegations',  ['only' => ['exportBulkHotelsDelegationsPdf']]);
+        $this->middleware('permission:view_interviews_reports',  ['only' => ['interviewsReport']]);
+        $this->middleware('permission:export_interviews_reports',  ['only' => ['exportBulkInterviewsPdf']]);
+        $this->middleware('permission:view_vip',  ['only' => ['vipReport']]);
+        $this->middleware('permission:export_vip',  ['only' => ['exportBulkVipPdf']]);
+        $this->middleware('permission:view_wives',  ['only' => ['wivesReport']]);
+        $this->middleware('permission:export_wives',  ['only' => ['exportBulkWivesPdf']]);
+        $this->middleware('permission:view_arrivals_report',  ['only' => ['delegationArrivalsReport']]);
+        $this->middleware('permission:export_arrivals_report',  ['only' => ['exportBulkDelegationArrivalsPdf']]);
+        $this->middleware('permission:view_arrival_hotels',  ['only' => ['hotelsArrivalsReport']]);
+        $this->middleware('permission:export_arrival_hotels',  ['only' => ['exportBulkHotelsArrivalsPdf']]);
+        $this->middleware('permission:view_delegation_head_invitations',  ['only' => ['delegationHeadsInvitations']]);
+        $this->middleware('permission:export_delegation_head_invitations',  ['only' => ['exportBulkDelegationHeadsInvitationsPdf']]);
+        $this->middleware('permission:export_delegation_head_invitation_statistics',  ['only' => ['delegationHeadsInvitationStatistics']]);
+        $this->middleware('permission:view_delegation_head_invitation_statistics',  ['only' => ['exportBulkDelegationHeadsInvitationStatisticsPdf']]);
     }
     public function index()
     {
@@ -280,6 +318,7 @@ class ReportController extends Controller
         }
         $mpdf->Output($reportName, 'D');
     }
+
 
     public function hotelRooms(Request $request)
     {
@@ -1037,7 +1076,6 @@ class ReportController extends Controller
        
         return view('admin.report.delegation_members', compact('delegations'));
     }
-
     public function exportBulkDelegationMembersPdf(Request $request){
         $currentEventId = session('current_event_id', getDefaultEventId());
         $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
@@ -1091,7 +1129,7 @@ class ReportController extends Controller
 
     }
 
-     public function delegationWithoutEscortsReport(){
+    public function delegationWithoutEscortsReport(){
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
@@ -1118,7 +1156,6 @@ class ReportController extends Controller
        
         return view('admin.report.without_escorts', compact('delegations'));
     }
-
     public function exportBulkDelegationWithoutEscortsPdf(Request $request){
         $currentEventId = session('current_event_id', getDefaultEventId());
         $filters = request()->only(['country_id', 'invitation_from', 'invitation_status']);
@@ -2061,7 +2098,7 @@ class ReportController extends Controller
         $mpdf->Output($reportName, 'D');  
     }
 
-     public function delegationHeadsInvitationStatistics(Request $request){
+    public function delegationHeadsInvitationStatistics(Request $request){
         $currentEventId = session('current_event_id', getDefaultEventId());
 
         $filters = request()->only(['invitation_from', 'country_id', 'invitation_status']);

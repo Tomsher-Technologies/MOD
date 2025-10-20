@@ -17,10 +17,38 @@
         * {
             box-sizing: border-box;
         }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: center;
+        }
+
+        /* Direction handling */
+        [lang="ar"], .rtl {
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+        }
+
+        [lang="en"], .ltr {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
+        }
+
+        /* Optional background for headers */
+        thead th {
+            background: #d3d3d3;
+        }
     </style>
 </head>
 
-<body style="margin: 0px; padding: 0px; font-size: 10px;">
+<body style="margin: 0px; padding: 0px; font-size: 12px;">
     <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
         <div style=" border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
@@ -58,12 +86,7 @@
         @endphp
 
         <table style="width:100%; border-collapse:collapse; font-size:12px; margin-bottom:8px; table-layout:fixed;">
-            <colgroup>
-                <col style="width:40%;">
-                <col style="width:20%;">
-                <col style="width:40%;">
-            </colgroup>
-
+          
             @foreach ($delegation->escorts as $ekey => $escort)
                 @php
                     $roomEscort = $escort->currentRoomAssignment ?? null;
@@ -86,46 +109,40 @@
                 @endphp
 
                 <tr>
-                    <td style="vertical-align:top; padding:4px 6px;">
-                        <table style="width:100%; border-collapse:collapse;">
-                            <tr>
-                                <td style="text-align:left; padding:0; word-wrap:break-word;width:50%;">
-                                    {!! e($accValue) !!}
-                                </td>
-                                <td style="text-align:left; padding:0; white-space:nowrap; width:50%;">
-                                    <strong>&nbsp; : &nbsp;{!! e(__db('accommodation')) !!}</strong>
-                                </td>
-                            </tr>
-                        </table>
+                   
+                    <td colspan="3" style="padding:6px; border:0;">
+                        <span class="ltr" style="display:inline-block; width:100%;">
+                            <span style="float:left;">
+                                {!! e($accValue) !!}
+                            </span>
+                            <strong>: {{ __db('accommodation') }}</strong>
+                        </span>
                     </td>
 
-                    <td style="vertical-align:top; padding:4px 6px;">
-                        <table style="width:100%; border-collapse:collapse;">
-                            <tr>
-                                <td style="text-align:right; padding:0; word-wrap:break-word;width:80%;">
-                                    {!! e($mobileValue) !!}
-                                </td>
-                                <td style="text-align:right; padding:0; white-space:nowrap;width:20%;">
-                                    <strong> &nbsp;:&nbsp; {!! e(__db('mobile')) !!}</strong>
-                                </td>
-                            </tr>
-                        </table>
+                    <td colspan="1" style="padding:6px; border:0;">
+                        <span class="ltr">
+                            {!! e($mobileValue) !!} <strong> : {!! e(__db('mobile')) !!}</strong>
+                        </span>
                     </td>
+                    
+                    <td colspan="3" style="padding:6px; border:0; text-align:right;">
+                        <span class="ltr" style="display:inline-block; width:100%;">
+                            <span style="float:left;">
+                                @if (getActiveLanguage() == 'en')
+                                    {{ $escort?->military_number ?? ' ' }} &nbsp;-&nbsp; {{ $escort?->internalRanking?->value ?? ' ' }}&nbsp;{{ $escort?->name ?? ' ' }}
+                                @else
+                                    {{ $escort?->internalRanking?->value ?? ' ' }}&nbsp;{{ $escort?->name ?? ' ' }}&nbsp;-&nbsp; {{ $escort?->military_number ?? ' ' }}
+                                   
+                                @endif
+                            </span>
 
-                    <td style="vertical-align:top; padding:4px 6px;">
-                        <table style="width:100%; border-collapse:collapse;">
-                            <tr>
-                                <td style="text-align:right; padding:0; word-wrap:break-word;width:90%;">
-                                    {!! $escortValue !!}
-                                </td>
-                                <td style="text-align:right; padding:0; white-space:nowrap;width:10%;">
-                                    @if($ekey === 0)
-                                        <strong>&nbsp; : &nbsp;{!! e(__db('escort')) !!}</strong>
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
+                            <strong >
+                                : {{ __db('escort') }} 
+                            </strong>
+                        </span>
                     </td>
+                    
+                 
                 </tr>
             @endforeach
         </table>
@@ -133,43 +150,56 @@
 
         <table style="width: 100%; font-size: 12px !important; border-collapse: collapse; margin-top: 15px; margin-bottom: 8px;">
             <tr>
-                <!-- Column 1 -->
-                <td style="width: 40%; vertical-align: top;">
-                    <table style="width: 100%;">
-                        <tr>
-                            <td style="text-align: left;">
-                                <span>{{ $delegation->invitationFrom?->value ?? ' - ' }}</span>
-                                <strong>&nbsp;: &nbsp;{{ __db('invitation_from') }}</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: left;">
-                                <span>{{ $delegation->participationStatus?->value ?? ' - ' }}</span>
-                                <strong>&nbsp;: &nbsp;{{ __db('participation_status') }}</strong>
-                            </td>
-                        </tr>
-                    </table>
+                <td style="padding:6px; border:0; text-align:left;">
+                    <span class="ltr" style="display:inline-block; width:100%;">
+                        <span style="float:left;">
+                            {{ $delegation->invitationFrom?->value ?? ' - ' }}
+                        </span>
+                        <strong>: {{ __db('invitation_from') }}</strong>
+                    </span>
                 </td>
-
-                <td style="width: 20%;"></td>
-
-                <td style="width: 40%; vertical-align: top;">
-                    <table style="width: 100%;">
-                        <tr>
-                            <td style="text-align: right;">
-                                <span>{{ $delegation->country?->name ?? ' - ' }}</span>
-                                <strong>&nbsp;: &nbsp;{{ __db('country') }}</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: right; white-space: nowrap;">
-                                <span>{{ $delegation->invitationStatus?->value ?? ' - ' }}</span>
-                                <strong>&nbsp;:&nbsp; {{ __db('invitation_status') }}</strong>
-                            </td>
-                        </tr>
-                    </table>
+                
+                <td style="padding:6px; border:0;">
+                    <span class="ltr" style="display:inline-block; width:100%;">
+                        <span style="float:left;">
+                            
+                        </span>
+                        <strong></strong>
+                    </span>
+                </td>
+                
+                <td style="padding:6px; border:0; text-align:right;">
+                    <span class="ltr" style="display:inline-block; width:100%;">
+                        <span style="float:left;">
+                            {{ $delegation->country?->name ?? ' - ' }}
+                        </span>
+                        <strong>: {{ __db('country') }}</strong>
+                    </span>
                 </td>
             </tr>
+            <tr>
+                <td style="padding:6px; border:0; text-align:left;">
+                    <span class="ltr" style="display:inline-block; width:100%;">
+                        <span style="float:left;">
+                             {{ $delegation->participationStatus?->value ?? ' - ' }}
+                        </span>
+                        <strong>: {{ __db('participation_status') }}</strong>
+                    </span>
+                </td>
+                <td  style="padding:6px; border:0;">
+                    
+                </td>
+
+                <td  style="padding:6px; border:0; text-align:right;">
+                    <span class="ltr" style="display:inline-block; width:100%;">
+                        <span style="float:left;">
+                            {{ $delegation->invitationStatus?->value ?? ' - ' }}
+                        </span>
+                        <strong>: {{ __db('invitation_status') }}</strong>
+                    </span>
+                </td>
+            </tr>
+            
         </table>
         @php
             $teamHead = '';
@@ -286,46 +316,44 @@
 
             @endphp
             
-                <table style="width:100%; border-collapse: collapse; margin-bottom: 12px;">
-                <tbody style="">
+            <table style="width:100%; border-collapse: collapse; margin-bottom: 12px;">
+                <tbody>
                     @foreach($hotelDetails as $key => $hotel)
-                        @php
-                            $acc_con = $acc_name = '';
-                            foreach($hotel->contacts as $k => $con){
-                                $acc_con .= '<div style="margin-bottom: 5px; display: flex;">
-                                                <span>'.$con->phone.'</span>
-                                                <strong style="width: 30%;">&nbsp; : '. __db('mobile').'</strong>
-                                            </div>';
-                                $acc_name .= '<div style="margin-bottom: 5px; justify-content: flex-end;">
-                                                <span>'.$con->name.'</span>
-                                                <strong style="width: 22%;">&nbsp; : '. __db('res'.$k).'</strong>
-                                            </div>';
-                            }
-                        @endphp
-
-                        <tr>
-                            <!-- Left side (hotel numbers + contacts) -->
-                            <td style="width:30%; vertical-align: top; padding: 6px;">
-                                <div style="margin-bottom: 5px; display: flex;">
+                        @if($key == 0)
+                            <tr>
+                                <!-- Left side (hotel number) -->
+                                <td style="padding:6px; border:0; text-align:left; direction:ltr;">
                                     <span>{{ $hotel->contact_number }}</span>
-                                    <strong style="width: 30%;">&nbsp; : {{ __db('hotel_number') }}</strong>
-                                </div>
-                                {!! $acc_con !!}
-                            </td>
-
-                            <!-- Right side (hotel name + responsible persons) -->
-                            <td style="width:25%; text-align: right; vertical-align: top; padding: 6px;">
-                                <div style="margin-bottom: 5px;  justify-content: flex-end;">
+                                    <strong style="float:right;">: {{ __db('hotel_number') }}</strong>
+                                </td>
+            
+                                <!-- Right side (hotel name) -->
+                                <td style="padding:6px; border:0; text-align:right; direction:ltr;">
                                     <span>{{ $hotel->hotel_name }}</span>
-                                    <strong style="width: 22%;">&nbsp; : {{ __db('hotel') }}</strong>
-                                </div>
-                                {!! $acc_name !!}
-                            </td>
-                        </tr>
+                                    <strong style="float:right;">: {{ __db('hotel') }}</strong>
+                                </td>
+                            </tr>
+                        @endif
+            
+                        @foreach($hotel->contacts as $k => $con)
+                            <tr>
+                                <!-- Left side (contact number) -->
+                                <td style="padding:6px; border:0; text-align:left; direction:ltr;">
+                                    <span>{{ $con->phone ?? '' }}</span>
+                                    <strong style="float:right;">: {{ __db('mobile') }}</strong>
+                                </td>
+            
+                                <!-- Right side (responsible person) -->
+                                <td style="padding:6px; border:0; text-align:right; direction:ltr;">
+                                    <span>{{ $con->name ?? '' }}</span>
+                                    <strong style="float:right;">: {{ __db('res') }}</strong>
+                                </td>
+                            </tr>
+                        @endforeach
                     @endforeach
                 </tbody>
             </table>
-            
+
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-1 gap-x-0 md:gap-x-8 gap-y-8">

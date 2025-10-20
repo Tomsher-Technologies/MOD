@@ -65,6 +65,7 @@ class AuthController extends Controller
             if($user->user_type == 'admin' || $user->user_type == 'staff') {
                 $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
                 // $user->givePermissionTo($rolePermissions);
+
                 $user->syncPermissions($rolePermissions);
                 $user = $user->fresh();
             }else{
@@ -81,19 +82,18 @@ class AuthController extends Controller
 
                 $rolePermissions = $user->getPermissionsViaRoles()->pluck('name')->toArray();
 
+                $rolePermissions = array_unique($rolePermissions);
                 $user->syncPermissions([]);
 
                 $event = $roleAssignment->event;
 
                 if ($event?->status == 1) {
                     $filtered = collect($rolePermissions)->filter(function ($perm) {
-                        return str_contains($perm, '_view_') || str_contains($perm, '_manage_');
+                        return str_contains($perm, 'view_') || str_contains($perm, 'manage_') || str_contains($perm, 'export_');
                     })->toArray();
 
-                    // $user->givePermissionTo($filtered);
                     $user->syncPermissions($filtered);
                 } else {
-                    // $user->givePermissionTo($rolePermissions);
                     $user->syncPermissions($rolePermissions);
                 }
                 $user = $user->fresh();

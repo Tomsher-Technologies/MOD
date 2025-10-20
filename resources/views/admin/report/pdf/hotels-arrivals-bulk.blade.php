@@ -18,6 +18,30 @@
         border-spacing: 0;   
         width: 100%;
     }
+    
+     th, td {
+            padding: 5px;
+            text-align: center;
+        }
+
+        /* Direction handling */
+        [lang="ar"], .rtl {
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+        }
+
+        [lang="en"], .ltr {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
+        }
+
+        /* Optional background for headers */
+        thead th {
+            background: #d3d3d3;
+        }
+
 
     </style>
 </head>
@@ -35,39 +59,48 @@
                 <table style="width:100%; border-collapse: collapse; margin-bottom: 5px;">
                     <tbody>
                         <tr>
-                            <td style="width:40%; padding: 3px; border: 0px;">
-                                <div style="">
-                                    <span>{{ trim($delegation?->country?->name) ?? '-' }}</span>
-                                    <strong> : {{ __db('country') }}</strong>
-                                </div>
-
+                            <td style="padding:6px; border:0;">
+                                <span class="ltr" style="display:inline-block; width:100%;">
+                                    <span style="float:left;">
+                                        {{ $delegation?->country?->name ?? '-' }}
+                                    </span>
+                                    <strong>: {{ __db('country') }}</strong>
+                                </span>
                             </td>
-                            <td style="width:5%; padding: 3px; border: 0px;">
-
+                            
+                            <td style="padding:6px; border:0;">
+                                <span class="ltr" style="display:inline-block; width:100%;">
+                                    <span style="float:left;">
+                                        
+                                    </span>
+                                    <strong></strong>
+                                </span>
                             </td>
-
-                            <td style="width:55%; padding: 3px; border: 0px;text-align: right;">
-                                <div style="">
-                                    <span>{{ $delegation->invitationFrom?->value ?? '-' }}</span>
-                                    <strong> : {{ __db('invitation_from') }}</strong>
-                                </div>
-
+                            
+                            <td style="padding:6px; border:0; text-align:right;">
+                                <span class="ltr" style="display:inline-block; width:100%;">
+                                    <span style="float:left;">
+                                        {{ $delegation->invitationFrom?->value ?? '-' }}
+                                    </span>
+                                    <strong>: {{ __db('invitation_from') }}</strong>
+                                </span>
                             </td>
                         </tr>
                         <tr>
-                            <td style="width:20%; padding: 6px; border: 0px;">
-
+                            <td style="padding:6px; border:0;">
+                            
                             </td>
-                            <td style="width:5%; padding: 6px; border: 0px;">
-
+                            <td  style="padding:6px; border:0;">
+                                
                             </td>
 
-                            <td style="width:75%; padding: 6px; border: 0px;text-align: right;">
-
-                                <div style="margin-bottom: 5px; display: flex; justify-content: flex-end;">
-                                    <span>{{ $delegation?->note2 ?? '-' }}</span>
-                                    <strong style="width: 22%;"> : {{ __db('note') }}</strong>
-                                </div>
+                            <td  style="padding:6px; border:0; text-align:right;">
+                                <span class="ltr" style="display:inline-block; width:100%;">
+                                    <span style="float:left;">
+                                        {{ $delegation?->note2 ?? '-' }}
+                                    </span>
+                                    <strong>: {{ __db('note') }}</strong>
+                                </span>
                             </td>
                         </tr>
                     </tbody>
@@ -82,27 +115,34 @@
                             @endphp
 
                             <tr>
-                                <td style="padding: 6px; border: 0px;">
-                                     <span>{{ $roomEscort?->room_number }}</span>&nbsp; - &nbsp; <span>{{ $roomEscort?->hotel?->hotel_name }} </span>
-                                     <strong> : {{ __db('accommodation') }}</strong>
+                                <td colspan="5" style="padding:6px; border:0;">
+                                    <span class="ltr" style="display:inline-block; width:100%;">
+                                        <span style="float:left;">
+                                            {{ $roomEscort?->room_number ?? ' ' }} - {{ $roomEscort?->hotel?->hotel_name ?? ' ' }} 
+                                        </span>
+                                        <strong>: {{ __db('accommodation') }}</strong>
+                                    </span>
                                 </td>
-                                <td style="padding: 6px; border: 0px;">
-                                    {{ $escort?->phone_number }} <strong> : {{ __db('mobile') }} </strong>
+                               
+                                <td colspan="1" style="padding:6px; border:0;">
+                                    <span class="ltr">
+                                        {{ $escort?->phone_number ?? ' - ' }} <strong> : {{ __db('mobile') }}</strong>
+                                    </span>
                                 </td>
-                                <td style="padding: 6px; border: 0px;text-align: right;">
-                                  
-                                    @if (getActiveLanguage() == 'en')
-                                        <span>{{ $escort?->military_number }}</span>&nbsp; - &nbsp;<span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
-                                    @else
-                                        <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>&nbsp; - &nbsp;<span>{{ $escort?->military_number }}</span>
-                                    @endif
-                                    
-                                    @if ($key == 0)
-                                        <strong> : {{ __db('escort') }}</strong>
-                                    @else
-                                        <strong style="margin-right: 45px;"></strong>
-                                    @endif
+                                
+                                <td colspan="5" style="padding:6px; border:0; text-align:right;">
+                                    <span class="ltr" style="display:inline-block; width:100%;">
+                                        <span style="float:left;">
+                                            @if (getActiveLanguage() == 'en')
+                                                {{ $escort?->military_number ?? ' ' }} &nbsp;-&nbsp; {{ $escort?->internalRanking?->value ?? ' ' }}&nbsp;{{ $escort?->name ?? ' ' }}
+                                            @else
+                                                {{ $escort?->internalRanking?->value ?? ' ' }}&nbsp;{{ $escort?->name ?? ' ' }}&nbsp;-&nbsp; {{ $escort?->military_number ?? ' ' }}
+                                               
+                                            @endif
+                                        </span>
 
+                                        <strong> : {{ __db('escort') }}</strong> 
+                                    </span>
                                 </td>
                             </tr>
                         @endforeach
@@ -110,7 +150,7 @@
                 </table>
 
                 <table style="width: 100%; border-collapse: collapse; border: 2px solid #000; border-bottom: 0;">
-                    <thead>
+                    <thead class="rtl">
                         <tr style="background-color: #d9d9d9;">
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('room_type') }}
@@ -133,7 +173,7 @@
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('sl_no') }}</th>
                         </tr>
                     </thead>
-                    <tbody style="text-align: center;">
+                    <tbody style="text-align: center;"  class="rtl">
                         @forelse ($delegates as $key => $delegate)
                             @php
                                 $delegateRoom = $delegate->currentRoomAssignment ?? null;
@@ -201,26 +241,43 @@
                         <table style="width:100%; border-collapse:collapse;">
                             @foreach ($delegation?->drivers as $index => $driver)
                                 <tr>
-                                    <td style="padding:6px;text-align:right;width: 20%;">
-                                        <span>{{ $driver->car_number }}</span>
-                                        <strong> : {{ __db('car_number') }}</strong>
+                                    <td colspan="2" style="padding:6px; border:0;">
+                                        <span class="ltr" style="display:inline-block; width:100%;">
+                                            <span style="float:left;">
+                                                {{ $driver->car_number  ?? '-'}}
+                                            </span>
+                                            <strong>: {{ __db('car_number') }}</strong>
+                                        </span>
                                     </td>
-                                    <td style="padding:6px;text-align:right;width: 20%;">
-                                        <span>{{ $driver->car_type }}</span>
-                                        <strong> : {{ __db('car_type') }}</strong>
+                                    <td colspan="2" style="padding:6px; border:0;">
+                                        <span class="ltr" style="display:inline-block; width:100%;">
+                                            <span style="float:left;">
+                                                {{ $driver->car_type  ?? '-'}}
+                                            </span>
+                                            <strong>: {{ __db('car_type') }}</strong>
+                                        </span>
                                     </td>
-                                    <td style="padding:6px;text-align:right;width: 20%;">
-                                        <span>{{ $driver->phone_number }}</span>
-                                        <strong> : {{ __db('mobile') }}</strong>
+                                    <td colspan="2" style="padding:6px; border:0;">
+                                        <span class="ltr" style="display:inline-block; width:100%;">
+                                            <span style="float:left;">
+                                                {{ $driver->phone_number ?? '-' }}
+                                            </span>
+                                            <strong>: {{ __db('mobile') }}</strong>
+                                        </span>
                                     </td>
-                                    <td style="padding:6px;text-align:right;width: 40%;">
-                                     
-                                        @if (getActiveLanguage() == 'en')
-                                            <span>{{ $driver?->military_number }}</span>&nbsp; - &nbsp;<span>{{ $driver?->getTranslation('title') .' '. $driver?->getTranslation('name') }}</span>
-                                        @else
-                                            <span>{{ $driver?->getTranslation('title') .' '. $driver?->getTranslation('name') }}</span>&nbsp; - &nbsp;<span>{{ $driver?->military_number }}</span>
-                                        @endif
-                                        <strong> : {{ __db('driver') }}{{ $index + 1 }}</strong>
+                                    <td colspan="5" style="padding:6px; border:0; text-align:right;">
+                                        <span class="ltr" style="display:inline-block; width:100%;">
+                                            <span style="float:left;">
+                                                @if (getActiveLanguage() == 'en')
+                                                    {{ $driver?->military_number }} &nbsp;-&nbsp; {{ $driver?->getTranslation('title') .' '. $driver?->getTranslation('name') }}
+                                                @else
+                                                    {{ $driver?->getTranslation('title') .' '. $driver?->getTranslation('name') }}&nbsp;-&nbsp; {{ $driver?->military_number }}
+                                                   
+                                                @endif
+                                            </span>
+
+                                            <strong> : {{ __db('driver') }}{{ $index+1 }}</strong>
+                                        </span>
                                     </td>
                                 </tr>
                             @endforeach

@@ -10,21 +10,16 @@
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
-
-
-
-
-                <div class="mb-4">
+                <div class="mb-4 w-[75%]">
                     <form action="{{ route('roles.index') }}" method="GET">
                         {{-- Main flex container for all filter elements --}}
-                        {{-- It wraps on small screens and stays horizontal on md+ --}}
                         <div class="flex flex-wrap items-end gap-3">
 
-                            {{-- 1. Filter Inputs Group (take majority width on md+) --}}
-                            <div class="flex w-full md:w-auto md:flex-grow items-center gap-2 flex-wrap">
+                            {{-- 1. Filter Inputs Group --}}
+                            <div class="flex flex-wrap items-end gap-3 w-[75%] md:flex-nowrap md:flex-grow">
 
-                                {{-- Search Input with Icon --}}
-                                <div class="relative w-full sm:w-1/2">
+                                {{-- Search Input --}}
+                                <div class="relative flex-1 min-w-[250px]">
                                     <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
                                         <svg class="h-4 w-4 text-gray-500" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -37,38 +32,36 @@
                                         placeholder="{{ __db('search') }}" value="{{ request('search') }}">
                                 </div>
 
-                                {{-- Module Select Dropdown --}}
-                                <select name="module"
-                                    class="block w-full sm:w-1/2 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
-                                    <option value="">{{ __db('select_module') }}</option>
-                                    <option value="admin" @selected(request('module') == 'admin')>Admin</option>
-                                    <option value="delegate" @selected(request('module') == 'delegate')>Delegate</option>
-                                    <option value="escort" @selected(request('module') == 'escort')>Escort</option>
-                                    <option value="driver" @selected(request('module') == 'driver')>Driver</option>
-                                    <option value="hotel" @selected(request('module') == 'hotel')>Hotel</option>
-                                    <option value="top-management" @selected(request('module') == 'top-management')>Top Management</option>
-                                </select>
+                                {{-- Module Dropdown --}}
+                                <div class="flex-1 min-w-[200px]">
+                                    <select name="module"
+                                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="">{{ __db('select_module') }}</option>
+                                        <option value="admin" @selected(request('module') == 'admin')>Admin</option>
+                                        <option value="delegate" @selected(request('module') == 'delegate')>Delegate</option>
+                                        <option value="escort" @selected(request('module') == 'escort')>Escort</option>
+                                        <option value="driver" @selected(request('module') == 'driver')>Driver</option>
+                                        <option value="hotel" @selected(request('module') == 'hotel')>Hotel</option>
+                                        <option value="top-management" @selected(request('module') == 'top-management')>Top Management</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex flex-shrink-0 gap-2">
+                                    <button type="submit"
+                                        class="rounded-lg bg-[#E6D2A5] text-[#5D471D] px-4 py-2 text-sm font-medium hover:bg-[#d8c585] focus:outline-none focus:ring-4 focus:ring-[#f0e6c1]">
+                                        {{ __db('search') }}
+                                    </button>
+
+                                    <a href="{{ route('roles.index') }}"
+                                        class="rounded-lg border border-[#B48D3C] text-[#B48D3C] px-4 py-2 text-sm font-medium hover:bg-[#fdf9ea]">
+                                        {{ __db('reset') }}
+                                    </a>
+                                </div>
                             </div>
 
-                            {{-- 2. Action Buttons Group --}}
-                            <div class="flex flex-shrink-0 gap-2">
-
-                                <button type="submit"
-                                    class="rounded-lg bg-[#E6D2A5] text-[#5D471D] px-4 py-2 text-sm font-medium hover:bg-[#d8c585] focus:outline-none focus:ring-4 focus:ring-[#f0e6c1]">
-                                    {{ __db('search') }}
-                                </button>
-
-                                <a href="{{ route('roles.index') }}"
-                                    class="rounded-lg border border-[#B48D3C] text-[#B48D3C] px-4 py-2 text-sm font-medium hover:bg-[#fdf9ea]">
-                                    {{ __db('reset') }}
-                                </a>
-                            </div>
                         </div>
                     </form>
                 </div>
-
-
-
 
                 <table class="table-auto mb-0 !border-[#F9F7ED] w-full">
                     <thead>
