@@ -427,17 +427,6 @@
                             'render' => fn($row) => $row->code ?? '-',
                         ],
                         [
-                            'label' => __db('name_en'),
-                            'render' => function ($row) {
-                                $badge = $row->team_head
-                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
-                                    : '';
-                                $name = $row->name_en;
-                                $title = $row->title_en;
-                                return $badge . '<div class="block">' . e($title . ' ' . $name) . '</div>';
-                            },
-                        ],
-                        [
                             'label' => __db('name_ar'),
                             'render' => function ($row) {
                                 $badge = $row->team_head
@@ -449,17 +438,25 @@
                             },
                         ],
                         [
-                            'label' => __db('designation'),
-                            'render' => fn($row) => $row->getTranslation('designation') ?? '-',
+                            'label' => __db('designation_ar'),
+                            'render' => fn($row) => $row->designation_ar,
                         ],
-                        // [
-                        //     'label' => __db('designation_en'),
-                        //     'render' => fn($row) => $row->designation_en,
-                        // ],
-                        // [
-                        //     'label' => __db('designation_ar'),
-                        //     'render' => fn($row) => $row->designation_ar,
-                        // ],
+                        [
+                            'label' => __db('name_en'),
+                            'render' => function ($row) {
+                                $badge = $row->team_head
+                                    ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
+                                    : '';
+                                $name = $row->name_en;
+                                $title = $row->title_en;
+                                return $badge . '<div class="block">' . e($title . ' ' . $name) . '</div>';
+                            },
+                        ],
+
+                        [
+                            'label' => __db('designation_en'),
+                            'render' => fn($row) => $row->designation_en,
+                        ],
                         [
                             'label' => __db('internal_ranking'),
                             'render' => fn($row) => $row->internalRanking->value ?? '-',
@@ -700,11 +697,13 @@
                             'label' => __db('escort') . ' ' . __db('code'),
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                return '<a href="' .
-                                    $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .
-                                    e($escort->code) .
-                                    '</a>';
+                                // return '<a href="' .
+                                //     $searchUrl .
+                                //     '" class="text-[#B68A35] hover:underline">' .
+                                //     e($escort->code) .
+                                //     '</a>';
+
+                                return '<span class="">' . e($escort->code) . '</span>';
                             },
                         ],
                         [
@@ -712,11 +711,15 @@
                             'key' => 'military_number',
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->military_number]);
-                                return '<a href="' .
-                                    $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .
+                                // return '<a href="' .
+                                //     $searchUrl .
+                                //     '" class="text-[#B68A35] hover:underline">' .
+                                //     e($escort->military_number) .
+                                //     '</a>';
+
+                                return '<span class="">' .
                                     e($escort->military_number) .
-                                    '</a>';
+                                    '</span>';
                             },
                         ],
                         [
@@ -729,11 +732,15 @@
                             'key' => 'name',
                             'render' => function ($escort) {
                                 $searchUrl = route('escorts.index', ['search' => $escort->name_en]);
-                                return '<a href="' .
-                                    $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .
-                                    e($escort->getTranslation('title') . '. ' . $escort->getTranslation('name')) .
-                                    '</a>';
+                                // return '<a href="' .
+                                //     $searchUrl .
+                                //     '" class="text-[#B68A35] hover:underline">' .
+                                //     e($escort->getTranslation('title') . ' ' . $escort->getTranslation('name')) .
+                                //     '</a>';
+
+                                return '<span class="">' .
+                                    e($escort->getTranslation('title') . ' ' . $escort->getTranslation('name')) .
+                                    '</span>';
                             },
                         ],
                         [
@@ -889,11 +896,13 @@
                             'label' => __db('driver') . ' ' . __db('code'),
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                return '<a href="' .
-                                    $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .
-                                    e($driver->code) .
-                                    '</a>';
+                                // return '<a href="' .
+                                //     $searchUrl .
+                                //     '" class="text-[#B68A35] hover:underline">' .
+                                //     e($driver->code) .
+                                //     '</a>';
+
+                                return '<span class="">' . e($driver->code) . '</span>';
                             },
                         ],
                         [
@@ -901,11 +910,13 @@
                             'key' => 'military_number',
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->military_number]);
-                                return '<a href="' .
-                                    $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .
-                                    e($driver->military_number) .
-                                    '</a>';
+                                // return '<a href="' .
+                                //     $searchUrl .
+                                //     '" class="text-[#B68A35] hover:underline">' .
+                                //     e($driver->military_number) .
+                                //     '</a>';
+
+                                return '<span class="">' . e($driver->military_number) . '</span>';
                             },
                         ],
                         [
@@ -916,11 +927,13 @@
                                 $driverTitle = $driver?->getTranslation('title') ?? '';
                                 $driverName = $driver?->getTranslation('name') ?? '';
 
-                                return '<a href="' .
-                                    $searchUrl .
-                                    '" class="text-[#B68A35] hover:underline">' .
-                                    e($driverTitle . '. ' . $driverName) .
-                                    '</a>';
+                                // return '<a href="' .
+                                //     $searchUrl .
+                                //     '" class="text-[#B68A35] hover:underline">' .
+                                //     e($driverTitle . ' ' . $driverName) .
+                                //     '</a>';
+
+                                return '<span class="">' . e($driverTitle . ' ' . $driverName) . '</span>';
                             },
                         ],
                         [

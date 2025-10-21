@@ -141,14 +141,21 @@
                                     return '-';
                                 }
 
+                                // return $delegation->escorts
+                                //     ->map(function ($escort) {
+                                //         $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                //         return '<a href="' .
+                                //             $searchUrl .
+                                //             '" class="text-[#B68A35] hover:underline">' .
+                                //             e($escort->code) .
+                                //             '</a>';
+                                //     })
+                                //     ->implode('<br>');
+
                                 return $delegation->escorts
                                     ->map(function ($escort) {
                                         $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                        return '<a href="' .
-                                            $searchUrl .
-                                            '" class="text-[#B68A35] hover:underline">' .
-                                            e($escort->code) .
-                                            '</a>';
+                                        return '<span class="">' . e($escort->code) . '</span>';
                                     })
                                     ->implode('<br>');
                             },
@@ -161,14 +168,23 @@
                                     return '-';
                                 }
 
+                                // return $delegation->drivers
+                                //     ->map(function ($driver) {
+                                //         $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                //         return '<a href="' .
+                                //             $searchUrl .
+                                //             '" class="text-[#B68A35] hover:underline">' .
+                                //             e($driver->code) .
+                                //             '</a>';
+                                //     })
+                                //     ->implode('<br>');
+
                                 return $delegation->drivers
                                     ->map(function ($driver) {
                                         $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                        return '<a href="' .
-                                            $searchUrl .
-                                            '" class="text-[#B68A35] hover:underline">' .
+                                        return '<span class="">' .
                                             e($driver->code) .
-                                            '</a>';
+                                            '</span>';
                                     })
                                     ->implode('<br>');
                             },

@@ -129,6 +129,10 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::post('/delegations/{delegation}/delegates', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.storeDelegate');
     Route::put('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'storeOrUpdateDelegate'])->name('delegations.updateDelegate');
     Route::delete('/delegations/{delegation}/delegates/{delegate}', [DelegationController::class, 'destroyDelegate'])->name('delegations.destroyDelegate');
+    
+    // Clear Transport Data
+    Route::post('/delegations/{delegation}/delegates/{delegate}/clear-arrival', [DelegationController::class, 'clearArrivalData'])->name('delegations.clearArrivalData');
+    Route::post('/delegations/{delegation}/delegates/{delegate}/clear-departure', [DelegationController::class, 'clearDepartureData'])->name('delegations.clearDepartureData');
 
     // Travel
     Route::get('/delegations/add-travel/{id}', [DelegationController::class, 'addTravel'])->name('delegations.addTravel');

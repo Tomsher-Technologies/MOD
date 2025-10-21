@@ -117,7 +117,7 @@
                                     if ($otherMemberId) {
                                         $with =
                                             '
-                                            <span class="block">Other Member: ' .
+                                            <span class="block"> ' . __db('other_member') . ": " .  
                                             e($row->otherMember?->getTranslation('name')) .
                                             '</span>
                             ';

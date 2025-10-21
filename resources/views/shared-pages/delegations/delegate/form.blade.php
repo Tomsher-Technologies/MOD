@@ -174,6 +174,16 @@
                 'transport' => $arrival,
             ])
 
+            @if ($arrival)
+                <div class="mt-4 flex justify-end">
+                    <button type="button" id="clear-arrival-btn"
+                        class="btn !bg-red-600 text-white rounded-lg px-6 py-2.5">
+                        {{ __db('clear_arrival_data') }}
+                    </button>
+                </div>
+            @endif
+
+
             <hr class="my-6">
 
             @include('shared-pages.delegations.delegate.partials.transport_section', [
@@ -181,6 +191,16 @@
                 'title' => __db('departure'),
                 'transport' => $departure,
             ])
+
+            @if ($departure)
+                <div class="mt-4 flex justify-end">
+                    <button type="button" id="clear-departure-btn"
+                        class="btn !bg-red-600 text-white rounded-lg px-6 py-2.5">
+                        {{ __db('clear_departure_data') }}
+                    </button>
+                </div>
+            @endif
+
 
             <div class="flex justify-start items-center mt-8">
                 <button type="submit" class="btn !bg-[#B68A35] text-white rounded-lg px-8 py-3">
@@ -245,6 +265,136 @@
 
             if (typeof $ !== 'undefined' && $.fn.select2) {
                 $(parentSelect).on('change', toggleRelationshipField);
+            }
+
+            // Clear arrival data button
+            const clearArrivalBtn = document.getElementById('clear-arrival-btn');
+            if (clearArrivalBtn) {
+                clearArrivalBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Do you really want to clear the arrival data?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, clear it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch("{{ route('delegations.clearArrivalData', [$delegation, $delegate]) }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector(
+                                            'meta[name="csrf-token"]').getAttribute(
+                                            'content')
+                                    },
+                                    body: JSON.stringify({
+                                        _token: document.querySelector(
+                                            'meta[name="csrf-token"]').getAttribute(
+                                            'content')
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            title: 'Cleared!',
+                                            text: data.message ||
+                                                'Arrival data has been cleared.',
+                                            icon: 'success'
+                                        }).then(() => {
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: data.message ||
+                                                'An error occurred while clearing arrival data.',
+                                            icon: 'error'
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'An error occurred while processing your request.',
+                                        icon: 'error'
+                                    });
+                                });
+                        }
+                    });
+                });
+            }
+
+            // Clear departure data button
+            const clearDepartureBtn = document.getElementById('clear-departure-btn');
+            if (clearDepartureBtn) {
+                clearDepartureBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'Do you really want to clear the departure data?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, clear it!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Make AJAX request to clear departure data
+                            fetch("{{ route('delegations.clearDepartureData', [$delegation, $delegate]) }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector(
+                                            'meta[name="csrf-token"]').getAttribute(
+                                            'content')
+                                    },
+                                    body: JSON.stringify({
+                                        _token: document.querySelector(
+                                            'meta[name="csrf-token"]').getAttribute(
+                                            'content')
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({
+                                            title: 'Cleared!',
+                                            text: data.message ||
+                                                'Departure data has been cleared.',
+                                            icon: 'success'
+                                        }).then(() => {
+                                            // Reload the page after successful deletion
+                                            window.location.reload();
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            title: 'Error!',
+                                            text: data.message ||
+                                                'An error occurred while clearing departure data.',
+                                            icon: 'error'
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'An error occurred while processing your request.',
+                                        icon: 'error'
+                                    });
+                                });
+                        }
+                    });
+                });
             }
 
         });

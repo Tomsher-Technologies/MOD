@@ -516,7 +516,8 @@
                             </div>
 
                             <span class="col-span-12 border-t border-neutral-200 pt-6 mt-6 flex gap-8">
-                                <div class="flex items-center gap-3" x-show="!delegates.some(d => d.team_head) || delegate.team_head">
+                                <div class="flex items-center gap-3"
+                                    x-show="!delegates.some(d => d.team_head) || delegate.team_head">
 
                                     <input type="checkbox" :id="`team-head-${index}`"
                                         :name="`delegates[${index}][team_head]`" value="1"
@@ -561,7 +562,8 @@
 
             <div class="flex justify-between items-center mt-5">
                 <button type="button" id="add-delegate-btn"
-                    class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-6" @click="addDelegate()">
+                    class="btn text-md !bg-[#B68A35] text-white rounded-lg h-12 px-6" @click="addDelegate()"
+                    x-show="delegates.length === 0">
                     {{ __db('add_delegate') }}
                 </button>
 

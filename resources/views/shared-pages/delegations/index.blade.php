@@ -39,7 +39,7 @@
                                 placeholder="{{ __db('delegation_search_placeholder') }}" />
                             <button type="submit"
                                 class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
-                                
+
                             <a href="{{ route('delegations.index') }}"
                                 class="absolute end-[85px] bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
                                 {{ __db('reset') }}</a>
@@ -209,14 +209,23 @@
                                     return '-';
                                 }
 
+                                // return $delegation->escorts
+                                //     ->map(function ($escort) {
+                                //         $searchUrl = route('escorts.index', ['search' => $escort->code]);
+                                //         return '<a href="' .
+                                //             $searchUrl .
+                                //             '" class="text-[#B68A35] hover:underline">' .
+                                //             e($escort->code) .
+                                //             '</a>';
+                                //     })
+                                //     ->implode('<br>');
+
                                 return $delegation->escorts
                                     ->map(function ($escort) {
                                         $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                        return '<a href="' .
-                                            $searchUrl .
-                                            '" class="text-[#B68A35] hover:underline">' .
+                                        return '<span class="text-[#B68A35] hover:underline">' .
                                             e($escort->code) .
-                                            '</a>';
+                                            '</span>';
                                     })
                                     ->implode('<br>');
                             },
@@ -229,14 +238,21 @@
                                     return '-';
                                 }
 
+                                // return $delegation->drivers
+                                //     ->map(function ($driver) {
+                                //         $searchUrl = route('drivers.index', ['search' => $driver->code]);
+                                //         return '<a href="' .
+                                //             $searchUrl .
+                                //             '" class="text-[#B68A35] hover:underline">' .
+                                //             e($driver->code) .
+                                //             '</a>';
+                                //     })
+                                //     ->implode('<br>');
+
                                 return $delegation->drivers
                                     ->map(function ($driver) {
                                         $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                        return '<a href="' .
-                                            $searchUrl .
-                                            '" class="text-[#B68A35] hover:underline">' .
-                                            e($driver->code) .
-                                            '</a>';
+                                        return '<span class="">' . e($driver->code) . '</span>';
                                     })
                                     ->implode('<br>');
                             },
@@ -252,26 +268,26 @@
                             'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
                         ],
 
-                        // [
-                        //     'key' => 'note',
-                        //     'label' => __db('note'),
-                        //     'render' => function ($d) {
-                        //         if (empty($d->note1) && empty($d->note2)) {
-                        //             return '-';
-                        //         }
-                        //         return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
-    //             data-modal-target="note-modal" data-modal-toggle="note-modal"
-    //             data-note1="' .
-                        //             e($d->note1) .
-                        //             '"
-    //             data-note2="' .
-                        //             e($d->note2) .
-                        //             '"
-    //             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-    //             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
-    //         </svg>';
-                        //     },
-                        // ],
+                        [
+                            'key' => 'note',
+                            'label' => __db('note'),
+                            'render' => function ($d) {
+                                if (empty($d->note1) && empty($d->note2)) {
+                                    return '-';
+                                }
+                                return '<svg class="w-6 h-6 text-[#B68A35] cursor-pointer note-icon"
+                data-modal-target="note-modal" data-modal-toggle="note-modal"
+                data-note1="' .
+                                    e($d->note1) .
+                                    '"
+                data-note2="' .
+                                    e($d->note2) .
+                                    '"
+                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.556 8.5h8m-8 3.5H12m7.111-7H4.89a.896.896 0 0 0-.629.256.868.868 0 0 0-.26.619v9.25c0 .232.094.455.26.619A.896.896 0 0 0 4.89 16H9l3 4 3-4h4.111a.896.896 0 0 0 .629-.256.868.868 0 0 0 .26-.619v-9.25a.868.868 0 0 0-.26-.619.896.896 0 0 0-.63-.256Z"/>
+            </svg>';
+                            },
+                        ],
                         [
                             'label' => __db(__db('actions')),
                             'key' => __db('actions'),
@@ -571,14 +587,6 @@
 
                     let html = '';
 
-                    if (note1.trim() !== '') {
-                        html += `
-                    <h3 class="mb-2 font-medium">{{ __db('note_1') }}:</h3>
-                    <div class="border p-5 rounded-lg">
-                        <p>${note1}</p>
-                    </div>
-                `;
-                    }
 
                     if (note2.trim() !== '') {
                         html += `

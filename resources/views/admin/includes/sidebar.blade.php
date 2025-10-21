@@ -508,10 +508,10 @@
 
             @directCanany([
                 'manage_other_interview_members',
-                'delegate_manage_delegations',
-                'escort_manage_delegations',
-                'driver_manage_delegations',
-                'hotel_manage_delegations'
+                // 'delegate_manage_delegations',
+                // 'escort_manage_delegations',
+                // 'driver_manage_delegations',
+                // 'hotel_manage_delegations'
             ])
                 <li>
                     <a href="{{ route('other-interview-members.index') }}"
