@@ -65,7 +65,7 @@
                         [
                             'label' => __db('files_count'),
                             'key' => 'files_count',
-                            'render' => fn($floorPlan) => count($floorPlan->file_paths ?? []),
+                            'render' => fn($floorPlan) => count($floorPlan->file_objects ?? []),
                         ],
                         [
                             'label' => __db('created_at'),

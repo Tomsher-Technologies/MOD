@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv1">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
@@ -72,7 +72,7 @@
                 </div>
 
                 <div class="flex items-end justify-end mb-3">
-                    <a href="#" id="fullscreenToggleBtn"
+                    <a href="#" id="fullscreenToggleBtn1"
                         class="!px-4 flex items-center gap-4 py-2 text-nowrap text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
                         <span>{{ __db('go_fullscreen') }}</span>
                     </a>

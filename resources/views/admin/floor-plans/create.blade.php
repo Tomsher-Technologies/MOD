@@ -47,10 +47,32 @@
 
                 <div class="col-span-12">
                     <label class="form-label">{{ __db('floor_plan_files') }}: <span class="text-red-600">*</span></label>
-                    <input type="file" name="floor_plan_files[]" multiple accept=".pdf"
-                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 p-3"
-                        required>
-                    <p class="mt-1 text-sm text-gray-500">{{ __db('floor_plan_files_help') }}</p>
+                    
+                    <div id="file-inputs-container">
+                        <div class="file-input-group mb-4 p-4 border rounded-lg bg-gray-50">
+                            <div class="flex flex-col md:flex-row gap-4">
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('file') }}</label>
+                                    <input type="file" name="floor_plan_files[]" accept=".pdf"
+                                        class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white p-2"
+                                        required>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title') }}</label>
+                                    <input type="text" name="file_titles[]" 
+                                        class="p-2 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                        placeholder="{{ __db('enter_file_title') }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="add-more-files" 
+                            class="mt-2 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        {{ __db('add_more_files') }}
+                    </button>
+                    
+                    <p class="mt-2 text-sm text-gray-500">{{ __db('floor_plan_files_help') }}</p>
                     @error('floor_plan_files.*')
                         <div class="text-red-600">{{ $message }}</div>
                     @enderror
@@ -68,4 +90,65 @@
             </div>
         </form>
     </div>
+@endsection
+
+@section('script')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('file-inputs-container');
+            const addButton = document.getElementById('add-more-files');
+            
+            let fileIndex = 1;
+            
+            addButton.addEventListener('click', function() {
+                const fileInputGroup = document.createElement('div');
+                fileInputGroup.className = 'file-input-group mb-4 p-4 border rounded-lg bg-gray-50';
+                fileInputGroup.innerHTML = `
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('file') }}</label>
+                            <input type="file" name="floor_plan_files[]" accept=".pdf"
+                                class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white p-2">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title') }}</label>
+                            <input type="text" name="file_titles[]" 
+                                class="p-2 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                placeholder="{{ __db('enter_file_title') }}">
+                        </div>
+                        <div class="flex items-end">
+                            <button type="button" class="remove-file-input px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                                {{ __db('remove') }}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(fileInputGroup);
+                
+                // Add event listener to the new remove button
+                fileInputGroup.querySelector('.remove-file-input').addEventListener('click', function() {
+                    if (container.children.length > 1) {
+                        fileInputGroup.remove();
+                    } else {
+                        alert('{{ __db('at_least_one_file_required') }}');
+                    }
+                });
+                
+                fileIndex++;
+            });
+            
+            // Add event listeners to existing remove buttons
+            document.querySelectorAll('.remove-file-input').forEach(button => {
+                button.addEventListener('click', function() {
+                    const fileInputGroup = this.closest('.file-input-group');
+                    if (container.children.length > 1) {
+                        fileInputGroup.remove();
+                    } else {
+                        alert('{{ __db('at_least_one_file_required') }}');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

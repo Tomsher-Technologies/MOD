@@ -58,28 +58,39 @@ class FloorPlanController extends Controller
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
             'floor_plan_files.*' => 'required|file|max:10240',
+            'file_titles.*' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $filePaths = [];
+        $fileObjects = [];
         $files = $request->file('floor_plan_files', []);
-        foreach ($files as $file) {
+        $fileTitles = $request->input('file_titles', []);
+        
+        foreach ($files as $index => $file) {
             if (!$file || !$file->isValid()) {
                 continue;
             }
+            
             $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('floor-plans', $fileName, 'public');
-            $filePaths[] = $filePath;
+            
+            // Get the custom title if provided, otherwise use the original filename
+            $fileTitle = !empty($fileTitles[$index]) ? $fileTitles[$index] : basename($filePath);
+            
+            $fileObjects[] = [
+                'path' => $filePath,
+                'title' => $fileTitle
+            ];
         }
 
         FloorPlan::create([
             'event_id' => $request->event_id,
             'title_en' => $request->title_en,
             'title_ar' => $request->title_ar,
-            'file_paths' => $filePaths,
+            'file_paths' => $fileObjects,
         ]);
 
         return redirect()->route('floor-plans.index')->with('success', __db('created_successfully'));
@@ -103,8 +114,10 @@ class FloorPlanController extends Controller
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
             'existing_file_paths' => 'array',
-            'existing_file_paths.*' => 'string',
+            'existing_file_paths.*.path' => 'string',
+            'existing_file_paths.*.title' => 'string|max:255',
             'new_floor_plan_files.*' => 'nullable|file|max:10240',
+            'new_file_titles.*' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -117,25 +130,60 @@ class FloorPlanController extends Controller
             'title_ar' => $request->title_ar,
         ];
 
-        $original = $floorPlan->file_paths ?? [];
+        $originalFileObjects = $floorPlan->file_paths ?? [];
+        
+        // Get existing files with updated titles
+        $keptFileObjects = [];
+        $existingFiles = $request->input('existing_file_paths', []);
+        
+        foreach ($existingFiles as $existingFile) {
+            $keptFileObjects[] = [
+                'path' => $existingFile['path'],
+                'title' => !empty($existingFile['title']) ? $existingFile['title'] : basename($existingFile['path'])
+            ];
+        }
 
-        $kept = $request->input('existing_file_paths', []);
-
+        // Add new files if any
         if ($request->hasFile('new_floor_plan_files')) {
-            foreach ($request->file('new_floor_plan_files') as $file) {
+            $newFiles = $request->file('new_floor_plan_files');
+            $newFileTitles = $request->input('new_file_titles', []);
+            
+            foreach ($newFiles as $index => $file) {
                 if ($file && $file->isValid()) {
                     $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
                     $filePath = $file->storeAs('floor-plans', $fileName, 'public');
-                    $kept[] = $filePath;
+                    
+                    // Get the custom title if provided, otherwise use the original filename
+                    $fileTitle = !empty($newFileTitles[$index]) ? $newFileTitles[$index] : basename($filePath);
+                    
+                    $keptFileObjects[] = [
+                        'path' => $filePath,
+                        'title' => $fileTitle
+                    ];
                 }
             }
         }
 
-        $data['file_paths'] = array_values($kept);
+        $data['file_paths'] = array_values($keptFileObjects);
         $floorPlan->update($data);
 
-        $toDelete = array_diff($original, $kept);
-        foreach ($toDelete as $path) {
+        // Handle file deletion - find files to delete by comparing original vs updated
+        $originalPaths = [];
+        foreach ($originalFileObjects as $fileObj) {
+            if (is_string($fileObj)) {
+                // Old format - just the path as a string
+                $originalPaths[] = $fileObj;
+            } else {
+                // New format - object with path and title
+                $originalPaths[] = $fileObj['path'];
+            }
+        }
+        
+        $updatedPaths = array_column($keptFileObjects, 'path');
+        
+        $pathsToDelete = array_diff($originalPaths, $updatedPaths);
+        
+        foreach ($pathsToDelete as $path) {
             if (Storage::disk('public')->exists($path)) {
                 Storage::disk('public')->delete($path);
             }

@@ -15,6 +15,7 @@ Route::get('/about-us', [FrontController::class, 'aboutUs'])->name('about-us');
 Route::get('/committees', [FrontController::class, 'committees'])->name('committees');
 Route::get('/news', [FrontController::class, 'news'])->name('news');
 Route::get('/news-details/{id}', [FrontController::class, 'newsDetails'])->name('news-details');
+Route::get('/floor-plans', [FrontController::class, 'getFloorPlans'])->name('floor-plans.api');
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login'])->name('web.login');

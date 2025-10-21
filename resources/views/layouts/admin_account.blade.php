@@ -22,6 +22,58 @@
         .tox-promotion {
             display: none !important;
         }
+        
+        :fullscreen #fullDiv table#arrivals-table thead tr,
+        :fullscreen #fullDiv table#departures-table thead tr,
+        :fullscreen #fullDiv1 table#arrivals-table thead tr,
+        :fullscreen #fullDiv1 table#departures-table thead tr {
+            font-size: 20px !important;
+        }
+        
+        :fullscreen #fullDiv table#arrivals-table tbody tr,
+        :fullscreen #fullDiv table#departures-table tbody tr,
+        :fullscreen #fullDiv1 table#arrivals-table tbody tr,
+        :fullscreen #fullDiv1 table#departures-table tbody tr {
+            font-size: 18px !important;
+        }
+        
+        /* For webkit browsers */
+        ::-webkit-full-screen #fullDiv table#arrivals-table thead tr,
+        ::-webkit-full-screen #fullDiv table#departures-table thead tr,
+        ::-webkit-full-screen #fullDiv1 table#arrivals-table thead tr,
+        ::-webkit-full-screen #fullDiv1 table#departures-table thead tr {
+            font-size: 20px !important;
+        }
+        
+        ::-webkit-full-screen #fullDiv table#arrivals-table tbody tr,
+        ::-webkit-full-screen #fullDiv table#departures-table tbody tr,
+        ::-webkit-full-screen #fullDiv1 table#arrivals-table tbody tr,
+        ::-webkit-full-screen #fullDiv1 table#departures-table tbody tr {
+            font-size: 18px !important;
+        }
+        
+        /* For mozilla browsers */
+        :-moz-full-screen #fullDiv table#arrivals-table thead tr,
+        :-moz-full-screen #fullDiv table#departures-table thead tr,
+        :-moz-full-screen #fullDiv1 table#arrivals-table thead tr,
+        :-moz-full-screen #fullDiv1 table#departures-table thead tr {
+            font-size: 20px !important;
+        }
+        
+        :-moz-full-screen #fullDiv table#arrivals-table tbody tr,
+        :-moz-full-screen #fullDiv table#departures-table tbody tr,
+        :-moz-full-screen #fullDiv1 table#arrivals-table tbody tr,
+        :-moz-full-screen #fullDiv1 table#departures-table tbody tr {
+            font-size: 18px !important;
+        }
+        
+        .fullscreen-table thead tr {
+            font-size: 20px !important;
+        }
+        
+        .fullscreen-table tbody tr {
+            font-size: 18px !important;
+        }
     </style>
 </head>
 
@@ -141,10 +193,14 @@
                         $('.hide-when-fullscreen').hide();
                         $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
                         $('#fullscreenToggleBtn').text('Exit Fullscreen');
+                        // Add class to increase font size for arrivals table
+                        $('#fullDiv table').addClass('fullscreen-table');
                     } else {
                         $('.hide-when-fullscreen').show();
                         $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
                         $('#fullscreenToggleBtn').text('Go Fullscreen');
+                        // Remove class to reset font size
+                        $('#fullDiv table').removeClass('fullscreen-table');
                     }
                 });
 
@@ -210,10 +266,14 @@
                         $('.hide-when-fullscreen').hide();
                         $('.full-screen-logo').css('display', 'flex'); // SHOW during fullscreen
                         $('#fullscreenToggleBtn1').text('Exit Fullscreen');
+                        // Add class to increase font size for departures table
+                        $('#fullDiv1 table').addClass('fullscreen-table');
                     } else {
                         $('.hide-when-fullscreen').show();
                         $('.full-screen-logo').css('display', 'none'); // HIDE when not in fullscreen
                         $('#fullscreenToggleBtn1').text('Go Fullscreen');
+                        // Remove class to reset font size
+                        $('#fullDiv1 table').removeClass('fullscreen-table');
                     }
                 });
 

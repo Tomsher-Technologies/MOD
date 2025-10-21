@@ -76,10 +76,13 @@
                         <div class="relative z-10">
                             <div class="flex items-center gap-2 flex-wrap">
                                 @php
-                                    $files = $plan->file_paths;
+                                    $fileObjects = $plan->file_objects;
                                 @endphp
-                                @foreach ($files as $file)
-                                    <a href="{{ asset('storage/' . $file) }}" target="_blank" rel="noopener noreferrer"
+                                @foreach ($fileObjects as $fileObj)
+                                    @php
+                                        $path = is_string($fileObj) ? $fileObj : ($fileObj['path'] ?? $fileObj);
+                                    @endphp
+                                    <a href="{{ asset('storage/' . $path) }}" target="_blank" rel="noopener noreferrer"
                                         class="flex items-center gap-2 bg-gray-100 text-[#797E86] text-sm font-semibold px-3 py-1.5 rounded-full border border-gray-200 hover:bg-[#b68a35] hover:text-white hover:border-[#b68a35] transition-colors duration-200">
 
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2"

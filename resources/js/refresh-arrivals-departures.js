@@ -37,6 +37,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (newTable) {
                             newTable.classList.remove('hidden');
 
+                            const isInFullscreen = document.fullscreenElement ||
+                                document.webkitFullscreenElement ||
+                                document.mozFullScreenElement ||
+                                document.msFullscreenElement;
+
+                            if (isInFullscreen) {
+                                newTable.classList.add('fullscreen-table');
+                            }
+
                             const currentTable = tableContainer.querySelector('table');
                             if (currentTable) {
                                 currentTable.replaceWith(newTable);
@@ -53,6 +62,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                     tableContainer.parentNode.insertBefore(newLegend, tableContainer.nextSibling);
                                 }
                             }
+
+                            addFullscreenStyles();
 
                             applySavedColumnVisibility();
 
@@ -157,10 +168,87 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function addFullscreenStyles() {
+        if (!document.getElementById('fullscreen-table-styles')) {
+            const styleSheet = document.createElement('style');
+            styleSheet.id = 'fullscreen-table-styles';
+            styleSheet.textContent = `
+                :fullscreen #fullDiv table#arrivals-table thead tr,
+                :fullscreen #fullDiv table#departures-table thead tr,
+                :fullscreen #fullDiv1 table#arrivals-table thead tr,
+                :fullscreen #fullDiv1 table#departures-table thead tr {
+                    font-size: 20px !important;
+                }
+                
+                :fullscreen #fullDiv table#arrivals-table tbody tr,
+                :fullscreen #fullDiv table#departures-table tbody tr,
+                :fullscreen #fullDiv1 table#arrivals-table tbody tr,
+                :fullscreen #fullDiv1 table#departures-table tbody tr {
+                    font-size: 18px !important;
+                }
+                
+                /* For webkit browsers */
+                ::-webkit-full-screen #fullDiv table#arrivals-table thead tr,
+                ::-webkit-full-screen #fullDiv table#departures-table thead tr,
+                ::-webkit-full-screen #fullDiv1 table#arrivals-table thead tr,
+                ::-webkit-full-screen #fullDiv1 table#departures-table thead tr {
+                    font-size: 20px !important;
+                }
+                
+                ::-webkit-full-screen #fullDiv table#arrivals-table tbody tr,
+                ::-webkit-full-screen #fullDiv table#departures-table tbody tr,
+                ::-webkit-full-screen #fullDiv1 table#arrivals-table tbody tr,
+                ::-webkit-full-screen #fullDiv1 table#departures-table tbody tr {
+                    font-size: 18px !important;
+                }
+                
+                /* For mozilla browsers */
+                :-moz-full-screen #fullDiv table#arrivals-table thead tr,
+                :-moz-full-screen #fullDiv table#departures-table thead tr,
+                :-moz-full-screen #fullDiv1 table#arrivals-table thead tr,
+                :-moz-full-screen #fullDiv1 table#departures-table thead tr {
+                    font-size: 20px !important;
+                }
+                
+                :-moz-full-screen #fullDiv table#arrivals-table tbody tr,
+                :-moz-full-screen #fullDiv table#departures-table tbody tr,
+                :-moz-full-screen #fullDiv1 table#arrivals-table tbody tr,
+                :-moz-full-screen #fullDiv1 table#departures-table tbody tr {
+                    font-size: 18px !important;
+                }
+                
+                /* For MS browsers */
+                :-ms-fullscreen #fullDiv table#arrivals-table thead tr,
+                :-ms-fullscreen #fullDiv table#departures-table thead tr,
+                :-ms-fullscreen #fullDiv1 table#arrivals-table thead tr,
+                :-ms-fullscreen #fullDiv1 table#departures-table thead tr {
+                    font-size: 20px !important;
+                }
+                
+                :-ms-fullscreen #fullDiv table#arrivals-table tbody tr,
+                :-ms-fullscreen #fullDiv table#departures-table tbody tr,
+                :-ms-fullscreen #fullDiv1 table#arrivals-table tbody tr,
+                :-ms-fullscreen #fullDiv1 table#departures-table tbody tr {
+                    font-size: 18px !important;
+                }
+                
+                .fullscreen-table thead tr {
+                    font-size: 20px !important;
+                }
+                
+                .fullscreen-table tbody tr {
+                    font-size: 18px !important;
+                }
+            `;
+            document.head.appendChild(styleSheet);
+        }
+    }
+
+    addFullscreenStyles();
     bindEditButtons();
     applySavedColumnVisibility();
 
-    setInterval(refreshData, 60000);
+    setInterval(refreshData, 3000);
 
     console.log('Auto-refresh initialized for ' + (isArrivalsPage ? 'arrivals' : 'departures') + ' page');
 });
