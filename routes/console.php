@@ -8,10 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-
-Schedule::command('check:vendor-expiry')->daily();
-Schedule::command('subscriptions:check-expiry')->daily();
-// Schedule::command('membership:send-expiry-reminders')->everyMinute();
 Schedule::command('queue:work --stop-when-empty')
         ->everyMinute()
         ->withoutOverlapping();
