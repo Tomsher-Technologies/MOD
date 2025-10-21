@@ -279,7 +279,7 @@
             <form action="{{ route('accommodations.index') }}" method="GET">
                 <div class="flex flex-col gap-2 mt-2">
                     <div class="flex flex-col">
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('room_type') }}</label>
+                        <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('room_type') }}</label>
                         <select name="room_type_id" id="room_type_id" data-placeholder="{{ __db('select') }}"
                             class="select2 w-full rounded-lg border border-gray-300 text-sm">
                             <option value=" ">{{ __db('all') }}</option>

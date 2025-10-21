@@ -392,7 +392,7 @@
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('assigned_status') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('assigned_status') }}</label>
                 <select name="assigned"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
@@ -405,7 +405,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('unit') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('unit') }}</label>
                 <select multiple name="unit_id[]"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
@@ -418,7 +418,7 @@
 
             <div class="flex flex-col">
                 <label
-                    class="form-label block mb-1 text-gray-700 font-medium">{{ __db('vehicle') . ' ' . __db('type') }}</label>
+                    class="form-label block mb-1 text-gray-700 font-bold">{{ __db('vehicle') . ' ' . __db('type') }}</label>
                 <select name="car_type[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($carTypes as $carType)
@@ -430,7 +430,7 @@
 
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('car_number') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('car_number') }}</label>
                 <select name="car_number[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($carNumbers as $carNumber)
@@ -441,7 +441,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('capacity') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('capacity') }}</label>
                 <select name="capacity[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($capacities as $capacity)
@@ -452,7 +452,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation_id') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('delegation_id') }}</label>
                 <select name="delegation_id[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full h-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_delegations') }}</option>

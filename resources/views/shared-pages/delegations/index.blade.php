@@ -223,7 +223,7 @@
                                 return $delegation->escorts
                                     ->map(function ($escort) {
                                         $searchUrl = route('escorts.index', ['search' => $escort->code]);
-                                        return '<span class="text-[#B68A35] hover:underline">' .
+                                        return '<span class="">' .
                                             e($escort->code) .
                                             '</span>';
                                     })
@@ -440,7 +440,7 @@
 
                 <div class="flex flex-col">
                     <label
-                        class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                        class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         @foreach (getDropDown('departments')->options as $option)
@@ -452,7 +452,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('all_continents') }}</label>
                     <select multiple name="continent_id[]" id="continent-select"
                         data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
@@ -466,7 +466,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('all_countries') }}</label>
                     <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         {{-- @foreach (getAllCountries() as $option)
@@ -480,7 +480,7 @@
 
                 <div class="flex flex-col">
                     <label
-                        class="form-label block text-gray-700 font-medium">{{ __db('all_invitation_statuses') }}</label>
+                        class="form-label block text-gray-700 font-bold">{{ __db('all_invitation_statuses') }}</label>
                     <select multiple name="invitation_status_id[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         @foreach (getDropDown('invitation_status')->options as $status)
@@ -494,7 +494,7 @@
 
                 <div class="flex flex-col">
                     <label
-                        class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
+                        class="form-label block text-gray-700 font-bold">{{ __db('all_participation_statuses') }}</label>
                     <select multiple name="participation_status_id[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         @foreach (getDropDown('participation_status')->options as $status)

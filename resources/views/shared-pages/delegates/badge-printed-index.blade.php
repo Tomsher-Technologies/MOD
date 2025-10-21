@@ -301,7 +301,7 @@
                 @endif
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('all_continents') }}</label>
                     <select multiple name="continent_id[]" id="continent-select"
                         data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
@@ -315,7 +315,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('all_countries') }}</label>
                     <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                     </select>
@@ -323,7 +323,7 @@
 
                 <div class="flex flex-col">
                     <label
-                        class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                        class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
