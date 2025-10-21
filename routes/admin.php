@@ -33,11 +33,16 @@ Route::prefix('mod-admin')->group(function () {
     Route::post('/check-username', [LoginController::class, 'checkUsername'])->name('check.username');
     Route::post('login', [LoginController::class, 'login'])->name('post.login');
     Route::get('logout', [LoginController::class, 'logout'])->name('admin.logout');
+    Route::get('/set-config-cache', function () {
+        Artisan::call('config:cache');
+        return back()->with('success', 'All config cached successfully!');
+    })->name('config.cache');
 });
 
 Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])->group(function () {
     Route::get('/clear-cache', function () {
-        Artisan::call('optimize:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
         return back()->with('success', 'All cache cleared successfully!');
     })->name('clear.cache');
 
