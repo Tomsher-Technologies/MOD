@@ -26,7 +26,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'ensureFrontendRequestsAreStateful' => EnsureFrontendRequestsAreStateful::class, 
             'locale' => \App\Http\Middleware\SetLocale::class,
-            'set_api_locale' => \App\Http\Middleware\SetApiLocale::class,
             'checkFrontendUserType' => \App\Http\Middleware\CheckFrontendUserType::class,
             'check.permission' => \App\Http\Middleware\CheckPermission::class,
         ]);
