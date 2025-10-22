@@ -9,6 +9,7 @@ use App\Models\CommitteeMember;
 use App\Models\DropdownOption;
 use App\Models\Event;
 use Carbon\Carbon;
+use DB;
 
 class CommitteeController extends Controller
 {
@@ -25,8 +26,10 @@ class CommitteeController extends Controller
     public function index(Request $request)
     {
         $request->session()->put('committee_last_url', url()->full());
-        $query = CommitteeMember::with(['designation', 'committee'])->orderBy('id','desc');
-        
+        // DB::enableQueryLog();
+        $query = CommitteeMember::with(['designation', 'committee'])
+                            ->leftJoin('dropdown_options as committee_sort', 'committee_members.committee_id', '=', 'committee_sort.id')
+                            ->leftJoin('dropdown_options as designation_sort', 'committee_members.designation_id', '=', 'designation_sort.id');
         if ($request->filled('search')) {
             $search = $request->search;
             $query->when($search, function ($qu, $search) {
@@ -59,6 +62,11 @@ class CommitteeController extends Controller
         if ($request->filled('event_id')) {
             $query->where('event_id', $request->event_id);
         }
+        $query->select('committee_members.*')
+        ->orderBy('committee_sort.sort_order', 'asc')
+            ->orderBy('designation_sort.sort_order', 'asc')->get();
+
+            // dd(DB::getQueryLog());
 
         $committee_members = $query->paginate(15);
 
