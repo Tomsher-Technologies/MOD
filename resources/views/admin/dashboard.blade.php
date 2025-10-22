@@ -7,7 +7,7 @@
     <div class="">
         <!-- Overview boxes -->
         <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
-            <h2 class="text-sm xl:text-xl font-medium mb-0">{{ __db('dashboard') }}</h2>
+            <h2 class="text-sm xl:text-xl font-bold mb-0">{{ __db('dashboard') }}</h2>
         </div>
       
       
@@ -106,7 +106,7 @@
             <div class="col-span-8 sm:col-span-8 xl:col-span-8">
                 <div class="bg-white h-full rounded-lg border-0 p-4">
                     <div class="border-b border-neutral-200 pb-4 mb-4">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0">
+                        <h6 class="text-sm xl:text-xl font-bold mb-0">
                             <a href="{{ route("admin.dashboard.tables",["table" => "divisions"]) }}">
                                 {{ __db('delegations_by_division') }}
                             </a>
@@ -118,7 +118,7 @@
             <div class="col-span-4 sm:col-span-4 xl:col-span-4">
                 <div class="bg-white h-full rounded-lg border-0 p-4">
                     <div class="border-b border-neutral-200 pb-4 mb-4">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0">
+                        <h6 class="text-sm xl:text-xl font-bold mb-0">
                             <a href="{{ route("admin.dashboard.tables",["table" => "assignments"]) }}">
                                 {{ __db('delegation_assignments') }}
                             </a>
@@ -130,7 +130,7 @@
             <div class="col-span-5 sm:col-span-5 xl:col-span-5">
                 <div class="bg-white h-full rounded-lg border-0 p-4">
                     <div class="border-b border-neutral-200 pb-4 mb-4">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0"> 
+                        <h6 class="text-sm xl:text-xl font-bold mb-0"> 
                             <a href="{{ route("admin.dashboard.tables",["table" => "arrival"]) }}">
                                 {{ __db('arrival_status') }}
                             </a>
@@ -143,7 +143,7 @@
             <div class="col-span-7 sm:col-span-7 xl:col-span-7">
                <div class="bg-white h-full rounded-lg border-0 p-6">
                   <div class="mb-4 flex items-center justify-start gap-2">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('members_arrivals_and_departures') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('members_arrivals_and_departures') }}</h6>
                         <span
                            class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                            <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
@@ -153,7 +153,7 @@
                   </div>
                     <table class="table-auto mb-0  !border-[#F9F7ED] w-full">
                         <thead>
-                        <tr class="text-[13px]">
+                        <tr class="text-[14px]">
                             <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">
                                     {{ __db('airport_land_sea') }}</th>
                             <th scope="col"
@@ -166,8 +166,14 @@
                         </thead>
                         <tbody>
                             @forelse($data['arr_dep_summary'] as $drow)
-                                    <tr class="text-[12px] align-[middle]">
-                                        <td class="px-2 py-2 border border-gray-200">{{ $drow->transport_point }}</td>
+                                    <tr class="text-[13px] align-[middle]">
+                                        <td class="px-2 py-2 border border-gray-200">
+                                            @if($drow->transport_point == 'land' || $drow->transport_point == 'sea')
+                                                {{ __db($drow->transport_point) }}
+                                            @else
+                                                {{ $drow->transport_point }}
+                                            @endif
+                                        </td>
                                         <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->arrival_count }}</td>
                                         <td class="px-2 py-2 border border-gray-200 text-center">{{ $drow->departure_count }}</td>
                                     </tr>
@@ -203,7 +209,7 @@
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <a href="{{ route("admin.dashboard.tables",["table" => "invitations"]) }}">
-                            <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('delegates_invitation_status') }}</h6>
+                            <h6 class="text-sm xl:text-xl font-bold mb-0">{{ __db('delegates_invitation_status') }}</h6>
                         </a>
                     </div>
                     <div id="InvitationStatus"></div>
@@ -219,7 +225,7 @@
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <a href="{{ route("admin.dashboard.tables",["table" => "participations"]) }}">
-                            <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('delegates_by_participation_status') }}</h6>
+                            <h6 class="text-sm xl:text-xl font-bold mb-0">{{ __db('delegates_by_participation_status') }}</h6>
                         </a>
                     </div>
                     <div id="ParticipationStatus"></div>
@@ -233,7 +239,7 @@
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class="mb-4 flex items-center justify-between">
                         <a href="{{ route("admin.dashboard.tables",["table" => "continents"]) }}">
-                            <h6 class="text-sm xl:text-xl font-medium mb-0">{{ __db('accepted_invitations_continents') }}</h6>
+                            <h6 class="text-sm xl:text-xl font-bold mb-0">{{ __db('accepted_invitations_continents') }}</h6>
                         </a>
                     </div>
                 
@@ -242,25 +248,29 @@
             </div>
         </div>
 
+        @php 
+            $upcoming_arrivals = $data['upcomming_arrivals'];
+            $upcoming_departures = $data['upcomming_departures'];
+        @endphp
         <!-- Upcoming Arrivals-->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6" id="upcoming_arrivals">
             <div class="xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class=" mb-4 flex items-center justify-start gap-2">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('upcoming_arrivals') }} </h6>
+                        <h6 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('upcoming_arrivals') }} ({{ $upcoming_arrivals->total() }})</h6>
                         <span
                             class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
                             {{ __db('today') }}
                         </span>
-                        <button onclick="printSection('print_area_arrival')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-1 px-2">
+                        {{-- <button onclick="printSection('print_area_arrival')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-1 px-2">
                             <svg class="ml-1 w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-12 0h12v3H6v-3Z" />
                             </svg>
 
                             {{ __db('print') }}
-                        </button>
+                        </button> --}}
                     </div>
 
                     <table class="table-auto mb-0 !border-[#F9F7ED] w-full" id="print_area_arrival">
@@ -270,24 +280,24 @@
                                 <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('sl_no') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                {{-- <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegation') }}
                                 </th>
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('continent') }}
-                                </th>
+                                </th> --}}
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('country') }}
                                 </th>
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegates') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                {{-- <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('escort') }}
                                 </th>
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('driver') }}
-                                </th>
+                                </th> --}}
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('airport') }}
                                 </th>
@@ -307,10 +317,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($data['upcomming_arrivals'] as $akey => $row)
+                            @forelse ($upcoming_arrivals as $akey => $row)
                                 <tr class="text-[12px] align-middle  align-center">
-                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $akey + 1 }}</td>
-                                    <td class="text-center px-2 py-2 border border-gray-200]">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
+                                        {{ $akey + 1 + ($upcoming_arrivals->currentPage() - 1) * $upcoming_arrivals->perPage() }}
+                                    </td>
+                                    {{-- <td class="text-center px-2 py-2 border border-gray-200]">
 
                                         <a href="{{ route('delegations.show', $row->delegate->delegation_id) }}">
                                             {{ $row->delegate->delegation->code ?? '-' }}
@@ -319,14 +331,17 @@
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $row->delegate->delegation->continent->value ?? '-' }}
+                                    </td> --}}
+                                    <td class="text-center px-2 py-2 border border-gray-200">
+                                        {{ $row->delegate->delegation->country->name ?? '-' }}
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">
-                                        {{ $row->delegate->delegation->country->value ?? '-' }}
+                                        <span class="block">{{ getLangTitleSeperator(
+                                                    $row->delegate->getTranslation('title'),
+                                                    $row->delegate->getTranslation('name'),
+                                                ) }}</span>
                                     </td>
-                                    <td class="text-center px-2 py-2 border border-gray-200">
-                                        <span class="block">{{ $row->delegate->name_en ?? '-' }}</span>
-                                    </td>
-                                    <td class="text-center px-2 py-2 border border-gray-200">
+                                    {{-- <td class="text-center px-2 py-2 border border-gray-200">
                                         @if($row->delegate->delegation->escorts->isNotEmpty())
                                             @foreach ($row->delegate->delegation->escorts as $escort)
                                                 <span class="">{{ $escort->code }}</span><br>
@@ -339,13 +354,13 @@
                                                 <span class="">{{ $driver->code }}</span><br>
                                             @endforeach
                                         @endif
-                                    </td>
+                                    </td> --}}
 
                                     <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $row->airport->value ?? '-' }}
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">
-                                        {{ $row->date_time ? \Carbon\Carbon::parse($row->date_time)->format('h:i A') : '-' }}
+                                        {{ $row->date_time ? \Carbon\Carbon::parse($row->date_time)->format('H:i') : '-' }}
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">{{ $row->flight_no ?? '-' }}</td>
                                     <td class="text-center px-2 py-2 border border-gray-200">{{ $row->flight_name ?? '-' }}</td>
@@ -382,29 +397,33 @@
                             
                         </tbody>
                     </table>
+
+                    <div class="mt-4">
+                        {{ $upcoming_arrivals->appends(request()->query())->fragment('upcoming_arrivals')->links() }}
+                    </div>
                 </div>
             </div>
         </div>
 
 
         <!-- Upcoming Arrivals-->
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6" id="upcoming_departures">
             <div class="xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6">
                     <div class=" mb-4 flex items-center justify-start gap-2">
-                        <h6 class="text-sm xl:text-xl font-medium mb-0"> {{ __db('upcoming_departures') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('upcoming_departures') }} ({{ $upcoming_departures->total() }})</h6>
                         <span  class="bg-red-100 text-red-700 text-sm font-medium px-3 py-1 rounded-full flex items-center gap-1">
                             <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
                             {{ __db('today') }}
                         </span>
-                        <button onclick="printSection('print_area_departure')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-1 px-2">
+                        {{-- <button onclick="printSection('print_area_departure')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-1 px-2">
                             <svg class="ml-1 w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2m-12 0h12v3H6v-3Z" />
                             </svg>
 
                             {{ __db('print') }}
-                        </button>
+                        </button> --}}
                     </div>
 
                     <table class="table-auto mb-0 !border-[#F9F7ED] w-full" id="print_area_departure">
@@ -413,24 +432,24 @@
                                 <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('sl_no') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                {{-- <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegation') }}
                                 </th>
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('continent') }}
-                                </th>
+                                </th> --}}
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('country') }}
                                 </th>
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('delegates') }}
                                 </th>
-                                <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                {{-- <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('escort') }}
                                 </th>
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('driver') }}
-                                </th>
+                                </th> --}}
                                 <th class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                     {{ __db('airport') }}
                                 </th>
@@ -450,24 +469,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($data['upcomming_departures'] as $dkey => $drow)
+                            @forelse ($upcoming_departures as $dkey => $drow)
                                 <tr class="text-[12px] align-middle  align-center">
-                                    <td class="text-center px-2 py-2 border border-gray-200">{{ $dkey + 1 }}</td>
-                                    <td class="text-center px-2 py-2 border border-gray-200]">
+                                    <td class="text-center px-2 py-2 border border-gray-200">
+                                        {{ $dkey + 1 + ($upcoming_departures->currentPage() - 1) * $upcoming_departures->perPage() }}
+                                    </td>
+                                    {{-- <td class="text-center px-2 py-2 border border-gray-200]">
                                         <a href="{{ route('delegations.show', $drow->delegate->delegation_id) }}">
                                             {{ $drow->delegate->delegation->code ?? '-' }}
                                         </a>
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $drow->delegate->delegation->continent->value ?? '-' }}
+                                    </td> --}}
+                                    <td class="text-center px-2 py-2 border border-gray-200">
+                                        {{ $drow->delegate->delegation->country->name ?? '-' }}
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">
-                                        {{ $drow->delegate->delegation->country->value ?? '-' }}
+                                        <span class="block">{{ getLangTitleSeperator(
+                                                    $drow->delegate->getTranslation('title'),
+                                                    $drow->delegate->getTranslation('name'),
+                                                ) }}</span>
                                     </td>
-                                    <td class="text-center px-2 py-2 border border-gray-200">
-                                        <span class="block">{{ $drow->delegate->name_en ?? '-' }}</span>
-                                    </td>
-                                    <td class="text-center px-2 py-2 border border-gray-200">
+                                    {{-- <td class="text-center px-2 py-2 border border-gray-200">
                                         @if($drow->delegate->delegation->escorts->isNotEmpty())
                                             @foreach ($drow->delegate->delegation->escorts as $escort)
                                                 <span class="">{{ $escort->code }}</span><br>
@@ -480,13 +504,13 @@
                                                 <span class="">{{ $driver->code }}</span> <br>
                                             @endforeach
                                         @endif
-                                    </td>
+                                    </td> --}}
 
                                     <td class="text-center px-2 py-2 border border-gray-200">
                                         {{ $drow->airport->value ?? '-' }}
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">
-                                        {{ $drow->date_time ? \Carbon\Carbon::parse($drow->date_time)->format('h:i A') : '-' }}
+                                        {{ $drow->date_time ? \Carbon\Carbon::parse($drow->date_time)->format('H:i') : '-' }}
                                     </td>
                                     <td class="text-center px-2 py-2 border border-gray-200">{{ $drow->flight_no ?? '-' }}</td>
                                     <td class="text-center px-2 py-2 border border-gray-200">{{ $drow->flight_name ?? '-' }}</td>
@@ -518,6 +542,10 @@
                             
                         </tbody>
                     </table>
+
+                    <div class="mt-4">
+                        {{ $upcoming_departures->appends(request()->query())->fragment('upcoming_departures')->links()}}
+                    </div>
                 </div>
             </div>
         </div>

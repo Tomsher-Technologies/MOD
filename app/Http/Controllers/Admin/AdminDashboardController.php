@@ -447,7 +447,7 @@ class AdminDashboardController extends Controller
                                 END ASC
                             ", [$oneHourBefore, $oneHourAfter])
             ->orderBy('date_time', 'asc');
-        $data['upcomming_arrivals'] = $arrivals_query->get();
+        $data['upcomming_arrivals'] = $arrivals_query->paginate(5, ['*'], 'arrival_page');
 
         $departure_query = DelegateTransport::where('type', 'departure')
             ->with([
@@ -469,7 +469,7 @@ class AdminDashboardController extends Controller
                                 END ASC
                             ", [$oneHourBefore, $oneHourAfter])
             ->orderBy('date_time', 'asc');
-        $data['upcomming_departures'] = $departure_query->get();
+        $data['upcomming_departures'] = $departure_query->paginate(5, ['*'], 'departure_page');
 
         $data['arr_dep_summary'] = $summary;
 

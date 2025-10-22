@@ -32,8 +32,7 @@ class CommitteeController extends Controller
             $query->where('name_en', 'like', "%{$search}%")
                 ->orWhere('name_ar', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
-                ->orWhere('phone', 'like', "%{$search}%")
-                ->orWhere('military_no', 'like', "%{$search}%");
+                ->orWhere('phone', 'like', "%{$search}%");
         }
 
         if ($request->filled('status')) {
@@ -80,7 +79,7 @@ class CommitteeController extends Controller
             'name_ar'           => 'required',
             'email'             => 'required',
             'phone'             => 'required',
-            'military_no'       => 'required',
+            // 'military_no'       => 'required',
             'designation_id'    => 'required',
             'committee_id'      => 'required',
         ],[
@@ -89,7 +88,7 @@ class CommitteeController extends Controller
             'name_ar.required'          => __db('this_field_is_required'),
             'email.required'            => __db('this_field_is_required'),
             'phone.required'            => __db('this_field_is_required'),
-            'military_no.required'      => __db('this_field_is_required'),
+            // 'military_no.required'      => __db('this_field_is_required'),
             'designation_id.required'   => __db('this_field_is_required'),
             'committee_id.required'     => __db('this_field_is_required'),
         ]);
@@ -114,7 +113,7 @@ class CommitteeController extends Controller
             'name_ar'           => 'required',
             'email'             => 'required',
             'phone'             => 'required',
-            'military_no'       => 'required',
+            // 'military_no'       => 'required',
             'designation_id'    => 'required',
             'committee_id'      => 'required',
         ],[
@@ -123,7 +122,7 @@ class CommitteeController extends Controller
             'name_ar.required'          => __db('this_field_is_required'),
             'email.required'            => __db('this_field_is_required'),
             'phone.required'            => __db('this_field_is_required'),
-            'military_no.required'      => __db('this_field_is_required'),
+            // 'military_no.required'      => __db('this_field_is_required'),
             'designation_id.required'   => __db('this_field_is_required'),
             'committee_id.required'     => __db('this_field_is_required'),
         ]);

@@ -46,6 +46,9 @@
                         <label class="form-label">{{ __db('image') }} <span class="text-red-500">*</span> :</label>
                         <input type="file" name="image"
                             class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <small class="text-gray-500 text-xs block mt-1">
+                            ({{ __db('news_image_recommended_size') }})
+                        </small>
                         <img id="imagePreview" src="{{ asset(getUploadedImage($news->image)) }}" alt="Image Preview"
                                     class="mt-3 h-30 w-20 img-thumbnail  {{ $news->image ? '' : 'd-none' }}"/>
                         @error('image')

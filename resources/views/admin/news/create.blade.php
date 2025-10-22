@@ -45,6 +45,9 @@
                         <label class="form-label">{{ __db('image') }} <span class="text-red-500">*</span> :</label>
                         <input type="file" name="image"
                             class=" rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                        <small class="text-gray-500 text-xs block mt-1">
+                            ({{ __db('news_image_recommended_size') }})
+                        </small>
                         @error('image')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                         @enderror
