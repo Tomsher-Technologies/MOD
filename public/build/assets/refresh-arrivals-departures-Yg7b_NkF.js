@@ -65,4 +65,4 @@ document.addEventListener("DOMContentLoaded",function(){const i=document.getElem
                 .fullscreen-table tbody tr {
                     font-size: 18px !important;
                 }
-            `,document.head.appendChild(t)}}f(),u(),c(),setInterval(p,3e3),console.log("Auto-refresh initialized for "+(i?"arrivals":"departures")+" page")});
+            `,document.head.appendChild(t)}}f(),u(),c(),setInterval(p,6e4),console.log("Auto-refresh initialized for "+(i?"arrivals":"departures")+" page")});
