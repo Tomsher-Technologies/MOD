@@ -25,7 +25,17 @@ class DropdownOption extends Model
             return $this->attributes['value'];
         }
 
-        return !empty($this->attributes['value_ar']) ? $this->attributes['value_ar'] :
-           (!empty($this->attributes['value_en']) ? $this->attributes['value_en'] : $value);
+        return !empty($this->attributes['value_ar']) ? $this->attributes['value_ar'] : (!empty($this->attributes['value_en']) ? $this->attributes['value_en'] : $value);
+    }
+
+    public function getValueEn()
+    {
+        return $this->attributes['value'];
+    }
+
+
+    public function getValueAr()
+    {
+        return $this->attributes['value_ar'];
     }
 }

@@ -983,3 +983,16 @@ INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', '96', 'view_interviews', 'View interviews', 'web', '1', current_timestamp(), current_timestamp());
 
 INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '107', 'view_interviews', 'View interviews', 'web', '1', current_timestamp(), current_timestamp());
+
+
+
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '25', 'view_badge_printed', 'View Badge Printed Delegates', 'web', '1', current_timestamp(), current_timestamp());
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'delegate', '69', 'view_badge_printed', 'View Badge Printed Delegates', 'web', '1', current_timestamp(), current_timestamp());
+    
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'escort', '85', 'view_badge_printed', 'View Badge Printed Delegates', 'web', '1', current_timestamp(), current_timestamp());
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', '96', 'view_badge_printed', 'View Badge Printed Delegates', 'web', '1', current_timestamp(), current_timestamp());
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '107', 'view_badge_printed', 'View Badge Printed Delegates', 'web', '1', current_timestamp(), current_timestamp());

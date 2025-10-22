@@ -102,18 +102,13 @@ class DelegationController extends Controller
             'only' => ['addTravel', 'storeTravel', 'updateTravel']
         ]);
 
-        $this->middleware('permission:edit_delegations|delegate_edit_delegations', [
-            'only' => ['badgePrintedIndex']
-        ]);
-
         // Badge Print Export
-
-        $this->middleware('permission:view_badge_printed', [
+        $this->middleware('permission:badge_print_export|view_badge_printed', [
             'only' => ['badgePrintedIndex']
         ]);
 
         $this->middleware('permission:badge_print_export', [
-            'only' => ['badgePrintedIndex', 'exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
+            'only' => ['exportNonBadgePrintedDelegates', 'exportNonBadgePrinted']
         ]);
 
         $this->delegationStatusService = new DelegationStatusService();
