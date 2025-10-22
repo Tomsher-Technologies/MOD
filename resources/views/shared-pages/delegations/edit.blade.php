@@ -432,14 +432,28 @@
                                 $badge = $row->team_head
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                                     : '';
+
                                 $name = $row->name_ar;
                                 $title = $row->title_ar;
-                                return $badge . '<div class="block">' . e($title . ' / ' . $name) . '</div>';
+
+                                $displayText = '';
+                                if ($title && $name) {
+                                    $displayText = e($title . '/ ' . $name);
+                                } elseif ($title) {
+                                    $displayText = e($title);
+                                } elseif ($name) {
+                                    $displayText = e($name);
+                                } else {
+                                    $displayText = '-';
+                                }
+
+                                return $badge . '<div class="block">' . $displayText . '</div>';
                             },
                         ],
+
                         [
                             'label' => __db('designation_ar'),
-                            'render' => fn($row) => $row->designation_ar,
+                            'render' => fn($row) => $row?->designation_ar,
                         ],
                         [
                             'label' => __db('name_en'),
@@ -447,9 +461,22 @@
                                 $badge = $row->team_head
                                     ? '<span class="bg-[#B68A35] font-semibold text-[10px] px-3 py-[1px] rounded-lg text-white">TH</span> '
                                     : '';
+
                                 $name = $row->name_en;
                                 $title = $row->title_en;
-                                return $badge . '<div class="block">' . e($title . ' ' . $name) . '</div>';
+
+                                $displayText = '';
+                                if ($title && $name) {
+                                    $displayText = e($title . '. ' . $name);
+                                } elseif ($title) {
+                                    $displayText = e($title);
+                                } elseif ($name) {
+                                    $displayText = e($name);
+                                } else {
+                                    $displayText = '-';
+                                }
+
+                                return $badge . '<div class="block">' . $displayText . '</div>';
                             },
                         ],
 

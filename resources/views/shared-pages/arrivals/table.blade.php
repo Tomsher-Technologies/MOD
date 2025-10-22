@@ -74,12 +74,19 @@
                     }
 
                     if ($teamHead) {
-                        return e(
+                        $name = e(
                             getLangTitleSeperator(
                                 $teamHead->getTranslation('title'),
                                 $teamHead->getTranslation('name'),
                             ),
                         );
+
+                        return '<div class="flex flex-col items-center gap-1">
+                            <span class="!bg-[#B68A35] !text-white px-1 py-0.2 rounded !text-[9px] font-semibold inline-block w-fit">TH</span>
+                            <span>' .
+                            $name .
+                            '</span>
+                        </div>';
                     }
 
                     $firstDelegate = collect($row['delegates'])->first();
