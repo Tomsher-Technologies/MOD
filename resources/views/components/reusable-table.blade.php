@@ -54,8 +54,8 @@
                 @endforeach
                 <select id="limit" name="limit" onchange="this.form.submit()"
                     class="border text-secondary-light text-xs !border-[#d1d5db] rounded px-5 py-1 !pe-7">
-                    @foreach ([10, 25, 50, 100, 500] as $size)
-                        <option value="{{ $size }}" {{ request('limit', 25) == $size ? 'selected' : '' }}>
+                    @foreach ([10, 20, 50, 100, 500] as $size)
+                        <option value="{{ $size }}" {{ request('limit', 20) == $size ? 'selected' : '' }}>
                             {{ $size }}
                         </option>
                     @endforeach
