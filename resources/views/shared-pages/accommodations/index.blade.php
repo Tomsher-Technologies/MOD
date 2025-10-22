@@ -47,6 +47,16 @@
                 <div class=" mb-4 flex items-center justify-between gap-3">
                 <form class="w-[50%] me-4" action="{{ route('accommodations.index') }}" method="GET">
                     <div class="relative">
+
+                        @foreach (request()->except(['search', 'page']) as $k => $v)
+                            @if (is_array($v))
+                                @foreach ($v as $vv)
+                                    <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                                @endforeach
+                            @else
+                                <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                            @endif
+                        @endforeach
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 20 20">
@@ -277,6 +287,16 @@
             </button>
 
             <form action="{{ route('accommodations.index') }}" method="GET">
+
+                @foreach (request()->except(['page']) as $k => $v)
+                    @if (is_array($v))
+                        @foreach ($v as $vv)
+                            <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                        @endforeach
+                    @else
+                        <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                    @endif
+                @endforeach
                 <div class="flex flex-col gap-2 mt-2">
                     <div class="flex flex-col">
                         <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('room_type') }}</label>

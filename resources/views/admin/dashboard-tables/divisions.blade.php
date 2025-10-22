@@ -6,7 +6,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6 w-full" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('delegations_by_division') }}</h4>
+                        <h4 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('delegations_by_division') }}</h4>
 
                         <div class="flex items-center gap-2 no-print">
                             <button onclick="printSection('print_area','pieChart')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
@@ -36,7 +36,7 @@
                     <div class="overflow-x-auto w-full">
                         <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]" id="tableContainer">
                             <thead>
-                                <tr class="text-[13px]">
+                                <tr class="text-[14px]">
                                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
                                     <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('count') }}</th>
                                 </tr>
@@ -45,7 +45,7 @@
                                 @php $grandTotal = 0; @endphp
                                 @foreach($delegatesByDivision as $division)
                                     @php $grandTotal += $division->total; @endphp
-                                    <tr class=" text-[12px] align-[middle]">
+                                    <tr class=" text-[13px] align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">{{ $division->department_name }}</td>
                                         <td class="px-4 text-center py-2 border border-gray-200">{{ $division->total }}</td>
                                     </tr>
@@ -207,7 +207,7 @@
 
         insertChartAsPNG(() => {
             const printWindow = window.open('', 'PRINT', 'height=800,width=1500');
-            printWindow.document.write('<html dir="rtl"><head><title> </title>');
+            printWindow.document.write('<html dir="rtl"><head><title>&nbsp;</title>');
             printWindow.document.write(`
             <style>
                 @media print {

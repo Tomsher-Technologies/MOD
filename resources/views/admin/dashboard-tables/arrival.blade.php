@@ -6,7 +6,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('arrival_status') }}</h4>
+                        <h4 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('arrival_status') }}</h4>
                         <div class="flex items-center gap-2 no-print">
                             <button onclick="printSection('print_area')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
                                 <svg class="ml-1 w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
                             @endphp
                             <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[200px]" id="tableContainer">
                                 <thead>
-                                    <tr class="text-[13px]">
+                                    <tr class="text-[14px]">
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('status') }}</th>
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('count') }}</th>
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('percentage') }}</th>
@@ -48,7 +48,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($arrivalData as $status => $count)
-                                        <tr>
+                                        <tr class="text-[13px]">
                                             <td class="border border-gray-300 px-4 py-2 capitalize">
                                                 {{ __db($status) }}
                                             </td>
@@ -150,7 +150,7 @@
         }
 
         const printWindow = window.open('', 'PRINT', 'height=800,width=1500');
-        printWindow.document.write('<html dir="rtl"><head><title> </title>');
+        printWindow.document.write('<html dir="rtl"><head><title>&nbsp;</title>');
         printWindow.document.write(`
         <style>
         @media print {
@@ -176,7 +176,7 @@
             display: flex;
             justify-content: center; /* horizontal centering */
             align-items: center;     /* vertical centering */
-            height: calc(100vh - 40px); /* adjust for margins */
+            height: calc(100vh - 50px); /* adjust for margins */
             width: 100%;
             box-sizing: border-box; /* include padding/margins in width */
             padding: 0 10mm; /* give some horizontal padding so SVG doesn't touch edges */
