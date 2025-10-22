@@ -976,5 +976,10 @@
 
 ---- Id - 403 taken (next permissions should be added after 403)
 
-   
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'delegate', '69', 'view_interviews', 'View interviews', 'web', '1', current_timestamp(), current_timestamp());
     
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'escort', '85', 'view_interviews', 'View interviews', 'web', '1', current_timestamp(), current_timestamp());
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'driver', '96', 'view_interviews', 'View interviews', 'web', '1', current_timestamp(), current_timestamp());
+
+INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'hotel', '107', 'view_interviews', 'View interviews', 'web', '1', current_timestamp(), current_timestamp());

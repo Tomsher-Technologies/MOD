@@ -6,7 +6,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h6 class="!text-[16px] font-medium mb-0"> {{ __db('delegation_assignments') }}</h6>
+                        <h6 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('delegation_assignments') }}</h6>
 
                         <div class="flex items-center gap-2 no-print">
                             <button onclick="printSection('print_area')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
@@ -46,26 +46,26 @@
                             @endphp --}}
                             <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[200px]" id="tableContainer">
                                 <thead>
-                                    <tr class="text-[13px]">
+                                    <tr class="text-[14px]">
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]"></th>
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('assigned') }}</th>
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ __db('not_assigned') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class=" text-[12px] align-[middle]">
+                                    <tr class=" text-[13px] align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">{{ __db('escorts') }}</td>
                                         <td class="px-4 py-2  text-center border border-gray-200">{{ $data['delegation_assignments']['assignedEscorts'] }}</td>
                                         <td class="px-4 py-2  text-center border border-gray-200">{{ $data['delegation_assignments']['notAssignedEscorts'] }}</td>
                                     </tr>
 
-                                    <tr class=" text-[12px] align-[middle]">
+                                    <tr class=" text-[13px] align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">{{ __db('drivers') }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['assignedDrivers'] }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['notAssignedDrivers'] }}</td>
                                     </tr>
 
-                                    <tr class=" text-[12px] align-[middle]">
+                                    <tr class=" text-[13px] align-[middle]">
                                         <td class="px-4 py-2 border border-gray-200">{{ __db('hotels') }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['assignedHotels'] }}</td>
                                         <td class="px-4 py-2 text-center border border-gray-200">{{ $data['delegation_assignments']['notAssignedHotels'] }}</td>
@@ -203,7 +203,7 @@
             display: flex;
             justify-content: center; /* horizontal centering */
             align-items: center;     /* vertical centering */
-            height: calc(100vh - 40px); /* adjust for margins */
+            height: calc(100vh - 60px); /* adjust for margins */
             width: 100%;
             box-sizing: border-box; /* include padding/margins in width */
             padding: 0 10mm; /* give some horizontal padding so SVG doesn't touch edges */
