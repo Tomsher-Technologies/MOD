@@ -74,7 +74,14 @@ class RoleController extends Controller
         }
 
         $role = Role::create(['name' => $request->input('name'), 'module' => $request->input('module')]);
-        $role->givePermissionTo($request->permissions);
+        
+        // echo '<pre>';
+        // print_r($request->permissions);
+
+        $permissions = CustomPermission::whereIn('id', $request->permissions)->get();
+        // print_r($permissions);
+        // die;
+        $role->givePermissionTo($permissions);
         
         session()->flash('success', __db('role').__db('created_successfully'));
         return redirect()->route('roles.index');
@@ -90,7 +97,7 @@ class RoleController extends Controller
         $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();
-    
+
         return view('admin.roles_permissions.edit',compact('role','permission','rolePermissions'));
     }
 
@@ -114,8 +121,14 @@ class RoleController extends Controller
         $role->name = $request->input('name');
         $role->module = $request->input('module');
         $role->save();
-    
-        $role->syncPermissions($request->input('permissions'));
+
+        // echo '<pre>';
+        // print_r($request->permissions);
+
+        $permissions = CustomPermission::whereIn('id', $request->permissions)->get();
+        // print_r($permissions);
+        // die;
+        $role->syncPermissions($permissions);
 
         session()->flash('success', __db('role').__db('updated_successfully'));
         return redirect()->route('roles.index');

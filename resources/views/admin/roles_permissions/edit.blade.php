@@ -47,6 +47,11 @@
                     <label class="form-label block text-gray-700 font-semibold text-base">{{ __db('permissions') }} <span class="text-danger">*</span></label>
                     <div class="w-full">
                         <div id="permissionContainer" class="mt-4">
+                            {{-- @php
+                                echo '<pre>';
+                                print_r($permission);
+                                die;
+                            @endphp --}}
                             @foreach ($permission as $parent)
                                 @php
                                     $selected = '';
@@ -59,9 +64,9 @@
                                         <!-- Parent Permission -->
                                         <label class="flex items-center text-sm gap-2 font-semibold text-gray-800">
                                             <input type="checkbox" name="permissions[]"
-                                                value="{{ $parent->name }}"
+                                                value="{{ $parent->id }}"
                                                 class="parent-checkbox accent-yellow-600 h-4 w-4"
-                                                data-parent="{{ $parent->name }}" {{ $selected }}>
+                                                data-parent="{{ $parent->id }}" {{ $selected }}>
                                             {{ $parent->title }}
                                         </label>
 
@@ -76,9 +81,9 @@
                                                 @endphp
                                                 <label class="flex items-center  text-sm gap-2 text-gray-700">
                                                     <input type="checkbox" name="permissions[]"
-                                                        value="{{ $child->name }}"
+                                                        value="{{ $child->id }}"
                                                         class="child-checkbox accent-yellow-500 h-4 w-4"
-                                                        data-parent="{{ $parent->name }}"  {{ $selectedChild }}>
+                                                        data-parent="{{ $parent->id }}"  {{ $selectedChild }}>
                                                     {{ $child->title }}
                                                 </label>
                                             @endforeach

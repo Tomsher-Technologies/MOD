@@ -2,7 +2,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
         <h2 class="font-semibold text-2xl">{{ __db('delegation') }}</h2>
         <div class="flex gap-3 ms-auto">
-            <x-back-btn class="" back-url="{{ route('accommodation-delegations') }}" />
+            <x-back-btn class="" back-url="{{ session()->get('accommodation_delegations_last_url') ? session()->get('accommodation_delegations_last_url') : route('accommodation-delegations') }}" />
         </div>
     </div>
 
