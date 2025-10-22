@@ -197,7 +197,7 @@
 
         insertChartAsPNG(() => {
             const printWindow = window.open('', 'PRINT', 'height=800,width=1500');
-            printWindow.document.write('<html dir="rtl"><head><title> </title>');
+            printWindow.document.write('<html dir="rtl"><head><title>&nbsp;</title>');
             printWindow.document.write(`
             <style>
                 @media print {
