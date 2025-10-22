@@ -85,9 +85,9 @@
                                         {!! $escortValue !!}
                                     </td>
                                     <td style="text-align:right; padding:0; white-space:nowrap;width:10%;">
-                                        @if($ekey === 0)
+                                        {{-- @if($ekey === 0) --}}
                                             <strong>&nbsp; : &nbsp;{!! e(__db('escort')) !!}</strong>
-                                        @endif
+                                        {{-- @endif --}}
                                     </td>
                                 </tr>
                             </table>

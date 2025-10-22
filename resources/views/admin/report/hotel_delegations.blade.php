@@ -185,11 +185,7 @@
                                                 <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
                                             @endif
                                                     
-                                            @if ($key == 0)
-                                                <strong> : {{ __db('escort') }}</strong>
-                                            @else
-                                                <strong style="margin-right: 42px;"></strong>
-                                            @endif
+                                            <strong> : {{ __db('escort') }}</strong> 
                                         </td>
                                     </tr>
                                 @endforeach
