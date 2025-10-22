@@ -73,7 +73,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-span-4">
+                    {{-- <div class="col-span-4">
                         <label class="form-label">{{ __db('military_number') }} <span class="text-red-500">*</span> :</label>
                         <input type="text" name="military_no"  dir="ltr"
                             class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
@@ -81,7 +81,7 @@
                         @error('military_no')
                             <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
                         @enderror
-                    </div>
+                    </div> --}}
 
                     <div class="col-span-4">
                         <label class="form-label">{{ __db('designation') }} <span class="text-red-500">*</span> :</label>

@@ -66,9 +66,9 @@
                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('phone') }}
                         </th>
-                        <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                        {{-- <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('military_number') }}
-                        </th>
+                        </th> --}}
                         <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                             {{ __db('designation') }}
                         </th>
@@ -101,9 +101,9 @@
                             <td class="px-4 border text-center border-gray-200 py-3">
                                 {{ $com->phone ?? '' }}
                             </td>
-                            <td class="px-4 border text-center border-gray-200 py-3">
+                            {{-- <td class="px-4 border text-center border-gray-200 py-3">
                                 {{ $com->military_no ?? '' }}
-                            </td>
+                            </td> --}}
                             <td class="px-4 border text-center border-gray-200 py-3">
                                 {{ $com->designation->value ?? '' }}
                             </td>

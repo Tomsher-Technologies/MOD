@@ -73,9 +73,11 @@
                         <div class="col-span-6">
                             <label class="form-label">{{ __db('video') }} ({{ $lang['name'] }}) <span class="text-red-600">*</span></label>
                             <input type="file" name="translations[{{ $lang['code'] }}][link]" class="rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-
+                            <small class="text-gray-500 text-xs block mt-1">
+                                ({{ __db('home_page_video_recommended_size') }})
+                            </small>
                             @if($trans->link)
-                                <video autoplay="" muted="" loop="" playsinline="" class="w-50 h-50 object-cover -z-20">
+                                <video autoplay="" muted="" loop="" playsinline="" class="w-50 mt-2 h-50 object-cover -z-20">
                                     <source src="{{ asset(getUploadedImage($trans->link)) }}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>

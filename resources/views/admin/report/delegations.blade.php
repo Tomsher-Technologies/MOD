@@ -314,7 +314,7 @@
                         <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('invitation_status')->options as $status)
                             <option value="{{ $status->id }}"
-                                {{ request('invitation_status_id') == $status->id ? 'selected' : '' }}>
+                                {{ is_array(request('invitation_status_id')) && in_array($status->id, request('invitation_status_id')) ? 'selected' : '' }}>
                                 {{ $status->value }}
                             </option>
                         @endforeach
@@ -324,12 +324,11 @@
                 <div class="flex flex-col">
                     <label
                         class="form-label block text-gray-700 font-medium">{{ __db('all_participation_statuses') }}</label>
-                    <select multiple name="participation_status_id" data-placeholder="{{ __db('select') }}"
+                    <select multiple name="participation_status_id[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
-                        <option value="">{{ __db('select') }}</option>
                         @foreach (getDropDown('participation_status')->options as $status)
                             <option value="{{ $status->id }}"
-                                {{ request('participation_status_id') == $status->id ? 'selected' : '' }}>
+                                {{ is_array(request('participation_status_id')) && in_array($status->id, request('participation_status_id')) ? 'selected' : '' }}>
                                 {{ $status->value }}
                             </option>
                         @endforeach
