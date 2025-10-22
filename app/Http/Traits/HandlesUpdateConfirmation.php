@@ -303,7 +303,7 @@ trait HandlesUpdateConfirmation
                 if (!empty($notifiedChanges)) {
                     $notificationActivity = clone $activity;
                     $notificationActivity->changes = $notifiedChanges;
-                    $notificationActivity->message = $this->generateActivityMessage($action, $module, $notifiedChanges);
+                    $notificationActivity->message = $message ? $message : $this->generateActivityMessage($action, $module, $notifiedChanges);
                     $this->sendNotification($notificationActivity, $action, $module, $delegationId);
                 }
             }

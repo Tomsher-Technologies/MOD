@@ -175,7 +175,7 @@
                         [
                             'label' => __db('assigned') . ' ' . __db('delegation'),
                             'key' => 'assigned_delegation',
-                            'render' => function ($driver, $assignmentMode) {
+                            'render' => function ($driver) use ($assignmentMode) {
                                 return $driver->delegations
                                     ->map(function ($delegation) use ($driver, $assignmentMode) {
                                         if ($delegation->pivot->status === 1) {
@@ -183,16 +183,6 @@
                                             $delegationUrl = route('delegations.show', $delegation->id);
 
                                             $unassignButton = '';
-
-                                            $delegationButton =
-                                                ' <a href="' .
-                                                $delegationUrl .
-                                                '" class="font-medium !text-[#B68A35] hover:underline">
-                                                ' .
-                                                $delegation->code .
-                                                '
-                                                </a>
-                                            ';
 
                                             if (isset($assignmentMode)) {
                                                 $delegationButton =
@@ -203,6 +193,16 @@
                                                     '
                                                     </span>
                                                 ';
+                                            } else {
+                                                $delegationButton =
+                                                    ' <a href="' .
+                                                    $delegationUrl .
+                                                    '" class="font-medium !text-[#B68A35] hover:underline">
+                                                ' .
+                                                    $delegation->code .
+                                                    '
+                                                </a>
+                                            ';
                                             }
 
                                             if (can(['assign_drivers', 'driver_edit_drivers'])) {

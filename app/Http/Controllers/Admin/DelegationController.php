@@ -1136,6 +1136,35 @@ class DelegationController extends Controller
         try {
             DB::beginTransaction();
 
+            $delegation->load([
+                'country',
+                'invitationFrom',
+                'escorts.internalRanking',
+                'drivers',
+                'delegates.currentRoomAssignment.hotel'
+            ]);
+
+            $snapshotData = [
+                'escorts' => $delegation->escorts->map(function ($escort) {
+                    return [
+                        'name' => $escort->name,
+                        'rank' => $escort->internalRanking?->getValueEn() ?? 'N/A'
+                    ];
+                })->toArray(),
+                'drivers' => $delegation->drivers->map(function ($driver) {
+                    return ['name' => $driver->name];
+                })->toArray(),
+                'hotels' => $delegation->delegates
+                    ->filter(fn($delegate) => $delegate->currentRoomAssignment && $delegate->currentRoomAssignment->hotel)
+                    ->pluck('currentRoomAssignment.hotel.hotel_name')
+                    ->unique()
+                    ->values()
+                    ->toArray(),
+                'country' => $delegation->country?->getNameEn() ?? 'N/A',
+                'invitation_from' => $delegation->invitationFrom?->getValueEn() ?? 'N/A',
+                'delegation_code' => $delegation->code ?? 'N/A'
+            ];
+
             $delegation->update([
                 'invitation_from_id' => $dataToSave['invitation_from_id'],
                 'continent_id' => $dataToSave['continent_id'],
@@ -1147,13 +1176,17 @@ class DelegationController extends Controller
             ]);
 
             if ($delegation->shouldUnassignServices()) {
+                $delegation->escorts()->updateExistingPivot(
+                    $delegation->escorts->pluck('id')->toArray(),
+                    ['status' => 0]
+                );
 
-                $delegation->escorts()->updateExistingPivot($delegation->escorts->pluck('id')->toArray(), ['status' => 0]);
-
-                $delegation->drivers()->updateExistingPivot($delegation->drivers->pluck('id')->toArray(), ['status' => 0]);
+                $delegation->drivers()->updateExistingPivot(
+                    $delegation->drivers->pluck('id')->toArray(),
+                    ['status' => 0]
+                );
 
                 $delegation->interviews()->delete();
-
                 $this->removeDelegationAllAccommodation($delegation);
             }
 
@@ -1162,19 +1195,33 @@ class DelegationController extends Controller
             if ($request->has('changed_fields_json')) {
                 $changes = json_decode($request->input('changed_fields_json'), true);
                 if (!empty($changes)) {
+                    $customMessage = null;
+
+                    if (isset($changes['invitation_status_id'])) {
+                        $delegation->refresh();
+                        $delegation->load([
+                            'country',
+                            'invitationFrom',
+                            'invitationStatus'
+                        ]);
+
+                        $customMessage = $this->generateDelegationStatusChangeMessage(
+                            $snapshotData,
+                            $changes['invitation_status_id']['old'],
+                            $changes['invitation_status_id']['new']
+                        );
+                    }
+
                     $this->logActivity(
                         module: 'Delegation',
                         action: 'update',
                         model: $delegation,
                         changedFields: $changes,
                         delegationId: $delegation->id,
-                        fieldsToNotify: $fieldsToNotify
+                        fieldsToNotify: $fieldsToNotify,
+                        message: $customMessage
                     );
                 }
-            }
-
-            if (!empty($fieldsToNotify)) {
-                Log::info('Admin chose to notify about these delegation changes: ' . implode(', ', $fieldsToNotify));
             }
 
             return response()->json([
@@ -1189,12 +1236,45 @@ class DelegationController extends Controller
                 'delegation_id' => $id,
                 'validated_data' => $validated,
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
             ]);
 
-            return back()->withErrors(['error' => __db('failed_to_update')])->withInput();
+            return response()->json([
+                'status' => 'error',
+                'message' => __db('failed_to_update'),
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
+
+
+    protected function generateDelegationStatusChangeMessage(
+        array $snapshotData,
+        $oldStatusName,
+        $newStatusName
+    ): array {
+        $delegationCode = $snapshotData['delegation_code'];
+        $countryName = $snapshotData['country'];
+        $invitationFrom = $snapshotData['invitation_from'];
+
+        $escortDetails = collect($snapshotData['escorts'])
+            ->map(fn($escort) => "Rank - {$escort['rank']}, Name - {$escort['name']}")
+            ->implode(', ') ?: 'None';
+
+        $driverDetails = collect($snapshotData['drivers'])
+            ->map(fn($driver) => "Name - {$driver['name']}")
+            ->implode(', ') ?: 'None';
+
+        $hotelNames = collect($snapshotData['hotels'])->implode(', ') ?: 'None';
+
+        return [
+            'en' => "This delegation status was changed from {$oldStatusName} to {$newStatusName} for {$delegationCode}, Country {$countryName}, Invitation from {$invitationFrom}, Escort: {$escortDetails}, Driver: {$driverDetails}, Hotels: {$hotelNames}",
+            'ar' => "تم تغيير حالة الوفد من {$oldStatusName} إلى {$newStatusName} للوفد {$delegationCode}، الدولة {$countryName}، الدعوة من {$invitationFrom}، المرافق: {$escortDetails}، السائق: {$driverDetails}، الفنادق: {$hotelNames}"
+        ];
+    }
+
+
 
     public function updateAttachments(Request $request, $delegationId)
     {
