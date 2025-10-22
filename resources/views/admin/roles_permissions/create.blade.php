@@ -52,9 +52,9 @@
                                         <!-- Parent Permission -->
                                         <label class="flex items-center text-sm gap-2 font-semibold text-gray-800">
                                             <input type="checkbox" name="permissions[]"
-                                                value="{{ $parent->name }}"
+                                                value="{{ $parent->id }}"
                                                 class="parent-checkbox accent-yellow-600 h-4 w-4"
-                                                data-parent="{{ $parent->name }}">
+                                                data-parent="{{ $parent->id }}">
                                             {{ $parent->title }}
                                         </label>
 
@@ -63,9 +63,9 @@
                                             @foreach ($parent->children as $child)
                                                 <label class="flex items-center  text-sm gap-2 text-gray-700">
                                                     <input type="checkbox" name="permissions[]"
-                                                        value="{{ $child->name }}"
+                                                        value="{{ $child->id }}"
                                                         class="child-checkbox accent-yellow-500 h-4 w-4"
-                                                        data-parent="{{ $parent->name }}">
+                                                        data-parent="{{ $parent->id }}">
                                                     {{ $child->title }}
                                                 </label>
                                             @endforeach
