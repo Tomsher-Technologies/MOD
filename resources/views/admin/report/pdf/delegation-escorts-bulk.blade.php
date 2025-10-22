@@ -103,9 +103,7 @@ table {
                                     @endif
                                 </span>
     
-                                <strong >
-                                    : {{ __db('escort') }} 
-                                </strong>
+                                <strong> : {{ __db('escort') }}</strong> 
                             </span>
                         </td>
                         

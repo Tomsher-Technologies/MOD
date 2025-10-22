@@ -19,10 +19,34 @@
         }
 
         table {
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;   
+        width: 100%;
+    }
+     th, td {
+            padding: 5px;
+            text-align: center;
         }
+
+        /* Direction handling */
+        [lang="ar"], .rtl {
+            direction: rtl;
+            text-align: right;
+            unicode-bidi: isolate;
+        }
+
+        [lang="en"], .ltr {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: isolate;
+        }
+
+        /* Optional background for headers */
+        thead th {
+            background: #d3d3d3;
+        }
+
+
     </style>
 </head>
 
@@ -79,26 +103,36 @@
                             $drivers = $del?->delegation?->drivers;
 
                             $driverCount = count($drivers);
-                            $ulStyle = 'list-style:none !important; margin:0; padding:0;';
-                            $liStyle = 'padding:4px 0;list-style:none !important;';
-
-                            $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '';
-
+                           
+                            $ulStyle = 'margin:0; padding:0; list-style-type:none; list-style:none;';
+                            $liStyle = 'margin:0; padding:2px 0; text-indent:0;';
+                            
+                            $driverNames = $driverPhones = $driverCarNos = $driverCarTypes = '<div style="margin:0; padding:0;">';
+                            
                             foreach ($drivers as $driver) {
-                                 if (getActiveLanguage() == 'en'){
-                                    $driverNames .= '<li style="' . $liStyle . '"> <span> '.$driver?->military_number .'</span> - <span>'. getLangTitleSeperator($driver?->getTranslation('title'),$driver?->getTranslation('name')) .'</span></li>';
-                                }else{
-                                    $driverNames .= '<li style="' . $liStyle . '"> <span> '.getLangTitleSeperator($driver?->getTranslation('title'),$driver?->getTranslation('name')).'</span> - <span>'.$driver?->military_number .'</span></li>';
+                            
+                                if (getActiveLanguage() == 'en') {
+                                    $driverNames .= '<div style="' . $liStyle . '"><span>' . $driver?->military_number . '</span> - <span>' . getLangTitleSeperator($driver?->getTranslation('title'), $driver?->getTranslation('name')) . '</span></div>';
+                                } else {
+                                    $driverNames .= '<div style="' . $liStyle . '"><span>' . getLangTitleSeperator($driver?->getTranslation('title'), $driver?->getTranslation('name')) . '</span> - <span>' . $driver?->military_number . '</span></div>';
                                 }
-
-                                $driverPhones .= ($driver?->phone_number ?? '-') . '<br>';
-                                $driverCarNos .= ($driver?->car_number ?? '-') . '<br>';
-                                $driverCarTypes .= ($driver?->car_type ?? '-') . '<br>';
+                            
+                                $driverPhones .= '<div style="' . $liStyle . '">' . ($driver?->phone_number ?? '-') . '</div>';
+                                $driverCarNos .= '<div style="' . $liStyle . '">' . ($driver?->car_number ?? '-') . '</div>';
+                                $driverCarTypes .= '<div style="' . $liStyle . '">' . ($driver?->car_type ?? '-') . '</div>';
                             }
+                            
+                            $driverNames .= '</div>';
+                            $driverPhones .= '</div>';
+                            $driverCarNos .= '</div>';
+                            $driverCarTypes .= '</div>';
+
                         @endphp
                         <tr>
                             <td
                                 style="padding: 8px; border-left: 2px solid #000;border-right: 2px solid #000;text-align: center;">
+
+
                             </td>
                             <td style="padding: 8px; text-align: center; border-right: 2px solid #000;">
                                 {!! $driverCarTypes !!}
@@ -116,13 +150,13 @@
                                 {{ $del->delegation?->delegates?->count() ?? '0' }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
-                                {{ $del?->getTranslation('designation') ?? '-' }}
+                                {{ $del?->getTranslation('designation') ?: '-' }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000;">
                                 {{ getLangTitleSeperator($del?->getTranslation('title'), $del?->getTranslation('name')) }}
                             </td>
                             <td style="padding: 8px;text-align: center; border-right: 2px solid #000; ">
-                                {{ $del->delegation?->country?->name ?? '-' }}
+                                {{ $del->delegation?->country?->name ?: '-' }}
                             </td>
                             <td style="padding: 8px; border-right: 2px solid #000; text-align: center;">
                                 {{ $idel + 1 }}
@@ -179,19 +213,24 @@
                                         <!-- Mobile -->
                                         @php $escort = $del?->delegation?->escorts?->first(); @endphp
                                         <td style="width: 20%; padding: 4px; vertical-align: bottom; text-align: right;">
-                                            <span>{{ $escort?->phone_number ?? '-' }}</span>
+                                            <span>{{ $escort?->phone_number ?: '-' }}</span>
                                             <strong> : {{ __db('mobile') }}</strong>
                                         </td>
 
                                         <!-- Escort -->
                                         <td style="width: 35%; padding: 4px; vertical-align: bottom; text-align: right;">
-                                            
-                                            @if (getActiveLanguage() == 'en')
-                                                <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
-                                            @else
-                                                <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
-                                            @endif
-                                            <strong> : {{ __db('escort') }}</strong>
+                                            <span class="ltr" style="display:inline-block; width:100%;">
+                                                <span style="float:left;">
+                                                    @if (getActiveLanguage() == 'en')
+                                                        {{ $escort?->military_number ?? ' ' }} &nbsp;-&nbsp; {{ $escort?->internalRanking?->value ?? ' ' }}&nbsp;{{ $escort?->name ?? ' ' }}
+                                                    @else
+                                                        {{ $escort?->internalRanking?->value ?? ' ' }}&nbsp;{{ $escort?->name ?? ' ' }}&nbsp;-&nbsp; {{ $escort?->military_number ?? ' ' }}
+                                                       
+                                                    @endif
+                                                </span>
+        
+                                                <strong> : {{ __db('escort') }}</strong> 
+                                            </span>
                                         </td>
                                     </tr>
                                 </table>

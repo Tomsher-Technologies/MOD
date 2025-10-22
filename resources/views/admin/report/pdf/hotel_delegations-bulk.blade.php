@@ -144,11 +144,11 @@
                                                     @endif
                                                 </span>
 
-                                                @if($key == 0)
+                                                {{-- @if($key == 0) --}}
                                                     <strong >
                                                         : {{ __db('escort') }} 
                                                     </strong>
-                                                @endif
+                                                {{-- @endif --}}
                                             </span>
                                         </td>
                                     </tr>

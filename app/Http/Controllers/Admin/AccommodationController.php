@@ -307,6 +307,7 @@ class AccommodationController extends Controller
 
     public function accommodationDelegations(Request $request)
     {
+        $request->session()->put('accommodation_delegations_last_url', url()->full());
         $query = Delegation::with([
             'invitationFrom',
             'continent',
