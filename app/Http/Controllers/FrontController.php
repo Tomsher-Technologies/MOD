@@ -36,7 +36,9 @@ class FrontController extends Controller
         $page = EventPage::with('translations')->where('event_id', $eventId)->where('status', 1)->where('slug', 'committee')->first();
         
         $query = CommitteeMember::with(['committee', 'designation'])
-                                ->where('event_id', $eventId);
+                                ->where('event_id', $eventId)
+                                ->leftJoin('dropdown_options as committee_sort', 'committee_members.committee_id', '=', 'committee_sort.id')
+                            ->leftJoin('dropdown_options as designation_sort', 'committee_members.designation_id', '=', 'designation_sort.id');
 
         if ($request->filled('search')) {
             $keyword = $request->search;
@@ -56,7 +58,9 @@ class FrontController extends Controller
             $query->where('committee_id', $request->committee_id);
         }
 
-        $committees = $query->get();
+        $committees = $query->select('committee_members.*')
+        ->orderBy('committee_sort.sort_order', 'asc')
+            ->orderBy('designation_sort.sort_order', 'asc')->get();
 
         $availableDesignations = CommitteeMember::where('event_id', $eventId)
                                                 ->with('designation')->get()
