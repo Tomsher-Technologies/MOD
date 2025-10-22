@@ -48,7 +48,7 @@
                         <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('name') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('email') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('phone') }}</th>
-                        <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('military_no') }}</th>
+                        {{-- <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('military_no') }}</th> --}}
                         <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('designation') }}</th>
                         <th class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('committee') }}</th>
                     </tr>
@@ -60,7 +60,7 @@
                             <td class="px-4 py-3 border">{{ $com->getTranslation('name', $lang) }}</td>
                             <td class="px-4 py-3 border">{{ $com->email }}</td>
                             <td class="px-4 py-3 border text-end" dir="ltr">{{ $com->phone }}</td>
-                            <td class="px-4 py-3 border">{{ $com->military_no }}</td>
+                            {{-- <td class="px-4 py-3 border">{{ $com->military_no }}</td> --}}
                             <td class="px-4 py-3 border">{{ $com->designation?->value }}</td>
                             <td class="px-4 py-3 border">{{ $com->committee?->value }}</td>
                         </tr>
