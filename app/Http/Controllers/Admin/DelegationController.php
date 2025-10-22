@@ -48,7 +48,7 @@ class DelegationController extends Controller
 
         // === Delegations ===
         $this->middleware('permission:view_delegations|delegate_view_delegations|escort_view_delegations|driver_view_delegations|hotel_view_delegations', [
-            'only' => ['index', 'search', 'searchByCode', 'members', 'interviewsIndex', 'show', 'arrivalsIndex', 'departuresIndex', 'getTravelDetails']
+            'only' => ['index', 'search', 'searchByCode', 'members', 'show', 'arrivalsIndex', 'departuresIndex', 'getTravelDetails']
         ]);
 
         $this->middleware('permission:add_delegations|delegate_add_delegations', [
@@ -83,6 +83,10 @@ class DelegationController extends Controller
         // === Interviews ===
         $this->middleware('permission:add_interviews|delegate_edit_delegates', [
             'only' => ['storeOrUpdateInterview', 'addInterview']
+        ]);
+
+        $this->middleware('permission:view_interviews', [
+            'only' => ['interviewsIndex']
         ]);
 
         $this->middleware('permission:edit_interviews|delegate_edit_delegates', [
@@ -2703,15 +2707,15 @@ class DelegationController extends Controller
     public function clearArrivalData(Request $request, Delegation $delegation, Delegate $delegate)
     {
         try {
-           
+
 
             $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->first();
-            
+
             if ($arrivalTransport) {
                 $arrivalTransport->delete();
                 $this->delegationStatusService->updateAllStatus($delegate);
                 $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => __db('arrival_data_cleared_successfully'),
@@ -2735,15 +2739,15 @@ class DelegationController extends Controller
     public function clearDepartureData(Request $request, Delegation $delegation, Delegate $delegate)
     {
         try {
-           
+
 
             $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->first();
-            
+
             if ($departureTransport) {
                 $departureTransport->delete();
                 $this->delegationStatusService->updateAllStatus($delegate);
                 $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => __db('departure_data_cleared_successfully'),

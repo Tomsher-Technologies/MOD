@@ -83,9 +83,12 @@
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 
             hover:text-[#b68a35] focus:text-[#b68a35] 
             {{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit', 'delegations.show']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
-                       
-                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit', 'delegations.show']) ? 'stroke-[#b68a35]' : '' }}" width="30" height="30"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+
+                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['delegations.index', 'delegations.create', 'delegations.edit', 'delegations.show']) ? 'stroke-[#b68a35]' : '' }}"
+                            width="30" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
                         <span class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">
                             {{ __db('delegations') }}
@@ -101,9 +104,12 @@
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 
             hover:text-[#b68a35] focus:text-[#b68a35]
             {{ areActiveRoutes(['accommodation-delegations', 'accommodation-delegation-view']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
-                    
-                        <svg  class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['accommodation-delegations', 'accommodation-delegation-view']) ? 'stroke-[#b68a35]' : '' }}" width="30" height="30"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+
+                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['accommodation-delegations', 'accommodation-delegation-view']) ? 'stroke-[#b68a35]' : '' }}"
+                            width="30" height="30" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                         </svg>
                         <span class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">
                             {{ __db('delegations') }}
@@ -182,10 +188,15 @@
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 
             hover:text-[#b68a35] focus:text-[#b68a35]
             {{ areActiveRoutes(['delegations.departuresIndex']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
-                       
-                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['delegations.departuresIndex']) ? 'stroke-[#b68a35]' : '' }}"  xmlns="http://www.w3.org/2000/svg"  width="35"  height="35"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plane-departure">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M14.639 10.258l4.83 -1.294a2 2 0 1 1 1.035 3.863l-14.489 3.883l-4.45 -5.02l2.897 -.776l2.45 1.414l2.897 -.776l-3.743 -6.244l2.898 -.777l5.675 5.727z" />
+
+                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['delegations.departuresIndex']) ? 'stroke-[#b68a35]' : '' }}"
+                            xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-plane-departure">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M14.639 10.258l4.83 -1.294a2 2 0 1 1 1.035 3.863l-14.489 3.883l-4.45 -5.02l2.897 -.776l2.45 1.414l2.897 -.776l-3.743 -6.244l2.898 -.777l5.675 5.727z" />
                             <path d="M3 21h18" />
                         </svg>
                         <span class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">
@@ -200,13 +211,7 @@
 
 
 
-            @directCanany([
-                'manage_delegations',
-                'delegate_manage_delegations',
-                'escort_manage_delegations',
-                'driver_manage_delegations',
-                'hotel_manage_delegations'
-            ])
+            @directCanany(['view_interviews'])
                 <li>
                     <a href="{{ route('delegations.interviewsIndex') }}"
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
@@ -390,13 +395,19 @@
 
             @directCanany(['manage_floor_plans'])
                 <li>
-                    <a href="{{ route('floor-plans.index') }}" class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35] {{ areActiveRoutes(['floor-plans.index', 'floor-plans.create']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
+                    <a href="{{ route('floor-plans.index') }}"
+                        class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35] {{ areActiveRoutes(['floor-plans.index', 'floor-plans.create']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
 
-                        <svg class="pe-2 size-8 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['floor-plans.index', 'floor-plans.create']) ? 'stroke-[#b68a35]' : '' }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="rgba(121,122,130,1)">
-                            <path d="M4 6.14286V18.9669L9.06476 16.7963L15.0648 19.7963L20 17.6812V4.85714L21.303 4.2987C21.5569 4.18992 21.8508 4.30749 21.9596 4.56131C21.9862 4.62355 22 4.69056 22 4.75827V19L15 22L9 19L2.69696 21.7013C2.44314 21.8101 2.14921 21.6925 2.04043 21.4387C2.01375 21.3765 2 21.3094 2 21.2417V7L4 6.14286ZM16.2426 11.2426L12 15.4853L7.75736 11.2426C5.41421 8.89949 5.41421 5.10051 7.75736 2.75736C10.1005 0.414214 13.8995 0.414214 16.2426 2.75736C18.5858 5.10051 18.5858 8.89949 16.2426 11.2426ZM12 12.6569L14.8284 9.82843C16.3905 8.26633 16.3905 5.73367 14.8284 4.17157C13.2663 2.60948 10.7337 2.60948 9.17157 4.17157C7.60948 5.73367 7.60948 8.26633 9.17157 9.82843L12 12.6569Z"></path>
+                        <svg class="pe-2 size-8 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['floor-plans.index', 'floor-plans.create']) ? 'stroke-[#b68a35]' : '' }}"
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12"
+                            fill="rgba(121,122,130,1)">
+                            <path
+                                d="M4 6.14286V18.9669L9.06476 16.7963L15.0648 19.7963L20 17.6812V4.85714L21.303 4.2987C21.5569 4.18992 21.8508 4.30749 21.9596 4.56131C21.9862 4.62355 22 4.69056 22 4.75827V19L15 22L9 19L2.69696 21.7013C2.44314 21.8101 2.14921 21.6925 2.04043 21.4387C2.01375 21.3765 2 21.3094 2 21.2417V7L4 6.14286ZM16.2426 11.2426L12 15.4853L7.75736 11.2426C5.41421 8.89949 5.41421 5.10051 7.75736 2.75736C10.1005 0.414214 13.8995 0.414214 16.2426 2.75736C18.5858 5.10051 18.5858 8.89949 16.2426 11.2426ZM12 12.6569L14.8284 9.82843C16.3905 8.26633 16.3905 5.73367 14.8284 4.17157C13.2663 2.60948 10.7337 2.60948 9.17157 4.17157C7.60948 5.73367 7.60948 8.26633 9.17157 9.82843L12 12.6569Z">
+                            </path>
                         </svg>
 
-                        <span class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">{{ __db('floor_plans') }}</span>
+                        <span
+                            class="text-md transition-colors duration-200 group-hover:text-[#b68a35]">{{ __db('floor_plans') }}</span>
                     </a>
                 </li>
             @enddirectCanany
@@ -451,15 +462,14 @@
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
             hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35]
             {{ areActiveRoutes(['event_pages.index', 'event_pages.edit']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
-                       
 
-                        <svg xmlns="http://www.w3.org/2000/svg" 
-                            class="pe-2 size-8 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['event_pages.index', 'event_pages.edit']) ? 'stroke-[#b68a35]' : '' }}" 
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="pe-2 size-8 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['event_pages.index', 'event_pages.edit']) ? 'stroke-[#b68a35]' : '' }}"
                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                    d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V10l-6-6z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M12 4v6h6" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V10l-6-6z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v6h6" />
                         </svg>
 
 
@@ -507,7 +517,7 @@
             @enddirectCanany
 
             @directCanany([
-                'manage_other_interview_members',
+                'manage_other_interview_members'
                 // 'delegate_manage_delegations',
                 // 'escort_manage_delegations',
                 // 'driver_manage_delegations',
@@ -554,8 +564,9 @@
 
             @directCanany(['manage_reports'])
                 <li>
-                    <a href="{{ route('reports.index') }}" class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35] {{ areActiveRoutes(['reports.index','reports-delegations','reports-delegations.show']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
-                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['reports.index','reports-delegations','reports-delegations.show']) ? 'stroke-[#b68a35]' : '' }}"
+                    <a href="{{ route('reports.index') }}"
+                        class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 focus:bg-gray-100 text-gray-800 hover:text-[#b68a35] focus:text-[#b68a35] {{ areActiveRoutes(['reports.index', 'reports-delegations', 'reports-delegations.show']) ? 'bg-[#b68a35]/20 text-[#b68a35] font-semibold shadow' : 'text-gray-800' }}">
+                        <svg class="pe-2 stroke-current transition-colors duration-200 group-hover:stroke-[#b68a35] {{ areActiveRoutes(['reports.index', 'reports-delegations', 'reports-delegations.show']) ? 'stroke-[#b68a35]' : '' }}"
                             width="36" height="30" fill="none" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round"
