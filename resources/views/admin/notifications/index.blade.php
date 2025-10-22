@@ -31,8 +31,8 @@
                                 }
                             }
 
-                            $module = $data['module'] ?? null;
-                            $action = $data['action'] ?? null;
+                            $module = $data['module'] ? __db(strtolower($data['module'])) : null;
+                            $action = $data['action'] ? __db(strtolower($data['action'])) : null;
                             $delegationId = $data['delegation_id'] ?? null;
                             $submoduleId = $data['submodule_id'] ?? null;
 
