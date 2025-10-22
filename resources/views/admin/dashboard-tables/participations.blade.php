@@ -6,7 +6,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('delegates_by_participation_status') }}</h4>
+                        <h4 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('delegates_by_participation_status') }}</h4>
                         <div class="flex items-center gap-2">
                             <button onclick="printSection('print_area','ParticipationStatus')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
                                 <svg class="ml-1 w-4 h-4 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -36,7 +36,7 @@
                     <div class="w-full mt-6">
                        <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]" id="tableContainer">
                             <thead>
-                                <tr class="text-[13px]">
+                                <tr class="text-[14px]">
                                     <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
                                     @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
                                         <th scope="col" class=" text-center p-3 !bg-[#B68A35] text-white border !border-[#cbac71]">{{ __db($status) }}</th>
@@ -47,7 +47,7 @@
                             <tbody>
 
                                 @foreach($data['delegatesByParticipationTable']['departments'] as $dept)
-                                    <tr class="align-[middle] text-[12px]">
+                                    <tr class="align-[middle] text-[13px]">
                                         <td class="px-4 py-2 border border-gray-200">{{ $dept->value }}</td>
                                         @foreach($data['delegatesByParticipationTable']['statuses'] as $status)
                                             <td class="px-4 py-2 text-center border border-gray-200">
@@ -197,7 +197,7 @@
 
         insertChartAsPNG(() => {
             const printWindow = window.open('', 'PRINT', 'height=800,width=1500');
-            printWindow.document.write('<html dir="rtl"><head><title> </title>');
+            printWindow.document.write('<html dir="rtl"><head><title>&nbsp;</title>');
             printWindow.document.write(`
             <style>
                 @media print {

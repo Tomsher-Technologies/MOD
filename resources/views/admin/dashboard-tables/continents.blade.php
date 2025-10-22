@@ -6,7 +6,7 @@
             <div class="xl:col-span-12 2xl:col-span-12">
                 <div class="bg-white h-full rounded-lg border-0 p-6" id="print_area">
                     <div class="mb-4 flex items-center justify-between">
-                        <h4 class="!text-[20px] font-medium mb-0"> {{ __db('accepted_invitations_continents') }}</h4>
+                        <h4 class="text-sm xl:text-xl font-bold mb-0"> {{ __db('accepted_invitations_continents') }}</h4>
 
                         <div class="flex items-center gap-2">
                             <button onclick="printSection('print_area','AcceptedContinents')"  class=" no-print btn text-sm !bg-[#5c451d] flex items-center text-white rounded-lg py-2.5 px-3">
@@ -38,7 +38,7 @@
                         <div class="w-full mt-6">
                             <table class="table-auto mb-0  !border-[#F9F7ED] w-full h-[400px]" id="tableContainer">
                                 <thead>
-                                    <tr class="text-[13px]">
+                                    <tr class="text-[14px]">
                                         <th scope="col" class="p-3 !bg-[#B68A35] text-start text-white border !border-[#cbac71]">{{ __db('department') }}</th>
                                         @foreach($data['invitationByContinentsTable']['continents'] as $continentName)
                                             <th scope="col" class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">{{ $continentName }}</th>
@@ -48,7 +48,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($data['invitationByContinentsTable']['rows'] as $row)
-                                        <tr class=" text-[12px] align-[middle]">
+                                        <tr class=" text-[13px] align-[middle]">
                                             <td class="px-4 py-2 border border-gray-200">{{ $row['department'] }}</td>
                                             @foreach($data['invitationByContinentsTable']['continents'] as $continentId => $continentName)
                                                 <td class="px-4 text-center py-2 border border-gray-200">{{ $row['continents'][$continentId] ?? 0 }}</td>
@@ -205,7 +205,7 @@
 
         insertChartAsPNG(() => {
             const printWindow = window.open('', 'PRINT', 'height=800,width=1500');
-            printWindow.document.write('<html dir="rtl"><head><title> </title>');
+            printWindow.document.write('<html dir="rtl"><head><title>&nbsp;</title>');
             printWindow.document.write(`
             <style>
                 @media print {

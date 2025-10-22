@@ -752,7 +752,12 @@ class AccommodationController extends Controller
             ->where('active_status', 1);
 
         if ($search = $request->input('search')) {
-            $externalMembersQuery->where('name', 'like', '%' . $search . '%')->orWhere('coming_from', 'like', '%' . $search . '%');
+            $externalMembersQuery->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('coming_from', 'like', '%' . $search . '%');
+                });
+            });
         }
 
         if ($request->has('room_number')) {
