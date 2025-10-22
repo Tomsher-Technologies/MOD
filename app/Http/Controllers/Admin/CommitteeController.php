@@ -29,11 +29,16 @@ class CommitteeController extends Controller
         
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('name_en', 'like', "%{$search}%")
-                ->orWhere('name_ar', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%")
-                ->orWhere('phone', 'like', "%{$search}%");
+            $query->when($search, function ($qu, $search) {
+                $qu->where(function ($q) use ($search) {
+                    $q->where('name_en', 'like', "%{$search}%")
+                        ->orWhere('name_ar', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            });
         }
+
 
         if ($request->filled('status')) {
             // 1 = active, 2 = inactive; 

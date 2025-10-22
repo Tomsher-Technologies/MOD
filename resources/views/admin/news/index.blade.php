@@ -11,6 +11,15 @@
 
             <div class=" mb-4 flex items-center justify-between gap-3">
                 <form class="w-[50%] me-4" action="{{ route('news.index') }}" method="GET">
+                     @foreach (request()->except(['search', 'page']) as $k => $v)
+                        @if (is_array($v))
+                            @foreach ($v as $vv)
+                                <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                        @endif
+                    @endforeach
                     <div class="relative">
                         <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-3 text-black" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -166,6 +175,15 @@
 
             <form action="{{ route('news.index') }}" method="GET">
                 <div class="flex flex-col gap-2 mt-2">
+                    @foreach (request()->except(['page']) as $k => $v)
+                        @if (is_array($v))
+                            @foreach ($v as $vv)
+                                <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                        @endif
+                    @endforeach
                     <div class="flex flex-col">
                         <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('event') }}</label>
                         <select name="event_id" id="event_id" class="select2 w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" data-placeholder="{{ __db('select') . ' ' . __db('event') }}">
