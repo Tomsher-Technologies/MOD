@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-3">
-                    <label class="form-label">{{ __db('title_en') }}: <span class="text-red-600">*</span></label>
+                    <label class="form-label">{{ __db('floor_plan_title_en') }}: <span class="text-red-600">*</span></label>
                     <input type="text" name="title_en"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('title_en', $floorPlan->title_en) }}" required>
@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-3">
-                    <label class="form-label">{{ __db('title_ar') }}: <span class="text-red-600">*</span></label>
+                    <label class="form-label">{{ __db('floor_plan_title_ar') }}: <span class="text-red-600">*</span></label>
                     <input type="text" name="title_ar" dir="rtl"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                         value="{{ old('title_ar', $floorPlan->title_ar) }}" required>

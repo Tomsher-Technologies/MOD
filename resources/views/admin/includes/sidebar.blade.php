@@ -119,7 +119,7 @@
             @enddirectCanany
 
 
-            @directCanany(['badge_print_export'])
+            @directCanany(['view_badge_printed'])
                 <li>
                     <a href="{{ route('delegates.badgePrintedIndex') }}"
                         class="group flex items-center px-3 py-2 rounded-lg transition-colors duration-200
@@ -138,13 +138,6 @@
                     </a>
                 </li>
             @enddirectCanany
-
-
-
-
-
-
-
 
             @directCanany([
                 'manage_delegations',

@@ -53,12 +53,12 @@
                             'render' => fn($floorPlan) => e($floorPlan->event->name_en ?? '-'),
                         ],
                         [
-                            'label' => __db('title_en'),
+                            'label' => __db('floor_plan_title_en'),
                             'key' => 'title_en',
                             'render' => fn($floorPlan) => e($floorPlan->title_en),
                         ],
                         [
-                            'label' => __db('title_ar'),
+                            'label' => __db('floor_plan_title_ar'),
                             'key' => 'title_ar',
                             'render' => fn($floorPlan) => e($floorPlan->title_ar),
                         ],

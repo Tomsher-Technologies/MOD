@@ -18,12 +18,12 @@
             </div>
 
             <div class="col-span-12 md:col-span-6">
-                <label class="form-label font-medium">{{ __db('title_en') }}:</label>
+                <label class="form-label font-medium">{{ __db('floor_plan_title_en') }}:</label>
                 <p class="text-gray-700">{{ $floorPlan->title_en }}</p>
             </div>
 
             <div class="col-span-12 md:col-span-6">
-                <label class="form-label font-medium">{{ __db('title_ar') }}:</label>
+                <label class="form-label font-medium">{{ __db('floor_plan_title_ar') }}:</label>
                 <p class="text-gray-700" dir="rtl">{{ $floorPlan->title_ar }}</p>
             </div>
 
