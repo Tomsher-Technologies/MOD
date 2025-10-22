@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 mt-6 h-full " id="fullDiv1">
         <div class="xl:col-span-12 h-full">
             <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
@@ -72,7 +72,7 @@
                 </div>
 
                 <div class="flex items-end justify-end mb-3">
-                    <a href="#" id="fullscreenToggleBtn"
+                    <a href="#" id="fullscreenToggleBtn1"
                         class="!px-4 flex items-center gap-4 py-2 text-nowrap text-sm font-medium text-center !text-[#B68A35] bg-white border !border-[#B68A35] rounded-lg focus:outline-none hover:bg-gray-100 hover:text-[#B68A35] focus:z-10 focus:ring-4 focus:ring-gray-10">
                         <span>{{ __db('go_fullscreen') }}</span>
                     </a>
@@ -211,7 +211,7 @@
 
                 <div class="flex flex-col">
                     <label
-                        class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                        class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
@@ -223,7 +223,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('all_continents') }}</label>
                     <select multiple name="continent_id[]" id="continent-select"
                         data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
@@ -238,7 +238,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('all_countries') }}</label>
                     <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
@@ -254,7 +254,7 @@
 
 
                 <div class="flex flex-col">
-                    <label class="form-label block text-gray-700 font-medium">{{ __db('airport') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('airport') }}</label>
                     <select name="airport_id[]" multiple
                         data-placeholder="{{ __db('select') . ' ' . __db('airport_id') }}"
                         class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
@@ -285,7 +285,7 @@
                     @endphp
 
                     <label
-                        class="form-label block text-gray-700 font-medium">{{ __db('departure') . ' ' . __db('status') }}</label>
+                        class="form-label block text-gray-700 font-bold">{{ __db('departure') . ' ' . __db('status') }}</label>
                     <select name="status[]" multiple data-placeholder="{{ __db('select') . ' ' . __db('status') }}"
                         class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                         <option value="">{{ __db('all_departure_statuses') }}</option>

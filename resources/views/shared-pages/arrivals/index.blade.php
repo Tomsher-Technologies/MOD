@@ -224,7 +224,7 @@
         <div class="flex flex-col gap-4 mt-4">
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('invitation_from') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
                 <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full rounded-lg border border-gray-300 text-sm">
                     <option value="">{{ __db('select') }}</option>
@@ -236,7 +236,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('all_continents') }}</label>
+                <label class="form-label block text-gray-700 font-bold">{{ __db('all_continents') }}</label>
                 <select multiple name="continent_id[]" id="continent-select" data-placeholder="{{ __db('select') }}"
                     class="select2 w-full rounded-lg border border-gray-300 text-sm">
                     <option value="">{{ __db('select') }}</option>
@@ -250,7 +250,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('all_countries') }}</label>
+                <label class="form-label block text-gray-700 font-bold">{{ __db('all_countries') }}</label>
                 <select name="country_id[]" id="country-select" multiple data-placeholder="{{ __db('select') }}"
                     class="select2 w-full rounded-lg border border-gray-300 text-sm">
                     <option value="">{{ __db('select') }}</option>
@@ -266,7 +266,7 @@
 
 
             <div class="flex flex-col">
-                <label class="form-label block text-gray-700 font-medium">{{ __db('airport') }}</label>
+                <label class="form-label block text-gray-700 font-bold">{{ __db('airport') }}</label>
                 <select name="airport_id[]" multiple
                     data-placeholder="{{ __db('select') . ' ' . __db('airport_id') }}"
                     class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
@@ -298,7 +298,7 @@
                 @endphp
 
                 <label
-                    class="form-label block text-gray-700 font-medium">{{ __db('arrival') . ' ' . __db('status') }}</label>
+                    class="form-label block text-gray-700 font-bold">{{ __db('arrival') . ' ' . __db('status') }}</label>
                 <select name="status[]" multiple data-placeholder="{{ __db('select') . ' ' . __db('status') }}"
                     class="select2 w-full bg-white !py-3 text-sm !px-6 rounded-lg border text-secondary-light">
                     <option value="">{{ __db('all_arrival_statuses') }}</option>

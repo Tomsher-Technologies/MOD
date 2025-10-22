@@ -25,7 +25,7 @@ class AdminDashboardController extends Controller
 
     const ASSIGNABLE_STATUS_CODES = [2, 10];
 
-    public function dashboard()
+    public function dashboard(Request $request )
     {
 
         $lang = app()->getLocale() ?? 'en';
@@ -92,9 +92,9 @@ class AdminDashboardController extends Controller
         $notAssignedDrivers = $totalDelegations - $assignedDrivers;
 
         $hotels_status = DB::table('delegations as d')->select(
-                'd.id as delegation_id',
-                'd.code as delegation_name',
-                DB::raw("
+            'd.id as delegation_id',
+            'd.code as delegation_name',
+            DB::raw("
                                 CASE
                                     WHEN (COALESCE(delegates_summary.total_count, 0) +
                                         COALESCE(escorts_summary.total_count, 0) +
@@ -114,13 +114,13 @@ class AdminDashboardController extends Controller
                                     ELSE 2
                                 END as status
                             "),
-                DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
+            DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
                                     COALESCE(escorts_summary.total_count, 0) + 
                                     COALESCE(drivers_summary.total_count, 0)) as total_count"),
-                DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
+            DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
                                     COALESCE(escorts_summary.assigned_count, 0) + 
                                     COALESCE(drivers_summary.assigned_count, 0)) as assigned_count")
-            )
+        )
             ->leftJoin(
                 DB::raw("(select delegation_id,
                                         COUNT(*) as total_count,
@@ -199,18 +199,18 @@ class AdminDashboardController extends Controller
         // Member arrivals and departures
 
         $airports = DropdownOption::whereHas('dropdown', function ($query) {
-                        $query->where('code', 'airports');
-                    })->where('status', 1)->orderBy('sort_order','asc')
-                    ->select(
-                        'id',
-                        'sort_order',
-                        DB::raw("'flight' as mode"),
-                        DB::raw(
-                            $lang === 'ar'
-                                ? "CASE WHEN value_ar IS NOT NULL AND value_ar != '' THEN value_ar ELSE value END as transport_point"
-                                : "value as transport_point"
-                        )
-                    );
+            $query->where('code', 'airports');
+        })->where('status', 1)->orderBy('sort_order', 'asc')
+            ->select(
+                'id',
+                'sort_order',
+                DB::raw("'flight' as mode"),
+                DB::raw(
+                    $lang === 'ar'
+                        ? "CASE WHEN value_ar IS NOT NULL AND value_ar != '' THEN value_ar ELSE value END as transport_point"
+                        : "value as transport_point"
+                )
+            );
 
 
         $static = DB::table(DB::raw("(SELECT NULL as id, 100 as sort_order, 'Sea' as transport_point, 'sea' as mode 
@@ -220,26 +220,26 @@ class AdminDashboardController extends Controller
         $base = $airports->unionAll($static);
 
         $summary = DB::query()
-                    ->fromSub($base, 'tp')
-                    ->leftJoin('delegate_transports as dt', function ($join) {
-                        $join->whereRaw("(tp.mode = 'flight' AND dt.airport_id = tp.id AND dt.mode = 'flight')")
-                            ->orWhereRaw("(tp.mode = 'sea' AND dt.mode = 'sea')")
-                            ->orWhereRaw("(tp.mode = 'land' AND dt.mode = 'land')");
-                    })
-                    ->select(
-                        'tp.transport_point',
-                        DB::raw("SUM(CASE WHEN dt.type = 'arrival' AND DATE(dt.date_time) = CURDATE() THEN 1 ELSE 0 END) as arrival_count"),
-                        DB::raw("SUM(CASE WHEN dt.type = 'departure' AND DATE(dt.date_time) = CURDATE() THEN 1 ELSE 0 END) as departure_count")
-                    )
-                    ->groupBy('tp.transport_point', 'tp.mode')
-                    ->orderByRaw("tp.sort_order,
+            ->fromSub($base, 'tp')
+            ->leftJoin('delegate_transports as dt', function ($join) {
+                $join->whereRaw("(tp.mode = 'flight' AND dt.airport_id = tp.id AND dt.mode = 'flight')")
+                    ->orWhereRaw("(tp.mode = 'sea' AND dt.mode = 'sea')")
+                    ->orWhereRaw("(tp.mode = 'land' AND dt.mode = 'land')");
+            })
+            ->select(
+                'tp.transport_point',
+                DB::raw("SUM(CASE WHEN dt.type = 'arrival' AND DATE(dt.date_time) = CURDATE() THEN 1 ELSE 0 END) as arrival_count"),
+                DB::raw("SUM(CASE WHEN dt.type = 'departure' AND DATE(dt.date_time) = CURDATE() THEN 1 ELSE 0 END) as departure_count")
+            )
+            ->groupBy('tp.transport_point', 'tp.mode')
+            ->orderByRaw("tp.sort_order,
                         CASE 
                             WHEN tp.mode = 'flight' THEN 1
                             WHEN tp.mode = 'land' THEN 2
                             WHEN tp.mode = 'sea' THEN 3
                         END, tp.transport_point
                     ")
-                    ->get();
+            ->get();
 
         // Delegates By Invitation Status
         $departments = DB::table('dropdown_options as d')
@@ -298,15 +298,15 @@ class AdminDashboardController extends Controller
             }
 
             $color = '#B68A35';
-            if($status->code == '1') {  // Waiting
+            if ($status->code == '1') {  // Waiting
                 $color = '#FFF9C4';
-            }elseif($status->code == '2') {  // Accepted
+            } elseif ($status->code == '2') {  // Accepted
                 $color = '#C8E6C9';
-            }elseif($status->code == '3') {   // Rejected
+            } elseif ($status->code == '3') {   // Rejected
                 $color = '#F8BBD0';
-            }elseif($status->code == '9') {  // Accepted with representative
+            } elseif ($status->code == '9') {  // Accepted with representative
                 $color = '#E1BEE7';
-            }elseif($status->code == '10') {  // Accepted with secretary
+            } elseif ($status->code == '10') {  // Accepted with secretary
                 $color = '#BBDEFB';
             }
 
@@ -392,13 +392,38 @@ class AdminDashboardController extends Controller
 
         $seriesContinents = [];
         // $baseColorCont = ['#d9a644', '#A0782F', '#f0da8b', '#806028', '#5C451D', '#e8bc64', '#D2AA59', '#E0BA6B', '#ECCC85', '#F7DEA0'];
-         $baseColorCont = [
-                '#FFB3BA','#BAE0FF', '#FFFFBA', '#BAFFC9','#BAE1FF','#D5BAFF','#FFC1E3',
-                '#FFE0BA','#FFF5BA','#C8FFD4','#C4E7FF','#E1C8FF','#FFBAF2','#FFE5BA',
-                '#FCFFBA','#BAFFD0','#BAF0FF','#D0BAFF','#FFF0BA','#BAFFE4','#FFBAC8',
-                '#FFDABA','#FFFFC4','#BAFFD1','#E3BAFF','#FFBAE0','#FFE8BA','#FFDFBA',
-                '#BFFAFF','#D9FFBA' 
-            ];
+        $baseColorCont = [
+            '#FFB3BA',
+            '#BAE0FF',
+            '#FFFFBA',
+            '#BAFFC9',
+            '#BAE1FF',
+            '#D5BAFF',
+            '#FFC1E3',
+            '#FFE0BA',
+            '#FFF5BA',
+            '#C8FFD4',
+            '#C4E7FF',
+            '#E1C8FF',
+            '#FFBAF2',
+            '#FFE5BA',
+            '#FCFFBA',
+            '#BAFFD0',
+            '#BAF0FF',
+            '#D0BAFF',
+            '#FFF0BA',
+            '#BAFFE4',
+            '#FFBAC8',
+            '#FFDABA',
+            '#FFFFC4',
+            '#BAFFD1',
+            '#E3BAFF',
+            '#FFBAE0',
+            '#FFE8BA',
+            '#FFDFBA',
+            '#BFFAFF',
+            '#D9FFBA'
+        ];
 
 
         $ij = 0;
@@ -483,6 +508,9 @@ class AdminDashboardController extends Controller
         // print_r($summary);
         // echo '</pre>';
         // exit;
+
+        $request->session()->put('show_delegations_last_url', url()->full());
+
         return view('admin.dashboard', compact('data'));
     }
 
@@ -508,7 +536,7 @@ class AdminDashboardController extends Controller
                 ->where('dropdowns.code', 'invitation_status')
                 ->where('d.status', 1)
                 ->orderBy('d.sort_order', 'asc')
-                ->select('d.id','d.code',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
+                ->select('d.id', 'd.code',  DB::raw($lang === 'ar' ? 'COALESCE(d.value_ar, d.value) as value' : 'd.value as value'))
                 ->get();
 
             $rawData = DB::table('delegations')
@@ -551,15 +579,15 @@ class AdminDashboardController extends Controller
                 }
 
                 $color = '#B68A35';
-                if($status->code == '1') {  // Waiting
+                if ($status->code == '1') {  // Waiting
                     $color = '#FFF9C4';
-                }elseif($status->code == '2') {  // Accepted
+                } elseif ($status->code == '2') {  // Accepted
                     $color = '#C8E6C9';
-                }elseif($status->code == '3') {   // Rejected
+                } elseif ($status->code == '3') {   // Rejected
                     $color = '#F8BBD0';
-                }elseif($status->code == '9') {  // Accepted with representative
+                } elseif ($status->code == '9') {  // Accepted with representative
                     $color = '#E1BEE7';
-                }elseif($status->code == '10') {  // Accepted with secretary
+                } elseif ($status->code == '10') {  // Accepted with secretary
                     $color = '#BBDEFB';
                 }
 
@@ -623,7 +651,7 @@ class AdminDashboardController extends Controller
                 ->whereIN('delegations.invitation_status_id', [41, 42])
                 ->groupBy('delegates.participation_status', 'delegations.invitation_from_id')
                 ->get();
-              
+
             $departmentsIds   = $departments->pluck('id');
             $categories       = $departments->pluck('value');
             $seriesParticipation = [];
@@ -706,11 +734,36 @@ class AdminDashboardController extends Controller
 
             $seriesContinents = [];
             $baseColorCont = [
-                '#FFB3BA','#BAE0FF', '#FFFFBA', '#BAFFC9','#BAE1FF','#D5BAFF','#FFC1E3',
-                '#FFE0BA','#FFF5BA','#C8FFD4','#C4E7FF','#E1C8FF','#FFBAF2','#FFE5BA',
-                '#FCFFBA','#BAFFD0','#BAF0FF','#D0BAFF','#FFF0BA','#BAFFE4','#FFBAC8',
-                '#FFDABA','#FFFFC4','#BAFFD1','#E3BAFF','#FFBAE0','#FFE8BA','#FFDFBA',
-                '#BFFAFF','#D9FFBA' 
+                '#FFB3BA',
+                '#BAE0FF',
+                '#FFFFBA',
+                '#BAFFC9',
+                '#BAE1FF',
+                '#D5BAFF',
+                '#FFC1E3',
+                '#FFE0BA',
+                '#FFF5BA',
+                '#C8FFD4',
+                '#C4E7FF',
+                '#E1C8FF',
+                '#FFBAF2',
+                '#FFE5BA',
+                '#FCFFBA',
+                '#BAFFD0',
+                '#BAF0FF',
+                '#D0BAFF',
+                '#FFF0BA',
+                '#BAFFE4',
+                '#FFBAC8',
+                '#FFDABA',
+                '#FFFFC4',
+                '#BAFFD1',
+                '#E3BAFF',
+                '#FFBAE0',
+                '#FFE8BA',
+                '#FFDFBA',
+                '#BFFAFF',
+                '#D9FFBA'
             ];
 
             $ij = 0;

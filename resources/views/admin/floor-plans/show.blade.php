@@ -30,17 +30,24 @@
             <div class="col-span-12">
                 <label class="form-label font-medium">{{ __db('floor_plan_files') }}:</label>
                 <div class="border rounded-lg p-4">
-                    @if(count($floorPlan->file_paths) > 0)
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            @foreach($floorPlan->file_paths as $index => $filePath)
+                    @if(count($floorPlan->file_objects) > 0)
+                        <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                            @foreach($floorPlan->file_objects as $index => $fileObj)
+                                @php
+                                    $path = is_string($fileObj) ? $fileObj : ($fileObj['path'] ?? $fileObj);
+                                    $title = is_string($fileObj) ? basename($fileObj) : ($fileObj['title'] ?? basename($fileObj['path']));
+                                @endphp
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
                                     <div class="flex items-center">
                                         <svg class="w-5 h-5 text-red-500 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
                                             <path fill-rule="evenodd" d="M3 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H3Zm1.741 4.47L7.5 10.724 11.259 7l1.2 1.2-5.018 4.542a.6.6 0 0 1-.844-.001L2.542 8.2l1.2-1.2Zm2.434 5.745L11.259 18l-1.2 1.2-5.018-4.542a.6.6 0 0 1-.001-.844L9.584 8.8l1.2 1.2Zm7.671-1.2-1.2-1.2 5.018-4.542a.6.6 0 0 1 .844-.001L21.458 15.8l-1.2 1.2-4.046-4.045Zm-1.2 6.47-1.2-1.2 4.046-4.045 1.2 1.2-4.045 4.045Z" clip-rule="evenodd"/>
                                         </svg>
-                                        <span class="text-sm text-gray-600">{{ basename($filePath) }}</span>
+                                        <div>
+                                            <div class="text-sm text-gray-700 font-medium">{{ $title }}</div>
+                                            <div class="text-xs text-gray-500">{{ basename($path) }}</div>
+                                        </div>
                                     </div>
-                                    <a href="{{ asset('storage/' . $filePath) }}" target="_blank" 
+                                    <a href="{{ asset('storage/' . $path) }}" target="_blank" 
                                        class="inline-flex items-center text-[#B68A35] hover:underline">
                                         <svg class="w-5 h-5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 15v2a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-2m-8 1V4m0 12 4-4m-4 4-4-4"/>

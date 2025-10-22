@@ -167,7 +167,7 @@
             <form action="{{ route('news.index') }}" method="GET">
                 <div class="flex flex-col gap-2 mt-2">
                     <div class="flex flex-col">
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('event') }}</label>
+                        <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('event') }}</label>
                         <select name="event_id" id="event_id" class="select2 w-full p-3 rounded-lg border border-neutral-300 text-sm text-neutral-600 focus:border-primary-600 focus:ring-0" data-placeholder="{{ __db('select') . ' ' . __db('event') }}">
                             <option value="">{{ __db('select') . ' ' . __db('event') }}</option>
                             @foreach ($events as $event)
@@ -177,7 +177,7 @@
                     </div>
 
                     <div class="flex flex-col">
-                        <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('news_date') }}</label>
+                        <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('news_date') }}</label>
                         <input type="text" class="form-control date-range" id="date_range" name="date_range"
                     placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
                     data-separator=" to " autocomplete="off"  value="{{ request('date_range') ?? '' }}">

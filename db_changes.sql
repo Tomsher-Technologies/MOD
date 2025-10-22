@@ -974,6 +974,7 @@
 
 -- INSERT INTO `permissions` (`id`, `module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES (NULL, 'admin', '154', 'export_delegation_head_invitation_statistics', 'Export Delegation Head Invitation Statistics', 'web', '1', NULL, NULL), (NULL, 'admin', '154', 'view_delegation_head_invitation_statistics', 'View Delegation Head Invitation Statistics', 'web', '1', NULL, NULL);
 
+---- Id - 403 taken (next permissions should be added after 403)
 
    
     

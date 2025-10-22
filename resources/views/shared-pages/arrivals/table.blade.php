@@ -85,12 +85,10 @@
                     $firstDelegate = collect($row['delegates'])->first();
                     if ($firstDelegate) {
                         return e(
-                            $firstDelegate->getTranslation('title') .
-                                getLangTitleSeperator(
-                                    $firstDelegate->getTranslation('title'),
-                                    $firstDelegate->getTranslation('name'),
-                                ) .
+                            getLangTitleSeperator(
+                                $firstDelegate->getTranslation('title'),
                                 $firstDelegate->getTranslation('name'),
+                            ),
                         );
                     }
                 }

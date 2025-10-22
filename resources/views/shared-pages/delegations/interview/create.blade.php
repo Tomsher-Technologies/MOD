@@ -210,7 +210,7 @@
                     $countryOptions = getDropDown('country');
                 @endphp
                 <div>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('continents') }}:</label>
+                    <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('continents') }}:</label>
                     <select id="modal-continent" class="select2 p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_continent') }}</option>
 
@@ -225,7 +225,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('country') }}:</label>
+                    <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('country') }}:</label>
                     <select id="modal-country" class="select2 p-3 rounded-lg w-full border text-sm">
                         <option value="" selected disabled>{{ __db('select_country') }}</option>
                         @if ($countryOptions)

@@ -35,6 +35,27 @@ class FloorPlan extends Model
         $this->file_paths = is_array($value) ? $value : [];
     }
 
+    public function getFileObjectsAttribute()
+    {
+        $filePaths = $this->file_paths;
+        
+        if (is_array($filePaths) && count($filePaths) > 0) {
+            $firstElement = reset($filePaths);
+            if (is_string($firstElement)) {
+                return array_map(function($path) {
+                    return [
+                        'path' => $path,
+                        'title' => basename($path)
+                    ];
+                }, $filePaths);
+            } else {
+                return $filePaths;
+            }
+        }
+        
+        return [];
+    }
+
     public function getTitleAttribute($value)
     {
         $lang = getActiveLanguage();

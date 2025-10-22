@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\EventPage;
 use App\Models\News;
 use App\Models\CommitteeMember;
+use App\Models\FloorPlan;
 
 class FrontController extends Controller
 {
@@ -91,5 +92,24 @@ class FrontController extends Controller
                             ->take(4)
                             ->get();
         return view('frontend.news_details', compact('news','lang','relatedNews'));
+    }
+
+    public function getFloorPlans()
+    {
+        $eventId = getDefaultEventId() ?? null;
+        
+        $floorPlans = FloorPlan::with('event')
+            ->where('event_id', $eventId)
+            ->get()
+            ->map(function ($floorPlan) {
+                return [
+                    'id' => $floorPlan->id,
+                    'title_en' => $floorPlan->title_en,
+                    'title_ar' => $floorPlan->title_ar,
+                    'file_objects' => $floorPlan->file_objects ?? [],
+                ];
+            });
+
+        return response()->json($floorPlans);
     }
 }

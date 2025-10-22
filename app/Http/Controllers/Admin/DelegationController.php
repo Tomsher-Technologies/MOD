@@ -18,7 +18,9 @@ use App\Exports\DelegateExport;
 use App\Imports\DelegateImport;
 use App\Imports\DelegationAttachmentImport;
 use App\Imports\DelegationOnlyImport;
+use App\Models\DropdownOption;
 use App\Models\Escort;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +38,7 @@ class DelegationController extends Controller
 
     const UNASSIGNABLE_STATUS_CODES = [3, 9];
     const ASSIGNABLE_STATUS_CODES = [2, 10];
+    const DEFAULT_INTERNAL_RANKING_CODE = 1;
 
     protected $delegationStatusService;
 
@@ -1410,6 +1413,8 @@ class DelegationController extends Controller
 
         DB::beginTransaction();
 
+        $delegate = null;
+
         try {
 
             foreach ($validated['delegate_ids'] as $delegateId) {
@@ -1428,14 +1433,34 @@ class DelegationController extends Controller
 
             DB::commit();
 
-            $this->logActivity(
-                module: 'Delegation',
-                submodule: 'travel',
-                action: 'create',
-                model: $delegation,
-                submoduleId: $delegation->id,
-                delegationId: $delegation->id
-            );
+            if (count($validated['delegate_ids']) > 1) {
+                $this->logActivity(
+                    module: 'Delegation',
+                    submodule: 'travel',
+                    action: 'create',
+                    model: $delegation,
+                    submoduleId: $delegation->id,
+                    delegationId: $delegation->id,
+                    message: [
+                        'en' => auth()->user()->name . " " .  __db('delegate_group_transport_created'),
+                        'ar' => auth()->user()->name . " " .  __db('delegate_group_transport_created')
+                    ]
+                );
+            } else {
+                $this->logActivity(
+                    module: 'Delegation',
+                    submodule: 'travel',
+                    action: 'create',
+                    model: $delegation,
+                    submoduleId: $delegation->id,
+                    delegationId: $delegation->id,
+                    message: [
+                        'en' => auth()->user()->name . " " .  __db('delegate_transport_created') . ", " . __db('delegate') . ": " . $delegate->code,
+                        'ar' => auth()->user()->name . " " .  __db('delegate_transport_created') . ", " . __db('delegate') . ": " . $delegate->code
+                    ]
+                );
+            }
+
 
             if ($request->has('submit_exit')) {
                 return redirect()->route('delegations.edit', ['id' => $delegation->id])->with('success', __db('travel') . " " . __db("created_successfully"));
@@ -1753,11 +1778,25 @@ class DelegationController extends Controller
         $dataToProcess['badge_printed'] = $request->has('badge_printed');
         $dataToProcess['accommodation'] = $request->has('accommodation');
 
+
         if (!$isEditMode) {
             try {
                 DB::beginTransaction();
 
                 $delegateDataForCreate = Arr::except($dataToProcess, ['arrival', 'departure']);
+
+                if (!$dataToProcess['internal_ranking_id']) {
+                    $defaultInternalRanking = DropdownOption::whereHas('dropdown', function ($q) {
+                        $q->where('code', 'internal_ranking');
+                    })->where('code', self::DEFAULT_INTERNAL_RANKING_CODE)->first();
+
+                    if ($defaultInternalRanking) {
+                        $delegateDataForCreate['internal_ranking_id'] = $defaultInternalRanking->id;
+                    } else {
+                        LOG::error("Default internal ranking not found with the default code while creating a new delegate with no internal ranking" . " " .  self::DEFAULT_INTERNAL_RANKING_CODE);
+                    }
+                }
+
                 $newDelegate = $delegation->delegates()->create($delegateDataForCreate);
 
                 $this->delegationStatusService->syncTransportInfo($newDelegate, $dataToProcess['arrival'] ?? null, 'arrival');
@@ -2658,6 +2697,70 @@ class DelegationController extends Controller
         } catch (\Exception $e) {
             Log::error('Delegation Import Error: ' . $e->getMessage());
             return back()->with('error', __db('import_failed') . ': ' . $e->getMessage());
+        }
+    }
+
+    public function clearArrivalData(Request $request, Delegation $delegation, Delegate $delegate)
+    {
+        try {
+           
+
+            $arrivalTransport = $delegate->delegateTransports()->where('type', 'arrival')->first();
+            
+            if ($arrivalTransport) {
+                $arrivalTransport->delete();
+                $this->delegationStatusService->updateAllStatus($delegate);
+                $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => __db('arrival_data_cleared_successfully'),
+                    'redirect_url' => route('delegations.editDelegate', [$delegation, $delegate])
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => __db('no_arrival_data_to_clear')
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error('Clear Arrival Data Failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __db('failed_to_clear_arrival_data')
+            ], 500);
+        }
+    }
+
+    public function clearDepartureData(Request $request, Delegation $delegation, Delegate $delegate)
+    {
+        try {
+           
+
+            $departureTransport = $delegate->delegateTransports()->where('type', 'departure')->first();
+            
+            if ($departureTransport) {
+                $departureTransport->delete();
+                $this->delegationStatusService->updateAllStatus($delegate);
+                $this->delegationStatusService->updateDelegationParticipationStatus($delegation);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => __db('departure_data_cleared_successfully'),
+                    'redirect_url' => route('delegations.editDelegate', [$delegation, $delegate])
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => __db('no_departure_data_to_clear')
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error('Clear Departure Data Failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __db('failed_to_clear_departure_data')
+            ], 500);
         }
     }
 }

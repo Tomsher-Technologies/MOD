@@ -345,7 +345,7 @@
 
         <div class="flex flex-col gap-4 mt-4">
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('rank') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('rank') }}</label>
                 <select multiple name="internal_ranking_id[]"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
@@ -357,7 +357,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('assigned_status') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('assigned_status') }}</label>
                 <select name="assigned"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select') }}">
@@ -370,7 +370,7 @@
             </div>
 
             {{-- <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_en') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('title_en') }}</label>
                 <select multiple name="title_en[]"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select_title_en') }}">
@@ -383,7 +383,7 @@
             </div>
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('title_ar') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('title_ar') }}</label>
                 <select multiple name="title_ar[]"
                     class="select2 w-full h-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm"
                     data-placeholder="{{ __db('select_title_ar') }}">
@@ -396,7 +396,7 @@
             </div> --}}
 
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('gender') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('gender') }}</label>
                 <select name="gender_id[]" multiple data-placeholder="{{ __db('select_genders') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getDropDown('gender')->options as $gender)
@@ -407,7 +407,7 @@
                 </select>
             </div>
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('language') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('language') }}</label>
                 <select name="language_id[]" multiple data-placeholder="{{ __db('select_languages') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach (getDropDown('spoken_languages')->options as $language)
@@ -417,7 +417,7 @@
                 </select>
             </div>
             <div class="flex flex-col">
-                <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('delegation') }}</label>
+                <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('delegation') }}</label>
                 <select name="delegation_id[]" multiple data-placeholder="{{ __db('select_delegations') }}"
                     class="select2 w-full p-3 text-secondary-light rounded-lg border border-gray-300 text-sm">
                     @foreach ($delegations as $delegation)
