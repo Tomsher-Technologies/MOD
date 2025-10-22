@@ -31,6 +31,7 @@
                 $isIndexRoute =
                     str_ends_with($currentRoute, '.index') ||
                     str_contains($currentRoute, 'dashboard') ||
+                    str_contains($currentRoute, 'report') ||
                     str_contains($currentRoute, 'Index');
             @endphp
 
