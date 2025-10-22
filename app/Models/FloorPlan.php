@@ -45,11 +45,21 @@ class FloorPlan extends Model
                 return array_map(function($path) {
                     return [
                         'path' => $path,
-                        'title' => basename($path)
+                        'title_en' => basename($path),
+                        'title_ar' => ''
                     ];
                 }, $filePaths);
             } else {
-                return $filePaths;
+                return array_map(function($fileObj) {
+                    if (isset($fileObj['title']) && !isset($fileObj['title_en'])) {
+                        return [
+                            'path' => $fileObj['path'],
+                            'title_en' => $fileObj['title'],
+                            'title_ar' => ''
+                        ];
+                    }
+                    return $fileObj;
+                }, $filePaths);
             }
         }
         

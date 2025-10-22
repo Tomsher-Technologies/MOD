@@ -58,10 +58,16 @@
                                         required>
                                 </div>
                                 <div class="flex-1">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title') }}</label>
-                                    <input type="text" name="file_titles[]" 
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title_en') }}</label>
+                                    <input type="text" name="file_titles_en[]" 
                                         class="p-2 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                         placeholder="{{ __db('enter_file_title') }}">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title_ar') }}</label>
+                                    <input type="text" name="file_titles_ar[]" dir="rtl"
+                                        class="p-2 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                        placeholder="{{ __db('enter_file_title_ar') }}">
                                 </div>
                             </div>
                         </div>
@@ -111,10 +117,16 @@
                                 class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white p-2">
                         </div>
                         <div class="flex-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title') }}</label>
-                            <input type="text" name="file_titles[]" 
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title_en') }}</label>
+                            <input type="text" name="file_titles_en[]" 
                                 class="p-2 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                 placeholder="{{ __db('enter_file_title') }}">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('title_ar') }}</label>
+                            <input type="text" name="file_titles_ar[]" dir="rtl"
+                                class="p-2 rounded-lg w-full border text-sm border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                placeholder="{{ __db('enter_file_title_ar') }}">
                         </div>
                         <div class="flex items-end">
                             <button type="button" class="remove-file-input px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600">

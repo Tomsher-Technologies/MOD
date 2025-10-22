@@ -58,7 +58,8 @@ class FloorPlanController extends Controller
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
             'floor_plan_files.*' => 'required|file|max:10240',
-            'file_titles.*' => 'nullable|string|max:255',
+            'file_titles_en.*' => 'nullable|string|max:255',
+            'file_titles_ar.*' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -67,7 +68,8 @@ class FloorPlanController extends Controller
 
         $fileObjects = [];
         $files = $request->file('floor_plan_files', []);
-        $fileTitles = $request->input('file_titles', []);
+        $fileTitlesEn = $request->input('file_titles_en', []);
+        $fileTitlesAr = $request->input('file_titles_ar', []);
         
         foreach ($files as $index => $file) {
             if (!$file || !$file->isValid()) {
@@ -77,12 +79,13 @@ class FloorPlanController extends Controller
             $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
             $filePath = $file->storeAs('floor-plans', $fileName, 'public');
             
-            // Get the custom title if provided, otherwise use the original filename
-            $fileTitle = !empty($fileTitles[$index]) ? $fileTitles[$index] : basename($filePath);
+            $fileTitleEn = !empty($fileTitlesEn[$index]) ? $fileTitlesEn[$index] : basename($filePath);
+            $fileTitleAr = !empty($fileTitlesAr[$index]) ? $fileTitlesAr[$index] : '';
             
             $fileObjects[] = [
                 'path' => $filePath,
-                'title' => $fileTitle
+                'title_en' => $fileTitleEn,
+                'title_ar' => $fileTitleAr
             ];
         }
 
@@ -115,9 +118,11 @@ class FloorPlanController extends Controller
             'title_ar' => 'required|string|max:255',
             'existing_file_paths' => 'array',
             'existing_file_paths.*.path' => 'string',
-            'existing_file_paths.*.title' => 'string|max:255',
+            'existing_file_paths.*.title_en' => 'nullable|string|max:255',
+            'existing_file_paths.*.title_ar' => 'nullable|string|max:255',
             'new_floor_plan_files.*' => 'nullable|file|max:10240',
-            'new_file_titles.*' => 'nullable|string|max:255',
+            'new_file_titles_en.*' => 'nullable|string|max:255',
+            'new_file_titles_ar.*' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -139,26 +144,30 @@ class FloorPlanController extends Controller
         foreach ($existingFiles as $existingFile) {
             $keptFileObjects[] = [
                 'path' => $existingFile['path'],
-                'title' => !empty($existingFile['title']) ? $existingFile['title'] : basename($existingFile['path'])
+                'title_en' => !empty($existingFile['title_en']) ? $existingFile['title_en'] : (!empty($existingFile['title']) ? $existingFile['title'] : basename($existingFile['path'])),
+                'title_ar' => !empty($existingFile['title_ar']) ? $existingFile['title_ar'] : ''
             ];
         }
 
         // Add new files if any
         if ($request->hasFile('new_floor_plan_files')) {
             $newFiles = $request->file('new_floor_plan_files');
-            $newFileTitles = $request->input('new_file_titles', []);
+            $newFileTitlesEn = $request->input('new_file_titles_en', []);
+            $newFileTitlesAr = $request->input('new_file_titles_ar', []);
             
             foreach ($newFiles as $index => $file) {
                 if ($file && $file->isValid()) {
                     $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
                     $filePath = $file->storeAs('floor-plans', $fileName, 'public');
                     
-                    // Get the custom title if provided, otherwise use the original filename
-                    $fileTitle = !empty($newFileTitles[$index]) ? $newFileTitles[$index] : basename($filePath);
+                    // Get the custom titles if provided, otherwise use the original filename
+                    $fileTitleEn = !empty($newFileTitlesEn[$index]) ? $newFileTitlesEn[$index] : basename($filePath);
+                    $fileTitleAr = !empty($newFileTitlesAr[$index]) ? $newFileTitlesAr[$index] : '';
                     
                     $keptFileObjects[] = [
                         'path' => $filePath,
-                        'title' => $fileTitle
+                        'title_en' => $fileTitleEn,
+                        'title_ar' => $fileTitleAr
                     ];
                 }
             }

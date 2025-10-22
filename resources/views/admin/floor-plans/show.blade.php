@@ -35,7 +35,10 @@
                             @foreach($floorPlan->file_objects as $index => $fileObj)
                                 @php
                                     $path = is_string($fileObj) ? $fileObj : ($fileObj['path'] ?? $fileObj);
-                                    $title = is_string($fileObj) ? basename($fileObj) : ($fileObj['title'] ?? basename($fileObj['path']));
+                                    $title_en = is_string($fileObj) ? basename($fileObj) : ($fileObj['title_en'] ?? ($fileObj['title'] ?? basename($fileObj['path'])));
+                                    $title_ar = is_string($fileObj) ? basename($fileObj) : ($fileObj['title_ar'] ?? ($fileObj['title'] ?? basename($fileObj['path'])));
+                                    $lang = app()->getLocale();
+                                    $title = $lang === 'ar' && $title_ar ? $title_ar : $title_en;
                                 @endphp
                                 <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
                                     <div class="flex items-center">
@@ -43,7 +46,7 @@
                                             <path fill-rule="evenodd" d="M3 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H3Zm1.741 4.47L7.5 10.724 11.259 7l1.2 1.2-5.018 4.542a.6.6 0 0 1-.844-.001L2.542 8.2l1.2-1.2Zm2.434 5.745L11.259 18l-1.2 1.2-5.018-4.542a.6.6 0 0 1-.001-.844L9.584 8.8l1.2 1.2Zm7.671-1.2-1.2-1.2 5.018-4.542a.6.6 0 0 1 .844-.001L21.458 15.8l-1.2 1.2-4.046-4.045Zm-1.2 6.47-1.2-1.2 4.046-4.045 1.2 1.2-4.045 4.045Z" clip-rule="evenodd"/>
                                         </svg>
                                         <div>
-                                            <div class="text-sm text-gray-700 font-medium">{{ $title }}</div>
+                                            <div class="text-sm text-gray-700 font-medium" @if($lang === 'ar') dir="rtl" @endif>{{ $title }}</div>
                                             <div class="text-xs text-gray-500">{{ basename($path) }}</div>
                                         </div>
                                     </div>

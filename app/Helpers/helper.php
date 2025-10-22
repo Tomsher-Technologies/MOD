@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Language;
 use App\Models\Accommodation;
 use App\Models\Delegation;
+use App\Models\FloorPlan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Request;
@@ -813,4 +814,23 @@ function getLangTitleSeperator($fieldOne, $fieldTwo)
 function isArabicOnly($text)
 {
     return preg_match('/^[\p{Arabic}\s]+$/u', $text) > 0;
+}
+
+function getFloorPlansFormatted()
+{
+    $eventId = getDefaultEventId() ?? null;
+
+    $floorPlans = FloorPlan::with('event')
+        ->where('event_id', $eventId)
+        ->get()
+        ->map(function ($floorPlan) {
+            return [
+                'id' => $floorPlan->id,
+                'title_en' => $floorPlan->title_en,
+                'title_ar' => $floorPlan->title_ar,
+                'file_objects' => $floorPlan->file_objects ?? [],
+            ];
+        });
+
+    return $floorPlans;
 }
