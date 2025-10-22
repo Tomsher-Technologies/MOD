@@ -64,15 +64,15 @@
 
                         <div class="flex gap-5 items-center ">
                             <div class="full-screen-logo hidden items-start">
-                                <img src="{{ getAdminEventLogo() }}" alt="" class="max-h-[100px]">
+                                <img src="{{ getAdminEventLogo() }}" alt="" width="200" class="max-h-[100px]">
                             </div>
                         </div>
 
-                        <h2 class="font-semibold mb-0 !text-[22px] hidden full-screen-logo ">{{ __db('arrivals') }}
+                        <h2 class="font-semibold mb-0 text-[40px] hidden full-screen-logo ">{{ __db('arrivals') }}
                         </h2>
 
                         <div class="full-screen-logo gap-8 !justify-between hidden items-end ">
-                            <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[100px]"
+                            <img src="{{ asset('assets/img/md-logo.svg') }}"  width="200" class="light-logo max-h-[100px]"
                                 alt="Logo">
                         </div>
                     </div>
