@@ -84,7 +84,7 @@
         </div>
         <div class="flex items-center p-4 md:p-5 border-gray-200 rounded-b px-0 pb-0">
 
-            <button type="submit" id="assignBtn" disabled
+            <button type="button" id="assignBtn" disabled
                 class="btn text-md rounded-lg h-12 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50 enabled:bg-[#B68A35] enabled:text-white">
                 {{ __db('assign') }}
             </button>

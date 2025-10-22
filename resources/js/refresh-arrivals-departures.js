@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
     bindEditButtons();
     applySavedColumnVisibility();
 
-    setInterval(refreshData, 3000);
+    setInterval(refreshData, 60000);
 
     console.log('Auto-refresh initialized for ' + (isArrivalsPage ? 'arrivals' : 'departures') + ' page');
 });

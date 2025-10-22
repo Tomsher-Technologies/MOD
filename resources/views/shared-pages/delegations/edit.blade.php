@@ -594,8 +594,9 @@
                             <div class="p-6 space-y-6">
                                 {{-- Arrival --}}
                                 <section>
-                                    <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h4>
                                     @php $arrival = $delegate->delegateTransports->where('type', 'arrival')->first(); @endphp
+                                    <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('arrival') }}</h4>
+                                    <span class="mb-2">{{ __db('mode') . ': ' . $arrival?->mode ?? '-' }}</span>
                                     <div
                                         class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
                                         @if ($arrival)
@@ -628,8 +629,9 @@
 
                                 {{-- Departure --}}
                                 <section>
-                                    <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h4>
                                     @php $departure = $delegate->delegateTransports->where('type', 'departure')->first(); @endphp
+                                    <h4 class="text-xl font-semibold text-gray-900 pb-2">{{ __db('departure') }}</h4>
+                                    <span class="mb-2">{{ __db('mode') . ': ' . $departure?->mode ?? '-' }}</span>
                                     <div
                                         class="border rounded-lg p-6 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-gray-50">
                                         @if ($departure)
@@ -717,9 +719,7 @@
                                 //     e($escort->military_number) .
                                 //     '</a>';
 
-                                return '<span class="">' .
-                                    e($escort->military_number) .
-                                    '</span>';
+                                return '<span class="">' . e($escort->military_number) . '</span>';
                             },
                         ],
                         [

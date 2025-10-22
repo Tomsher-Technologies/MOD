@@ -200,7 +200,10 @@ class DriverController extends Controller
             $assignmentDelegation = Delegation::find($delegationId);
         }
 
-        $request->session()->put('show_delegations_last_url', url()->full());
+        if (!isset($assignmentMode)) {
+            $request->session()->put('show_delegations_last_url', url()->full());
+        }
+
         $request->session()->put('edit_drivers_last_url', url()->full());
         $request->session()->put('assign_drivers_last_url', url()->full());
 
@@ -687,9 +690,9 @@ class DriverController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         $event = \App\Models\Event::find($currentEventId);
-        
+
         $fileName = $event ? $event->code . '_drivers_report.xlsx' : 'drivers_report.xlsx';
-        
+
         return Excel::download(new \App\Exports\DriverExport, $fileName);
     }
 }

@@ -188,7 +188,10 @@ class EscortController extends Controller
             $assignmentDelegation = Delegation::find($delegationId);
         }
 
-        $request->session()->put('show_delegations_last_url', url()->full());
+        if (!isset($assignmentMode)) {
+            $request->session()->put('show_delegations_last_url', url()->full());
+        }
+        
         $request->session()->put('edit_escorts_last_url', url()->full());
         $request->session()->put('assign_escorts_last_url', url()->full());
         $request->session()->put('import_escorts_last_url', url()->full());
@@ -624,9 +627,9 @@ class EscortController extends Controller
     {
         $currentEventId = session('current_event_id', getDefaultEventId());
         $event = \App\Models\Event::find($currentEventId);
-        
+
         $fileName = $event ? $event->code . '_escorts_report.xlsx' : 'escorts_report.xlsx';
-        
+
         return Excel::download(new \App\Exports\EscortExport, $fileName);
     }
 }

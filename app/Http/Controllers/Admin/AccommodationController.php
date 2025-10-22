@@ -531,8 +531,8 @@ class AccommodationController extends Controller
                     $existingModel = $assignment->assignable_type;
                     $existingUserModel = $existingModel::find($assignment->assignable_id);
                     if ($existingUserModel) {
-                        $existingUserName = $existingUserModel->name_en ?? $existingUserModel->name_ar ?? $existingUserModel->name ?? 'Unknown';
-                        $existingUserType = class_basename($existingModel);
+                        $existingUserName = $existingUserModel->getTranslation('name') ?? 'Unknown';
+                        $existingUserType = __db(strtolower(class_basename($existingModel)));
                         $existingUsers[] = [
                             'name' => $existingUserName,
                             'type' => $existingUserType
@@ -546,9 +546,9 @@ class AccommodationController extends Controller
                     'success' => 5,
                     'message' => 'Room already assigned to other users. Do you want to proceed?',
                     'existing_users' => $existingUsers,
-                    'hotel_name' => $hotel->hotel_name ?? 'Unknown',
+                    'hotel_name' => $hotel->getHotelNameTranslation() ?? 'Unknown',
                     'room_number' => $request->room_number ?? 'Unknown',
-                    'room_type' => $roomType->roomType->value ?? 'Unknown'
+                    'room_type' => __db($roomType->roomType->value) ?? 'Unknown'
                 ]);
             }
 

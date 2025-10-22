@@ -492,7 +492,7 @@
                 url.searchParams.append('badge_printed', badgePrintedFilter.value);
             }
 
-            window.location.href = url.toString();
+            // window.location.href = url.toString();
 
         }
 

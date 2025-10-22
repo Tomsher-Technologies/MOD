@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Accommodation extends Model
 {
-    protected $fillable = ['hotel_name', 'hotel_name_ar', 'address', 'contact_number','status', 'event_id', 'ref_code','created_by', 'updated_by'];
+    protected $fillable = ['hotel_name', 'hotel_name_ar', 'address', 'contact_number', 'status', 'event_id', 'ref_code', 'created_by', 'updated_by'];
 
     public function event()
     {
@@ -79,5 +79,22 @@ class Accommodation extends Model
         }
 
         return $value;
+    }
+
+
+    public function getHotelNameTranslation($lang = false)
+    {
+        $lang = $lang == false ? getActiveLanguage() : $lang;
+
+        $arabicContent = trim($this->hotel_name);
+        $englishContent = trim($this->hotel_name_ar);
+
+        if ($lang === 'ar') {
+            return !empty($arabicContent) ? $arabicContent : $englishContent;
+        } else if ($lang === 'en') {
+            return !empty($englishContent) ? $englishContent : $arabicContent;
+        }
+
+        return !empty($arabicContent) ? $arabicContent : $englishContent;
     }
 }

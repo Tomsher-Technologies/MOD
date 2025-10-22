@@ -164,13 +164,18 @@
                         [
                             'label' => __db('assigned') . ' ' . __db('delegation'),
                             'key' => 'assigned_delegation',
-                            'render' => function ($escort) {
+                            'render' => function ($escort) use ($assignmentMode) {
                                 return $escort->delegations
                                     ->where('pivot.status', 1)
-                                    ->map(function ($delegation) {
+                                    ->map(function ($delegation) use ($assignmentMode) {
                                         $delegationUrl = $delegation->id
                                             ? route('delegations.show', $delegation->id)
                                             : '';
+
+                                        if (isset($assignmentMode)) {
+                                            return '<span>' . e($delegation->code) . '</span>';
+                                        }
+
                                         return '<a class="font-medium !text-[#B68A35] hover:underline" href="' .
                                             $delegationUrl .
                                             '?id=' .
@@ -210,7 +215,7 @@
                             'render' => function ($escort) use ($delegationId, $assignmentMode) {
                                 $editUrl = route('escorts.edit', $escort->id);
                                 $output = '<div class="flex align-center gap-4">';
-                                if (can(['edit_escorts', 'escort_edit_escorts'])) {
+                                if (can(['edit_escorts', 'escort_edit_escorts']) && !isset($assignmentMode)) {
                                     $output .=
                                         '<a href="' .
                                         $editUrl .

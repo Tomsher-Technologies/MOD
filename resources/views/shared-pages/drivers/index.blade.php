@@ -175,14 +175,35 @@
                         [
                             'label' => __db('assigned') . ' ' . __db('delegation'),
                             'key' => 'assigned_delegation',
-                            'render' => function ($driver) {
+                            'render' => function ($driver, $assignmentMode) {
                                 return $driver->delegations
-                                    ->map(function ($delegation) use ($driver) {
+                                    ->map(function ($delegation) use ($driver, $assignmentMode) {
                                         if ($delegation->pivot->status === 1) {
                                             $unassignUrl = route('drivers.unassign', $driver->id);
                                             $delegationUrl = route('delegations.show', $delegation->id);
 
                                             $unassignButton = '';
+
+                                            $delegationButton =
+                                                ' <a href="' .
+                                                $delegationUrl .
+                                                '" class="font-medium !text-[#B68A35] hover:underline">
+                                                ' .
+                                                $delegation->code .
+                                                '
+                                                </a>
+                                            ';
+
+                                            if (isset($assignmentMode)) {
+                                                $delegationButton =
+                                                    '
+                                                    <span>
+                                                        ' .
+                                                    $delegation->code .
+                                                    '
+                                                    </span>
+                                                ';
+                                            }
 
                                             if (can(['assign_drivers', 'driver_edit_drivers'])) {
                                                 $unassignButton =
@@ -208,17 +229,7 @@
                                                   <div class="flex items-center gap-2 mb-2">
                                                         ' .
                                                 $unassignButton .
-                                                '
-
-                                                        <a href="' .
-                                                $delegationUrl .
-                                                '" class="font-medium !text-[#B68A35] hover:underline">
-                                                            ' .
-                                                $delegation->code .
-                                                '
-                                                        </a>
-
-                                                        ' .
+                                                $delegationButton .
                                                 ($delegation->pivot->end_date
                                                     ? '<span class="!text-xs">(Till: ' .
                                                         $delegation->pivot->end_date .
@@ -268,7 +279,7 @@
 
                                 $output = '<div class="flex items-start  flex-wrap justify-start gap-2">';
 
-                                if (can(['edit_drivers', 'driver_edit_drivers'])) {
+                                if (can(['edit_drivers', 'driver_edit_drivers']) && !isset($assignmentMode)) {
                                     $output .=
                                         '
                                 <a href="' .
@@ -290,11 +301,14 @@
 
                                         if (!$isCurrentDelegationAssigned) {
                                             $assignUrl = route('drivers.assign', $driver->id);
+                                            $hasAssignment = $driver->delegations()->wherePivot('status', 1)->exists();
                                             $output .=
                                                 '
                                             <form action="' .
                                                 $assignUrl .
-                                                '" method="POST" class="assign-form" style="display:inline;">
+                                                '" method="POST" class="assign-form" style="display:inline"; data-has-assignment="' .
+                                                ($hasAssignment ? 'true' : 'false') .
+                                                '">
                                                 ' .
                                                 csrf_field() .
                                                 '
