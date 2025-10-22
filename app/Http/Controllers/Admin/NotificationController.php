@@ -126,9 +126,9 @@ class NotificationController extends Controller
 
             return [
                 'id' => $notification->id,
-                'module' => $module ?? __db('notification'),
+                'module' => $module ? __db(strtolower($module)) : __db('notification'),
                 'message' => $message,
-                'module_name' => $moduleName,
+                'module_name' => $moduleName ? __db(strtolower($moduleName)) : "",
                 'module_code' => $moduleCode,
                 'module_details' => $moduleDetails,
                 'created_at' => $notification->created_at->diffForHumans(),

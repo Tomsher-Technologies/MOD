@@ -52,7 +52,7 @@
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2 mb-1">
                                             <h3 class="font-medium text-neutral-900">
-                                                {{ $module ?? (getActiveLanguage() === 'ar' ? 'إشعار' : 'Notification') }}
+                                                {{ $module ? __db(strtolower($module)) : (getActiveLanguage() === 'ar' ? 'إشعار' : 'Notification') }}
                                             </h3>
                                         </div>
                                         <p class="text-neutral-700 mb-2">{{ $message }}</p>
@@ -67,11 +67,14 @@
                                                                     $label = $change['label'] ?? $field;
                                                                     $lang = getActiveLanguage();
                                                                     if ($lang !== 'en') {
-                                                                        $label = $lang === 'ar' ? $label : $label;
+                                                                        $label =
+                                                                            $lang === 'ar'
+                                                                                ? __db(strtolower($label))
+                                                                                : __db(strtolower($label));
                                                                     }
                                                                 @endphp
                                                                 @if (!empty($change['added']))
-                                                                    <li>{{ $label }}:
+                                                                    <li>{{ __db(strtolower($label)) }}:
                                                                         @if (getActiveLanguage() === 'ar')
                                                                             تمت الإضافة {{ $change['added'] }}
                                                                         @else
@@ -80,7 +83,7 @@
                                                                     </li>
                                                                 @endif
                                                                 @if (!empty($change['removed']))
-                                                                    <li>{{ $label }}:
+                                                                    <li>{{ __db(strtolower($label)) }}:
                                                                         @if (getActiveLanguage() === 'ar')
                                                                             تمت الإزالة {{ $change['removed'] }}
                                                                         @else
@@ -92,7 +95,7 @@
                                                                 @php
                                                                     $label = $change['label'] ?? $field;
                                                                 @endphp
-                                                                <li>{{ $label }}:
+                                                                <li>{{ __db(strtolower($label)) }}:
                                                                     @if (getActiveLanguage() === 'ar')
                                                                         تم التغيير من '{{ $change['old'] }}' إلى
                                                                         '{{ $change['new'] }}'
@@ -105,13 +108,16 @@
                                                                 @php
                                                                     $label = $change['label'] ?? $field;
                                                                 @endphp
-                                                                <li>{{ $label }}: {{ json_encode($change) }}</li>
+                                                                <li>{{ __db(strtolower($label)) }}:
+                                                                    {{ json_encode($change) }}</li>
                                                             @endif
                                                         @else
                                                             @if (getActiveLanguage() === 'ar')
-                                                                <li>{{ __db($field) }}: {{ $change }}</li>
+                                                                <li>{{ __db(strtolower($field)) }}: {{ $change }}
+                                                                </li>
                                                             @else
-                                                                <li>{{ __db($field) }}: {{ $change }}</li>
+                                                                <li>{{ __db(strtolower($field)) }}: {{ $change }}
+                                                                </li>
                                                             @endif
                                                         @endif
                                                     @endforeach
@@ -131,7 +137,7 @@
 
                                                 <div class="sm:col-span-1">
                                                     <dt class="text-sm font-medium text-gray-500">{{ __db('action') }}</dt>
-                                                    <dd class="mt-1 text-sm text-gray-900">{{ $action ?? 'N/A' }}</dd>
+                                                    <dd class="mt-1 text-sm text-gray-900">{{ __db(strtolower($action)) ?? 'N/A' }}</dd>
                                                 </div>
 
                                                 <div class="sm:col-span-1">
