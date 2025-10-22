@@ -1,6 +1,15 @@
 <div x-data="{ isDepartureEditModalOpen: false }">
     <div class="flex items-center justify-between gap-4 mb-4">
         <form class="flex gap-4 w-full" action="{{ route('delegations.departuresIndex') }}" method="GET">
+            @foreach (request()->except(['date_range', 'search_key', 'page']) as $k => $v)
+                @if (is_array($v))
+                    @foreach ($v as $vv)
+                        <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                @endif
+            @endforeach
             <div class="flex flex-col">
                 <input type="text" class="form-control date-range" id="date_range" name="date_range"
                     placeholder="{{ 'date' }}" data-time-picker="true" data-format="DD-MM-Y HH:mm:ss"
@@ -206,12 +215,22 @@
         </button>
 
         <form action="{{ route('delegations.departuresIndex') }}" method="GET">
+
+            @foreach (request()->except(['invitation_from', 'continent_id', 'country_id', 'airport_id', 'status', 'page']) as $k => $v)
+                @if (is_array($v))
+                    @foreach ($v as $vv)
+                        <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
+                    @endforeach
+                @else
+                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                @endif
+            @endforeach
+
             <div class="flex flex-col gap-4 mt-4">
 
 
                 <div class="flex flex-col">
-                    <label
-                        class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
+                    <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
