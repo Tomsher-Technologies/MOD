@@ -233,6 +233,29 @@ class DelegationController extends Controller
             $query->whereIn('delegations.participation_status_id', $participationStatusId);
         }
 
+        if ($driversAssignedStatus = $request->input('drivers_assigned_status')) {
+            if ($driversAssignedStatus === 'assigned') {
+                $query->whereHas('drivers', function ($q) {
+                    $q->where('delegation_drivers.status', 1);
+                });
+            } elseif ($driversAssignedStatus === 'not_assigned') {
+                $query->whereDoesntHave('drivers', function ($q) {
+                    $q->where('delegation_drivers.status', 1);
+                });
+            }
+        }
+
+        if ($escortsAssignedStatus = $request->input('escorts_assigned_status')) {
+            if ($escortsAssignedStatus === 'assigned') {
+                $query->whereHas('escorts', function ($q) {
+                    $q->where('delegation_escorts.status', 1);
+                });
+            } elseif ($escortsAssignedStatus === 'not_assigned') {
+                $query->whereDoesntHave('escorts', function ($q) {
+                    $q->where('delegation_escorts.status', 1);
+                });
+            }
+        }
 
         $limit = $request->limit ? $request->limit : 20;
 

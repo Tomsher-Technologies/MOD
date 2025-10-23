@@ -426,7 +426,7 @@
 
         <form action="{{ route('delegations.index') }}" method="GET">
 
-            @foreach (request()->except(['invitation_from', 'continent_id', 'country_id', 'invitation_status_id', 'participation_status_id', 'page']) as $k => $v)
+            @foreach (request()->except(['invitation_from', 'continent_id', 'country_id', 'invitation_status_id', 'participation_status_id', 'drivers_assigned_status', 'escorts_assigned_status', 'page']) as $k => $v)
                 @if (is_array($v))
                     @foreach ($v as $vv)
                         <input type="hidden" name="{{ $k }}[]" value="{{ $vv }}">
@@ -503,6 +503,34 @@
                                 {{ $status->value }}
                             </option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('drivers_assigned_status') }}</label>
+                    <select name="drivers_assigned_status" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('all') }}</option>
+                        <option value="not_assigned" @if(request('drivers_assigned_status') === 'not_assigned') selected @endif>
+                            {{ __db('not_assigned') }}
+                        </option>
+                        <option value="assigned" @if(request('drivers_assigned_status') === 'assigned') selected @endif>
+                            {{ __db('assigned') }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('escorts_assigned_status') }}</label>
+                    <select name="escorts_assigned_status" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('all') }}</option>
+                        <option value="not_assigned" @if(request('escorts_assigned_status') === 'not_assigned') selected @endif>
+                            {{ __db('not_assigned') }}
+                        </option>
+                        <option value="assigned" @if(request('escorts_assigned_status') === 'assigned') selected @endif>
+                            {{ __db('assigned') }}
+                        </option>
                     </select>
                 </div>
             </div>
