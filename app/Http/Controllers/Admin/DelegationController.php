@@ -1167,6 +1167,25 @@ class DelegationController extends Controller
                 'delegates.currentRoomAssignment.hotel'
             ]);
 
+            $delegateHotels = $delegation->delegates
+                ->filter(fn($delegate) => $delegate->currentRoomAssignment && $delegate->currentRoomAssignment->hotel)
+                ->pluck('currentRoomAssignment.hotel.hotel_name');
+
+            $escortHotels = $delegation->escorts
+                ->filter(fn($escort) => $escort->currentRoomAssignment && $escort->currentRoomAssignment->hotel)
+                ->pluck('currentRoomAssignment.hotel.hotel_name');
+
+            $driverHotels = $delegation->drivers
+                ->filter(fn($driver) => $driver->currentRoomAssignment && $driver->currentRoomAssignment->hotel)
+                ->pluck('currentRoomAssignment.hotel.hotel_name');
+
+            $allHotels = $delegateHotels
+                ->merge($escortHotels)
+                ->merge($driverHotels)
+                ->unique()
+                ->values()
+                ->toArray();
+
             $snapshotData = [
                 'escorts' => $delegation->escorts->map(function ($escort) {
                     return [
@@ -1177,12 +1196,10 @@ class DelegationController extends Controller
                 'drivers' => $delegation->drivers->map(function ($driver) {
                     return ['name' => $driver->name];
                 })->toArray(),
-                'hotels' => $delegation->delegates
-                    ->filter(fn($delegate) => $delegate->currentRoomAssignment && $delegate->currentRoomAssignment->hotel)
-                    ->pluck('currentRoomAssignment.hotel.hotel_name')
-                    ->unique()
-                    ->values()
-                    ->toArray(),
+                'driver_hotels' => $driverHotels->unique()->values()->toArray(),
+                'escort_hotels' => $escortHotels->unique()->values()->toArray(),
+                'delegate_hotels' => $delegateHotels->unique()->values()->toArray(),
+                'hotels' => $allHotels,
                 'country' => $delegation->country?->getNameEn() ?? 'N/A',
                 'invitation_from' => $delegation->invitationFrom?->getValueEn() ?? 'N/A',
                 'delegation_code' => $delegation->code ?? 'N/A'
@@ -1270,6 +1287,7 @@ class DelegationController extends Controller
             ], 500);
         }
     }
+
 
 
     protected function generateDelegationStatusChangeMessage(
