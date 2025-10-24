@@ -2770,18 +2770,19 @@ class DelegationController extends Controller
         ]);
 
         try {
-            Excel::import(new DelegationAttachmentImport, $request->file('file'));
+            $fileName = $request->file('file')->getClientOriginalName();
+            Excel::import(new DelegationAttachmentImport($fileName), $request->file('file'));
 
-            return redirect()->route('delegations.index')
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'attachments'])
                 ->with('success', __db('imported_successfully'));
         } catch (\Exception $e) {
             Log::error('Attachment Import Error: ' . $e->getMessage());
 
-            return redirect()->back()
-                ->with('error', __db('import_failed') . ': ' . $e->getMessage())
-                ->withInput();
+            return redirect()->route('admin.import-logs.index', ['import_type' => 'attachments'])
+                ->with('error', __db('import_failed') . ': ' . $e->getMessage());
         }
     }
+
 
     public function showImportForm()
     {

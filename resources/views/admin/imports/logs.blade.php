@@ -40,7 +40,10 @@
                             {{ __db('delegates') }}</option>
                         <option value="hotels" {{ request('import_type') == 'hotels' ? 'selected' : '' }}>
                             {{ __db('hotels') }}</option>
+                        <option value="attachments" {{ request('import_type') == 'attachments' ? 'selected' : '' }}>
+                            {{ __db('attachments') }}</option>
                     </select>
+
                 </div>
                 <div class="flex items-center gap-2">
                     <button type="submit"
@@ -76,6 +79,9 @@
                                     break;
                                 case 'hotels':
                                     $typeClass = 'bg-indigo-100 text-indigo-800';
+                                    break;
+                                case 'attachments':
+                                    $typeClass = 'bg-pink-100 text-pink-800';
                                     break;
                                 default:
                                     $typeClass = 'bg-gray-100 text-gray-800';
