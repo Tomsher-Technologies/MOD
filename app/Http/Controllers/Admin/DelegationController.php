@@ -127,11 +127,12 @@ class DelegationController extends Controller
             'drivers'
         ]);
 
+
         $currentEventId = session('current_event_id', getDefaultEventId());
         $query->where('delegations.event_id', $currentEventId);
 
-        if ($request->filter_services_assignable) {
-            $query->whereDoesntHave('invitationStatus', function ($q) {
+        if ($request->input('assignment_mode')) {
+            $query->whereHas('invitationStatus', function ($q) {
                 $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
             });
         }

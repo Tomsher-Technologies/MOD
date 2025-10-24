@@ -189,4 +189,9 @@ class Delegation extends Model
         return $this->invitationStatus &&
             in_array($this->invitationStatus->code, self::UNASSIGNABLE_STATUS_CODES);
     }
+    
+    public function roomAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class, 'delegation_id');
+    }
 }

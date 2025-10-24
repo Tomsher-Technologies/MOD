@@ -330,7 +330,7 @@
                                     }
                                 } else {
                                     if ($driver->status == 1 && can(['assign_drivers', 'driver_edit_drivers'])) {
-                                        $assignUrl = route('drivers.assignIndex', $driver->id);
+                                        $assignUrl = route('delegations.index', ['driver_id' => $driver->id, 'assignment_mode' => 'driver']);
                                         $output .=
                                             '
                                 <a href="' .

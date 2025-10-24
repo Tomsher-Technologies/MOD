@@ -211,6 +211,25 @@
                             'render' => fn($delegation) => e($delegation->participationStatus->value ?? '-'),
                         ],
                         [
+                            'label' => __db('hotels'),
+                            'key' => 'hotels',
+                            'render' => function ($delegation) {
+                                if ($delegation->roomAssignments->isEmpty()) {
+                                    return '-';
+                                }
+
+                                $hotelNames = $delegation->roomAssignments
+                                    ->pluck('hotel.hotel_name')
+                                    ->unique()
+                                    ->filter() 
+                                    ->values();
+
+                                return $hotelNames->count() > 0 
+                                    ? $hotelNames->implode('<br>')
+                                    : '-';
+                            },
+                        ],
+                        [
                             'label' => __db(__db('actions')),
                             'permission' => [
                                 'assign_external_members',
@@ -374,14 +393,20 @@
                     </select>
                 </div>
 
-                {{-- <select name="hotel_name"
-                    class="w-full rounded-lg border border-gray-300 text-sm">
-                    <option value="">{{ __db('select') }}</option>
-                    @foreach ($filterData['hotelNames'] as $hotel)
-                        <option value="{{ $hotel }}" {{ request('hotel_name') == $hotel ? 'selected' : '' }}>
-                            {{ $hotel }}</option>
-                    @endforeach
-                </select> --}}
+                <div class="flex flex-col">
+                    <label
+                        class="form-label block text-gray-700 font-bold">{{ __db('hotels') }}</label>
+                    <select multiple name="hotel_name[]" data-placeholder="{{ __db('select') }}"
+                        class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                        <option value="">{{ __db('select') }}</option>
+                        @if(isset($filterData['hotelNames']) && $filterData['hotelNames'])
+                            @foreach ($filterData['hotelNames'] as $id => $hotel)
+                                <option value="{{ $id }}" @if (in_array($id, request('hotel_name', []))) selected @endif>
+                                    {{ $hotel }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-4 mt-6">
                 <a href="{{ route('accommodation-delegations') }}"

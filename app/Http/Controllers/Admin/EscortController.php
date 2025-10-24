@@ -191,7 +191,7 @@ class EscortController extends Controller
         if (!isset($assignmentMode)) {
             $request->session()->put('show_delegations_last_url', url()->full());
         }
-        
+
         $request->session()->put('edit_escorts_last_url', url()->full());
         $request->session()->put('assign_escorts_last_url', url()->full());
         $request->session()->put('import_escorts_last_url', url()->full());
@@ -499,43 +499,90 @@ class EscortController extends Controller
         $delegation = \App\Models\Delegation::find($delegationId);
 
         if (!$delegation->canAssignServices()) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => __db('services_can_only_be_assigned_to_delegations_with_assignable_status')
+                ], 422);
+            }
             return back()->withErrors(['error' => __db('services_can_only_be_assigned_to_delegations_with_assignable_status')])->withInput();
         }
 
-        $escort->delegations()->update([
-            'delegation_escorts.status' => 0,
-        ]);
-
-        $escort->delegations()->attach([
-            $delegationId => [
-                'status' => 1,
-                'assigned_by' => auth()->id(),
-            ],
-        ]);
-
-        $escort->delegation_id = $delegationId;
-        $escort->save();
-
-        getRoomAssignmentStatus($delegationId);
-
-        $this->logActivity(
-            module: 'Escorts',
-            submodule: 'assignment',
-            action: 'assign-escorts',
-            model: $escort,
-            submoduleId: $escort->id,
-            delegationId: $delegationId,
-            changedFields: [
-                'escort_name' => $escort->name_en,
-                'delegation_code' => $delegation->code
-            ]
-        );
-
-        if ($request->has('assignment_mode') && $request->assignment_mode === 'escort') {
-            return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
+        if ($escort->delegations()->wherePivot('status', 1)->exists()) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => __db('escort_already_assigned')
+                ], 422);
+            }
+            return back()->withErrors(['error' => __db('escort_already_assigned')])->withInput();
         }
 
-        return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
+        try {
+            $escort->delegations()->update([
+                'delegation_escorts.status' => 0,
+            ]);
+
+            $escort->delegations()->attach([
+                $delegationId => [
+                    'status' => 1,
+                    'assigned_by' => auth()->id(),
+                ],
+            ]);
+
+            $escort->delegation_id = $delegationId;
+            $escort->save();
+
+            getRoomAssignmentStatus($delegationId);
+
+            $this->logActivity(
+                module: 'Escorts',
+                submodule: 'assignment',
+                action: 'assign-escorts',
+                model: $escort,
+                submoduleId: $escort->id,
+                delegationId: $delegationId,
+                changedFields: [
+                    'escort_name' => $escort->name_en,
+                    'delegation_code' => $delegation->code
+                ]
+            );
+
+            $response = [
+                'status' => 'success',
+                'message' => __db('updated_successfully'),
+                'redirect_url' => route('delegations.show', $delegationId)
+            ];
+
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json($response);
+            }
+
+            if ($request->has('assignment_mode') && $request->assignment_mode === 'escort') {
+                return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
+            }
+
+            return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Escort assignment failed: ' . $e->getMessage(), [
+                'escort_id' => $escort->id,
+                'delegation_id' => $delegationId,
+                'user_id' => auth()->id(),
+            ]);
+
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => __db('failed_to_update')
+                ], 500);
+            }
+
+            if ($request->has('assignment_mode') && $request->assignment_mode === 'escort') {
+                return redirect()->route('delegations.show', $delegationId)->with('error', __db('failed_to_update'));
+            }
+
+            return redirect()->route('delegations.show', $delegationId)->with('error', __db('failed_to_update'));
+        }
     }
 
 

@@ -479,6 +479,13 @@ class DriverController extends Controller
         $delegation = \App\Models\Delegation::find($delegationId);
 
         if (!$delegation->canAssignServices()) {
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => '1',
+                    'message' => __db('services_can_only_be_assigned_to_delegations_with_assignable_status')
+                ], 422);
+            }
             return back()->withErrors(['error' => __db('services_can_only_be_assigned_to_delegations_with_assignable_status')])->withInput();
         }
 
@@ -488,14 +495,6 @@ class DriverController extends Controller
 
         $activeAssignments = $driver->delegations()->wherePivot('status', 1)->orderBy('pivot_start_date')->get();
 
-        if (!$action) {
-            if ($activeAssignments->isEmpty()) {
-                $action = 'reassign';
-            } else {
-                return redirect()->back()->with('error', __db('action_required_for_existing_assignments'));
-            }
-        }
-
         if ($activeAssignments->isNotEmpty()) {
 
             $existingActiveDelegation = $driver->delegations()
@@ -504,37 +503,96 @@ class DriverController extends Controller
                 ->exists();
 
             if ($existingActiveDelegation) {
+                if (request()->ajax() || request()->wantsJson()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'code' => '2',
+                        'message' => __db('delegation_already_has_same_driver_assignment')
+                    ], 422);
+                }
                 return redirect()->route('delegations.show', $delegationId)->with('error', __db('delegation_already_has_same_driver_assignment'));
             }
+        }
 
-            if ($action === 'reassign') {
-                foreach ($activeAssignments as $assignment) {
-                    $assignmentStart = $assignment->pivot->start_date;
-                    $assignmentEnd   = $assignment->pivot->end_date;
+        if (!$action) {
+            if ($activeAssignments->isEmpty()) {
+                $action = 'reassign';
+            } else {
+                if (request()->ajax() || request()->wantsJson()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'code' => '3',
+                        'message' => __db('action_required_for_existing_assignments')
+                    ], 422);
+                }
+                return redirect()->back()->with('error', __db('action_required_for_existing_assignments'));
+            }
+        }
 
-                    if ($startDate <= $assignmentStart) {
+        try {
+            if ($activeAssignments->isNotEmpty()) {
+
+                if ($action === 'reassign') {
+                    foreach ($activeAssignments as $assignment) {
+                        $assignmentStart = $assignment->pivot->start_date;
+                        $assignmentEnd   = $assignment->pivot->end_date;
+
+                        if ($startDate <= $assignmentStart) {
+                            $driver->delegations()->updateExistingPivot($assignment->id, [
+                                'end_date' => $assignmentStart,
+                            ]);
+                        } elseif (is_null($assignmentEnd) || $startDate < $assignmentEnd) {
+                            $driver->delegations()->updateExistingPivot($assignment->id, [
+                                'end_date' => $startDate,
+                            ]);
+                        }
+                    }
+
+                    $driver->delegations()->attach($delegationId, [
+                        'status' => 1,
+                        'start_date' => $startDate,
+                        'assigned_by' => auth()->id(),
+                    ]);
+                } elseif ($action === 'replace') {
+                    foreach ($activeAssignments as $assignment) {
                         $driver->delegations()->updateExistingPivot($assignment->id, [
-                            'end_date' => $assignmentStart,
-                        ]);
-                    } elseif (is_null($assignmentEnd) || $startDate < $assignmentEnd) {
-                        $driver->delegations()->updateExistingPivot($assignment->id, [
-                            'end_date' => $startDate,
+                            'status' => 0,
                         ]);
                     }
-                }
 
-                $driver->delegations()->attach($delegationId, [
-                    'status' => 1,
-                    'start_date' => $startDate,
-                    'assigned_by' => auth()->id(),
-                ]);
-            } elseif ($action === 'replace') {
-                foreach ($activeAssignments as $assignment) {
-                    $driver->delegations()->updateExistingPivot($assignment->id, [
-                        'status' => 0,
+                    $driver->delegations()->attach($delegationId, [
+                        'status' => 1,
+                        'start_date' => $startDate ?? $today,
+                        'assigned_by' => auth()->id(),
                     ]);
                 }
 
+
+                if ($driver->current_room_assignment_id) {
+                    $oldAssignment = \App\Models\RoomAssignment::find($driver->current_room_assignment_id);
+
+                    if ($oldAssignment) {
+                        $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                        if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                            $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                ->where('room_number', $oldAssignment->room_number)
+                                ->where('active_status', 1)
+                                ->count();
+                            if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
+                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                $oldRoom->save();
+                            }
+                        }
+
+                        $oldAssignment->active_status = 0;
+                        $oldAssignment->save();
+                    }
+
+                    $driver->current_room_assignment_id = null;
+                    $driver->save();
+                }
+            } else {
                 $driver->delegations()->attach($delegationId, [
                     'status' => 1,
                     'start_date' => $startDate ?? $today,
@@ -542,56 +600,49 @@ class DriverController extends Controller
                 ]);
             }
 
+            getRoomAssignmentStatus($delegationId);
 
-            if ($driver->current_room_assignment_id) {
-                $oldAssignment = \App\Models\RoomAssignment::find($driver->current_room_assignment_id);
+            $this->logActivity(
+                module: 'Drivers',
+                submodule: 'assignment',
+                action: 'assign-drivers',
+                model: $driver,
+                submoduleId: $driver->id,
+                delegationId: $delegationId,
+                changedFields: [
+                    'driver_name' => $driver->name_en,
+                    'delegation_code' => $delegation->code,
+                    'action' => $action
+                ]
+            );
 
-                if ($oldAssignment) {
-                    $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                            ->where('room_type_id', $oldAssignment->room_type_id)
-                            ->where('room_number', $oldAssignment->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                            $oldRoom->save();
-                        }
-                    }
+            $response = [
+                'status' => 'success',
+                'message' => __db('updated_successfully'),
+                'redirect_url' => route('delegations.show', $delegationId)
+            ];
 
-                    $oldAssignment->active_status = 0;
-                    $oldAssignment->save();
-                }
-
-                $driver->current_room_assignment_id = null;
-                $driver->save();
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json($response);
             }
-        } else {
-            $driver->delegations()->attach($delegationId, [
-                'status' => 1,
-                'start_date' => $startDate ?? $today,
-                'assigned_by' => auth()->id(),
+
+            return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Driver assignment failed: ' . $e->getMessage(), [
+                'driver_id' => $driver->id,
+                'delegation_id' => $delegationId,
+                'user_id' => auth()->id(),
             ]);
+
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => __db('failed_to_update')
+                ], 500);
+            }
+
+            return redirect()->route('delegations.show', $delegationId)->with('error', __db('failed_to_update'));
         }
-
-        getRoomAssignmentStatus($delegationId);
-
-        $this->logActivity(
-            module: 'Drivers',
-            submodule: 'assignment',
-            action: 'assign-drivers',
-            model: $driver,
-            submoduleId: $driver->id,
-            delegationId: $delegationId,
-            changedFields: [
-                'driver_name' => $driver->name_en,
-                'delegation_code' => $delegation->code,
-                'action' => $action
-            ]
-        );
-
-        return redirect()->route('delegations.show', $delegationId)->with('success', __db('updated_successfully'));
     }
 
 

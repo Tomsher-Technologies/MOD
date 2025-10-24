@@ -316,7 +316,8 @@ class AccommodationController extends Controller
             'participationStatus',
             'delegates',
             'escorts',
-            'drivers'
+            'drivers',
+            'roomAssignments.hotel' 
         ])
             ->whereHas('invitationStatus', function ($q) {
                 $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
@@ -427,11 +428,25 @@ class AccommodationController extends Controller
             $query->whereIn('delegations.accomodation_status', $accomodationStatus);
         }
 
+        if ($hotelIds = $request->input('hotel_name')) {
+            $query->whereHas('roomAssignments', function($q) use ($hotelIds) {
+                $q->whereIn('hotel_id', $hotelIds);
+            });
+        }
+
 
         $limit = $request->limit ? $request->limit : 20;
 
         $delegations = $query->paginate($limit);
-        return view('admin.accommodations.delegations', compact('delegations'));
+        
+        $currentEventId = session('current_event_id', getDefaultEventId());
+        $filterData = [
+            'hotelNames' => Accommodation::where('event_id', $currentEventId)
+                ->where('status', 1)
+                ->pluck('hotel_name', 'id')
+        ];
+        
+        return view('admin.accommodations.delegations', compact('delegations', 'filterData'));
     }
 
     public function accommodationDelegationView(Request $request, $id)

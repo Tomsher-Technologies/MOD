@@ -285,7 +285,7 @@
                                             }
                                         } else {
                                             if (can(['assign_escorts', 'escort_edit_escorts'])) {
-                                                $assignUrl = route('escorts.assignIndex', $escort->id);
+                                                $assignUrl = route('delegations.index', ['escort_id' => $escort->id, 'assignment_mode' => 'escort']);
                                                 $output .=
                                                     '<a href="' .
                                                     $assignUrl .
