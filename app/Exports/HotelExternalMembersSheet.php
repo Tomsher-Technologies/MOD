@@ -20,14 +20,14 @@ class HotelExternalMembersSheet implements FromCollection, WithHeadings, WithMap
     public function __construct($hotelId)
     {
         $this->hotelId = $hotelId;
-        
+
         $this->data = ExternalMemberAssignment::with([
             'hotel',
             'roomType.roomType'
         ])
-        ->where('hotel_id', $this->hotelId)
-        ->where('active_status', 1)
-        ->get();
+            ->where('hotel_id', $this->hotelId)
+            ->where('active_status', 1)
+            ->get();
     }
 
     public function collection()
@@ -49,9 +49,11 @@ class HotelExternalMembersSheet implements FromCollection, WithHeadings, WithMap
 
     public function map($row): array
     {
+        $hotelName = !empty($row->hotel->hotel_name) ? $row->hotel->hotel_name : $row->hotel->hotel_name_ar;
+
         return [
             '',
-            $row->hotel->getHotelNameTranslation('en') ?? '',
+            $hotelName ?? '',
             $row->name ?? '',
             $row->coming_from ?? '',
             $row->roomType->roomType->value ?? '',
@@ -69,26 +71,29 @@ class HotelExternalMembersSheet implements FromCollection, WithHeadings, WithMap
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                
+
                 $sheet->insertNewRowBefore(1, 1);
-                $sheet->setCellValue('A1', 'Hotel External Members Export - Exported on: '. Carbon::now()->format('d-m-Y H:i A'));
+                $sheet->setCellValue('A1', 'Hotel External Members Export - Exported on: ' . Carbon::now()->format('d-m-Y H:i A'));
                 $sheet->mergeCells('A1:F1');
                 $sheet->getStyle('A1')->getFont()->setBold(true);
                 $sheet->getStyle('A2:F2')->getFont()->setBold(true);
-                
+
                 $sheet->getColumnDimension('A')->setWidth(12);
                 $sheet->getColumnDimension('B')->setWidth(25);
                 $sheet->getColumnDimension('C')->setWidth(25);
                 $sheet->getColumnDimension('D')->setWidth(20);
                 $sheet->getColumnDimension('E')->setWidth(20);
                 $sheet->getColumnDimension('F')->setWidth(15);
-                
+
                 $lastRow = $sheet->getHighestRow();
                 for ($row = 3; $row <= $lastRow; $row++) {
                     $sheet->setCellValue('A' . $row, $row - 2);
                 }
+
+                $sheet->getStyle('A1:L' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A1:L' . $lastRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
             },
         ];
     }

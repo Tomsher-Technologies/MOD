@@ -116,12 +116,13 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
 
         $countryName = !empty($delegation->country->name) ? $delegation->country->getNameEn() : $delegation->country->getNameAr();
         $invitationFromValue = !empty($delegation->invitationFrom->getValueEn()) ? $delegation->invitationFrom->getValueEn() : $delegation->invitationFrom->getNameAr();
+        $hotelName = !empty($row->hotel->hotel_name) ? $row->hotel->hotel_name : $row->hotel->hotel_name_ar;
 
 
         return [
             '',
             $delegation->code ?? '',
-            $row->hotel->getHotelNameTranslation('en') ?? '',
+            $hotelName ?? '',
             $countryName ?? '',
             $invitationFromValue ?? '',
             $titleAndName,
@@ -177,11 +178,14 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
                         $sheet->getStyle('A' . $row . ':L' . $row)->applyFromArray([
                             'fill' => [
                                 'fillType' => 'solid',
-                                'startColor' => ['rgb' => 'E6F3FF'] 
+                                'startColor' => ['rgb' => 'E6F3FF']
                             ]
                         ]);
                     }
                 }
+
+                $sheet->getStyle('A1:L' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $sheet->getStyle('A1:L' . $lastRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
             },
         ];
     }
