@@ -1396,15 +1396,23 @@ class DelegationController extends Controller
                 if ($oldAssignment) {
 
                     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                            ->where('room_type_id', $oldAssignment->room_type_id)
-                            ->where('room_number', $oldAssignment->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+
+                    if ($oldRoom) {
+
+                        if (is_null($oldAssignment->room_number)) {
+                            $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
                             $oldRoom->save();
+                        } else if ($oldRoom->assigned_rooms > 0) {
+
+                            $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                ->where('room_number', $oldAssignment->room_number)
+                                ->where('active_status', 1)
+                                ->count();
+                            if ($alreadyAssignedCount <= 1) {
+                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                $oldRoom->save();
+                            }
                         }
                     }
 
@@ -1421,15 +1429,23 @@ class DelegationController extends Controller
                 if ($oldAssignment) {
 
                     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                            ->where('room_type_id', $oldAssignment->room_type_id)
-                            ->where('room_number', $oldAssignment->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+
+                    if ($oldRoom) {
+
+                        if (is_null($oldAssignment->room_number)) {
+                            $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
                             $oldRoom->save();
+                        } else if ($oldRoom->assigned_rooms > 0) {
+                            $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                ->where('room_number', $oldAssignment->room_number)
+                                ->where('active_status', 1)
+                                ->count();
+
+                            if ($alreadyAssignedCount <= 1) {
+                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                $oldRoom->save();
+                            }
                         }
                     }
 
@@ -1446,15 +1462,23 @@ class DelegationController extends Controller
                 if ($oldAssignment) {
 
                     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                            ->where('room_type_id', $oldAssignment->room_type_id)
-                            ->where('room_number', $oldAssignment->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+
+                    if ($oldRoom) {
+
+                        if (is_null($oldAssignment->room_number)) {
+                            $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
                             $oldRoom->save();
+                        } else if ($oldRoom->assigned_rooms > 0) {
+
+                            $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                ->where('room_number', $oldAssignment->room_number)
+                                ->where('active_status', 1)
+                                ->count();
+                            if ($alreadyAssignedCount <= 1) {
+                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                $oldRoom->save();
+                            }
                         }
                     }
 
@@ -2032,6 +2056,7 @@ class DelegationController extends Controller
             DB::beginTransaction();
 
             if ($isEditMode) {
+
                 $newAccommodation = $request->has('accommodation') ? 1 : 0;
                 if ($newAccommodation == 0) {
                     if ($delegate->current_room_assignment_id) {
@@ -2039,15 +2064,23 @@ class DelegationController extends Controller
 
                         if ($oldAssignment) {
                             $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                            if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                                $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                                    ->where('room_type_id', $oldAssignment->room_type_id)
-                                    ->where('room_number', $oldAssignment->room_number)
-                                    ->where('active_status', 1)
-                                    ->count();
-                                if ($alreadyAssignedCount <= 1) {
-                                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+
+                            if ($oldRoom) {
+
+                                if (is_null($oldAssignment->room_number)) {
+                                    $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
                                     $oldRoom->save();
+                                } else if ($oldRoom->assigned_rooms > 0) {
+
+                                    $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                        ->where('room_type_id', $oldAssignment->room_type_id)
+                                        ->where('room_number', $oldAssignment->room_number)
+                                        ->where('active_status', 1)
+                                        ->count();
+                                    if ($alreadyAssignedCount <= 1) {
+                                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                        $oldRoom->save();
+                                    }
                                 }
                             }
 
@@ -2129,16 +2162,23 @@ class DelegationController extends Controller
                 if ($oldAssignment) {
                     $oldRoom = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
 
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                            ->where('room_type_id', $oldAssignment->room_type_id)
-                            ->where('room_number', $oldAssignment->room_number)
-                            ->where('active_status', 1)
-                            ->count();
+                    if ($oldRoom) {
 
-                        if ($alreadyAssignedCount <= 1) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        if (is_null($oldAssignment->room_number)) {
+                            $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
                             $oldRoom->save();
+                        } else if ($oldRoom->assigned_rooms > 0) {
+
+                            $alreadyAssignedCount = \App\Models\RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                ->where('room_number', $oldAssignment->room_number)
+                                ->where('active_status', 1)
+                                ->count();
+
+                            if ($alreadyAssignedCount <= 1) {
+                                $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                                $oldRoom->save();
+                            }
                         }
                     }
 

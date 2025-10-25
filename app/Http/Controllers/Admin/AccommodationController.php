@@ -516,101 +516,167 @@ class AccommodationController extends Controller
         $confirmedDuplicate = $request->has('confirm_duplicate') && $request->confirm_duplicate;
 
         if (!$current || $confirmedDuplicate) {
-            $alreadyAssignedExternal = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_number', $request->room_number)
-                ->where('active_status', 1)
-                ->exists();
-
-            $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_number', $request->room_number)
-                ->where('assignable_id', '!=', $user->id)
-                ->where('active_status', 1)
-                ->exists();
 
             $roomType = AccommodationRoom::with('roomType')->find($request->room_type_id);
             $availableRooms = $roomType->available_rooms;
 
-            if ($alreadyAssignedExternal) {
-                return response()->json(['success' => 3]);
-            }
+            if (empty($request->room_number)) {
 
-            if ($alreadyAssigned && !$confirmedDuplicate) {
-                $existingUsers = [];
-
-                $allExistingAssignments = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                    ->where('room_number', $request->room_number)
-                    ->where('assignable_id', '!=', $user->id)
-                    ->where('active_status', 1)
-                    ->get();
-
-                foreach ($allExistingAssignments as $assignment) {
-                    $existingModel = $assignment->assignable_type;
-                    $existingUserModel = $existingModel::find($assignment->assignable_id);
-                    if ($existingUserModel) {
-                        $existingUserName = $existingUserModel->getTranslation('name') ?? 'Unknown';
-                        $existingUserType = __db(strtolower(class_basename($existingModel)));
-                        $existingUsers[] = [
-                            'name' => $existingUserName,
-                            'type' => $existingUserType
-                        ];
-                    }
+                if ($availableRooms <= 0) {
+                    return response()->json(['success' => 2]);
                 }
 
-                $hotel = Accommodation::findOrFail($request->hotel_id);
+                if ($user->current_room_assignment_id) {
+                    $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
 
-                return response()->json([
-                    'success' => 5,
-                    'message' => 'Room already assigned to other users. Do you want to proceed?',
-                    'existing_users' => $existingUsers,
-                    'hotel_name' => $hotel->getHotelNameTranslation() ?? 'Unknown',
-                    'room_number' => $request->room_number ?? 'Unknown',
-                    'room_type' => __db($roomType->roomType->value) ?? 'Unknown'
-                ]);
-            }
+                    if (is_null($oldAssignment->room_number)) {
 
-            if ($availableRooms <= 0 && !$alreadyAssigned) {
-                return response()->json(['success' => 2]);
-            }
+                        return response()->json(['success' => 0,  'assignment_id' => null]);
+                    }
 
-            if ($user->current_room_assignment_id) {
-                $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
+                    if ($oldAssignment) {
+                        $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
 
-                if ($oldAssignment) {
-                    $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
-                    if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                        $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
-                            ->where('room_type_id', $oldAssignment->room_type_id)
-                            ->where('room_number', $oldAssignment->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                        if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
-                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                            $oldRoom->save();
+                        if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+
+                            $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                ->where('room_type_id', $oldAssignment->room_type_id)
+                                ->where('room_number', $oldAssignment->room_number)
+                                ->where('active_status', 1)
+                                ->count();
+
+                            if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
+                                $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                                $oldRoom->save();
+                            }
                         }
                     }
                 }
-            }
 
-            if (!$alreadyAssigned) {
                 $newRoom = AccommodationRoom::find($request->room_type_id);
+
                 if ($newRoom) {
-                    $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
+                    $newRoom->assigned_rooms += 1;
                     $newRoom->save();
                 }
+
+                $user->roomAssignments()->update(['active_status' => 0]);
+
+                $assignment = $user->roomAssignments()->create([
+                    'hotel_id'     => $request->hotel_id,
+                    'room_type_id' => $request->room_type_id,
+                    'room_number'  => null,
+                    'assigned_by'  => auth()->user()->id,
+                    'active_status' => 1,
+                    'delegation_id' => $request->delegation_id,
+                ]);
+
+                $user->update(['current_room_assignment_id' => $assignment->id]);
+            } else {
+
+                $alreadyAssignedExternal = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
+                    ->where('room_number', $request->room_number)
+                    ->where('active_status', 1)
+                    ->exists();
+
+                $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
+                    ->where('room_number', $request->room_number)
+                    ->where('assignable_id', '!=', $user->id)
+                    ->where('active_status', 1)
+                    ->exists();
+
+                if ($alreadyAssignedExternal) {
+                    return response()->json(['success' => 3]);
+                }
+
+                if ($availableRooms <= 0 && !$alreadyAssigned) {
+                    return response()->json(['success' => 2]);
+                }
+
+                if ($alreadyAssigned && !$confirmedDuplicate) {
+                    $existingUsers = [];
+
+                    $allExistingAssignments = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
+                        ->where('room_number', $request->room_number)
+                        ->where('assignable_id', '!=', $user->id)
+                        ->where('active_status', 1)
+                        ->get();
+
+                    foreach ($allExistingAssignments as $assignment) {
+                        $existingModel = $assignment->assignable_type;
+                        $existingUserModel = $existingModel::find($assignment->assignable_id);
+                        if ($existingUserModel) {
+                            $existingUserName = $existingUserModel->getTranslation('name') ?? 'Unknown';
+                            $existingUserType = __db(strtolower(class_basename($existingModel)));
+                            $existingUsers[] = [
+                                'name' => $existingUserName,
+                                'type' => $existingUserType
+                            ];
+                        }
+                    }
+
+                    $hotel = Accommodation::findOrFail($request->hotel_id);
+
+                    return response()->json([
+                        'success' => 5,
+                        'message' => 'Room already assigned to other users. Do you want to proceed?',
+                        'existing_users' => $existingUsers,
+                        'hotel_name' => $hotel->getHotelNameTranslation() ?? 'Unknown',
+                        'room_number' => $request->room_number ?? 'Unknown',
+                        'room_type' => __db($roomType->roomType->value) ?? 'Unknown'
+                    ]);
+                }
+
+                if ($user->current_room_assignment_id) {
+                    $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
+
+                    if ($oldAssignment) {
+                        $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
+
+                        if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+
+                            if (is_null($oldAssignment->room_number)) {
+
+                                $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                                $oldRoom->save();
+                            } else {
+
+                                $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                                    ->where('room_type_id', $oldAssignment->room_type_id)
+                                    ->where('room_number', $oldAssignment->room_number)
+                                    ->where('active_status', 1)
+                                    ->count();
+
+                                if ($alreadyAssignedCount <= 1 && (strtolower($oldAssignment->room_number) != strtolower($request->room_number) || $oldAssignment->room_type_id != $request->room_type_id || $oldAssignment->hotel_id != $request->hotel_id)) {
+                                    $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                                    $oldRoom->save();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!$alreadyAssigned) {
+                    $newRoom = AccommodationRoom::find($request->room_type_id);
+                    if ($newRoom) {
+                        $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
+                        $newRoom->save();
+                    }
+                }
+
+                $user->roomAssignments()->update(['active_status' => 0]);
+
+                $assignment = $user->roomAssignments()->create([
+                    'hotel_id'     => $request->hotel_id,
+                    'room_type_id' => $request->room_type_id,
+                    'room_number'  => $request->room_number,
+                    'assigned_by'  => auth()->user()->id,
+                    'active_status' => 1,
+                    'delegation_id' => $request->delegation_id
+                ]);
+
+                $user->update(['current_room_assignment_id' => $assignment->id]);
             }
-
-            $user->roomAssignments()->update(['active_status' => 0]);
-
-            $assignment = $user->roomAssignments()->create([
-                'hotel_id'     => $request->hotel_id,
-                'room_type_id' => $request->room_type_id,
-                'room_number'  => $request->room_number,
-                'assigned_by'  => auth()->user()->id,
-                'active_status' => 1,
-                'delegation_id' => $request->delegation_id
-            ]);
-
-            $user->update(['current_room_assignment_id' => $assignment->id]);
 
             $accommodation = Accommodation::findOrFail($request->hotel_id);
             if ($request->assignable_type === 'Escort') {
@@ -697,45 +763,69 @@ class AccommodationController extends Controller
             'room_number.required' => __db('this_field_is_required'),
         ]);
 
-        $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-            ->where('room_type_id', $request->room_type)
-            ->where('room_number', $request->room_number)
-            ->where('active_status', 1)
-            ->exists();
-
-        $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-            ->where('room_type_id', $request->room_type)
-            ->where('room_number', $request->room_number)
-            ->where('active_status', 1)
-            ->exists();
-
         $roomType = AccommodationRoom::find($request->room_type);
         $availableRooms = $roomType->available_rooms;
 
-        if ($alreadyAssignedDelegation) {
-            return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
-        }
-        if ($availableRooms <= 0) {
-            return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
-        }
-
-        if (!$alreadyAssigned) {
+        if (empty($request->room_number)) {
             $newRoom = AccommodationRoom::find($request->room_type);
+
+            if ($availableRooms <= 0) {
+                return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+            }
+
             if ($newRoom) {
                 $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
                 $newRoom->save();
             }
-        }
 
-        $user = ExternalMemberAssignment::create([
-            'name' => $request->name,
-            'coming_from' => $request->coming_from,
-            'room_type_id' => $request->room_type,
-            'room_number' => $request->room_number,
-            'hotel_id' => $request->hotel_id,
-            'assigned_by'  => auth()->user()->id,
-            'active_status' => 1,
-        ]);
+            $user = ExternalMemberAssignment::create([
+                'name' => $request->name,
+                'coming_from' => $request->coming_from,
+                'room_type_id' => $request->room_type,
+                'room_number' => null,
+                'hotel_id' => $request->hotel_id,
+                'assigned_by'  => auth()->user()->id,
+                'active_status' => 1,
+            ]);
+        } else {
+
+            $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
+                ->where('room_type_id', $request->room_type)
+                ->where('room_number', $request->room_number)
+                ->where('active_status', 1)
+                ->exists();
+
+            $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
+                ->where('room_type_id', $request->room_type)
+                ->where('room_number', $request->room_number)
+                ->where('active_status', 1)
+                ->exists();
+
+            if ($alreadyAssignedDelegation) {
+                return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
+            }
+            if ($availableRooms <= 0) {
+                return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+            }
+
+            if (!$alreadyAssigned) {
+                $newRoom = AccommodationRoom::find($request->room_type);
+                if ($newRoom) {
+                    $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
+                    $newRoom->save();
+                }
+            }
+
+            $user = ExternalMemberAssignment::create([
+                'name' => $request->name,
+                'coming_from' => $request->coming_from,
+                'room_type_id' => $request->room_type,
+                'room_number' => $request->room_number,
+                'hotel_id' => $request->hotel_id,
+                'assigned_by'  => auth()->user()->id,
+                'active_status' => 1,
+            ]);
+        }
 
         $hotel = Accommodation::findOrFail($request->hotel_id);
 
@@ -744,6 +834,7 @@ class AccommodationController extends Controller
             'hotel_name' => $hotel->hotel_name ?? NULL,
             'room_number' => $request->room_number ?? NULL,
         ];
+
         $this->logActivity(
             module: 'Accommodations',
             submodule: 'assignment',
@@ -845,7 +936,7 @@ class AccommodationController extends Controller
         $request->validate([
             'name' => 'required',
             'room_type' => 'required',
-            'room_number' => 'required'
+            'room_number' => 'nullable'
         ], [
             'name.required' => __db('this_field_is_required'),
             'room_type.required' => __db('this_field_is_required'),
@@ -854,65 +945,120 @@ class AccommodationController extends Controller
 
         $externalMember = ExternalMemberAssignment::findOrFail($id);
 
+        $roomType = AccommodationRoom::find($request->room_type);
+        $availableRooms = $roomType->available_rooms;
+
+
         if ($externalMember->room_type_id != $request->room_type || $externalMember->room_number != $request->room_number || $externalMember->hotel_id != $request->hotel_id) {
 
-            $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type)
-                ->where('room_number', $request->room_number)
-                ->where('active_status', 1)
-                ->exists();
+            if (empty($request->room_number)) {
 
-            $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type)
-                ->where('room_number', $request->room_number)
-                ->where('active_status', 1)
-                ->exists();
-
-
-            $roomType = AccommodationRoom::find($request->room_type);
-            $availableRooms = $roomType->available_rooms;
-
-            if ($alreadyAssignedDelegation) {
-                return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
-            }
-            if ($availableRooms <= 0) { // && $externalMember->hotel_id != $request->hotel_id && $externalMember->room_type_id != $request->room_type && $externalMember->room_number != $request->room_number
-                return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
-            }
-
-            if (!$alreadyAssigned) {
-                $newRoom = AccommodationRoom::find($request->room_type);
-                if ($newRoom) {
-                    $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
-                    $newRoom->save();
+                if ($availableRooms <= 0) {
+                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
                 }
-            }
 
-            if ($externalMember && ((($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id == $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) == strtolower($request->room_number))))) {
-                $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
-                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                if ($externalMember->room_type_id) {
+                    $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
+
                     $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
                         ->where('room_type_id', $externalMember->room_type_id)
                         ->where('room_number', $externalMember->room_number)
                         ->where('active_status', 1)
                         ->count();
+
                     if ($alreadyAssignedCount <= 1 && ((strtolower($externalMember->hotel_id) != strtolower($request->hotel_id)) || (strtolower($externalMember->room_type_id) != strtolower($request->room_type)) || (strtolower($externalMember->room_number) != strtolower($request->room_number)))) {
                         $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                         $oldRoom->save();
                     }
                 }
-            }
-            $externalMember->active_status = 0;
-            $externalMember->save();
 
-            $user = ExternalMemberAssignment::create([
-                'name' => $request->name,
-                'coming_from' => $request->coming_from,
-                'room_type_id' => $request->room_type,
-                'room_number' => $request->room_number,
-                'hotel_id' => $request->hotel_id,
-                'assigned_by'  => auth()->user()->id,
-                'active_status' => 1,
-            ]);
+                $newRoom = AccommodationRoom::find($request->room_type);
+                if ($newRoom) {
+                    $newRoom->assigned_rooms += 1;
+                    $newRoom->save();
+                }
+
+                $externalMember->active_status = 0;
+                $externalMember->save();
+
+                $user = ExternalMemberAssignment::create([
+                    'name' => $request->name,
+                    'coming_from' => $request->coming_from,
+                    'room_type_id' => $request->room_type,
+                    'room_number' => null,
+                    'hotel_id' => $request->hotel_id,
+                    'assigned_by'  => auth()->user()->id,
+                    'active_status' => 1,
+                ]);
+            } else {
+
+                $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
+                    ->where('room_type_id', $request->room_type)
+                    ->where('room_number', $request->room_number)
+                    ->where('active_status', 1)
+                    ->exists();
+
+                $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
+                    ->where('room_type_id', $request->room_type)
+                    ->where('room_number', $request->room_number)
+                    ->where('active_status', 1)
+                    ->exists();
+
+
+                if ($alreadyAssignedDelegation) {
+                    return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
+                }
+                if ($availableRooms <= 0) { // && $externalMember->hotel_id != $request->hotel_id && $externalMember->room_type_id != $request->room_type && $externalMember->room_number != $request->room_number
+                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                }
+
+                if (!$alreadyAssigned) {
+                    $newRoom = AccommodationRoom::find($request->room_type);
+                    if ($newRoom) {
+                        $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
+                        $newRoom->save();
+                    }
+                }
+
+                if (
+                    $externalMember &&
+                    ((($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id == $request->room_type) && (strtolower($externalMember->room_number) != strtolower($request->room_number))) || (($externalMember->room_type_id != $request->room_type) && (strtolower($externalMember->room_number) == strtolower($request->room_number))))
+                ) {
+                    $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
+
+                    if (is_null($externalMember->room_number)) {
+
+                        $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                        $oldRoom->save();
+                    } else {
+
+                        $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                            ->where('room_type_id', $externalMember->room_type_id)
+                            ->where('room_number', $externalMember->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                            
+                        if ($alreadyAssignedCount <= 1 && ((strtolower($externalMember->hotel_id) != strtolower($request->hotel_id)) || (strtolower($externalMember->room_type_id) != strtolower($request->room_type)) || (strtolower($externalMember->room_number) != strtolower($request->room_number)))) {
+                            $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                            $oldRoom->save();
+                        }
+                    }
+                }
+
+                $externalMember->active_status = 0;
+                $externalMember->save();
+
+                $user = ExternalMemberAssignment::create([
+                    'name' => $request->name,
+                    'coming_from' => $request->coming_from,
+                    'room_type_id' => $request->room_type,
+                    'room_number' => $request->room_number,
+                    'hotel_id' => $request->hotel_id,
+                    'assigned_by'  => auth()->user()->id,
+                    'active_status' => 1,
+                ]);
+            }
+
 
             $externalMemberId = $user->id;
             $hotel = Accommodation::findOrFail($request->hotel_id);
@@ -952,18 +1098,26 @@ class AccommodationController extends Controller
         if ($externalMember) {
             $oldRoom = AccommodationRoom::find($externalMember->room_type_id);
 
-            $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
-                ->where('room_type_id', $externalMember->room_type_id)
-                ->where('room_number', $externalMember->room_number)
-                ->where('active_status', 1)
-                ->count();
+            if (is_null($externalMember->room_number)) {
 
-            if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                if ($alreadyAssignedCount <= 1) {
-                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                    $oldRoom->save();
+                $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                $oldRoom->save();
+            } else {
+
+                $alreadyAssignedCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                    ->where('room_type_id', $externalMember->room_type_id)
+                    ->where('room_number', $externalMember->room_number)
+                    ->where('active_status', 1)
+                    ->count();
+
+                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    if ($alreadyAssignedCount <= 1) {
+                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        $oldRoom->save();
+                    }
                 }
             }
+
             $externalMember->active_status = 0;
             $externalMember->save();
         }
@@ -982,18 +1136,26 @@ class AccommodationController extends Controller
             $type = $assignment->assignable_type;
             $oldRoom = AccommodationRoom::find($assignment->room_type_id);
 
-            $alreadyAssignedCount = RoomAssignment::where('hotel_id', $assignment->hotel_id)
-                ->where('room_type_id', $assignment->room_type_id)
-                ->where('room_number', $assignment->room_number)
-                ->where('active_status', 1)
-                ->count();
+            if (is_null($assignment->room_number)) {
 
-            if ($oldRoom && $oldRoom->assigned_rooms > 0) {
-                if ($alreadyAssignedCount <= 1) {
-                    $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
-                    $oldRoom->save();
+                $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                $oldRoom->save();
+            } else {
+
+                $alreadyAssignedCount = RoomAssignment::where('hotel_id', $assignment->hotel_id)
+                    ->where('room_type_id', $assignment->room_type_id)
+                    ->where('room_number', $assignment->room_number)
+                    ->where('active_status', 1)
+                    ->count();
+
+                if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                    if ($alreadyAssignedCount <= 1) {
+                        $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
+                        $oldRoom->save();
+                    }
                 }
             }
+
             $assignment->active_status = 0;
             $assignment->save();
 

@@ -115,7 +115,7 @@
                 </div>
 
                 <div class="col-span-12 md:col-span-3">
-                    <label class="block text-sm text-gray-700 mb-1">{{ __db('room_number') }} <span class="text-red-600">*</span></label>
+                    <label class="block text-sm text-gray-700 mb-1">{{ __db('room_number') }} </label>
                     <input type="text"  name="room_number" id="room_number" placeholder="{{ __db('enter') }}" class="w-full text-secondary-light p-3 text-sm !border-[#d1d5db] rounded-lg" value="{{ old('room_number') }}"/>
                     @error('room_number')
                         <div class="text-red-600 text-sm mt-2">{{ $message }}</div>
