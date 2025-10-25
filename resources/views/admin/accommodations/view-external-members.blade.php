@@ -14,7 +14,7 @@
                 <span>{{ __db('back') }}</span>
             </a>
         </div>
-       
+
         <!-- DAdd Delegation -->
         <div class="bg-white h-full vh-100 max-h-full min-h-full rounded-lg border-0 p-6">
 
@@ -34,8 +34,9 @@
                         <button type="submit"
                             class="!text-[#5D471D] absolute end-[3px] bottom-[3px] !bg-[#E6D7A2] hover:bg-yellow-400 focus:ring-4 focus:outline-none focus:ring-yellow-200 font-medium rounded-lg text-sm px-4 py-2">{{ __db('search') }}</button>
 
-                         <a href="{{ route('admin.view-external-members') }}"  class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
-                                        {{ __db('reset') }}</a>
+                        <a href="{{ route('admin.view-external-members') }}"
+                            class="absolute end-[80px]  bottom-[3px] border !border-[#B68A35] !text-[#B68A35] font-medium rounded-lg text-sm px-4 py-2 ">
+                            {{ __db('reset') }}</a>
                     </div>
                 </form>
 
@@ -107,7 +108,8 @@
                 <tbody>
                     @forelse ($externalMembers as $key => $member)
                         <tr class="text-[12px] align-[middle]">
-                            <td class="text-center px-4 py-2 border border-gray-200">{{ $externalMembers->firstItem() + $key }}</td>
+                            <td class="text-center px-4 py-2 border border-gray-200">
+                                {{ $externalMembers->firstItem() + $key }}</td>
                             <td class="text-center px-4 py-3 border border-gray-200">
                                 {{ $member->name ?? '' }}
                             </td>
@@ -125,7 +127,7 @@
                             </td>
                             <td class="text-center px-4 py-3 border border-gray-200">
                                 <div class="flex items-center gap-5">
-                                    @directCanany(['assign_external_members','hotel_assign_external_members'])
+                                    @directCanany(['assign_external_members', 'hotel_assign_external_members'])
                                         <a href="{{ route('external-members.edit', $member->id) }}">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                 viewBox="0 0 512 512">
@@ -142,8 +144,8 @@
                                             <button class="delete-external text-red-600 hover:text-red-800">
                                                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                                     fill="none" viewBox="0 0 24 24">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="1.5"
+                                                    <path stroke="currentColor" stroke-linecap="round"
+                                                        stroke-linejoin="round" stroke-width="1.5"
                                                         d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
                                                 </svg>
                                             </button>
@@ -213,6 +215,21 @@
                             class="block w-full p-2.5 !ps-10 text-secondary-light text-sm !border-[#d1d5db] rounded-lg"
                             placeholder="{{ __db('search') }}" value="{{ request('room_number') }}">
                     </div>
+
+                    {{-- <div class="flex flex-col">
+                        <label class="form-label block text-gray-700 font-bold">{{ __db('accomodation_status') }}</label>
+                        <select multiple name="accomodation_status[]" data-placeholder="{{ __db('select') }}"
+                            class="select2 w-full rounded-lg border border-gray-300 text-sm">
+                            <option value="">{{ __db('select') }}</option>
+                            <option value="1" @if (in_array('1', request('accomodation_status', []))) selected @endif>
+                                {{ __db('fully_accomodated') }}
+                            </option>
+                            <option value="3" @if (in_array('3', request('accomodation_status', []))) selected @endif>
+                                {{ __db('missing_room_accomodated') }}
+                            </option>
+                        </select>
+                    </div> --}}
+
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-6">
                     <a href="{{ route('admin.view-external-members') }}"
@@ -261,7 +278,8 @@
                 $.get(url, function(data) {
                     dropdown.empty().append('<option value="">{{ __db('select') }}</option>');
                     data.forEach(function(room) {
-                        dropdown.append('<option value="' + room.id + '">' + room.room_type?.value + '</option>');
+                        dropdown.append('<option value="' + room.id + '">' + room.room_type
+                            ?.value + '</option>');
                     });
                 });
             });

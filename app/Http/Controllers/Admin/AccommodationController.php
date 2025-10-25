@@ -317,7 +317,7 @@ class AccommodationController extends Controller
             'delegates',
             'escorts',
             'drivers',
-            'roomAssignments.hotel' 
+            'roomAssignments.hotel'
         ])
             ->whereHas('invitationStatus', function ($q) {
                 $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
@@ -429,7 +429,7 @@ class AccommodationController extends Controller
         }
 
         if ($hotelIds = $request->input('hotel_name')) {
-            $query->whereHas('roomAssignments', function($q) use ($hotelIds) {
+            $query->whereHas('roomAssignments', function ($q) use ($hotelIds) {
                 $q->whereIn('hotel_id', $hotelIds);
             });
         }
@@ -438,14 +438,14 @@ class AccommodationController extends Controller
         $limit = $request->limit ? $request->limit : 20;
 
         $delegations = $query->paginate($limit);
-        
+
         $currentEventId = session('current_event_id', getDefaultEventId());
         $filterData = [
             'hotelNames' => Accommodation::where('event_id', $currentEventId)
                 ->where('status', 1)
                 ->pluck('hotel_name', 'id')
         ];
-        
+
         return view('admin.accommodations.delegations', compact('delegations', 'filterData'));
     }
 
@@ -690,7 +690,7 @@ class AccommodationController extends Controller
         $request->validate([
             'name' => 'required',
             'room_type' => 'required',
-            'room_number' => 'required'
+            'room_number' => 'nullable'
         ], [
             'name.required' => __db('this_field_is_required'),
             'room_type.required' => __db('this_field_is_required'),
@@ -770,7 +770,7 @@ class AccommodationController extends Controller
             $externalMembersQuery->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('coming_from', 'like', '%' . $search . '%');
+                        ->orWhere('coming_from', 'like', '%' . $search . '%');
                 });
             });
         }
@@ -785,8 +785,46 @@ class AccommodationController extends Controller
         if ($roomTypeId = $request->input('room_type_id')) {
             $externalMembersQuery->where('room_type_id', $roomTypeId);
         }
+
+        if ($accomodationStatus = $request->input('accomodation_status')) {
+
+            $missingRoomNumberAccomodatedStatusNumber = 3;
+            $fullyAccommodatedStatusNumber = 1;
+
+            if (is_array($accomodationStatus)) {
+                $externalMembersQuery->where(function ($query) use ($accomodationStatus, $missingRoomNumberAccomodatedStatusNumber, $fullyAccommodatedStatusNumber) {
+                    if (in_array($missingRoomNumberAccomodatedStatusNumber, $accomodationStatus)) {
+                        $query->orWhere(function ($q) {
+                            $q->whereNull('room_number')
+                                ->orWhere('room_number', '');
+                        });
+                    }
+
+                    if (in_array($fullyAccommodatedStatusNumber, $accomodationStatus)) {
+                        $query->orWhere(function ($q) {
+                            $q->whereNotNull('room_number')
+                                ->where('room_number', '!=', '');
+                        });
+                    }
+                });
+            } else {
+                if ($accomodationStatus == $missingRoomNumberAccomodatedStatusNumber) {
+                    $externalMembersQuery->where(function ($query) {
+                        $query->whereNull('room_number')
+                            ->orWhere('room_number', '');
+                    });
+                } elseif ($accomodationStatus == $fullyAccommodatedStatusNumber) {
+                    $externalMembersQuery->whereNotNull('room_number')
+                        ->where('room_number', '!=', '');
+                }
+            }
+        }
+
+
         $limit = $request->input('limit') ?? 10;
         $externalMembers = $externalMembersQuery->orderBy('id', 'desc')->paginate($limit);
+
+
 
         $hotels = Accommodation::where('event_id', $currentEventId)
             ->where('status', 1)
@@ -1002,7 +1040,7 @@ class AccommodationController extends Controller
         ]);
 
         $delegate = Delegate::findOrFail($request->delegate_id);
-        
+
         $hasActiveAssignment = $delegate->roomAssignments()
             ->where('active_status', 1)
             ->exists();
@@ -1028,20 +1066,20 @@ class AccommodationController extends Controller
         if (!$user->can('export_accommodation_delegations') && !$user->can('hotel_export_accommodation_delegations')) {
             abort(403, 'Access denied');
         }
-        
+
         $export = new \App\Exports\AccommodationDelegatesEscortsExport();
         return $export->download('accommodation_delegates_escorts_export.xlsx');
     }
-    
+
     public function exportHotelAccommodations($id)
     {
         $hotelId = base64_decode($id);
-        
+
         $user = auth()->user();
         if (!$user->can('export_hotel_accommodations') && !$user->can('hotel_export_hotel_accommodations')) {
             abort(403, 'Access denied');
         }
-        
+
         $export = new \App\Exports\HotelAccommodationsExport($hotelId);
         return $export->download('hotel_accommodations_export.xlsx');
     }
