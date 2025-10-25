@@ -165,6 +165,24 @@
                         ],
 
                         [
+                            'label' => __db('accommodation_required'),
+                            'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
+                            'render' => function ($row) {
+                                $room = $row->currentRoomAssignment ?? null;
+                                $isChecked = $row->accommodation == 1 ? 'checked' : '';
+
+                                return '<input type="checkbox" class="accommodation-status-checkbox"
+                                    data-delegate-id="' .
+                                    e($row->id) .
+                                    '"
+                                    ' .
+                                    $isChecked .
+                                    '
+                                    class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">';
+                            },
+                        ],
+
+                        [
                             'label' => __db('hotel'),
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
@@ -291,6 +309,8 @@
                             return 'bg-[#e5e5e5]';
                         } elseif ($room) {
                             return 'bg-[#acf3bc]';
+                        } else {
+                            return ''; // White background when accommodation is required but no room assigned
                         }
                     }" />
 
@@ -1105,7 +1125,7 @@
             $('.save-room-assignment').on('click', function(e) {
                 e.preventDefault();
                 let row = $(this).closest('tr');
-                let checkboxDel = row.find('input[type="checkbox"]');
+                let checkboxDel = row.find('.assign-hotel-checkbox');
                 let delegateId = row.data('id');
                 let hotelId = $('#hotel_id' + delegateId).val();
                 let roomTypeId = row.find('.room-type-dropdown').val();
@@ -1691,6 +1711,74 @@
                 $('.assign-hotel-checkbox-driver').each(function() {
                     if ($(this).is(':checked') !== isChecked) {
                         $(this).prop('checked', isChecked).trigger('change');
+                    }
+                });
+            });
+
+            $(document).on('change', '.accommodation-status-checkbox', function() {
+                const checkbox = $(this);
+                const delegateId = checkbox.data('delegate-id');
+                const isChecked = checkbox.is(':checked');
+                const row = checkbox.closest('tr');
+
+                const hasRoomAssigned = row.find('.remove-room-assignment').length > 0;
+
+                if (!isChecked && hasRoomAssigned) {
+                    toastr.error('Please unassign room first');
+                    checkbox.prop('checked', !isChecked);
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('accommodation.update-accommodation-status') }}",
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        delegate_id: delegateId,
+                        accommodation_status: isChecked ? 1 : 0
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            row.removeClass('bg-[#e5e5e5] bg-[#acf3bc]');
+
+                            if (!isChecked) {
+                                row.addClass('bg-[#e5e5e5]');
+                            } else {
+                                const hasRoomNow = row.find('.remove-room-assignment').length >
+                                    0;
+                                if (hasRoomNow) {
+                                    row.addClass('bg-[#acf3bc]');
+                                }
+                            }
+
+                            toastr.success(isChecked ?
+                                'Accommodation required' :
+                                'Accommodation not required');
+
+                            const assignHotelCheckbox = row.find('.assign-hotel-checkbox');
+                            if (assignHotelCheckbox.length) {
+                                assignHotelCheckbox.prop('disabled', !isChecked);
+                                if (!isChecked) {
+                                    assignHotelCheckbox.prop('checked', false);
+                                    row.find('.room-type-dropdown').empty().append(
+                                        '<option value="">{{ __db('select') }}</option>');
+                                    row.find('.room-number-input').val('');
+                                    row.find('.hotel_name').text('');
+                                    row.find('.hotel-id-input').val('');
+                                }
+                            }
+
+                            window.location.reload();
+                        } else {
+                            toastr.error(response.message ||
+                                'Error updating accommodation status');
+                            checkbox.prop('checked', !isChecked);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error updating accommodation status:', xhr);
+                        toastr.error('Error updating accommodation status');
+                        checkbox.prop('checked', !isChecked);
                     }
                 });
             });

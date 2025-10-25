@@ -993,4 +993,32 @@ class AccommodationController extends Controller
 
         return response()->json(['success' => 0]);
     }
+
+    public function updateAccommodationStatus(Request $request)
+    {
+        $request->validate([
+            'delegate_id' => 'required|integer|exists:delegates,id',
+            'accommodation_status' => 'required|boolean'
+        ]);
+
+        $delegate = Delegate::findOrFail($request->delegate_id);
+        
+        $hasActiveAssignment = $delegate->roomAssignments()
+            ->where('active_status', 1)
+            ->exists();
+
+        if (!$request->accommodation_status && $hasActiveAssignment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please unassign room first before changing accommodation status'
+            ]);
+        }
+
+        $delegate->update(['accommodation' => $request->accommodation_status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Accommodation status updated successfully'
+        ]);
+    }
 }
