@@ -6,7 +6,7 @@
 @endphp
 
 <h2 class="font-semibold text-2xl mb-4">{{ $title }}</h2>
-<div class="bg-gray-50 rounded-lg p-6" data-transport-section="{{ $type }}">
+<div class="bg-gray-50 rounded-lg p-6" data-transport-section="{{ $type }}" autocomplete="off">
     <div class="flex items-center gap-4 mb-5">
         <label class="flex items-center gap-1.5 cursor-pointer">
             <input type="radio" name="{{ $type }}[mode]" value="flight" class="form-radio"
@@ -43,13 +43,13 @@
                 <label class="form-label block mb-1 text-sm">{{ __db('flight_no') }}:</label>
                 <input name="{{ $type }}[flight_no]" type="text"
                     value="{{ old($type . '.flight_no', $transport->flight_no ?? '') }}"
-                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm" />
+                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm" autocomplete="off"/>
             </div>
             <div>
                 <label class="form-label block mb-1 text-sm">{{ __db('flight_name') }}:</label>
                 <input name="{{ $type }}[flight_name]" type="text"
                     value="{{ old($type . '.flight_name', $transport->flight_name ?? '') }}"
-                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm" />
+                    class="p-3 rounded-lg w-full border border-neutral-300 text-sm" autocomplete="off"/>
             </div>
         </div>
 
@@ -60,7 +60,7 @@
                 <input name="{{ $type }}[date_time]" id="{{ $type }}_datetime" type="text"
                     value="{{ old($type . '.date_time', $dateTime) }}"
                     class="p-3 rounded-lg w-full border border-neutral-300 text-sm datetimepicker-input"
-                    placeholder="{{ __db('select_date_time') }}" />
+                    placeholder="{{ __db('select_date_time') }}" autocomplete="off"/>
             </div>
 
             @php
