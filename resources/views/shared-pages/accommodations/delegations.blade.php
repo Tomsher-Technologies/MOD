@@ -193,9 +193,7 @@
                                 return $delegation->drivers
                                     ->map(function ($driver) {
                                         $searchUrl = route('drivers.index', ['search' => $driver->code]);
-                                        return '<span class="">' .
-                                            e($driver->code) .
-                                            '</span>';
+                                        return '<span class="">' . e($driver->code) . '</span>';
                                     })
                                     ->implode('<br>');
                             },
@@ -221,12 +219,10 @@
                                 $hotelNames = $delegation->roomAssignments
                                     ->pluck('hotel.hotel_name')
                                     ->unique()
-                                    ->filter() 
+                                    ->filter()
                                     ->values();
 
-                                return $hotelNames->count() > 0 
-                                    ? $hotelNames->implode('<br>')
-                                    : '-';
+                                return $hotelNames->count() > 0 ? $hotelNames->implode('<br>') : '-';
                             },
                         ],
                         [
@@ -257,6 +253,8 @@
                             return 'bg-[#acf3bc]';
                         } elseif ($status == 2) {
                             return 'bg-[#ffefb8b5]';
+                        } elseif ($status == 3) {
+                            return 'bg-[#ffdfdf]';
                         } else {
                             return 'bg-[#fff]';
                         }
@@ -274,6 +272,10 @@
                     <div class="mt-3 flex items-center justify-start gap-3 ">
                         <div class="h-5 w-5 bg-[#acf3bc] rounded"></div>
                         <span class="text-gray-800 text-sm">{{ __db('fully_accommodated') }}</span>
+                    </div>
+                    <div class="mt-3 flex items-center justify-start gap-3 ">
+                        <div class="h-5 w-5 bg-[#ffdfdf] rounded"></div>
+                        <span class="text-gray-800 text-sm">{{ __db('missing_room_accommodated') }}</span>
                     </div>
                 </div>
             </div>
@@ -308,8 +310,7 @@
                 @endforeach
 
                 <div class="flex flex-col">
-                    <label
-                        class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
+                    <label class="form-label block mb-1 text-gray-700 font-bold">{{ __db('invitation_from') }}</label>
                     <select name="invitation_from[]" multiple data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
@@ -376,8 +377,7 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <label
-                        class="form-label block text-gray-700 font-bold">{{ __db('accomodation_status') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('accomodation_status') }}</label>
                     <select multiple name="accomodation_status[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
@@ -390,18 +390,21 @@
                         <option value="2" @if (in_array('2', request('accomodation_status', []))) selected @endif>
                             {{ __db('partially_accomodated') }}
                         </option>
+                        <option value="3" @if (in_array('3', request('accomodation_status', []))) selected @endif>
+                            {{ __db('missing_room_accomodated') }}
+                        </option>
                     </select>
                 </div>
 
                 <div class="flex flex-col">
-                    <label
-                        class="form-label block text-gray-700 font-bold">{{ __db('hotels') }}</label>
+                    <label class="form-label block text-gray-700 font-bold">{{ __db('hotels') }}</label>
                     <select multiple name="hotel_name[]" data-placeholder="{{ __db('select') }}"
                         class="select2 w-full rounded-lg border border-gray-300 text-sm">
                         <option value="">{{ __db('select') }}</option>
-                        @if(isset($filterData['hotelNames']) && $filterData['hotelNames'])
+                        @if (isset($filterData['hotelNames']) && $filterData['hotelNames'])
                             @foreach ($filterData['hotelNames'] as $id => $hotel)
-                                <option value="{{ $id }}" @if (in_array($id, request('hotel_name', []))) selected @endif>
+                                <option value="{{ $id }}"
+                                    @if (in_array($id, request('hotel_name', []))) selected @endif>
                                     {{ $hotel }}</option>
                             @endforeach
                         @endif

@@ -10,6 +10,7 @@ use App\Models\Language;
 use App\Models\Accommodation;
 use App\Models\Delegation;
 use App\Models\FloorPlan;
+use App\Models\RoomAssignment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Request;
@@ -661,6 +662,11 @@ function isHotel()
 
 function getRoomAssignmentStatus($delegationId)
 {
+    $notAccomodatedStatusNumber = 0;
+    $fullyAccomodatedStatusNumber = 1;
+    $partiallyAccomodatedStatusNumber = 2;
+    $missingRoomNumberAccomodatedStatusNumber = 3;
+
     $delegation = Delegation::find($delegationId);
 
     $delegates = Delegate::where('delegation_id', $delegationId)->where('accommodation', 1)
@@ -684,10 +690,10 @@ function getRoomAssignmentStatus($delegationId)
 
     $all = $delegates->merge($escorts)->merge($drivers);
 
-    $accomodationStatus = 0;
+    $accomodationStatus = $notAccomodatedStatusNumber;
 
     if ($all->count() === 0) {
-        $accomodationStatus = 0;
+        $accomodationStatus = $notAccomodatedStatusNumber;
     }
 
     $assignedCount = $all->filter(fn($id) => !is_null($id))->count();
@@ -696,9 +702,21 @@ function getRoomAssignmentStatus($delegationId)
     if ($assignedCount === 0) {
         $accomodationStatus = 0;
     } elseif ($assignedCount === $totalCount) {
-        $accomodationStatus = 1;
+
+        $assignmentIds = $all->filter(fn($id) => !is_null($id));
+
+        $isMissingRoomNumberCount = RoomAssignment::whereIn('id', $assignmentIds)
+            ->whereNull('room_number')
+            ->count();
+
+        if ($isMissingRoomNumberCount > 0) {
+            $accomodationStatus = $missingRoomNumberAccomodatedStatusNumber;
+        } else {
+            $accomodationStatus = $fullyAccomodatedStatusNumber; 
+        }
+
     } else {
-        $accomodationStatus = 2;
+        $accomodationStatus = $partiallyAccomodatedStatusNumber;
     }
 
     $delegation->accomodation_status = $accomodationStatus;
