@@ -2,7 +2,8 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-10">
         <h2 class="font-semibold text-2xl">{{ __db('delegation') }}</h2>
         <div class="flex gap-3 ms-auto">
-            <x-back-btn class="" back-url="{{ session()->get('accommodation_delegations_last_url') ? session()->get('accommodation_delegations_last_url') : route('accommodation-delegations') }}" />
+            <x-back-btn class=""
+                back-url="{{ session()->get('accommodation_delegations_last_url') ? session()->get('accommodation_delegations_last_url') : route('accommodation-delegations') }}" />
         </div>
     </div>
 
@@ -82,7 +83,8 @@
                 @php
                     $columns = [
                         [
-                            'label' => '',
+                            'label' =>
+                                '<input type="checkbox" id="select-all-delegates" class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">',
                             'permission' => ['assign_accommodations', 'hotel_assign_accommodations'],
                             'render' => function ($row) {
                                 if ($row->accommodation == 1) {
@@ -356,6 +358,8 @@
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                 <th scope="col"
                                     class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                    <input type="checkbox" id="select-all-escorts"
+                                        class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
                                 </th>
                             @enddirectCanany
                             <th scope="col"
@@ -570,6 +574,8 @@
                             @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                 <th scope="col"
                                     class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                    <input type="checkbox" id="select-all-drivers"
+                                        class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
                                 </th>
                             @enddirectCanany
                             <th scope="col"
@@ -979,9 +985,6 @@
             });
 
             function hotelData(hotelId, section) {
-                $('.assign-hotel-checkbox').prop('checked', false);
-                $('.assign-hotel-checkbox-escort').prop('checked', false);
-                $('.assign-hotel-checkbox-driver').prop('checked', false);
                 let url = "{{ route('accommodation.rooms', ':id') }}";
                 url = url.replace(':id', hotelId);
 
@@ -1056,11 +1059,13 @@
 
             }
             $(document).on('change', '#hotelDelegate', function() {
+                $('.assign-hotel-checkbox').prop('checked', false);
+
                 let hotelId = this.value;
                 hotelData(hotelId, 'Delegate');
             });
 
-            $('.assign-hotel-checkbox').on('click', function() {
+            $('.assign-hotel-checkbox').on('change', function() {
                 let hotelId = $('#hotelDelegate').val();
                 let Hotelname = $('#hotelDelegate option:selected').text();
 
@@ -1106,7 +1111,7 @@
                 let roomTypeId = row.find('.room-type-dropdown').val();
                 let roomNumber = row.find('.room-number-input').val();
 
-                if (!hotelId || !roomTypeId || !roomNumber) {
+                if (!hotelId || !roomTypeId) {
                     toastr.error('{{ __db('please_select_room_details') }}');
                     return;
                 }
@@ -1234,11 +1239,13 @@
 
             // Escort Section
             $(document).on('change', '#hotelEscort', function() {
+                $('.assign-hotel-checkbox-escort').prop('checked', false);
+
                 let hotelId = this.value;
                 hotelData(hotelId, 'Escort');
             });
 
-            $('.assign-hotel-checkbox-escort').on('click', function() {
+            $('.assign-hotel-checkbox-escort').on('change', function() {
                 let hotelIdEscort = $('#hotelEscort').val();
                 let HotelnameEscort = $('#hotelEscort option:selected').text();
 
@@ -1285,7 +1292,7 @@
                 let roomTypeIdEscort = escortrow.find('.room-type-dropdown-escort').val();
                 let roomNumberEscort = escortrow.find('.room-number-input-escort').val();
 
-                if (!hotelIdEscort || !roomTypeIdEscort || !roomNumberEscort) {
+                if (!hotelIdEscort || !roomTypeIdEscort) {
                     toastr.error('{{ __db('please_select_room_details') }}');
                     return;
                 }
@@ -1416,11 +1423,13 @@
 
             // Drivers Section
             $(document).on('change', '#hotelDriver', function() {
+                $('.assign-hotel-checkbox-driver').prop('checked', false);
+
                 let hotelId = this.value;
                 hotelData(hotelId, 'Driver');
             });
 
-            $('.assign-hotel-checkbox-driver').on('click', function() {
+            $('.assign-hotel-checkbox-driver').on('change', function() {
                 let hotelIdDriver = $('#hotelDriver').val();
                 let HotelnameDriver = $('#hotelDriver option:selected').text();
 
@@ -1468,7 +1477,7 @@
                 let roomTypeIdDriver = driverrow.find('.room-type-dropdown-driver').val();
                 let roomNumberDriver = driverrow.find('.room-number-input-driver').val();
 
-                if (!hotelIdDriver || !roomTypeIdDriver || !roomNumberDriver) {
+                if (!hotelIdDriver || !roomTypeIdDriver) {
                     toastr.error('{{ __db('please_select_room_details') }}');
                     return;
                 }
@@ -1631,6 +1640,59 @@
                     }
                 });
 
+            });
+
+            $('#select-all-delegates').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                const hotelId = $('#hotelDelegate').val();
+
+                if (isChecked && !hotelId) {
+                    this.checked = false;
+                    toastr.error('{{ __db('please_select_hotel') }}');
+                    return;
+                }
+
+                $('.assign-hotel-checkbox').each(function() {
+                    if ($(this).is(':checked') !== isChecked) {
+                        $(this).prop('checked', isChecked).trigger('change');
+                    }
+                });
+            });
+
+
+
+            $('#select-all-escorts').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                const hotelId = $('#hotelEscort').val();
+
+                if (isChecked && !hotelId) {
+                    this.checked = false;
+                    toastr.error('{{ __db('please_select_hotel') }}');
+                    return;
+                }
+
+                $('.assign-hotel-checkbox-escort').each(function() {
+                    if ($(this).is(':checked') !== isChecked) {
+                        $(this).prop('checked', isChecked).trigger('change');
+                    }
+                });
+            });
+
+            $('#select-all-drivers').on('change', function() {
+                const isChecked = $(this).is(':checked');
+                const hotelId = $('#hotelDriver').val();
+
+                if (isChecked && !hotelId) {
+                    this.checked = false;
+                    toastr.error('{{ __db('please_select_hotel') }}');
+                    return;
+                }
+
+                $('.assign-hotel-checkbox-driver').each(function() {
+                    if ($(this).is(':checked') !== isChecked) {
+                        $(this).prop('checked', isChecked).trigger('change');
+                    }
+                });
             });
 
         });
