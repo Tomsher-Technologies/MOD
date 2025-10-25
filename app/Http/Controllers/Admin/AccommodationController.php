@@ -775,9 +775,10 @@ class AccommodationController extends Controller
             });
         }
 
-        if ($request->has('room_number')) {
+        if ($request->has('room_number') && $request->room_number !== '' && $request->room_number !== null) {
             $externalMembersQuery->where('room_number', 'like', '%' . $request->input('room_number') . '%');
         }
+
         if ($hotelId = $request->input('hotel_id')) {
             $externalMembersQuery->where('hotel_id', $hotelId);
         }
@@ -787,35 +788,21 @@ class AccommodationController extends Controller
         }
 
         if ($accomodationStatus = $request->input('accomodation_status')) {
+            $missingRoomNumberAccomodatedStatusNumber = '3';
 
-            $missingRoomNumberAccomodatedStatusNumber = 3;
-            $fullyAccommodatedStatusNumber = 1;
 
             if (is_array($accomodationStatus)) {
-                $externalMembersQuery->where(function ($query) use ($accomodationStatus, $missingRoomNumberAccomodatedStatusNumber, $fullyAccommodatedStatusNumber) {
+                $externalMembersQuery->where(function ($query) use ($accomodationStatus, $missingRoomNumberAccomodatedStatusNumber) {
                     if (in_array($missingRoomNumberAccomodatedStatusNumber, $accomodationStatus)) {
-                        $query->orWhere(function ($q) {
-                            $q->whereNull('room_number')
-                                ->orWhere('room_number', '');
-                        });
-                    }
-
-                    if (in_array($fullyAccommodatedStatusNumber, $accomodationStatus)) {
-                        $query->orWhere(function ($q) {
-                            $q->whereNotNull('room_number')
-                                ->where('room_number', '!=', '');
-                        });
+                        $query->whereNull('room_number');
                     }
                 });
             } else {
                 if ($accomodationStatus == $missingRoomNumberAccomodatedStatusNumber) {
                     $externalMembersQuery->where(function ($query) {
-                        $query->whereNull('room_number')
-                            ->orWhere('room_number', '');
+                        $query->whereNull('room_number');
                     });
-                } elseif ($accomodationStatus == $fullyAccommodatedStatusNumber) {
-                    $externalMembersQuery->whereNotNull('room_number')
-                        ->where('room_number', '!=', '');
+                } else {
                 }
             }
         }

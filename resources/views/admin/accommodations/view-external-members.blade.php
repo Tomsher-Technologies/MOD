@@ -216,7 +216,7 @@
                             placeholder="{{ __db('search') }}" value="{{ request('room_number') }}">
                     </div>
 
-                    {{-- <div class="flex flex-col">
+                    <div class="flex flex-col">
                         <label class="form-label block text-gray-700 font-bold">{{ __db('accomodation_status') }}</label>
                         <select multiple name="accomodation_status[]" data-placeholder="{{ __db('select') }}"
                             class="select2 w-full rounded-lg border border-gray-300 text-sm">
@@ -228,7 +228,7 @@
                                 {{ __db('missing_room_accomodated') }}
                             </option>
                         </select>
-                    </div> --}}
+                    </div>
 
                 </div>
                 <div class="grid grid-cols-2 gap-4 mt-6">
