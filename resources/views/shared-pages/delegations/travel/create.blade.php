@@ -1,6 +1,6 @@
 <div>
      <x-back-btn title="{{ __db('add_travel_details') }}"
-        back-url="{{ url()->previous() ?: route('delegations.show', $delegation->id)}}" />
+        back-url="{{ route('delegations.show', $delegation->id)}}" />
 
     @if ($errors->any())
         <div class="mb-6 p-4 border border-red-400 bg-red-100 text-red-700 rounded">

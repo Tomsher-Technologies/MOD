@@ -9,7 +9,7 @@
     @endphp
 
     <x-back-btn title="{{ $isEditMode ? __db('edit_delegate') : __db('add_delegate') }}"
-        back-url="{{ url()->previous() ?: route('delegations.edit', $delegation->id) }}" />
+        back-url="{{ route('delegations.edit', $delegation->id) }}" />
 
     @if ($errors->any())
         <div class="p-4 my-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
