@@ -1021,4 +1021,28 @@ class AccommodationController extends Controller
             'message' => 'Accommodation status updated successfully'
         ]);
     }
+
+    public function exportAccommodationDelegations()
+    {
+        $user = auth()->user();
+        if (!$user->can('export_accommodation_delegations') && !$user->can('hotel_export_accommodation_delegations')) {
+            abort(403, 'Access denied');
+        }
+        
+        $export = new \App\Exports\AccommodationDelegatesEscortsExport();
+        return $export->download('accommodation_delegates_escorts_export.xlsx');
+    }
+    
+    public function exportHotelAccommodations($id)
+    {
+        $hotelId = base64_decode($id);
+        
+        $user = auth()->user();
+        if (!$user->can('export_hotel_accommodations') && !$user->can('hotel_export_hotel_accommodations')) {
+            abort(403, 'Access denied');
+        }
+        
+        $export = new \App\Exports\HotelAccommodationsExport($hotelId);
+        return $export->download('hotel_accommodations_export.xlsx');
+    }
 }

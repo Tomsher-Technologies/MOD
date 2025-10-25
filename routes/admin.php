@@ -194,10 +194,12 @@ Route::prefix('mod-events')->middleware(['web', 'auth', 'prevent-back-history'])
     Route::get('/export-room-types', [AccommodationController::class, 'exportRoomTypes'])->name('export.room.types');
     Route::get('/accommodation-delegations', [AccommodationController::class, 'accommodationDelegations'])->name('accommodation-delegations');
     Route::get('/accommodation-delegation-view/{id}', [AccommodationController::class, 'accommodationDelegationView'])->name('accommodation-delegation-view');
+    Route::get('/accommodation-delegations/export-excel', [AccommodationController::class, 'exportAccommodationDelegations'])->name('accommodation-delegations.export-excel');
     Route::get('/accommodation/{id}/rooms', [AccommodationController::class, 'getHotelRooms'])->name('accommodation.rooms');
     Route::post('/accommodation/room-assign', [AccommodationController::class, 'assignRoom'])->name('accommodation.assign-rooms');
     Route::post('/accommodation/update-accommodation-status', [AccommodationController::class, 'updateAccommodationStatus'])->name('accommodation.update-accommodation-status');
     Route::get('/accommodation/hotel/{hotel}/occupancy', [AccommodationController::class, 'hotelOccupancy'])->name('accommodation.occupancy');
+    Route::get('/accommodations/hotel/{id}/export-excel', [AccommodationController::class, 'exportHotelAccommodations'])->name('accommodations.export-hotel');
     Route::post('/accommodation/room-unassign', [AccommodationController::class, 'unassignAccommodation'])->name('accommodation.remove-rooms');
 
     Route::get('/add-external-accommodation/{id}', [AccommodationController::class, 'addExternalMembers'])->name('external_accommodations.add');

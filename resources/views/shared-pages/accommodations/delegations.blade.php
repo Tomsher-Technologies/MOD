@@ -48,7 +48,12 @@
                         </div>
                     </form>
 
-                    <div class="text-center">
+                    <div class="text-center flex items-center gap-2">
+                        {{-- <a href="{{ route('accommodation-delegations.export-excel') }}"
+                            class="text-white flex items-center gap-1 !bg-[#4CAF50] hover:bg-[#45a049] focus:ring-4 focus:ring-green-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
+                            type="button">
+                            <span>{{ __db('export_to_excel') }}</span>
+                        </a>  --}}
                         <button
                             class="text-white flex items-center gap-1 !bg-[#B68A35] hover:bg-[#A87C27] focus:ring-4 focus:ring-yellow-300 font-sm rounded-lg text-sm px-5 py-2.5 focus:outline-none"
                             type="button" data-drawer-target="filter-drawer" data-drawer-show="filter-drawer"
