@@ -2775,12 +2775,15 @@ class DelegationController extends Controller
             $delegation->attachments()->delete();
 
             $this->removeDelegationAllAccommodation($delegation);
+            getRoomAssignmentStatus($delegation->id);
+
             $escorts = $delegation->escorts()->pluck('escorts.id');
 
             if ($escorts->count() > 0) {
                 $delegation->escorts()->detach();
                 Escort::whereIn('id', $escorts)->update(['delegation_id' => null]);
             }
+
 
             $this->logActivity(
                 module: 'Delegation',
@@ -2794,6 +2797,7 @@ class DelegationController extends Controller
             );
             $delegation->delegates()->delete();
             $delegation->delete();
+
 
             return redirect()
                 ->route('delegations.index')

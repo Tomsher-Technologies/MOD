@@ -11,8 +11,8 @@ class Delegation extends Model
 {
     use HasFactory;
 
-    const ASSIGNABLE_STATUS_CODES = ['2', '10']; 
-    const UNASSIGNABLE_STATUS_CODES = ['3', '9']; 
+    const ASSIGNABLE_STATUS_CODES = ['2', '10'];
+    const UNASSIGNABLE_STATUS_CODES = ['3', '9'];
 
     protected $fillable = [
         'code',
@@ -48,11 +48,11 @@ class Delegation extends Model
 
             $eventId = $delegation->event_id ?: Session::get('current_event_id') ?: getDefaultEventId();
             $event = Event::find($eventId);
-            
+
             if ($event) {
                 $latestDelegation = self::where('event_id', $eventId)->latest('id')->first();
                 $newId = $latestDelegation ? (int)substr(strrchr($latestDelegation->code, '-'), 1) + 1 : 1;
-                
+
                 $delegation->code = $event->code . '-' . str_pad($newId, 4, '0', STR_PAD_LEFT);
             } else {
                 $year = date('y');
@@ -189,9 +189,14 @@ class Delegation extends Model
         return $this->invitationStatus &&
             in_array($this->invitationStatus->code, self::UNASSIGNABLE_STATUS_CODES);
     }
-    
+
     public function roomAssignments()
     {
         return $this->hasMany(RoomAssignment::class, 'delegation_id');
+    }
+
+    public function activeRoomAssignments()
+    {
+        return $this->hasMany(RoomAssignment::class, 'delegation_id')->where('active_status', 1);
     }
 }

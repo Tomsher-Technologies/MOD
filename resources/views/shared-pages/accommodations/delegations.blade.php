@@ -217,11 +217,11 @@
                             'label' => __db('hotels'),
                             'key' => 'hotels',
                             'render' => function ($delegation) {
-                                if ($delegation->roomAssignments->isEmpty()) {
+                                if ($delegation->activeRoomAssignments->isEmpty()) {
                                     return '-';
                                 }
 
-                                $hotelNames = $delegation->roomAssignments
+                                $hotelNames = $delegation->activeRoomAssignments
                                     ->pluck('hotel.hotel_name')
                                     ->unique()
                                     ->filter()
