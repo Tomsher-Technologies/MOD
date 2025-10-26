@@ -1265,6 +1265,8 @@ class DelegationController extends Controller
                 }
             }
 
+            getRoomAssignmentStatus($delegation->id);
+
             return response()->json([
                 'status' => 'success',
                 'message' => __db('updated_successfully'),
