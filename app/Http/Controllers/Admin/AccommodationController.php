@@ -1017,13 +1017,6 @@ class AccommodationController extends Controller
                     return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
                 }
 
-                if (!$alreadyAssigned) {
-                    $newRoom = AccommodationRoom::find($request->room_type);
-                    if ($newRoom) {
-                        $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
-                        $newRoom->save();
-                    }
-                }
 
                 if (
                     $externalMember &&
@@ -1047,6 +1040,14 @@ class AccommodationController extends Controller
                             $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                             $oldRoom->save();
                         }
+                    }
+                }
+
+                if (!$alreadyAssigned) {
+                    $newRoom = AccommodationRoom::find($request->room_type);
+                    if ($newRoom) {
+                        $newRoom->assigned_rooms = $newRoom->assigned_rooms + 1;
+                        $newRoom->save();
                     }
                 }
 
