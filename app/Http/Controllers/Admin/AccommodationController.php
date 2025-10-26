@@ -535,7 +535,6 @@ class AccommodationController extends Controller
                         if (is_null($oldAssignment->room_number)) {
                             $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
                             $oldRoom->save();
-                            
                         } else if ($oldRoom->assigned_rooms > 0) {
 
                             $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
@@ -1126,7 +1125,7 @@ class AccommodationController extends Controller
 
     public function unassignAccommodation(Request $request)
     {
-        $assignment = RoomAssignment::find($request->assignable_id);
+        $assignment = RoomAssignment::find($request->assignable_id)->latest()->first();;
 
         $hotel_id = $assignment?->hotel_id ?? NULL;
         $room_number = $assignment?->room_number ?? NULL;
@@ -1147,7 +1146,7 @@ class AccommodationController extends Controller
                     ->where('active_status', 1)
                     ->count();
 
-                // dd($alreadyAssignedCount);
+                    // dd($alreadyAssignedCount);
 
                 if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                     if ($alreadyAssignedCount <= 1) {
