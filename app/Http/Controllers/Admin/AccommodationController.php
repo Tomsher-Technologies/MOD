@@ -529,15 +529,14 @@ class AccommodationController extends Controller
                 if ($user->current_room_assignment_id) {
                     $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
 
-                    if (is_null($oldAssignment->room_number)) {
-
-                        return response()->json(['success' => 0,  'assignment_id' => null]);
-                    }
-
                     if ($oldAssignment) {
                         $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
 
-                        if ($oldRoom && $oldRoom->assigned_rooms > 0) {
+                        if (is_null($oldAssignment->room_number)) {
+                            $oldRoom->assigned_rooms = max(0, $oldRoom->assigned_rooms - 1);
+                            $oldRoom->save();
+                            
+                        } else if ($oldRoom->assigned_rooms > 0) {
 
                             $alreadyAssignedCount = RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
                                 ->where('room_type_id', $oldAssignment->room_type_id)
@@ -1037,7 +1036,7 @@ class AccommodationController extends Controller
                             ->where('room_number', $externalMember->room_number)
                             ->where('active_status', 1)
                             ->count();
-                            
+
                         if ($alreadyAssignedCount <= 1 && ((strtolower($externalMember->hotel_id) != strtolower($request->hotel_id)) || (strtolower($externalMember->room_type_id) != strtolower($request->room_type)) || (strtolower($externalMember->room_number) != strtolower($request->room_number)))) {
                             $oldRoom->assigned_rooms = $oldRoom->assigned_rooms - 1;
                             $oldRoom->save();
@@ -1147,6 +1146,8 @@ class AccommodationController extends Controller
                     ->where('room_number', $assignment->room_number)
                     ->where('active_status', 1)
                     ->count();
+
+                // dd($alreadyAssignedCount);
 
                 if ($oldRoom && $oldRoom->assigned_rooms > 0) {
                     if ($alreadyAssignedCount <= 1) {
