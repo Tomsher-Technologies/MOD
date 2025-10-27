@@ -893,6 +893,8 @@ class AccommodationController extends Controller
         if ($currentRoomAssignmentCount > 1 && !empty($oldAssignment->room_number)) {
             return 0;
         }
+
+        return 1;
     }
 
     public function getExternalMembers(Request $request)
