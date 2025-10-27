@@ -4,7 +4,7 @@
     </button>
     <div class="p-3 border-b min-h-[105px]">
         <a href="#" class="">
-            <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
+            <img src="{{ getLogo() }}" class="light-logo" alt="Logo">
         </a>
     </div>
     <div class="sidebar-menu-area flex flex-col justify-between">

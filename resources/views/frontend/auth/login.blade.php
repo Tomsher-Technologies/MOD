@@ -11,7 +11,13 @@
             <div class="lg:max-w-[464px] mx-auto w-full">
                 <div>
                     <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="">
+                        @if(getActiveLanguage() == 'ar')
+                            <img src="{{ public_path('assets/img/md-logo-ar.svg') }}" 
+                                alt="{{ env('APP_NAME') }}" >
+                        @else
+                            <img src="{{ public_path('assets/img/md-logo.svg') }}" 
+                            alt="{{ env('APP_NAME') }}" >
+                        @endif
                     </a>
                     <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
                         <img src="{{ getModuleEventLogo() }}" alt="">

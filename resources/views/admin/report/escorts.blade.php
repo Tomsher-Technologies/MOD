@@ -24,7 +24,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center;">
 
                     <div style="width: auto;">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="{{ env('APP_NAME') }}"
+                        <img src="{{ getLogo() }}" alt="{{ env('APP_NAME') }}"
                             style="height: auto; width: 150px;">
 
                     </div>

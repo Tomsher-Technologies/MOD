@@ -173,7 +173,7 @@ function getAdminEventLogo()
         }
     }
 
-    return asset('assets/img/md-logo.svg');
+    return getLogo();
 }
 
 function getAdminEventPDFLogo()
@@ -188,7 +188,13 @@ function getAdminEventPDFLogo()
         }
     }
 
-    return 'assets/img/md-logo.svg';
+    $lang = getActiveLanguage();
+
+    if($lang == 'ar'){
+        return 'assets/img/md-logo-ar.svg';
+    }else{
+        return 'assets/img/md-logo.svg';
+    }
 }
 
 function getCurrentEventName()
@@ -212,7 +218,7 @@ function getModuleEventLogo()
             return asset($defaultEventLogo);
         }
     }
-    return asset('assets/img/md-logo.svg');
+    return getLogo();
 }
 
 
@@ -228,7 +234,17 @@ function getModuleAccountEventLogo()
             return asset($defaultEventLogo);
         }
     }
-    return asset('assets/img/md-logo.svg');
+    return getLogo();
+}
+
+function getLogo(){
+    $lang = getActiveLanguage();
+
+    if($lang == 'ar'){
+        return asset('assets/img/md-logo-ar.svg');
+    }else{
+        return asset('assets/img/md-logo.svg');
+    }
 }
 
 function getAccommodationDetails($hotels)

@@ -7,7 +7,7 @@
     <!-- Logo -->
     <div class="p-3 border-b min-h-[80px] flex items-center justify-center">
         <a href="{{ route('admin.dashboard') }}">
-            <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo max-h-[58px]" alt="Logo">
+            <img src="{{ getLogo() }}" class="light-logo max-h-[58px]" alt="Logo">
         </a>
     </div>
 

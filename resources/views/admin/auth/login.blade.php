@@ -11,7 +11,7 @@
             <div class="lg:max-w-[464px] mx-auto w-full">
                 <div>
                     <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" alt="">
+                        <img src="{{ getLogo() }}" alt="">
                     </a>
                     <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
                         <img src="{{ getModuleEventLogo() }}" alt="">

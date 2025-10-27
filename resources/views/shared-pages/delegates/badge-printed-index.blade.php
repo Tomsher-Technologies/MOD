@@ -114,7 +114,7 @@
 
                     <div class="full-screen-logo flex items-center gap-8 hidden">
                         <img src="{{ getAdminEventLogo() }}" alt="">
-                        <img src="{{ asset('assets/img/md-logo.svg') }}" class="light-logo" alt="Logo">
+                        <img src="{{ getLogo() }}" class="light-logo" alt="Logo">
                     </div>
 
                     {{-- <a href="#" id="fullscreenToggleBtn"

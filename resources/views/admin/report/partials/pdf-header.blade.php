@@ -3,9 +3,16 @@
         <tr>
             <!-- Left Logo -->
             <td style="width: 25%; text-align: left; vertical-align: middle;">
-                <img src="{{ public_path('assets/img/md-logo.svg') }}" 
+                @if(getActiveLanguage() == 'ar')
+                    <img src="{{ public_path('assets/img/md-logo-ar.svg') }}" 
+                        alt="{{ env('APP_NAME') }}" 
+                        style="width: 150px; height: auto;">
+                @else
+                    <img src="{{ public_path('assets/img/md-logo.svg') }}" 
                     alt="{{ env('APP_NAME') }}" 
                     style="width: 150px; height: auto;">
+                @endif
+                
             </td>
 
             <!-- Center Text -->

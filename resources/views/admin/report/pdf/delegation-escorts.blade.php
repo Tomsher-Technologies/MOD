@@ -54,8 +54,15 @@
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
                 <tr>
                     <td style="width: 25%; text-align: left; vertical-align: middle;">
-                        <img src="{{ public_path('assets/img/md-logo.svg') }}" alt="{{ env('APP_NAME') }}"
+                        @if(getActiveLanguage() == 'ar')
+                            <img src="{{ public_path('assets/img/md-logo-ar.svg') }}" 
+                                alt="{{ env('APP_NAME') }}" 
+                                style="width: 150px; height: auto;">
+                        @else
+                            <img src="{{ public_path('assets/img/md-logo.svg') }}" 
+                            alt="{{ env('APP_NAME') }}" 
                             style="width: 150px; height: auto;">
+                        @endif
                     </td>
 
                     <td style="width: 50%; text-align: center; vertical-align: middle;">

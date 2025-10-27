@@ -13,7 +13,7 @@
                     <img src="{{ getModuleEventLogo() }}" class="h-[60px]" alt="Main Logo">
                 </a>
                 <a href="{{ route('home') }} ">
-                    <img src="{{ asset('assets/img/md-logo.svg') }}" class="h-[70px]" alt="Main Logo">
+                    <img src="{{ getLogo() }}" class="h-[70px]" alt="Main Logo">
                 </a>
             </div>
 

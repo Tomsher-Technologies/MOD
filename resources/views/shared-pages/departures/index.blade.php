@@ -73,7 +73,7 @@
                         </h2>
 
                         <div class="full-screen-logo gap-8 !justify-between hidden items-end ">
-                            <img src="{{ asset('assets/img/md-logo.svg') }}" width="200" class="light-logo max-h-[100px]"
+                            <img src="{{ getLogo() }}" width="200" class="light-logo max-h-[100px]"
                                 alt="Logo">
                         </div>
 
