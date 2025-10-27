@@ -892,7 +892,7 @@ class AccommodationController extends Controller
                 }
             }
 
-            if ($currentRoomAssignmentCount > 1 && !is_null($oldAssignment->room_number)) {
+            if ($currentRoomAssignmentCount > 1 && !empty($oldAssignment->room_number)) {
                 if (!$isJsonResponse) {
                     return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
                 } else {
