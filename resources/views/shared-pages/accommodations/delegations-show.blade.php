@@ -1157,7 +1157,9 @@
                                 </a>`;
                             actionCellDel.append(removeBtnHtml);
                         } else {
-                            actionCellDel.find('.remove-room-assignment').show();
+                            let actionCellDel = row.find('td').last();
+                            let removeBtn = actionCellDel.find('.remove-room-assignment')
+                            removeBtn.attr('data-assignment-id', res.assignment_id).show();
                         }
                     } else if (res.success === 0) {
                         toastr.success('{{ __db('room_already_assigned') }}');
@@ -1222,9 +1224,12 @@
                                                 </a>`;
                                             actionCellDel.append(removeBtnHtml);
                                         } else {
-                                            let actionCellDel = row.find('td').last();
-                                            let removeBtn = actionCellDel.find('.remove-room-assignment')
-                                            removeBtn.attr('data-assignment-id', res2.assignment_id).show();
+                                            let actionCellDel = row.find('td')
+                                            .last();
+                                            let removeBtn = actionCellDel.find(
+                                                '.remove-room-assignment')
+                                            removeBtn.attr('data-assignment-id',
+                                                res2.assignment_id).show();
                                         }
                                     } else {
                                         if (res2.success === 2) {
@@ -1409,9 +1414,12 @@
                                                 </a>`;
                                             actionCellEsc.append(removeBtnHtml);
                                         } else {
-                                           let actionCellEsc = escortrow.find('td').last();
-                                            let removeBtn = actionCellEsc.find('.remove-room-assignment')
-                                            removeBtn.attr('data-assignment-id', res2.assignment_id).show();
+                                            let actionCellEsc = escortrow.find('td')
+                                                .last();
+                                            let removeBtn = actionCellEsc.find(
+                                                '.remove-room-assignment')
+                                            removeBtn.attr('data-assignment-id',
+                                                res2.assignment_id).show();
                                         }
 
                                     } else {
@@ -1593,9 +1601,12 @@
                                                 </a>`;
                                             actionCell.append(removeBtnHtml);
                                         } else {
-                                             let actionCell = driverrow.find('td').last();
-                                            let removeBtn = actionCell.find('.remove-room-assignment')
-                                            removeBtn.attr('data-assignment-id', res2.assignment_id).show();
+                                            let actionCell = driverrow.find('td')
+                                                .last();
+                                            let removeBtn = actionCell.find(
+                                                '.remove-room-assignment')
+                                            removeBtn.attr('data-assignment-id',
+                                                res2.assignment_id).show();
                                         }
                                     } else {
                                         // Handle any errors in reassignment
@@ -1630,8 +1641,8 @@
                 e.preventDefault();
                 let assignmentId = $(this).data('assignment-id');
 
-                console.log("assignmentId",assignmentId);
-                
+                console.log("assignmentId", assignmentId);
+
 
                 Swal.fire({
                     title: "{{ __db('are_you_sure') }}",
