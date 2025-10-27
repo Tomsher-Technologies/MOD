@@ -57,7 +57,7 @@ class FloorPlanController extends Controller
             'event_id' => 'required|exists:events,id',
             'title_en' => 'required|string|max:255',
             'title_ar' => 'required|string|max:255',
-            'floor_plan_files.*' => 'required|file|max:10240',
+            'floor_plan_files.*' => 'required|file',
             'file_titles_en.*' => 'nullable|string|max:255',
             'file_titles_ar.*' => 'nullable|string|max:255',
         ]);
@@ -120,7 +120,7 @@ class FloorPlanController extends Controller
             'existing_file_paths.*.path' => 'string',
             'existing_file_paths.*.title_en' => 'nullable|string|max:255',
             'existing_file_paths.*.title_ar' => 'nullable|string|max:255',
-            'new_floor_plan_files.*' => 'nullable|file|max:10240',
+            'new_floor_plan_files.*' => 'nullable|file',
             'new_file_titles_en.*' => 'nullable|string|max:255',
             'new_file_titles_ar.*' => 'nullable|string|max:255',
         ]);

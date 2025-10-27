@@ -53,7 +53,7 @@
                             <div class="flex flex-col md:flex-row gap-4">
                                 <div class="flex-1">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('file') }}</label>
-                                    <input type="file" name="floor_plan_files[]" accept=".pdf"
+                                    <input type="file" name="floor_plan_files[]" 
                                         class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white p-2"
                                         required>
                                 </div>
@@ -113,7 +113,7 @@
                     <div class="flex flex-col md:flex-row gap-4">
                         <div class="flex-1">
                             <label class="block text-sm font-medium text-gray-700 mb-1">{{ __db('file') }}</label>
-                            <input type="file" name="floor_plan_files[]" accept=".pdf"
+                            <input type="file" name="floor_plan_files[]" 
                                 class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white p-2">
                         </div>
                         <div class="flex-1">
