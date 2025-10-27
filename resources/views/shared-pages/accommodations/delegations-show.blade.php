@@ -229,7 +229,7 @@
                                         return '<select name="room_type" id="room_type' .
                                             $row->id .
                                             '"
-                                            class="room-type-dropdown p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                            class="room-type-dropdown p-1 rounded-lg min-w-[150px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                             <option value="">' .
                                             __db('select') .
                                             '</option>
@@ -246,7 +246,7 @@
 
                         [
                             'label' => __db('room_number'),
-                            'class' => 'w-[115px]',
+                            'class' => '',
                             'render' => function ($row) {
                                 $room = $row->currentRoomAssignment ?? null;
                                 if (can(['assign_accommodations', 'hotel_assign_accommodations'])) {
@@ -254,7 +254,7 @@
                                         return '<input type="text" name="room_number" id="room_number' .
                                             $row->id .
                                             '"
-                                            class="room-number-input w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                            class="room-number-input w-[75px] p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                             value="' .
                                             $room?->room_number .
                                             '">';
@@ -489,7 +489,7 @@
                                         @endphp
 
                                         <select name="room_type_escort" id="room_type_escort"
-                                            class="room-type-dropdown-escort p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                            class="room-type-dropdown-escort p-1 rounded-lg min-w-[150px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                             <option value="">{{ __db('select') }}</option>
                                             {!! $optionsEscort !!}
                                         </select>
@@ -501,7 +501,7 @@
                                 <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <input type="text" name="room_number_escort" id="room_number_escort"
-                                            class="room-number-input-escort w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                            class="room-number-input-escort w-[75px] p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                             value="{{ $roomEscort?->room_number ?? '' }}">
                                     @else
                                         {{ $roomEscort?->room_number ?? '' }}
@@ -621,7 +621,7 @@
                                 {{ __db('room_type') }}</th>
 
                             <th scope="col"
-                                class="p-2 w-[115px] !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
+                                class="p-2  !bg-[#B68A35] text-center text-white border !border-[#cbac71]">
                                 {{ __db('room_number') }}</th>
 
 
@@ -701,7 +701,7 @@
                                         @endphp
 
                                         <select name="room_type_driver" id="room_type_driver"
-                                            class="room-type-dropdown-driver p-1 rounded-lg w-full text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                            class="room-type-dropdown-driver p-1 rounded-lg min-w-[150px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                                             <option value="">{{ __db('select') }}</option>
                                             {!! $optionsDriver !!}
                                         </select>
@@ -713,7 +713,7 @@
                                 <td class="text-center px-1 border border-gray-200 py-3">
                                     @if (can(['assign_accommodations', 'hotel_assign_accommodations']))
                                         <input type="text" name="room_number_driver" id="room_number_driver"
-                                            class="room-number-input-driver w-full p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                            class="room-number-input-driver w-[75px] p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                             value="{{ $roomDriver?->room_number ?? '' }}">
                                     @else
                                         {{ $roomDriver?->room_number ?? '' }}
