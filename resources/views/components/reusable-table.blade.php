@@ -66,75 +66,77 @@
     </div>
 @endif
 
-<table class="table-auto mb-0 !border-[#F9F7ED] w-full hidden" id="{{ $tableId }}">
-    <thead>
-        <tr class="text-[13px]">
-            @foreach ($columns as $column)
-                @php
-                    $permissionKey = $column['permission'] ?? null;
-                    $colPermissions = $permissionKey
-                        ? (is_array($permissionKey)
-                            ? $permissionKey
-                            : [$permissionKey])
-                        : null;
-                @endphp
-                @if (!$colPermissions || can($colPermissions))
-                    <th scope="col"
-                        class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
-                        data-column-key="{{ $column['key'] }}">
-                        {!! $column['label'] !!}
-                    </th>
-                @endif
-            @endforeach
-        </tr>
-    </thead>
-    <tbody>
-        @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
-            <tr>
-                <td class="px-4 py-2 border border-gray-200 text-center" colspan="{{ count($columns) }}">
-                    {{ $noDataMessage ?? 'No data found.' }}
-                </td>
+<div class="overflow-x-auto">
+    <table class="table-auto mb-0 !border-[#F9F7ED] w-full hidden" id="{{ $tableId }}">
+        <thead>
+            <tr class="text-[13px]">
+                @foreach ($columns as $column)
+                    @php
+                        $permissionKey = $column['permission'] ?? null;
+                        $colPermissions = $permissionKey
+                            ? (is_array($permissionKey)
+                                ? $permissionKey
+                                : [$permissionKey])
+                            : null;
+                    @endphp
+                    @if (!$colPermissions || can($colPermissions))
+                        <th scope="col"
+                            class="p-3 !bg-[#B68A35] text-center text-white border !border-[#cbac71] {{ isset($column['class']) ? $column['class'] : '' }}"
+                            data-column-key="{{ $column['key'] }}">
+                            {!! $column['label'] !!}
+                        </th>
+                    @endif
+                @endforeach
             </tr>
-        @else
-            @foreach ($data as $key => $row)
-                @php
-                    $rowId = is_array($row) ? $row['id'] ?? '' : $row->id ?? '';
+        </thead>
+        <tbody>
+            @if ((is_array($data) && count($data) === 0) || (!is_array($data) && $data->count() === 0))
+                <tr>
+                    <td class="px-4 py-2 border border-gray-200 text-center" colspan="{{ count($columns) }}">
+                        {{ $noDataMessage ?? 'No data found.' }}
+                    </td>
+                </tr>
+            @else
+                @foreach ($data as $key => $row)
+                    @php
+                        $rowId = is_array($row) ? $row['id'] ?? '' : $row->id ?? '';
 
-                    $rowPermissionsKey = is_array($row) ? $row['permission'] ?? null : $row->permission ?? null;
-                    $rowPermissions = $rowPermissionsKey
-                        ? (is_array($rowPermissionsKey)
-                            ? $rowPermissionsKey
-                            : [$rowPermissionsKey])
-                        : null;
-                @endphp
-                @if (!$rowPermissions || can($rowPermissions))
-                    <tr class="text-[12px] align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
-                        data-id="{{ $rowId }}">
-                        @foreach ($columns as $column)
-                            @php
-                                $colPermissionKey = $column['permission'] ?? null;
-                                $colPermissions = $colPermissionKey
-                                    ? (is_array($colPermissionKey)
-                                        ? $colPermissionKey
-                                        : [$colPermissionKey])
-                                    : null;
-                            @endphp
-                            @if (!$colPermissions || can($colPermissions))
-                                <td class="px-4 text-center py-2 border {{ $rowClass ? $rowClass($row) : 'border-gray-200' }} {{ isset($column['class']) ? $column['class'] : '' }}"
-                                    data-column-key="{{ $column['key'] }}">
-                                    {!! $column['render']($row, $key) !!}
-                                </td>
-                            @endif
-                        @endforeach
-                    </tr>
-                @endif
-            @endforeach
-        @endif
-    </tbody>
+                        $rowPermissionsKey = is_array($row) ? $row['permission'] ?? null : $row->permission ?? null;
+                        $rowPermissions = $rowPermissionsKey
+                            ? (is_array($rowPermissionsKey)
+                                ? $rowPermissionsKey
+                                : [$rowPermissionsKey])
+                            : null;
+                    @endphp
+                    @if (!$rowPermissions || can($rowPermissions))
+                        <tr class="text-[12px] align-[middle] {{ $rowClass ? $rowClass($row) : '' }}"
+                            data-id="{{ $rowId }}">
+                            @foreach ($columns as $column)
+                                @php
+                                    $colPermissionKey = $column['permission'] ?? null;
+                                    $colPermissions = $colPermissionKey
+                                        ? (is_array($colPermissionKey)
+                                            ? $colPermissionKey
+                                            : [$colPermissionKey])
+                                        : null;
+                                @endphp
+                                @if (!$colPermissions || can($colPermissions))
+                                    <td class="px-4 text-center py-2 border {{ $rowClass ? $rowClass($row) : 'border-gray-200' }} {{ isset($column['class']) ? $column['class'] : '' }}"
+                                        data-column-key="{{ $column['key'] }}">
+                                        {!! $column['render']($row, $key) !!}
+                                    </td>
+                                @endif
+                            @endforeach
+                        </tr>
+                    @endif
+                @endforeach
+            @endif
+        </tbody>
 
 
 
-</table>
+    </table>
+</div>
 
 @if (
     $data instanceof \Illuminate\Contracts\Pagination\Paginator ||
@@ -164,9 +166,9 @@
                     @foreach ($columns as $column)
                         @php
                             $isActionColumn = in_array($column['key'], ['action', 'actions']);
-                            $isCheckboxColumn = str_contains($column['key'], 'input'); 
+                            $isCheckboxColumn = str_contains($column['key'], 'input');
                         @endphp
-                        
+
                         @if (!$isActionColumn && !$isCheckboxColumn)
                             <label class="flex items-center space-x-2">
                                 <input type="checkbox" class="form-checkbox text-blue-600 column-toggle-checkbox me-2"
@@ -294,3 +296,32 @@
         })();
     </script>
 @endpush
+
+
+@section('style')
+    <style>
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #B68A35;
+            border-radius: 10px;
+        }
+
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+            background: #B68A35;
+        }
+
+        .overflow-x-auto {
+            overflow-x: scroll;
+            scrollbar-width: auto;
+            scrollbar-color: #B68A35 #f1f1f1;
+        }
+    </style>
+@endsection
