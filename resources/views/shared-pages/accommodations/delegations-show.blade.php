@@ -1225,7 +1225,7 @@
                                             actionCellDel.append(removeBtnHtml);
                                         } else {
                                             let actionCellDel = row.find('td')
-                                            .last();
+                                                .last();
                                             let removeBtn = actionCellDel.find(
                                                 '.remove-room-assignment')
                                             removeBtn.attr('data-assignment-id',
@@ -1344,7 +1344,9 @@
                                 </a>`;
                             actionCellEsc.append(removeBtnHtml);
                         } else {
-                            actionCellEsc.find('.remove-room-assignment').show();
+                            let actionCellEsc = escortrow.find('td').last();
+                            let removeBtn = actionCellEsc.find('.remove-room-assignment')
+                            removeBtn.attr('data-assignment-id', res.assignment_id).show();
                         }
 
                     } else if (res.success === 0) {
@@ -1532,7 +1534,9 @@
                                 </a>`;
                             actionCell.append(removeBtnHtml);
                         } else {
-                            actionCell.find('.remove-room-assignment').show();
+                            let actionCell = driverrow.find('td').last();
+                            let removeBtn = actionCell.find('.remove-room-assignment')
+                            removeBtn.attr('data-assignment-id', res.assignment_id).show();
                         }
                     } else if (res.success === 0) {
                         toastr.success('{{ __db('room_already_assigned') }}');
@@ -1640,9 +1644,6 @@
             $(document).on('click', '.remove-room-assignment', function(e) {
                 e.preventDefault();
                 let assignmentId = $(this).data('assignment-id');
-
-                console.log("assignmentId", assignmentId);
-
 
                 Swal.fire({
                     title: "{{ __db('are_you_sure') }}",
