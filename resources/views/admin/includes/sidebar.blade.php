@@ -13,7 +13,7 @@
     <!-- Logo -->
     <div class="p-3 border-b min-h-[80px] flex items-center justify-center">
         <a href="{{ route('admin.dashboard') }}">
-            <img src="{{ getLogo() }}" class="light-logo max-h-[58px]" width="150" alt="Logo">
+            <img src="{{ getLogo() }}" class="light-logo max-h" width="200px" alt="Logo">
         </a>
     </div>
 
