@@ -823,7 +823,11 @@ class ReportController extends Controller
             ->when(!empty($filters['internal_ranking']), function ($q) use ($filters) {
                 $q->whereIn('internal_ranking_id', $filters['internal_ranking']);
             })
-            ->whereHas('delegation', fn($q) => $q->where('event_id', $currentEventId));
+            ->whereHas('delegation', function ($q2) use ($currentEventId) {
+                $q2->where('event_id', $currentEventId)
+                    ->whereHas('invitationStatus', fn($q3) => $q3->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
+            });
+
 
             if(!empty($filters['date_range'])){
                 $newQuery->joinSub($arrivalSub, 'arrival_times', function($join) use ($filters) {
@@ -887,7 +891,10 @@ class ReportController extends Controller
             ->when(!empty($filters['internal_ranking']), function ($q) use ($filters) {
                 $q->whereIn('internal_ranking_id', $filters['internal_ranking']);
             })
-            ->whereHas('delegation', fn($q) => $q->where('event_id', $currentEventId));
+            ->whereHas('delegation', function ($q2) use ($currentEventId) {
+                $q2->where('event_id', $currentEventId)
+                    ->whereHas('invitationStatus', fn($q3) => $q3->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
+            });
 
             if(!empty($filters['date_range'])){
                 $newQuery->joinSub($arrivalSub, 'arrival_times', function($join) use ($filters) {
