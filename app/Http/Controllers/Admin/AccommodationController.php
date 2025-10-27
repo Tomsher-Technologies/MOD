@@ -522,12 +522,13 @@ class AccommodationController extends Controller
 
             if (empty($request->room_number)) {
 
+                $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
+
                 if ($availableRooms <= 0) {
-                    return response()->json(['success' => 2]);
+                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id);
                 }
 
                 if ($user->current_room_assignment_id) {
-                    $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
 
                     if ($oldAssignment) {
                         $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
@@ -587,8 +588,10 @@ class AccommodationController extends Controller
                     return response()->json(['success' => 3]);
                 }
 
+                $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
+
                 if ($availableRooms <= 0 && !$alreadyAssigned) {
-                    return response()->json(['success' => 2]);
+                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id);
                 }
 
                 if ($alreadyAssigned && !$confirmedDuplicate) {
@@ -626,7 +629,6 @@ class AccommodationController extends Controller
                 }
 
                 if ($user->current_room_assignment_id) {
-                    $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
 
                     if ($oldAssignment) {
                         $oldRoom = AccommodationRoom::find($oldAssignment->room_type_id);
@@ -844,6 +846,32 @@ class AccommodationController extends Controller
         return redirect()->back()->with('success', __db('room_assigned'));
     }
 
+    private function checkRoomAvailability($oldAssignment, $availableRooms, $requestRoomType, $isJsonResponse = true)
+    {
+
+        if ($availableRooms <= 0) {
+
+            if (!$oldAssignment) {
+                if (!$isJsonResponse) {
+                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                } else {
+                    return response()->json(['success' => 2]);
+                }
+            }
+
+            $isSameRoomType = $requestRoomType &&
+                $requestRoomType == $oldAssignment->room_type_id;
+
+            if (!$isSameRoomType) {
+                if (!$isJsonResponse) {
+                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                } else {
+                    return response()->json(['success' => 2]);
+                }
+            }
+        }
+    }
+
     public function getExternalMembers(Request $request)
     {
         $currentEventId = session('current_event_id', getDefaultEventId() ?? null);
@@ -952,7 +980,7 @@ class AccommodationController extends Controller
             if (empty($request->room_number)) {
 
                 if ($availableRooms <= 0) {
-                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                    $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false);
                 }
 
                 if ($externalMember->room_type_id) {
