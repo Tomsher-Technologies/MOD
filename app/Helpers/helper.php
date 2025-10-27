@@ -707,14 +707,14 @@ function getRoomAssignmentStatus($delegationId)
 
         $isMissingRoomNumberCount = RoomAssignment::whereIn('id', $assignmentIds)
             ->whereNull('room_number')
+            ->where('status', 1)
             ->count();
 
         if ($isMissingRoomNumberCount > 0) {
             $accomodationStatus = $missingRoomNumberAccomodatedStatusNumber;
         } else {
-            $accomodationStatus = $fullyAccomodatedStatusNumber; 
+            $accomodationStatus = $fullyAccomodatedStatusNumber;
         }
-
     } else {
         $accomodationStatus = $partiallyAccomodatedStatusNumber;
     }

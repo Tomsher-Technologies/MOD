@@ -1133,7 +1133,9 @@ class AccommodationController extends Controller
 
     public function unassignAccommodation(Request $request)
     {
-        $assignment = RoomAssignment::find($request->assignable_id)->where('active_status', 1)->latest()->first();
+
+        $assignment = RoomAssignment::find($request->assignable_id);
+
 
         $hotel_id = $assignment?->hotel_id ?? NULL;
         $room_number = $assignment?->room_number ?? NULL;

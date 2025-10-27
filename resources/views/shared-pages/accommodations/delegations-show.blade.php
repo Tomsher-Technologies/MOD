@@ -1630,6 +1630,9 @@
                 e.preventDefault();
                 let assignmentId = $(this).data('assignment-id');
 
+                console.log("assignmentId",assignmentId);
+                
+
                 Swal.fire({
                     title: "{{ __db('are_you_sure') }}",
                     text: "{{ __db('unassign_confirm_text_accommodation') }}",
