@@ -536,7 +536,11 @@ class AccommodationController extends Controller
                             ->count();
                     }
 
-                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id, true, $alreadyAssignedCount);
+                    $response = $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id, true, $alreadyAssignedCount);
+
+                    if ($response == 0) {
+                        return response()->json(['success' => 2]);
+                    }
                 }
 
                 if ($user->current_room_assignment_id) {
@@ -613,7 +617,11 @@ class AccommodationController extends Controller
                             ->count();
                     }
 
-                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id, true, $alreadyAssignedCount);
+                    $response = $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id, true, $alreadyAssignedCount);
+
+                    if ($response == 0) {
+                        return response()->json(['success' => 2]);
+                    }
                 }
 
                 if ($alreadyAssigned && !$confirmedDuplicate) {
@@ -871,34 +879,19 @@ class AccommodationController extends Controller
     private function checkRoomAvailability($oldAssignment, $availableRooms, $requestRoomType, $isJsonResponse = true, $currentRoomAssignmentCount = 0)
     {
 
-        if ($availableRooms <= 0) {
+        if (!$oldAssignment) {
+            return 0;
+        }
 
-            if (!$oldAssignment) {
-                if (!$isJsonResponse) {
-                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
-                } else {
-                    return response()->json(['success' => 2]);
-                }
-            }
+        $isSameRoomType = $requestRoomType &&
+            $requestRoomType == $oldAssignment->room_type_id;
 
-            $isSameRoomType = $requestRoomType &&
-                $requestRoomType == $oldAssignment->room_type_id;
+        if (!$isSameRoomType) {
+            return 0;
+        }
 
-            if (!$isSameRoomType) {
-                if (!$isJsonResponse) {
-                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
-                } else {
-                    return response()->json(['success' => 2]);
-                }
-            }
-
-            if ($currentRoomAssignmentCount > 1 && !empty($oldAssignment->room_number)) {
-                if (!$isJsonResponse) {
-                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
-                } else {
-                    return response()->json(['success' => 2]);
-                }
-            }
+        if ($currentRoomAssignmentCount > 1 && !empty($oldAssignment->room_number)) {
+            return 0;
         }
     }
 
@@ -1021,7 +1014,11 @@ class AccommodationController extends Controller
                             ->count();
                     }
 
-                    $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+
+                    if ($response == 0) {
+                        return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                    }
                 }
 
                 if ($externalMember->room_type_id) {
@@ -1093,7 +1090,11 @@ class AccommodationController extends Controller
                             ->count();
                     }
 
-                    $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+
+                    if ($response == 0) {
+                        return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                    }
                 }
 
 
