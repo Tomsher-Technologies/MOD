@@ -585,38 +585,38 @@
                 allowClear: true
             });
 
-            let initiallySelectedCountries = $('#country-select').val() || [];
+            const preselectedContinents = @json(request('continent_id') ?? []);
+            const preselectedCountries = @json(request('country_id') ?? []);
 
-            $('#continent-select').on('change', function() {
-                const continentId = $(this).val();
-                const countrySelect = $('#country-select');
+            const $continentSelect = $('#continent-select');
+            const $countrySelect = $('#country-select');
 
-                countrySelect.find('option[value!=""]').remove();
+            $continentSelect.on('change', function() {
+                const continentIds = $(this).val();
+                $countrySelect.find('option').remove();
 
-                if (continentId) {
+                if (continentIds && continentIds.length > 0) {
                     $.get('{{ route('countries.by-continent') }}', {
-                        continent_ids: continentId
+                        continent_ids: continentIds
                     }, function(data) {
                         $.each(data, function(index, country) {
-                            const isSelected = initiallySelectedCountries.includes(country
-                                .id.toString());
-
-                            countrySelect.append(new Option(country.name, country.id, false,
-                                isSelected));
+                            const isSelected = preselectedCountries.includes(country.id
+                                .toString());
+                            $countrySelect.append(new Option(country.name, country.id,
+                                false, isSelected));
                         });
 
-                        countrySelect.trigger('change');
+                        $countrySelect.trigger('change.select2');
                     }).fail(function() {
                         console.log('Failed to load countries');
                     });
                 } else {
-                    countrySelect.val(null).trigger('change');
+                    $countrySelect.val(null).trigger('change.select2');
                 }
             });
 
-            const selectedContinent = $('#continent-select').val();
-            if (selectedContinent && selectedContinent.length > 0) {
-                $('#continent-select').trigger('change');
+            if (preselectedContinents.length > 0) {
+                $continentSelect.val(preselectedContinents).trigger('change');
             }
         });
     </script>
