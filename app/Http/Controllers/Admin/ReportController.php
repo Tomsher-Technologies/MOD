@@ -1359,7 +1359,7 @@ class ReportController extends Controller
                             'delegate_transports.flight_no',
                             'delegate_transports.date_time',
                             'delegates.delegation_id',
-                            \DB::raw('GROUP_CONCAT(delegate_transports.delegate_id) as delegate_ids')
+                            \DB::raw('GROUP_CONCAT(DISTINCT delegate_transports.delegate_id) as delegate_ids')
                         )
                         ->join('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
                         ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
@@ -1423,7 +1423,7 @@ class ReportController extends Controller
                             'delegate_transports.flight_no',
                             'delegate_transports.date_time',
                             'delegates.delegation_id',
-                            \DB::raw('GROUP_CONCAT(delegate_transports.delegate_id) as delegate_ids')
+                            \DB::raw('GROUP_CONCAT(DISTINCT delegate_transports.delegate_id) as delegate_ids')
                         )
                         ->join('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
                         ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
@@ -1511,7 +1511,7 @@ class ReportController extends Controller
                             'delegate_transports.flight_no',
                             'delegate_transports.date_time',
                             'delegates.delegation_id',
-                            \DB::raw('GROUP_CONCAT(delegate_transports.delegate_id) as delegate_ids')
+                            \DB::raw('GROUP_CONCAT(DISTINCT delegate_transports.delegate_id) as delegate_ids')
                         )
                         ->join('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
                         ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
@@ -1575,7 +1575,7 @@ class ReportController extends Controller
                             'delegate_transports.flight_no',
                             'delegate_transports.date_time',
                             'delegates.delegation_id',
-                            \DB::raw('GROUP_CONCAT(delegate_transports.delegate_id) as delegate_ids')
+                            \DB::raw('GROUP_CONCAT(DISTINCT delegate_transports.delegate_id) as delegate_ids')
                         )
                         ->join('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
                         ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
