@@ -1024,7 +1024,7 @@ class AccommodationController extends Controller
                             ->count();
                     }
 
-                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type, false, $currentRoomAssignmentCount);
 
                     if ($response == 0) {
                         return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
@@ -1100,7 +1100,7 @@ class AccommodationController extends Controller
                             ->count();
                     }
 
-                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type, false, $currentRoomAssignmentCount);
 
                     if ($response == 0) {
                         return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
