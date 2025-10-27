@@ -996,18 +996,7 @@ class AccommodationController extends Controller
 
                 if ($availableRooms <= 0) {
 
-                    $currentRoomAssignmentCount = 0;
-
-                    if ($externalMember) {
-                        $currentRoomAssignmentCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
-                            ->where('room_type_id', $externalMember->room_type_id)
-                            ->where('room_number', $externalMember->room_number)
-                            ->where('active_status', 1)
-                            ->count();
-                    }
-
-
-                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
+                    $response = $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, 0);
 
 
                     if ($response == 0) {
