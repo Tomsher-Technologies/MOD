@@ -828,11 +828,9 @@ class ReportController extends Controller
                     ->whereHas('invitationStatus', fn($q3) => $q3->whereIn('code', self::ASSIGNABLE_STATUS_CODES));
             });
 
-
             if(!empty($filters['date_range'])){
                 $newQuery->joinSub($arrivalSub, 'arrival_times', function($join) use ($filters) {
                     $join->on('delegates.id', '=', 'arrival_times.delegate_id');
-                    
                 });
             }else{
                 $newQuery->leftJoinSub($arrivalSub, 'arrival_times', function($join) {
