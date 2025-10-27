@@ -1657,19 +1657,20 @@ class ReportController extends Controller
 
         $filters = request()->only(['hotel', 'date_range', 'invitation_from','country']);
 
+        // DB::enableQueryLog();
         $transportGroups = DelegateTransport::query()
                         ->select(
                             'delegate_transports.mode',
                             'delegate_transports.flight_no',
                             'delegate_transports.date_time',
                             'delegates.delegation_id',
-                            \DB::raw('GROUP_CONCAT(delegate_transports.delegate_id) as delegate_ids')
+                            \DB::raw('GROUP_CONCAT(DISTINCT delegate_transports.delegate_id) AS delegate_ids')
                         )
-                        ->join('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
-                        ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
+                        ->leftJoin('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
+                        ->leftJoin('delegations', 'delegates.delegation_id', '=', 'delegations.id')
 
-                        ->join('dropdown_options as invitation_status', 'delegations.invitation_status_id', '=', 'invitation_status.id')
-                        ->join('dropdowns as d', 'invitation_status.dropdown_id', '=', 'd.id')
+                        ->leftJoin('dropdown_options as invitation_status', 'delegations.invitation_status_id', '=', 'invitation_status.id')
+                        ->leftJoin('dropdowns as d', 'invitation_status.dropdown_id', '=', 'd.id')
                         ->leftJoin('room_assignments as cra', function($join) {
                             $join->on('delegates.id', '=', 'cra.assignable_id')
                                 ->where('cra.assignable_type', '=', \App\Models\Delegate::class);
@@ -1700,19 +1701,20 @@ class ReportController extends Controller
                         ->orderBy('delegate_transports.date_time', 'asc')
                         ->orderBy('delegates.team_head', 'desc')
                         ->get();
-
+        // dd(DB::getQueryLog());
         $allDelegateIds = $transportGroups->pluck('delegate_ids')
                             ->map(fn($ids) => explode(',', $ids))
                             ->flatten()
                             ->unique()
                             ->all();
+                       
 
         $delegates = Delegate::with('delegation')
                             ->whereIn('id', $allDelegateIds)
                             ->orderBy('team_head', 'desc')
                             ->get()
                             ->keyBy('id');
-
+       
         $formattedGroups = $transportGroups->map(function($group) use ($delegates) {
                                     $delegateIds = explode(',', $group->delegate_ids);
 
@@ -1745,7 +1747,7 @@ class ReportController extends Controller
                             'delegate_transports.flight_no',
                             'delegate_transports.date_time',
                             'delegates.delegation_id',
-                            \DB::raw('GROUP_CONCAT(delegate_transports.delegate_id) as delegate_ids')
+                            \DB::raw('GROUP_CONCAT(DISTINCT delegate_transports.delegate_id) AS delegate_ids')
                         )
                         ->join('delegates', 'delegate_transports.delegate_id', '=', 'delegates.id')
                         ->join('delegations', 'delegates.delegation_id', '=', 'delegations.id')
