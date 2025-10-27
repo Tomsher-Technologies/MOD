@@ -525,7 +525,18 @@ class AccommodationController extends Controller
                 $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
 
                 if ($availableRooms <= 0) {
-                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id);
+
+                    $alreadyAssignedCount = 0;
+
+                    if ($oldAssignment) {
+                        $alreadyAssignedCount =  RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                            ->where('room_type_id', $oldAssignment->room_type_id)
+                            ->where('room_number', $oldAssignment->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                    }
+
+                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id, true, $alreadyAssignedCount);
                 }
 
                 if ($user->current_room_assignment_id) {
@@ -591,7 +602,18 @@ class AccommodationController extends Controller
                 $oldAssignment = \App\Models\RoomAssignment::find($user->current_room_assignment_id);
 
                 if ($availableRooms <= 0 && !$alreadyAssigned) {
-                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id);
+
+                    $alreadyAssignedCount = 0;
+
+                    if ($oldAssignment) {
+                        $alreadyAssignedCount =  RoomAssignment::where('hotel_id', $oldAssignment->hotel_id)
+                            ->where('room_type_id', $oldAssignment->room_type_id)
+                            ->where('room_number', $oldAssignment->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                    }
+
+                    $this->checkRoomAvailability($oldAssignment, $availableRooms, $request->room_type_id, true, $alreadyAssignedCount);
                 }
 
                 if ($alreadyAssigned && !$confirmedDuplicate) {
@@ -846,7 +868,7 @@ class AccommodationController extends Controller
         return redirect()->back()->with('success', __db('room_assigned'));
     }
 
-    private function checkRoomAvailability($oldAssignment, $availableRooms, $requestRoomType, $isJsonResponse = true)
+    private function checkRoomAvailability($oldAssignment, $availableRooms, $requestRoomType, $isJsonResponse = true, $currentRoomAssignmentCount = 0)
     {
 
         if ($availableRooms <= 0) {
@@ -863,6 +885,14 @@ class AccommodationController extends Controller
                 $requestRoomType == $oldAssignment->room_type_id;
 
             if (!$isSameRoomType) {
+                if (!$isJsonResponse) {
+                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                } else {
+                    return response()->json(['success' => 2]);
+                }
+            }
+
+            if ($currentRoomAssignmentCount > 1 && !is_null($oldAssignment->room_number)) {
                 if (!$isJsonResponse) {
                     return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
                 } else {
@@ -980,7 +1010,18 @@ class AccommodationController extends Controller
             if (empty($request->room_number)) {
 
                 if ($availableRooms <= 0) {
-                    $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false);
+
+                    $currentRoomAssignmentCount = 0;
+
+                    if ($externalMember) {
+                        $currentRoomAssignmentCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                            ->where('room_type_id', $externalMember->room_type_id)
+                            ->where('room_number', $externalMember->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                    }
+
+                    $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
                 }
 
                 if ($externalMember->room_type_id) {
@@ -1041,8 +1082,18 @@ class AccommodationController extends Controller
                 if ($alreadyAssignedDelegation) {
                     return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
                 }
-                if ($availableRooms <= 0) { // && $externalMember->hotel_id != $request->hotel_id && $externalMember->room_type_id != $request->room_type && $externalMember->room_number != $request->room_number
-                    return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
+                if ($availableRooms <= 0) {
+                    $currentRoomAssignmentCount = 0;
+
+                    if ($externalMember) {
+                        $currentRoomAssignmentCount = ExternalMemberAssignment::where('hotel_id', $externalMember->hotel_id)
+                            ->where('room_type_id', $externalMember->room_type_id)
+                            ->where('room_number', $externalMember->room_number)
+                            ->where('active_status', 1)
+                            ->count();
+                    }
+
+                    $this->checkRoomAvailability($externalMember, $availableRooms, $request->room_type_id, false, $currentRoomAssignmentCount);
                 }
 
 
