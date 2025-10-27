@@ -974,10 +974,18 @@ class AccommodationController extends Controller
     {
         $externalMember = ExternalMemberAssignment::findOrFail($id);
         $hotel = Accommodation::findOrFail($externalMember->hotel_id);
+
         $roomTypes = AccommodationRoom::with('roomType')
             ->where('accommodation_id', $hotel->id)
             ->where('available_rooms', '>', 0)
             ->get();
+
+        $currentRoomType = AccommodationRoom::find($externalMember->room_type_id);
+
+        if ($currentRoomType) {
+            $roomTypes = $roomTypes->push($currentRoomType)->unique('id')->values();
+        }
+
         return view('admin.accommodations.edit-external-members', compact('externalMember', 'hotel', 'roomTypes'));
     }
 
