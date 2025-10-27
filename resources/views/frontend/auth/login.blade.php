@@ -12,11 +12,11 @@
                 <div>
                     <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
                         @if(getActiveLanguage() == 'ar')
-                            <img src="{{ public_path('assets/img/md-logo-ar.svg') }}" 
-                                alt="{{ env('APP_NAME') }}" >
+                            <img src="{{ asset('assets/img/md-logo-ar.svg') }}" 
+                                alt="{{ env('APP_NAME') }}"  width="200px">
                         @else
-                            <img src="{{ public_path('assets/img/md-logo.svg') }}" 
-                            alt="{{ env('APP_NAME') }}" >
+                            <img src="{{ asset('assets/img/md-logo.svg') }}" 
+                            alt="{{ env('APP_NAME') }}"  width="200px">
                         @endif
                     </a>
                     <a href="{{ route('home') }}" class="mb-2 max-w-[290px]">
