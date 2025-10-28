@@ -27,23 +27,23 @@ class AccommodationController extends Controller
 
     const ASSIGNABLE_STATUS_CODES = ['2', '10'];
 
-     public function __construct()
+    public function __construct()
     {
         $this->middleware('auth');
 
         // === Delegations ===
         $this->middleware('permission:manage_accommodations|view_accommodations|delegate_manage_accommodations|delegate_view_accommodations|escort_manage_accommodations|escort_view_accommodations|driver_manage_accommodations|driver_view_accommodations|hotel_manage_accommodations|hotel_view_accommodations|', [
-            'only' => ['index','show']
+            'only' => ['index', 'show']
         ]);
 
         $this->middleware('permission:view_accommodation_delegations|hotel_view_accommodation_delegations', [
-            'only' => ['accommodationDelegations','accommodationDelegationView']
+            'only' => ['accommodationDelegations', 'accommodationDelegationView']
         ]);
 
         $this->middleware('permission:view_external_members|hotel_view_external_members', [
-            'only' => ['getExternalMembers','addExternalMembers']
+            'only' => ['getExternalMembers', 'addExternalMembers']
         ]);
-        
+
         $this->middleware('permission:add_accommodations|hotel_add_accommodations', [
             'only' => ['create', 'store']
         ]);
@@ -52,7 +52,7 @@ class AccommodationController extends Controller
             'only' => ['edit', 'update']
         ]);
 
-         $this->middleware('permission:import_accommodations|hotel_import_accommodations', [
+        $this->middleware('permission:import_accommodations|hotel_import_accommodations', [
             'only' => ['showImportForm', 'import']
         ]);
     }
@@ -1332,6 +1332,8 @@ class AccommodationController extends Controller
         }
 
         $delegate->update(['accommodation' => $request->accommodation_status]);
+
+        getRoomAssignmentStatus($delegate->delegation_id);
 
         return response()->json([
             'success' => true,
