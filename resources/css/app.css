@@ -92,3 +92,9 @@ body {
     flex-wrap: wrap;
     gap: 0.25rem;
 }
+
+
+.hotelSelection + .select2-container {
+  width: 200px !important;
+}
+

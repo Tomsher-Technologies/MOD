@@ -146,7 +146,7 @@
         </form>
     </div>
 
-    @if ($escort->status == 1)
+    {{-- @if ($escort->status == 1)
         @php
             $hasActiveAssignment = $escort->delegations()->where('status', 1)->exists();
         @endphp
@@ -156,5 +156,5 @@
         </h2>
 
         <x-assign-delegation-with-search :escort="$escort" />
-    @endif
+    @endif --}}
 </div>

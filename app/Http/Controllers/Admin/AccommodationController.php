@@ -656,6 +656,8 @@ class AccommodationController extends Controller
 
                 if ($alreadyAssigned && !$confirmedDuplicate) {
                     $existingUsers = [];
+                    $differentRoomType = false;
+                    $differentRoomTypeDetails = [];
 
                     $allExistingAssignments = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
                         ->where('room_number', $request->room_number)
@@ -673,14 +675,41 @@ class AccommodationController extends Controller
                                 'name' => $existingUserName,
                                 'type' => $existingUserType
                             ];
+
+                            if ($assignment->room_type_id != $request->room_type_id) {
+                                $differentRoomType = true;
+                                $existingRoomType = AccommodationRoom::with('roomType')->find($assignment->room_type_id);
+                                $differentRoomTypeDetails[] = [
+                                    'name' => $existingUserName,
+                                    'type' => $existingUserType,
+                                    'room_type' => $existingRoomType ? __db($existingRoomType->roomType->value) : '-',
+                                    'room_type_id' => $existingRoomType ? $existingRoomType->room_type : '-'
+                                ];
+                            }
                         }
                     }
 
                     $hotel = Accommodation::findOrFail($request->hotel_id);
+                    $requestedRoomType = AccommodationRoom::with('roomType')->find($request->room_type_id);
+
+                    // dd(getActiveLanguage());
+
+                    if ($differentRoomType) {
+                        return response()->json([
+                            'success' => 6,
+                            'message' => __db('room_type_mismatch_error'),
+                            'existing_users' => $existingUsers,
+                            'different_room_types' => $differentRoomTypeDetails,
+                            'hotel_name' => $hotel->getHotelNameTranslation('') ?? '-',
+                            'room_number' => $request->room_number ?? '-',
+                            'requested_room_type' => $requestedRoomType ? __db($requestedRoomType->roomType->value) : '-',
+                            'requested_room_type_id' => $requestedRoomType ? $requestedRoomType->room_type : '-'
+                        ]);
+                    }
 
                     return response()->json([
                         'success' => 5,
-                        'message' => 'Room already assigned to other users. Do you want to proceed?',
+                        'message' => __db('room_assigned_to_other_users'),
                         'existing_users' => $existingUsers,
                         'hotel_name' => $hotel->getHotelNameTranslation() ?? '-',
                         'room_number' => $request->room_number ?? '-',
@@ -850,13 +879,13 @@ class AccommodationController extends Controller
         } else {
 
             $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type)
+                // ->where('room_type_id', $request->room_type)
                 ->where('room_number', $request->room_number)
                 ->where('active_status', 1)
                 ->exists();
 
             $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                ->where('room_type_id', $request->room_type)
+                // ->where('room_type_id', $request->room_type)
                 ->where('room_number', $request->room_number)
                 ->where('active_status', 1)
                 ->exists();
@@ -864,6 +893,26 @@ class AccommodationController extends Controller
             if ($alreadyAssignedDelegation) {
                 return back()->withErrors(['room_error' => __db('room_already_assigned_to_delegation')])->withInput();
             }
+
+            if ($alreadyAssigned) {
+                $existingAssignment = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
+                    ->where('room_number', $request->room_number)
+                    ->where('active_status', 1)
+                    ->first();
+
+                if ($existingAssignment && $existingAssignment->room_type_id != $request->room_type) {
+                    $existingRoomType = AccommodationRoom::with('roomType')->find($existingAssignment->room_type_id);
+                    $requestedRoomType = AccommodationRoom::with('roomType')->find($request->room_type);
+
+                    $errorMessage = __db('room_type_mismatch_error') . ' ' .
+                        __db('existing_room_type') . ': ' . ($existingRoomType ? __db($existingRoomType->roomType->value) : '-') . ', ' .
+                        __db('requested_room_type') . ': ' . ($requestedRoomType ? __db($requestedRoomType->roomType->value) : '-');
+
+                    return back()->withErrors(['room_error' => $errorMessage])->withInput();
+                }
+            }
+
+
             if ($availableRooms <= 0) {
                 return back()->withErrors(['room_error' => __db('room_not_available')])->withInput();
             }
@@ -1104,16 +1153,36 @@ class AccommodationController extends Controller
             } else {
 
                 $alreadyAssignedDelegation = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
-                    ->where('room_type_id', $request->room_type)
+                    // ->where('room_type_id', $request->room_type)
                     ->where('room_number', $request->room_number)
                     ->where('active_status', 1)
                     ->exists();
 
                 $alreadyAssigned = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
-                    ->where('room_type_id', $request->room_type)
+                    // ->where('room_type_id', $request->room_type)
                     ->where('room_number', $request->room_number)
                     ->where('active_status', 1)
                     ->exists();
+
+                if ($alreadyAssigned) {
+                    $existingAssignment = ExternalMemberAssignment::where('hotel_id', $request->hotel_id)
+                        ->where('room_number', $request->room_number)
+                        ->where('id', '!=', $id)
+                        ->where('active_status', 1)
+                        ->first();
+
+                    if ($existingAssignment && $existingAssignment->room_type_id != $request->room_type) {
+                        $existingRoomType = AccommodationRoom::with('roomType')->find($existingAssignment->room_type_id);
+                        $requestedRoomType = AccommodationRoom::with('roomType')->find($request->room_type);
+
+                        $errorMessage = __db('room_type_mismatch_error') . ' ' .
+                            __db('existing_room_type') . ': ' . ($existingRoomType ? __db($existingRoomType->roomType->value) : '-') . ', ' .
+                            __db('requested_room_type') . ': ' . ($requestedRoomType ? __db($requestedRoomType->roomType->value) : '-');
+
+                        return back()->withErrors(['room_error' => $errorMessage])->withInput();
+                    }
+                }
+
 
 
                 if ($alreadyAssignedDelegation) {
@@ -1341,17 +1410,6 @@ class AccommodationController extends Controller
         ]);
     }
 
-    public function exportAccommodationDelegations()
-    {
-        $user = auth()->user();
-        if (!$user->can('export_accommodation_delegations') && !$user->can('hotel_export_accommodation_delegations')) {
-            abort(403, 'Access denied');
-        }
-
-        $export = new \App\Exports\AccommodationDelegatesEscortsExport();
-        return $export->download('accommodation_delegates_escorts_export.xlsx');
-    }
-
     public function exportHotelAccommodations($id)
     {
         $hotelId = base64_decode($id);
@@ -1363,5 +1421,63 @@ class AccommodationController extends Controller
 
         $export = new \App\Exports\HotelAccommodationsExport($hotelId);
         return $export->download('hotel_accommodations_export.xlsx');
+    }
+
+    private function checkRoomTypeCompatibility($hotelId, $roomNumber, $requestRoomTypeId)
+    {
+        if (empty($roomNumber)) {
+            return true; // No room number provided, so no conflict possible
+        }
+
+        // Check for existing delegation assignments in the same room number (any room type)
+        $existingDelegationAssignments = \App\Models\RoomAssignment::where('hotel_id', $hotelId)
+            ->where('room_number', $roomNumber)
+            ->where('active_status', 1)
+            ->get();
+
+        foreach ($existingDelegationAssignments as $assignment) {
+            if ($assignment->room_type_id != $requestRoomTypeId) {
+                $existingRoomType = \App\Models\AccommodationRoom::with('roomType')->find($assignment->room_type_id);
+                $existingUser = $assignment->assignable;
+                $existingUserName = $existingUser ? $existingUser->getTranslation('name') ?? 'Unknown' : 'Unknown';
+                $existingUserType = __db(strtolower(class_basename($assignment->assignable_type)));
+
+                return [
+                    'compatible' => false,
+                    'existing_user' => [
+                        'name' => $existingUserName,
+                        'type' => $existingUserType,
+                        'room_type' => $existingRoomType ? __db($existingRoomType->roomType->value) : '-',
+                        'room_number' => $assignment->room_number
+                    ],
+                    'error_type' => 'delegation'
+                ];
+            }
+        }
+
+        // Check for existing external member assignments in the same room number (any room type)
+        $existingExternalAssignments = \App\Models\ExternalMemberAssignment::where('hotel_id', $hotelId)
+            ->where('room_number', $roomNumber)
+            ->where('active_status', 1)
+            ->get();
+
+        foreach ($existingExternalAssignments as $assignment) {
+            if ($assignment->room_type_id != $requestRoomTypeId) {
+                $existingRoomType = \App\Models\AccommodationRoom::with('roomType')->find($assignment->room_type_id);
+
+                return [
+                    'compatible' => false,
+                    'existing_user' => [
+                        'name' => $assignment->name,
+                        'type' => __db('external_member'),
+                        'room_type' => $existingRoomType ? __db($existingRoomType->roomType->value) : '-',
+                        'room_number' => $assignment->room_number
+                    ],
+                    'error_type' => 'external'
+                ];
+            }
+        }
+
+        return ['compatible' => true];
     }
 }

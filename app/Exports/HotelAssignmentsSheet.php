@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\RoomAssignment;
 use App\Models\Delegate;
+use App\Models\Driver;
 use App\Models\Escort;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -50,7 +51,21 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
             ->where('assignable_type', Escort::class)
             ->get();
 
-        $combined = $delegates->concat($escorts);
+
+        $drivers = RoomAssignment::with([
+            'assignable',
+            'delegation',
+            'delegation.country',
+            'delegation.invitationFrom',
+            'hotel',
+            'roomType.roomType'
+        ])
+            ->where('hotel_id', $this->hotelId)
+            ->where('active_status', 1)
+            ->where('assignable_type', Driver::class)
+            ->get();
+
+        $combined = $delegates->concat($escorts)->concat($drivers);
 
         $this->data = $combined->sortBy([
             ['delegation.country.sort_order', 'asc'],
@@ -84,12 +99,16 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
     public function map($row): array
     {
         $isEscort = $row->assignable_type === 'App\Models\Escort';
+        $isDriver = $row->assignable_type === 'App\Models\Driver';
         $member = $row->assignable;
         $delegation = $row->delegation;
 
-        if ($isEscort) {
+        if ($isDriver) {
             $name = $member->getTranslation('name', 'en') ?? '';
-            $title = $member->getTranslation('title') ?? '';
+            $title = $member->getTranslation('title', 'en') ?? '';
+        } elseif ($isEscort) {
+            $name = $member->getTranslation('name', 'en') ?? '';
+            $title = $member->getTranslation('title', 'en') ?? '';
         } else {
             $name = $member->getTranslation('name', 'en') ?? '';
             $title = $member->getTranslation('title', 'en') ?? '';
@@ -97,7 +116,9 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
 
         $titleAndName = trim($title . ' ' . $name);
 
-        if ($isEscort) {
+        if ($isDriver) {
+            $position = $member->getTranslation('designation', 'en') ?? '';
+        } elseif ($isEscort) {
             $position = $member->getTranslation('designation', 'en') ?? '';
         } else {
             $position = $member->getTranslation('designation', 'en') ?? '';
@@ -106,32 +127,44 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
         $arrival_date = '';
         $departure_date = '';
 
-        if (!$isEscort) {
+        if ($isDriver) {
+            $arrival_date = '';
+            $departure_date = '';
+        } elseif (!$isEscort) {
             $arrival = $member->delegateTransports()->where('type', 'arrival')->latest('date_time')->first();
             $departure = $member->delegateTransports()->where('type', 'departure')->latest('date_time')->first();
 
             $arrival_date = $arrival ? $arrival->date_time : '';
             $departure_date = $departure ? $departure->date_time : '';
+        } else {
+            $arrival_date = '';
+            $departure_date = '';
         }
 
         $countryName = !empty($delegation->country->name) ? $delegation->country->getNameEn() : $delegation->country->getNameAr();
         $invitationFromValue = !empty($delegation->invitationFrom->getValueEn()) ? $delegation->invitationFrom->getValueEn() : $delegation->invitationFrom->getNameAr();
-        $hotelName = !empty($row->hotel->hotel_name) ? $row->hotel->hotel_name : $row->hotel->hotel_name_ar;
 
+        if ($isDriver) {
+            $type = 'Driver';
+        } elseif ($isEscort) {
+            $type = 'Escort';
+        } else {
+            $type = 'Delegate';
+        }
 
         return [
             '',
             $delegation->code ?? '',
-            $hotelName ?? '',
+            $row->hotel->getHotelNameTranslation('en') ?? '',
             $countryName ?? '',
             $invitationFromValue ?? '',
             $titleAndName,
             $position,
-            $arrival_date ? (new Carbon($arrival_date))->format('Y-m-d') : '',
-            $departure_date ? (new Carbon($departure_date))->format('Y-m-d') : '',
+            $arrival_date ? (new \Carbon\Carbon($arrival_date))->format('Y-m-d') : '',
+            $departure_date ? (new \Carbon\Carbon($departure_date))->format('Y-m-d') : '',
             $row->room_number ?? '',
             $row->roomType->roomType->value ?? '',
-            $isEscort ? 'Escort' : 'Delegate'
+            $type
         ];
     }
 
@@ -149,7 +182,7 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
                 $sheet = $event->sheet->getDelegate();
 
                 $sheet->insertNewRowBefore(1, 1);
-                $sheet->setCellValue('A1', 'Hotel Assignments Export - Exported on: ' . Carbon::now()->format('d-m-Y H:i A'));
+                $sheet->setCellValue('A1', 'Accommodation Delegates, Escorts & Drivers Export - Exported on: ' . Carbon::now()->format('d-m-Y H:i A'));
                 $sheet->mergeCells('A1:L1');
                 $sheet->getStyle('A1')->getFont()->setBold(true);
                 $sheet->getStyle('A2:L2')->getFont()->setBold(true);
@@ -181,11 +214,15 @@ class HotelAssignmentsSheet implements FromCollection, WithHeadings, WithMapping
                                 'startColor' => ['rgb' => 'E6F3FF']
                             ]
                         ]);
+                    } elseif ($type === 'Driver') {
+                        $sheet->getStyle('A' . $row . ':L' . $row)->applyFromArray([
+                            'fill' => [
+                                'fillType' => 'solid',
+                                'startColor' => ['rgb' => 'FFE6F3']
+                            ]
+                        ]);
                     }
                 }
-
-                $sheet->getStyle('A1:L' . $lastRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $sheet->getStyle('A1:L' . $lastRow)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
             },
         ];
     }

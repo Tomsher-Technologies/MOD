@@ -168,7 +168,10 @@
                                     if (!$row->delegation?->id) {
                                         return '<span class="text-muted">N/A</span>';
                                     }
-                                    $url = route('accommodation-delegation-view', base64_encode($row->delegation->id ?? 0));
+                                    $url = route(
+                                        'accommodation-delegation-view',
+                                        base64_encode($row->delegation->id ?? 0),
+                                    );
                                     return '<a class="text-[#B68A35]" href="' .
                                         $url .
                                         '">' .
@@ -299,10 +302,11 @@
                         @php
                             $delegate = $delegate->assignable;
                         @endphp
-                        @if($delegate)
+                        @if ($delegate)
                             <div id="delegate-transport-modal-{{ $delegate->id }}" tabindex="-1" aria-hidden="true"
                                 class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-30 p-4 md:p-5">
-                                <div class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+                                <div
+                                    class="relative w-full max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
                                     <div class="flex items-center justify-between p-3 border-b border-gray-200">
                                         <h3 class="text-lg font-semibold text-gray-900 truncate">
                                             {{ __db('transport_information_for') }} {{ $delegate->name_en ?? '-' }}
@@ -323,7 +327,7 @@
                                         <section>
                                             <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('arrival') }}</h4>
                                             @php
-                                            $arrival = $delegate->delegateTransports
+                                                $arrival = $delegate->delegateTransports
                                                     ->where('type', 'arrival')
                                                     ->first();
                                             @endphp
@@ -331,23 +335,27 @@
                                             <div
                                                 class="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-6 bg-gray-50">
                                                 @if ($arrival)
-                                                    <div class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
+                                                    <div
+                                                        class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
                                                         <p class="font-medium text-gray-600">{{ __db('to_airport') }}</p>
                                                         <p class="text-sm text-gray-800">
                                                             {{ $arrival->airport?->value ?? '-' }}</p>
                                                     </div>
                                                     <div class="border-b md:border-b-0 border-gray-200 pb-2">
                                                         <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                                        <p class="text-sm text-gray-800">{{ $arrival->flight_no ?? '-' }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $arrival->flight_no ?? '-' }}
+                                                        </p>
                                                     </div>
                                                     <div class="pt-2 pr-3 md:border-r md:border-gray-200">
                                                         <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                                        <p class="text-sm text-gray-800">{{ $arrival->flight_name ?? '-' }}
+                                                        <p class="text-sm text-gray-800">
+                                                            {{ $arrival->flight_name ?? '-' }}
                                                         </p>
                                                     </div>
                                                     <div class="pt-2">
                                                         <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                                        <p class="text-sm text-gray-800">{{ $arrival->date_time ?? '-' }}</p>
+                                                        <p class="text-sm text-gray-800">{{ $arrival->date_time ?? '-' }}
+                                                        </p>
                                                     </div>
                                                 @else
                                                     <p class="col-span-2 text-gray-500 italic">
@@ -358,9 +366,10 @@
 
                                         {{-- Departure Section --}}
                                         <section>
-                                            <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('departure') }}</h4>
+                                            <h4 class="text-lg font-semibold text-gray-900 mb-3">{{ __db('departure') }}
+                                            </h4>
                                             @php
-                                            $departure = $delegate->delegateTransports
+                                                $departure = $delegate->delegateTransports
                                                     ->where('type', 'departure')
                                                     ->first();
                                             @endphp
@@ -368,24 +377,29 @@
                                             <div
                                                 class="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-y-3 md:gap-x-6 bg-gray-50">
                                                 @if ($departure)
-                                                    <div class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
-                                                        <p class="font-medium text-gray-600">{{ __db('from_airport') }}</p>
+                                                    <div
+                                                        class="border-b md:border-b-0 md:border-r border-gray-200 pb-2 pr-3">
+                                                        <p class="font-medium text-gray-600">{{ __db('from_airport') }}
+                                                        </p>
                                                         <p class="text-sm text-gray-800">
                                                             {{ $departure->airport?->value ?? '-' }}</p>
                                                     </div>
                                                     <div class="border-b md:border-b-0 border-gray-200 pb-2">
                                                         <p class="font-medium text-gray-600">{{ __db('flight_no') }}</p>
-                                                        <p class="text-sm text-gray-800">{{ $departure->flight_no ?? '-' }}
+                                                        <p class="text-sm text-gray-800">
+                                                            {{ $departure->flight_no ?? '-' }}
                                                         </p>
                                                     </div>
                                                     <div class="pt-2 pr-3 md:border-r md:border-gray-200">
                                                         <p class="font-medium text-gray-600">{{ __db('flight_name') }}</p>
-                                                        <p class="text-sm text-gray-800">{{ $departure->flight_name ?? '-' }}
+                                                        <p class="text-sm text-gray-800">
+                                                            {{ $departure->flight_name ?? '-' }}
                                                         </p>
                                                     </div>
                                                     <div class="pt-2">
                                                         <p class="font-medium text-gray-600">{{ __db('date_time') }}</p>
-                                                        <p class="text-sm text-gray-800">{{ $departure->date_time ?? '-' }}
+                                                        <p class="text-sm text-gray-800">
+                                                            {{ $departure->date_time ?? '-' }}
                                                         </p>
                                                     </div>
                                                 @else
@@ -428,26 +442,14 @@
                             [
                                 'label' => __db('escort') . ' ' . __db('code'),
                                 'render' => function ($escort) {
-                                    $searchUrl = route('escorts.index', ['search' => $escort->assignable?->code]);
-                                    return '<a href="' .
-                                        $searchUrl .
-                                        '" class="text-[#B68A35] hover:underline">' .
-                                        e($escort->assignable?->code) .
-                                        '</a>';
+                                    return '<span class="">' . e($escort?->assignable?->code) . '</span>';
                                 },
                             ],
                             [
                                 'label' => __db('military_number'),
                                 'key' => 'military_number',
                                 'render' => function ($escort) {
-                                    $searchUrl = route('escorts.index', [
-                                        'search' => $escort->assignable?->military_number,
-                                    ]);
-                                    return '<a href="' .
-                                        $searchUrl .
-                                        '" class="text-[#B68A35] hover:underline">' .
-                                        e($escort->assignable?->military_number) .
-                                        '</a>';
+                                    return '<span class="">' . e($escort?->assignable?->military_number) . '</span>';
                                 },
                             ],
 
@@ -455,13 +457,9 @@
                                 'label' => __db('name_en'),
                                 'key' => 'name',
                                 'render' => function ($escort) {
-                                    $searchUrl = route('escorts.index', ['search' => $escort->assignable?->name_en]);
-                                    return '<a href="' .
-                                        $searchUrl .
-                                        '" class="text-[#B68A35] hover:underline">' .
-                                        e($escort->assignable?->title_en ?? '') .
-                                        e($escort->assignable?->name_en) .
-                                        '</a>';
+                                    return '<span class="">' .
+                                        e($escort->assignable?->title_en . ' ' . $escort->assignable?->name_en) .
+                                        '</span>';
                                 },
                             ],
                             [
@@ -547,26 +545,14 @@
                             [
                                 'label' => __db('driver') . ' ' . __db('code'),
                                 'render' => function ($driver) {
-                                    $searchUrl = route('drivers.index', ['search' => $driver->assignable?->code]);
-                                    return '<a href="' .
-                                        $searchUrl .
-                                        '" class="text-[#B68A35] hover:underline">' .
-                                        e($driver->assignable?->code) .
-                                        '</a>';
+                                    return '<span class="">' . e($driver->assignable?->code) . '</span>';
                                 },
                             ],
                             [
                                 'label' => __db('military_number'),
                                 'key' => 'military_number',
                                 'render' => function ($driver) {
-                                    $searchUrl = route('drivers.index', [
-                                        'search' => $driver->assignable?->military_number,
-                                    ]);
-                                    return '<a href="' .
-                                        $searchUrl .
-                                        '" class="text-[#B68A35] hover:underline">' .
-                                        e($driver->assignable?->military_number) .
-                                        '</a>';
+                                    return '<span class="">' . e($driver->assignable?->military_number) . '</span>';
                                 },
                             ],
 
@@ -574,13 +560,9 @@
                                 'label' => __db('name_en'),
                                 'key' => 'name_en',
                                 'render' => function ($driver) {
-                                    $searchUrl = route('drivers.index', ['search' => $driver->assignable?->name_en]);
-                                    return '<a href="' .
-                                        $searchUrl .
-                                        '" class="text-[#B68A35] hover:underline">' .
-                                        e($driver->assignable?->title_en ?? '') .
-                                        e($driver->assignable?->name_en) .
-                                        '</a>';
+                                    return '<span class="">' .
+                                        e($driver->assignable?->title_en . ' ' . $driver->assignable?->name_en) .
+                                        '</span>';
                                 },
                             ],
                             [
