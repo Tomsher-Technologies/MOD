@@ -32,13 +32,13 @@
 
     @if ($currentPath !== '/')
         <style>
-            body {
-                padding-top: 8rem;
+            .innerBody {
+                margin-top: 8rem;
             }
         </style>
     @endif
 
-    <div class="min-h-[85vh]">
+    <div class="min-h-[85vh] innerBody">
         @yield('content')
     </div>
 
