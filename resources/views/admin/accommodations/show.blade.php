@@ -237,7 +237,7 @@
                             [
                                 'label' => __db('participation_status'),
                                 'render' => function ($row) {
-                                    return $row->assignable?->participation_status ?? '-';
+                                    return $row->assignable?->participation_status ? __db($row->assignable?->participation_status) : '-';
                                 },
                             ],
                             [
