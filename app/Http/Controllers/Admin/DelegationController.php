@@ -2145,6 +2145,33 @@ class DelegationController extends Controller
     public function destroyDelegate(Delegation $delegation, Delegate $delegate)
     {
         try {
+            $roomAssignmentInfo = '';
+            $hotelName = '';
+            $roomType = '';
+            $roomNumber = '';
+            
+            if ($delegate->current_room_assignment_id) {
+                $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
+                
+                if ($oldAssignment) {
+                    $hotel = \App\Models\Accommodation::find($oldAssignment->hotel_id);
+                    $room = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
+                    
+                    $hotelName = $hotel ? $hotel->hotel_name : '';
+                    $roomType = $room ? $room->room_type : '';
+                    $roomNumber = $oldAssignment->room_number ?: '';
+                }
+            }
+            
+            $roomAssignmentInfo = '';
+            if ($hotelName || $roomType || $roomNumber) {
+                $parts = [];
+                if ($hotelName) $parts[] = __db('hotel') . ": " . $hotelName;
+                if ($roomType) $parts[] = __db('room_type') . ": " . $roomType;
+                if ($roomNumber) $parts[] = __db('room_number') . ": " . $roomNumber;
+                $roomAssignmentInfo = ", " . implode(", ", $parts);
+            }
+
             $this->logActivity(
                 module: 'Delegation',
                 submodule: 'delegate',
@@ -2153,8 +2180,8 @@ class DelegationController extends Controller
                 submoduleId: $delegate->id,
                 delegationId: $delegation->id,
                 message: [
-                    'en' => auth()->user()->name . " " .  __db('delegate_deleted_notification') . ", " . __db('delegate_code') . ": " . $delegate->code . ", " . __db('delegate_name') . ": " . $delegate->getTranslation('name', 'en'),
-                    'ar' => auth()->user()->name . " " .  __db('delegate_deleted_notification') . ", " . __db('delegate_code') . ": " . $delegate->code . ", " . __db('delegate_name') . ": " . $delegate->getTranslation('name', 'ar')
+                    'en' => auth()->user()->name . " " .  __db('delegate_deleted_notification') . ", " . __db('delegate_code') . ": " . $delegate->code . ", " . __db('delegate_name') . ": " . $delegate->getTranslation('name', 'en') . $roomAssignmentInfo,
+                    'ar' => auth()->user()->name . " " .  __db('delegate_deleted_notification') . ", " . __db('delegate_code') . ": " . $delegate->code . ", " . __db('delegate_name') . ": " . $delegate->getTranslation('name', 'ar') . $roomAssignmentInfo
                 ]
             );
 
