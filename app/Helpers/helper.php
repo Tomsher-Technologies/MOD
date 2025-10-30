@@ -697,12 +697,13 @@ function getRoomAssignmentStatus($delegationId)
         ->pluck('current_room_assignment_id');
 
     $drivers = Driver::whereIn('id', function ($q) use ($delegationId) {
-        $q->select('driver_id')
-            ->from('delegation_drivers')
-            ->where('status', 1)
-            ->where('delegation_id', $delegationId);
-    })
-        ->pluck('current_room_assignment_id');
+                    $q->select('driver_id')
+                        ->from('delegation_drivers')
+                        ->where('status', 1)
+                        ->where('delegation_id', $delegationId);
+                })
+                ->where('accommodation', 1)
+                ->pluck('current_room_assignment_id');
 
     $all = $delegates->merge($escorts)->merge($drivers);
 
