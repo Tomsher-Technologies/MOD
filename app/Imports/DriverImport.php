@@ -68,10 +68,7 @@ class DriverImport implements ToCollection, WithHeadingRow
                 }
 
                 if (isset($driverData['phone_number']) && !empty($driverData['phone_number'])) {
-                    $phoneNumber = preg_replace('/[^0-9]/', '', $driverData['phone_number']);
-                    if (strlen($phoneNumber) === 9) {
-                        $driverData['phone_number'] = '971' . $phoneNumber;
-                    }
+                    $driverData['phone_number'] =  $driverData['phone_number'];
                 }
 
                 $driver = Driver::create($driverData);
