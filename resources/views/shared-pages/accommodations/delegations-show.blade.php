@@ -49,7 +49,7 @@
         @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
             <div class="items-center gap-3 ">
                 <select id="hotelDelegate" name="hotelDelegate"
-                    class="select2 p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    class="select2 hotelSelection p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                     <option selected value="">{{ __db('select_hotel') }}</option>
                     @foreach ($hotels as $hot)
                         <option value="{{ $hot->id }}">{{ $hot->hotel_name }}</option>
@@ -340,7 +340,7 @@
         @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
             <div class="items-center gap-3 ">
                 <select id="hotelEscort" name="hotelEscort"
-                    class="select2 p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    class="select2 hotelSelection p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                     <option selected value="">{{ __db('select_hotel') }}</option>
                     @foreach ($hotels as $hot)
                         <option value="{{ $hot->id }}">{{ $hot->hotel_name }}</option>
@@ -556,7 +556,7 @@
         @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
             <div class="items-center gap-3 ">
                 <select id="hotelDriver" name="hotelDriver"
-                    class="select2 p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                    class="select2 hotelSelection p-3 rounded-lg w-[300px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
                     <option selected value="">{{ __db('select_hotel') }}</option>
                     @foreach ($hotels as $hot)
                         <option value="{{ $hot->id }}">{{ $hot->hotel_name }}</option>
@@ -799,33 +799,77 @@
                             $with =
                                 '<a href="' .
                                 route('other-interview-members.show', [
-                                    'other_interview_member' => base64_encode($otherMemberId),
+                                    'other_interview_member' => base64_encode($row->other_member_id),
                                 ]) .
                                 '" class="!text-[#B68A35]">
                                     <span class="block">' .
                                 __db('other_member') .
                                 ': ' .
-                                e($otherMemberId) .
+                                e($row->otherMember->getTranslation('name')) .
                                 '</span>
                                 </a>';
                         }
                     } else {
-                        $with =
-                            '<a href="' .
-                            route('delegations.show', $row->interviewWithDelegation->id ?? '') .
-                            '" class="!text-[#B68A35]">' .
-                            '' .
-                            __db('delegation_id') .
-                            ' : ' .
-                            e($row->interviewWithDelegation->code ?? '') .
-                            '</a>';
+                        $toMembers = $row->toMembers->where('type', 'to');
+                        if ($toMembers->count() > 0) {
+                            $delegateNames = $toMembers
+                                ->map(function ($member) use ($row) {
+                                    $delegate = $member->resolveMemberForInterview($row);
+                                    if ($delegate) {
+                                        if ($delegate instanceof \App\Models\Delegate) {
+                                            return '<a href="' .
+                                                route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                                '" class="block !text-[#B68A35]">' .
+                                                e(
+                                                    $delegate->getTranslation('title') .
+                                                        ' ' .
+                                                        $delegate->getTranslation('name'),
+                                                ) .
+                                                '</a>';
+                                        } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
+                                            return '<a href="' .
+                                                route('other-interview-members.show', [
+                                                    'other_interview_member' => base64_encode($delegate->id),
+                                                ]) .
+                                                '" class="block !text-[#B68A35]">' .
+                                                __db('other_member') .
+                                                ': ' .
+                                                e($delegate->getTranslation('name')) .
+                                                '</a>';
+                                        }
+                                    }
+                                    return '';
+                                })
+                                ->filter()
+                                ->implode('');
+
+                            if (!empty($delegateNames)) {
+                                $with = $delegateNames;
+                            } else {
+                                $with =
+                                    '<a href="' .
+                                    route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                    '" class="!text-[#B68A35]">' .
+                                    ' ' .
+                                    __db('delegation_id') .
+                                    ' : ' .
+                                    e($row->interviewWithDelegation->code ?? '') .
+                                    '</a>';
+                            }
+                        } else {
+                            $with =
+                                '<a href="' .
+                                route('delegations.show', $row->interviewWithDelegation->id ?? '') .
+                                '" class="!text-[#B68A35]">' .
+                                ' ' .
+                                __db('delegation_id') .
+                                ' : ' .
+                                e($row->interviewWithDelegation->code ?? '') .
+                                '</a>';
+                        }
                     }
 
-                    $names = $row->interviewMembers
-                        ->map(fn($member) => '<span class="block">' . e($member->name ?? '') . '</span>')
-                        ->implode('');
-
-                    return $with . $names;
+                    return $with;
                 },
             ],
             ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status?->value))],
@@ -1253,6 +1297,39 @@
                                 row.find('.room-number-input').val('');
                             }
                         });
+                    } else if (res.success == 6) {
+                        let differentRoomTypesHtml = '<ul class="list-disc pl-5 mt-2 text-left">';
+                        if (res.different_room_types && res.different_room_types.length > 0) {
+                            res.different_room_types.forEach(function(user) {
+                                differentRoomTypesHtml +=
+                                    `<li><strong>${user.name}</strong> (${user.type}) - ${user.room_type}</li>`;
+                            });
+                        }
+                        differentRoomTypesHtml += '</ul>';
+
+                        Swal.fire({
+                            title: '{{ __db('room_type_mismatch') }}',
+                            html: `
+                            <div class="text-left">
+                                <p class="mb-3 text-red-600 font-semibold">${res.message}</p>
+                                <div class="bg-gray-100 p-3 rounded mb-3">
+                                    <p><strong>{{ __db('hotel') }}:</strong> ${res.hotel_name}</p>
+                                    <p><strong>{{ __db('room_number') }}:</strong> ${res.room_number}</p>
+                                    <p><strong>{{ __db('requested_room_type') }}:</strong> ${res.requested_room_type}</p>
+                                </div>
+                                <p class="font-semibold mb-1">{{ __db('current_assignments_with_different_types') }}:</p>
+                                ${differentRoomTypesHtml}
+                                <p class="mt-3 text-sm text-gray-600 font-semibold">{{ __db('please_select_different_room_or_matching_type') }}</p>
+                            </div>
+                        `,
+                            icon: 'error',
+                            confirmButtonColor: '#B68A35',
+                            confirmButtonText: '{{ __db('ok') }}',
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]'
+                            }
+                        });
                     }
                     checkboxDel.prop('checked', false);
 
@@ -1443,6 +1520,39 @@
                                 });
                             }
                         });
+                    } else if (res.success == 6) {
+                        let differentRoomTypesHtml = '<ul class="list-disc pl-5 mt-2 text-left">';
+                        if (res.different_room_types && res.different_room_types.length > 0) {
+                            res.different_room_types.forEach(function(user) {
+                                differentRoomTypesHtml +=
+                                    `<li><strong>${user.name}</strong> (${user.type}) - ${user.room_type}</li>`;
+                            });
+                        }
+                        differentRoomTypesHtml += '</ul>';
+
+                        Swal.fire({
+                            title: '{{ __db('room_type_mismatch') }}',
+                            html: `
+                                <div class="text-left">
+                                    <p class="mb-3 text-red-600 font-semibold">${res.message}</p>
+                                    <div class="bg-gray-100 p-3 rounded mb-3">
+                                        <p><strong>{{ __db('hotel') }}:</strong> ${res.hotel_name}</p>
+                                        <p><strong>{{ __db('room_number') }}:</strong> ${res.room_number}</p>
+                                        <p><strong>{{ __db('requested_room_type') }}:</strong> ${res.requested_room_type}</p>
+                                    </div>
+                                    <p class="font-semibold mb-1">{{ __db('current_assignments_with_different_types') }}:</p>
+                                    ${differentRoomTypesHtml}
+                                    <p class="mt-3 text-sm text-gray-600 font-semibold">{{ __db('please_select_different_room_or_matching_type') }}</p>
+                                </div>
+                            `,
+                            icon: 'error',
+                            confirmButtonColor: '#B68A35',
+                            confirmButtonText: '{{ __db('ok') }}',
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]'
+                            }
+                        });
                     }
                     checkboxEscort.prop('checked', false);
                     if ($('#hotelEscort').val() == hotelIdEscort) {
@@ -1545,7 +1655,6 @@
                     } else if (res.success === 3) {
                         toastr.error('{{ __db('room_already_booked_by_external_member') }}');
                     } else if (res.success === 5) {
-                        // Show confirmation dialog when room is already assigned to other users
                         let existingUsersHtml = '';
                         if (res.existing_users && res.existing_users.length > 0) {
                             res.existing_users.forEach(function(user) {
@@ -1577,7 +1686,6 @@
                             },
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                // Proceed with the reassignment by making the same call but with confirmation parameter
                                 $.post("{{ route('accommodation.assign-rooms') }}", {
                                     _token: '{{ csrf_token() }}',
                                     assignable_id: idDriver,
@@ -1586,7 +1694,7 @@
                                     room_type_id: roomTypeIdDriver,
                                     room_number: roomNumberDriver,
                                     delegation_id: {{ $delegation->id }},
-                                    confirm_duplicate: 1 // Add confirmation flag
+                                    confirm_duplicate: 1
                                 }, function(res2) {
                                     if (res2.success === 1) {
                                         driverrow.css('background-color',
@@ -1630,6 +1738,39 @@
                                         hotelData(hotelIdDriver, 'Driver');
                                     }
                                 });
+                            }
+                        });
+                    } else if (res.success == 6) {
+                        let differentRoomTypesHtml = '<ul class="list-disc pl-5 mt-2 text-left">';
+                        if (res.different_room_types && res.different_room_types.length > 0) {
+                            res.different_room_types.forEach(function(user) {
+                                differentRoomTypesHtml +=
+                                    `<li><strong>${user.name}</strong> (${user.type}) - ${user.room_type}</li>`;
+                            });
+                        }
+                        differentRoomTypesHtml += '</ul>';
+
+                        Swal.fire({
+                            title: '{{ __db('room_type_mismatch') }}',
+                            html: `
+                            <div class="text-left">
+                                <p class="mb-3 text-red-600 font-semibold">${res.message}</p>
+                                <div class="bg-gray-100 p-3 rounded mb-3">
+                                    <p><strong>{{ __db('hotel') }}:</strong> ${res.hotel_name}</p>
+                                    <p><strong>{{ __db('room_number') }}:</strong> ${res.room_number}</p>
+                                    <p><strong>{{ __db('requested_room_type') }}:</strong> ${res.requested_room_type}</p>
+                                </div>
+                                <p class="font-semibold mb-1">{{ __db('current_assignments_with_different_types') }}:</p>
+                                ${differentRoomTypesHtml}
+                                <p class="mt-3 text-sm text-gray-600 font-semibold">{{ __db('please_select_different_room_or_matching_type') }}</p>
+                            </div>
+                        `,
+                            icon: 'error',
+                            confirmButtonColor: '#B68A35',
+                            confirmButtonText: '{{ __db('ok') }}',
+                            customClass: {
+                                popup: 'w-full max-w-2xl',
+                                confirmButton: 'justify-center inline-flex items-center px-4 py-3 text-sm font-medium text-center text-white bg-[#B68A35] rounded-lg hover:bg-[#A87C27]'
                             }
                         });
                     }

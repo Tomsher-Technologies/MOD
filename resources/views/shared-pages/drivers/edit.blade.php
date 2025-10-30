@@ -141,7 +141,7 @@
         </form>
     </div>
 
-    @if ($driver->status == 1)
+    {{-- @if ($driver->status == 1)
         @php
             $hasActiveAssignment = $driver->delegations()->where('status', 1)->exists();
         @endphp
@@ -151,5 +151,5 @@
         </h2>
 
         <x-assign-delegation-to-driver :driver="$driver" />
-    @endif
+    @endif --}}
 </div>
