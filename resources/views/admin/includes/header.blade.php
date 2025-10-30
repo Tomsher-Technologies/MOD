@@ -102,7 +102,7 @@
                     ],
                     'accommodations.index' => [
                         'text' => __db('add_accommodation'),
-                        'link' => route('accommodation-delegations'),
+                        'link' => route('accommodation-delegations', ['from' => 'hotel']),
                         'permission' => ['view_accommodation_delegations', 'hotel_view_accommodation_delegations'],
                     ],
                     'news.index' => [

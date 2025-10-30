@@ -94,6 +94,7 @@ class Accommodation extends Model
         } else if ($lang === 'en') {
             return !empty($englishContent) ? $englishContent : $arabicContent;
         }
+        
 
         return !empty($arabicContent) ? $arabicContent : $englishContent;
     }

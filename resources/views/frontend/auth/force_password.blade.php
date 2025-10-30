@@ -1,4 +1,4 @@
-@extends('layouts.frontend_login',['title' => 'change_password'])
+@extends('layouts.frontend_login',['title' => 'update_password'])
 
 @section('content')
     <section class="bg-white dark:bg-dark-2 flex flex-wrap min-h-[100vh]">
