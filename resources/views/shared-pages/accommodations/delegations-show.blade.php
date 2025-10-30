@@ -670,15 +670,24 @@
 
                                     $roomDriver = $rowDriver->currentRoomAssignment ?? null;
 
+                                    if ($rowDriver->accommodation == 0) {
+                                        $rowColor = 'bg-[#e5e5e5]';
+                                    } elseif ($roomDriver) {
+                                        $rowColor = 'bg-[#acf3bc]';
+                                    } else {
+                                        $rowColor = ''; // White background when accommodation is required but no room assigned
+                                    }
                                 @endphp
 
                                 <tr data-id="{{ $rowDriver->id }}"
-                                    class="driver-row text-[12px] align-[middle] @if ($roomDriver) bg-[#acf3bc] @endif">
+                                    class="driver-row text-[12px] align-[middle] {{ $rowColor }}">
                                     @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                         <td class="text-center px-1 py-2 border border-gray-200">
-                                            <input type="checkbox" class="assign-hotel-checkbox-driver"
+                                            @if($rowDriver->accommodation == 1)
+                                                <input type="checkbox" class="assign-hotel-checkbox-driver"
                                                 data-driver-id="{{ $rowDriver->id }}"
                                                 class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
+                                            @endif
                                         </td>
                                     @enddirectCanany
                                     <td class="text-center px-1 py-2 border border-gray-200">{{ $keyDriver + 1 }}</td>
@@ -709,33 +718,37 @@
                                     </td>
                                     <td class="text-center px-1 border border-gray-200 py-3">
                                         @if (can(['assign_accommodations', 'hotel_assign_accommodations']) && $delegation->canAssignServices())
-                                            @php
-                                                $optionsDriver = '';
-                                                if ($roomDriver) {
-                                                    $hotelidDriver = $roomDriver->hotel_id;
-                                                    $roomTypesDriver = App\Models\AccommodationRoom::with('roomType')
-                                                        ->where('accommodation_id', $hotelidDriver)
-                                                        ->get();
-                                                    foreach ($roomTypesDriver as $roomTypeDriver) {
-                                                        $optionsDriver .=
-                                                            '<option value="' .
-                                                            $roomTypeDriver->id .
-                                                            '" ' .
-                                                            ($roomTypeDriver->id == $roomDriver->room_type_id
-                                                                ? 'selected'
-                                                                : '') .
-                                                            '>' .
-                                                            $roomTypeDriver->roomType?->value .
-                                                            '</option>';
+                                            @if($rowDriver->accommodation == 1)
+                                                @php
+                                                    $optionsDriver = '';
+                                                    if ($roomDriver) {
+                                                        $hotelidDriver = $roomDriver->hotel_id;
+                                                        $roomTypesDriver = App\Models\AccommodationRoom::with('roomType')
+                                                            ->where('accommodation_id', $hotelidDriver)
+                                                            ->get();
+                                                        foreach ($roomTypesDriver as $roomTypeDriver) {
+                                                            $optionsDriver .=
+                                                                '<option value="' .
+                                                                $roomTypeDriver->id .
+                                                                '" ' .
+                                                                ($roomTypeDriver->id == $roomDriver->room_type_id
+                                                                    ? 'selected'
+                                                                    : '') .
+                                                                '>' .
+                                                                $roomTypeDriver->roomType?->value .
+                                                                '</option>';
+                                                        }
                                                     }
-                                                }
-                                            @endphp
+                                                @endphp
 
-                                            <select name="room_type_driver" id="room_type_driver"
-                                                class="room-type-dropdown-driver p-1 rounded-lg min-w-[150px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
-                                                <option value="">{{ __db('select') }}</option>
-                                                {!! $optionsDriver !!}
-                                            </select>
+                                                <select name="room_type_driver" id="room_type_driver"
+                                                    class="room-type-dropdown-driver p-1 rounded-lg min-w-[150px] text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0">
+                                                    <option value="">{{ __db('select') }}</option>
+                                                    {!! $optionsDriver !!}
+                                                </select>
+                                            @else
+                                                {{ $roomDriver?->roomType?->roomType?->value ?? '' }}
+                                            @endif
                                         @else
                                             {{ $roomDriver?->roomType?->roomType?->value ?? '' }}
                                         @endif
@@ -743,9 +756,13 @@
 
                                     <td class="text-center px-1 border border-gray-200 py-3">
                                         @if (can(['assign_accommodations', 'hotel_assign_accommodations']) && $delegation->canAssignServices())
-                                            <input type="text" name="room_number_driver" id="room_number_driver"
+                                            @if($rowDriver->accommodation == 1)
+                                                <input type="text" name="room_number_driver" id="room_number_driver"
                                                 class="room-number-input-driver w-[75px] p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
                                                 value="{{ $roomDriver?->room_number ?? '' }}">
+                                            @else
+                                                {{ $roomDriver?->room_number ?? '' }}
+                                            @endif
                                         @else
                                             {{ $roomDriver?->room_number ?? '' }}
                                         @endif
@@ -753,20 +770,22 @@
 
                                     @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                         <td class="text-center px-1 py-3 border border-gray-200">
-                                            <div class="flex items-center gap-1">
-                                                <a href="#" id="add-attachment-btn"
-                                                    class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
-                                                    <span>{{ __db('save') }} </span>
-                                                </a>
-
-                                                @if ($roomDriver)
-                                                    <a href="#"
-                                                        class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2"
-                                                        data-assignment-id="{{ $roomDriver->id }}">
-                                                        {{ __db('remove') }}
+                                            @if($rowDriver->accommodation == 1)
+                                                <div class="flex items-center gap-1">
+                                                    <a href="#" id="add-attachment-btn"
+                                                        class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
+                                                        <span>{{ __db('save') }} </span>
                                                     </a>
-                                                @endif
-                                            </div>
+
+                                                    @if ($roomDriver)
+                                                        <a href="#"
+                                                            class="remove-room-assignment text-xs bg-red-600 text-white rounded-lg py-1 px-2"
+                                                            data-assignment-id="{{ $roomDriver->id }}">
+                                                            {{ __db('remove') }}
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            @endif
                                         </td>
                                     @enddirectCanany
                                 </tr>
@@ -781,7 +800,10 @@
                     </table>
                     <hr class="my-5">
                     <div class="flex items-center justify-start gap-6">
-
+                        <div class="mt-3 flex items-center justify-start gap-3 ">
+                            <div class="h-5 w-5 bg-[#e5e5e5] rounded"></div>
+                            <span class="text-gray-800 text-sm">{{ __db('accommodation_not_required') }}</span>
+                        </div>
                         <div class="mt-3 flex items-center justify-start gap-3 ">
                             <div class="h-5 w-5 bg-[#acf3bc] rounded"></div>
                             <span class="text-gray-800 text-sm">{{ __db('assigned') }}</span>

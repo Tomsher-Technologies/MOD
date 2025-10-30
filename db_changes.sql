@@ -1000,9 +1000,11 @@
 
 
 
-INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
-('admin', 154, 'export_hotel_accommodations', 'Export Hotel Accomodations', 'web', 1, NULL, NULL);
+-- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+-- ('admin', 154, 'export_hotel_accommodations', 'Export Hotel Accomodations', 'web', 1, NULL, NULL);
 
 
-INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
-('admin', 252, 'hotel_export_hotel_accommodations', 'Export Hotel Accomodations', 'web', 1, NULL, NULL);
+-- INSERT INTO `permissions` (`module`, `parent_id`, `name`, `title`, `guard_name`, `is_active`, `created_at`, `updated_at`) VALUES
+-- ('admin', 252, 'hotel_export_hotel_accommodations', 'Export Hotel Accomodations', 'web', 1, NULL, NULL);
+
+ALTER TABLE `drivers` ADD `accommodation` TINYINT(1) NOT NULL DEFAULT '0' AFTER `delegation_id`;

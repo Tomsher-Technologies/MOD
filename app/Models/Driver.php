@@ -27,6 +27,7 @@ class Driver extends Model
         'status',
         'delegation_id',
         'event_id',
+        'accommodation',
         'current_room_assignment_id'
     ];
     public function delegationDrivers()

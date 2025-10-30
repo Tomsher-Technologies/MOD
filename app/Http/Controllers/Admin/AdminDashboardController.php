@@ -91,74 +91,10 @@ class AdminDashboardController extends Controller
             ->count('delegation_id');
         $notAssignedDrivers = $totalDelegations - $assignedDrivers;
 
-        $hotels_status = DB::table('delegations as d')->select(
-            'd.id as delegation_id',
-            'd.code as delegation_name',
-            DB::raw("
-                                CASE
-                                    WHEN (COALESCE(delegates_summary.total_count, 0) +
-                                        COALESCE(escorts_summary.total_count, 0) +
-                                        COALESCE(drivers_summary.total_count, 0)) = 0
-                                        THEN 0
-                                    WHEN (COALESCE(delegates_summary.assigned_count, 0) +
-                                        COALESCE(escorts_summary.assigned_count, 0) +
-                                        COALESCE(drivers_summary.assigned_count, 0)) = 0
-                                        THEN 0
-                                    WHEN (COALESCE(delegates_summary.assigned_count, 0) +
-                                        COALESCE(escorts_summary.assigned_count, 0) +
-                                        COALESCE(drivers_summary.assigned_count, 0)) =
-                                        (COALESCE(delegates_summary.total_count, 0) +
-                                        COALESCE(escorts_summary.total_count, 0) +
-                                        COALESCE(drivers_summary.total_count, 0))
-                                        THEN 1
-                                    ELSE 2
-                                END as status
-                            "),
-            DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
-                                    COALESCE(escorts_summary.total_count, 0) + 
-                                    COALESCE(drivers_summary.total_count, 0)) as total_count"),
-            DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
-                                    COALESCE(escorts_summary.assigned_count, 0) + 
-                                    COALESCE(drivers_summary.assigned_count, 0)) as assigned_count")
-        )
-            ->leftJoin(
-                DB::raw("(select delegation_id,
-                                        COUNT(*) as total_count,
-                                        SUM(CASE WHEN current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
-                                from delegates
-                                where accommodation = 1
-                                group by delegation_id) as delegates_summary"),
-                'delegates_summary.delegation_id',
-                '=',
-                'd.id'
-            )
-            ->leftJoin(
-                DB::raw("(select de.delegation_id,
-                                        COUNT(*) as total_count,
-                                        SUM(CASE WHEN e.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
-                                from delegation_escorts de
-                                inner join escorts e on e.id = de.escort_id
-                                where de.status = 1
-                                group by de.delegation_id) as escorts_summary"),
-                'escorts_summary.delegation_id',
-                '=',
-                'd.id'
-            )
-            ->leftJoin(
-                DB::raw("(select dd.delegation_id,
-                                        COUNT(*) as total_count,
-                                        SUM(CASE WHEN dr.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
-                                from delegation_drivers dd
-                                inner join drivers dr on dr.id = dd.driver_id
-                                where dd.status = 1
-                                group by dd.delegation_id) as drivers_summary"),
-                'drivers_summary.delegation_id',
-                '=',
-                'd.id'
-            )
-            ->where('d.event_id', $currentEventId)
-            ->whereIN('d.id', $delegationIds)
-            ->get();
+        
+        $hotelDelegation = Delegation::where('event_id', $currentEventId)
+                                        ->whereIN('id',$delegationIds)
+                                        ->get();
 
 
         $data['delegation_assignments'] = [
@@ -166,8 +102,8 @@ class AdminDashboardController extends Controller
             'notAssignedEscorts' => $notAssignedEscorts,
             'assignedDrivers' => $assignedDrivers,
             'notAssignedDrivers' => $notAssignedDrivers,
-            'assignedHotels' => $hotels_status->where('status', 1)->count(),
-            'notAssignedHotels' => $hotels_status->whereIN('status', [0, 2])->count()
+            'assignedHotels' => $hotelDelegation->whereIN('accomodation_status', [1,3])->count(),
+            'notAssignedHotels' => $hotelDelegation->whereIN('accomodation_status', [0, 2])->count()
         ];
 
 
@@ -858,74 +794,9 @@ class AdminDashboardController extends Controller
                 ->count('delegation_id');
             $notAssignedDrivers = $totalDelegations - $assignedDrivers;
 
-            $hotels_status = DB::table('delegations as d')->select(
-                'd.id as delegation_id',
-                'd.code as delegation_name',
-                DB::raw("
-                                    CASE
-                                        WHEN (COALESCE(delegates_summary.total_count, 0) +
-                                            COALESCE(escorts_summary.total_count, 0) +
-                                            COALESCE(drivers_summary.total_count, 0)) = 0
-                                            THEN 0
-                                        WHEN (COALESCE(delegates_summary.assigned_count, 0) +
-                                            COALESCE(escorts_summary.assigned_count, 0) +
-                                            COALESCE(drivers_summary.assigned_count, 0)) = 0
-                                            THEN 0
-                                        WHEN (COALESCE(delegates_summary.assigned_count, 0) +
-                                            COALESCE(escorts_summary.assigned_count, 0) +
-                                            COALESCE(drivers_summary.assigned_count, 0)) =
-                                            (COALESCE(delegates_summary.total_count, 0) +
-                                            COALESCE(escorts_summary.total_count, 0) +
-                                            COALESCE(drivers_summary.total_count, 0))
-                                            THEN 1
-                                        ELSE 2
-                                    END as status
-                                "),
-                DB::raw("(COALESCE(delegates_summary.total_count, 0) + 
-                                        COALESCE(escorts_summary.total_count, 0) + 
-                                        COALESCE(drivers_summary.total_count, 0)) as total_count"),
-                DB::raw("(COALESCE(delegates_summary.assigned_count, 0) + 
-                                        COALESCE(escorts_summary.assigned_count, 0) + 
-                                        COALESCE(drivers_summary.assigned_count, 0)) as assigned_count")
-            )
-                ->leftJoin(
-                    DB::raw("(select delegation_id,
-                                                COUNT(*) as total_count,
-                                                SUM(CASE WHEN current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
-                                        from delegates
-                                        where accommodation = 1
-                                        group by delegation_id) as delegates_summary"),
-                    'delegates_summary.delegation_id',
-                    '=',
-                    'd.id'
-                )
-                ->leftJoin(
-                    DB::raw("(select de.delegation_id,
-                                                COUNT(*) as total_count,
-                                                SUM(CASE WHEN e.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
-                                        from delegation_escorts de
-                                        inner join escorts e on e.id = de.escort_id
-                                        where de.status = 1
-                                        group by de.delegation_id) as escorts_summary"),
-                    'escorts_summary.delegation_id',
-                    '=',
-                    'd.id'
-                )
-                ->leftJoin(
-                    DB::raw("(select dd.delegation_id,
-                                                COUNT(*) as total_count,
-                                                SUM(CASE WHEN dr.current_room_assignment_id IS NOT NULL THEN 1 ELSE 0 END) as assigned_count
-                                        from delegation_drivers dd
-                                        inner join drivers dr on dr.id = dd.driver_id
-                                        where dd.status = 1
-                                        group by dd.delegation_id) as drivers_summary"),
-                    'drivers_summary.delegation_id',
-                    '=',
-                    'd.id'
-                )
-                ->where('d.event_id', $currentEventId)
-                ->whereIN('d.invitation_status_id', [41, 42])
-                ->get();
+            $hotelDelegation = Delegation::where('event_id', $currentEventId)
+                                        ->whereIN('invitation_status_id', [41, 42])
+                                        ->get();
 
 
             $data['delegation_assignments'] = [
@@ -933,9 +804,11 @@ class AdminDashboardController extends Controller
                 'notAssignedEscorts' => $notAssignedEscorts,
                 'assignedDrivers' => $assignedDrivers,
                 'notAssignedDrivers' => $notAssignedDrivers,
-                'assignedHotels' => $hotels_status->where('status', 1)->count(),
-                'notAssignedHotels' => $hotels_status->whereIN('status', [0, 2])->count()
+                'assignedHotels' => $hotelDelegation->whereIN('accomodation_status', [1,3])->count(),
+                'notAssignedHotels' => $hotelDelegation->whereIN('accomodation_status', [0, 2])->count()
             ];
+
+
             return view('admin.dashboard-tables.assignments', compact('data'));
         } elseif ($table == 'arrival') {
             $delegIds = Delegation::where('event_id', $currentEventId)->whereIN('invitation_status_id', [41, 42])->pluck('id');
