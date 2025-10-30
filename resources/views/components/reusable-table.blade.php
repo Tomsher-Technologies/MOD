@@ -319,7 +319,7 @@
         }
 
         .overflow-x-auto {
-            overflow-x: scroll;
+            overflow-x: auto;
             scrollbar-width: auto;
             scrollbar-color: #B68A35 #f1f1f1;
         }
