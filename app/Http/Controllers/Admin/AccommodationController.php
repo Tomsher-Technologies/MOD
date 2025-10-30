@@ -625,7 +625,10 @@ class AccommodationController extends Controller
 
                 $alreadyAssigned = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
                     ->where('room_number', $request->room_number)
-                    ->where('assignable_id', '!=', $user->id)
+                    ->where(function ($q) use ($user) {
+                        $q->where('assignable_id', '!=', $user->id)
+                        ->orWhere('assignable_type', '!=', get_class($user));
+                    })
                     ->where('active_status', 1)
                     ->exists();
 
@@ -659,7 +662,10 @@ class AccommodationController extends Controller
 
                     $allExistingAssignments = \App\Models\RoomAssignment::where('hotel_id', $request->hotel_id)
                         ->where('room_number', $request->room_number)
-                        ->where('assignable_id', '!=', $user->id)
+                        ->where(function ($q) use ($user) {
+                            $q->where('assignable_id', '!=', $user->id)
+                            ->orWhere('assignable_type', '!=', get_class($user));
+                        })
                         ->where('active_status', 1)
                         ->get();
 

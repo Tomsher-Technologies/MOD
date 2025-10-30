@@ -86,14 +86,15 @@ class Accommodation extends Model
     {
         $lang = $lang == false ? getActiveLanguage() : $lang;
 
-        $arabicContent = trim($this->hotel_name);
-        $englishContent = trim($this->hotel_name_ar);
+        $englishContent = trim($this->hotel_name);
+        $arabicContent = trim($this->hotel_name_ar);
 
         if ($lang === 'ar') {
             return !empty($arabicContent) ? $arabicContent : $englishContent;
         } else if ($lang === 'en') {
             return !empty($englishContent) ? $englishContent : $arabicContent;
         }
+        
 
         return !empty($arabicContent) ? $arabicContent : $englishContent;
     }
