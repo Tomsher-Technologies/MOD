@@ -67,10 +67,13 @@ class DelegationAttachmentImport implements ToCollection, WithHeadingRow
                     }
 
                     $sourcePath = trim($row['file_path'] ?? '');
+                    
                     if (empty($sourcePath)) {
                         $this->importLogService->logError('attachments', $this->fileName, $rowNumber, 'Missing file_path', $row->toArray());
                         continue;
                     }
+
+                    $sourcePath = 'C:\wamp64\www\mod-fullstack\attachments_import_data' . trim($row['file_path'] ?? '') . ".pdf";
 
                     if (!file_exists($sourcePath)) {
                         $this->importLogService->logError('attachments', $this->fileName, $rowNumber, 'File not found at path: ' . $sourcePath, $row->toArray());
@@ -83,7 +86,8 @@ class DelegationAttachmentImport implements ToCollection, WithHeadingRow
                     }
 
                     $fileName = $row['attachment_file_name'] ?? basename($sourcePath);
-                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                    // $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+                    $extension = 'pdf';
                     $uniqueFileName = pathinfo($fileName, PATHINFO_FILENAME) . '_' . time() . '_' . uniqid() . '.' . $extension;
 
                     $destinationPath = $delegationDir . '/' . $uniqueFileName;
@@ -103,12 +107,27 @@ class DelegationAttachmentImport implements ToCollection, WithHeadingRow
                         }
                     }
 
+                    $uploadedDate = null;
+                    if (!empty($row['uploaded_date'])) {
+                        try {
+                            if (is_numeric($row['uploaded_date'])) {
+                                $uploadedDate = PhpOfficeDate::excelToDateTimeObject($row['uploaded_date'])->format('Y-m-d');
+                            } else {
+                                $uploadedDate = date('Y-m-d', strtotime($row['uploaded_date']));
+                            }
+                        } catch (\Exception $e) {
+                            $this->importLogService->logError('attachments', $this->fileName, $rowNumber, 'Invalid uploaded_date format: ' . $e->getMessage(), $row->toArray());
+                            continue;
+                        }
+                    }
+
                     $attachment = DelegationAttachment::create([
                         'delegation_id' => $delegation->id,
                         'file_name' => $row['attachment_file_name'] ?? $fileName,
                         'title_id' => $title ? $title->id : null,
                         'file_path' => $destinationPath,
                         'document_date' => $documentDate,
+                        'created_at' => $uploadedDate,
                     ]);
 
                     $this->importLogService->logSuccess('attachments', $this->fileName, $rowNumber, $row->toArray());
