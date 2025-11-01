@@ -744,7 +744,7 @@
                                 //     '</a>';
 
                                 return '<span class="">' .
-                                    e(getLangTitleSeperator($escort?->getTranslation('title'), $escort?->getTranslation('name'))) .
+                                    e($escort?->getTranslation('name')) .
                                     '</span>';
                             },
                         ],
