@@ -190,9 +190,9 @@ function getAdminEventPDFLogo()
 
     $lang = getActiveLanguage();
 
-    if($lang == 'ar'){
+    if ($lang == 'ar') {
         return 'assets/img/md-logo-ar.svg';
-    }else{
+    } else {
         return 'assets/img/md-logo.svg';
     }
 }
@@ -237,12 +237,13 @@ function getModuleAccountEventLogo()
     return getLogo();
 }
 
-function getLogo(){
+function getLogo()
+{
     $lang = getActiveLanguage();
 
-    if($lang == 'ar'){
+    if ($lang == 'ar') {
         return asset('assets/img/md-logo-ar.svg');
-    }else{
+    } else {
         return asset('assets/img/md-logo.svg');
     }
 }
@@ -697,13 +698,13 @@ function getRoomAssignmentStatus($delegationId)
         ->pluck('current_room_assignment_id');
 
     $drivers = Driver::whereIn('id', function ($q) use ($delegationId) {
-                    $q->select('driver_id')
-                        ->from('delegation_drivers')
-                        ->where('status', 1)
-                        ->where('delegation_id', $delegationId);
-                })
-                ->where('accommodation', 1)
-                ->pluck('current_room_assignment_id');
+        $q->select('driver_id')
+            ->from('delegation_drivers')
+            ->where('status', 1)
+            ->where('delegation_id', $delegationId);
+    })
+        ->where('accommodation', 1)
+        ->pluck('current_room_assignment_id');
 
     $all = $delegates->merge($escorts)->merge($drivers);
 
@@ -820,36 +821,44 @@ function getNotNullLanguageValues($dataField, $arabicFieldName, $englishFieldNam
 
     return " - ";
 }
-
 function getLangTitleSeperator($fieldOne, $fieldTwo)
 {
     $arabicSeperator = '/ ';
     $englishSeperator = '. ';
 
-    if (trim($fieldOne) == '' && trim($fieldTwo) == '') {
-        return '';
+    $fieldOne = trim($fieldOne);
+    $fieldTwo = trim($fieldTwo);
+
+    if ($fieldOne === '' && $fieldTwo === '') {
+        return '-';
     }
 
-    if (trim($fieldOne) == '') {
+    $fieldOneIsArabic = $fieldOne !== '' && isArabicOnly($fieldOne);
+    $fieldTwoIsArabic = $fieldTwo !== '' && isArabicOnly($fieldTwo);
+
+    if ($fieldTwo !== '' && $fieldOne !== '' && $fieldOneIsArabic !== $fieldTwoIsArabic) {
         return $fieldTwo;
     }
 
-    if (trim($fieldTwo) == '') {
-        return $fieldOne;
+    if ($fieldOne === '') {
+        return $fieldTwo;
+    }
+    if ($fieldTwo === '') {
+        return '-';
     }
 
-    if (isArabicOnly($fieldOne) && isArabicOnly($fieldTwo)) {
+    if ($fieldOneIsArabic && $fieldTwoIsArabic) {
         return $fieldOne . $arabicSeperator . $fieldTwo;
     } else {
         return $fieldOne . $englishSeperator . $fieldTwo;
     }
 }
 
-
 function isArabicOnly($text)
 {
     return preg_match('/^[\p{Arabic}\s]+$/u', $text) > 0;
 }
+
 
 function getFloorPlansFormatted()
 {

@@ -436,18 +436,7 @@
                                 $name = $row->name_ar;
                                 $title = $row->title_ar;
 
-                                $displayText = '';
-                                if ($title && $name) {
-                                    $displayText = e($title . '/ ' . $name);
-                                } elseif ($title) {
-                                    $displayText = e($title);
-                                } elseif ($name) {
-                                    $displayText = e($name);
-                                } else {
-                                    $displayText = '-';
-                                }
-
-                                return $badge . '<div class="block">' . $displayText . '</div>';
+                                return $badge . '<div class="block">' . getLangTitleSeperator($title, $name) . '</div>';
                             },
                         ],
 
@@ -465,18 +454,7 @@
                                 $name = $row->name_en;
                                 $title = $row->title_en;
 
-                                $displayText = '';
-                                if ($title && $name) {
-                                    $displayText = e($title . '. ' . $name);
-                                } elseif ($title) {
-                                    $displayText = e($title);
-                                } elseif ($name) {
-                                    $displayText = e($name);
-                                } else {
-                                    $displayText = '-';
-                                }
-
-                                return $badge . '<div class="block">' . $displayText . '</div>';
+                                return $badge . '<div class="block">' . getLangTitleSeperator($title, $name) . '</div>';
                             },
                         ],
 
@@ -766,7 +744,7 @@
                                 //     '</a>';
 
                                 return '<span class="">' .
-                                    e($escort->getTranslation('title') . ' ' . $escort->getTranslation('name')) .
+                                    e(getLangTitleSeperator($escort?->getTranslation('title'), $escort?->getTranslation('name'))) .
                                     '</span>';
                             },
                         ],
@@ -951,16 +929,8 @@
                             'key' => 'name',
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
-                                $driverTitle = $driver?->getTranslation('title') ?? '';
-                                $driverName = $driver?->getTranslation('name') ?? '';
 
-                                // return '<a href="' .
-                                //     $searchUrl .
-                                //     '" class="text-[#B68A35] hover:underline">' .
-                                //     e($driverTitle . ' ' . $driverName) .
-                                //     '</a>';
-
-                                return '<span class="">' . e($driverTitle . ' ' . $driverName) . '</span>';
+                                return '<span class="">' . e(getLangTitleSeperator($driver?->getTranslation('title'), $driver?->getTranslation('name'))) . '</span>';
                             },
                         ],
                         [
@@ -1177,10 +1147,7 @@
                                                                 $row->interviewWithDelegation->id ?? '',
                                                             ) .
                                                             '" class="block !text-[#B68A35]">' .
-                                                            e(
-                                                                $delegate->getTranslation('title') .
-                                                                    '. ' .
-                                                                    $delegate->getTranslation('name'),
+                                                            e(getLangTitleSeperator($delegate?->getTranslation('title'), $delegate?->getTranslation('name'))
                                                             ) .
                                                             '</a>';
                                                     } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {
