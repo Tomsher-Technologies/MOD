@@ -82,11 +82,11 @@ class Escort extends Model
 
             $eventId = $escort->event_id ?: Session::get('current_event_id') ?: getDefaultEventId();
             $event = Event::find($eventId);
-            
+
             if ($event) {
                 $latestEscort = self::where('event_id', $eventId)->latest('id')->first();
                 $newId = $latestEscort ? $latestEscort->id + 1 : 1;
-                
+
                 $escort->code = $event->code . '-ES-' . str_pad($newId, 4, '0', STR_PAD_LEFT);
             } else {
                 $latestEscort = self::latest('id')->first();
@@ -168,12 +168,15 @@ class Escort extends Model
     {
         $lang = $lang == false ? getActiveLanguage() : $lang;
 
-        if ($lang !== 'en') {
-            $field =  $field . '_ar';
-        } else {
-            $field =  $field . '_en';
+        $arabicContent = trim($this->{$field . '_ar'});
+        $englishContent = trim($this->{$field . '_en'});
+
+        if ($lang === 'ar') {
+            return !empty($arabicContent) ? $arabicContent : $englishContent;
+        } else if ($lang === 'en') {
+            return !empty($englishContent) ? $englishContent : $arabicContent;
         }
 
-        return $this->$field;
+        return !empty($arabicContent) ? $arabicContent : $englishContent;
     }
 }

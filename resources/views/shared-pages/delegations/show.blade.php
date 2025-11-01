@@ -657,6 +657,12 @@
                 },
             ],
             ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status->value))],
+            [
+                'label' => __db('note'),
+                'render' => function ($row) {
+                    return '<div class="break-words whitespace-normal max-w-xs">' . e($row?->comment) . '</div>';
+                },
+            ],
         ];
         $data = $delegation->interviews ?? collect();
         $noDataMessage = __db('no_data_found');

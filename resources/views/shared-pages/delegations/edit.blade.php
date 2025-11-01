@@ -1221,6 +1221,14 @@
                             'render' => fn($row) => e($row->status->title ?? ($row->status->value ?? 'Unknown')),
                         ],
                         [
+                            'label' => __db('note'),
+                            'render' => function ($row) {
+                                return '<div class="break-words whitespace-normal max-w-xs">' .
+                                    e($row?->comment) .
+                                    '</div>';
+                            },
+                        ],
+                        [
                             'label' => __db('action'),
                             'render' => function ($row) use ($delegation) {
                                 $editUrl = route('delegations.editInterview', [

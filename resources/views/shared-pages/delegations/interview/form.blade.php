@@ -56,7 +56,7 @@
                                 },
                             ],
                             ['label' => __db('title'), 'render' => fn($row) => $row?->getTranslation('title') ?? ''],
-                            ['label' => __db('name'), 'render' => fn($row) => e($row->getTranslation('name') ?? '-')],
+                            ['label' => __db('name'), 'render' => fn($row) => e($row?->getTranslation('name') ?? '-')],
                             [
                                 'label' => __db('designation'),
                                 'render' => fn($row) => $row->getTranslation('designation') ?? '',
@@ -79,12 +79,11 @@
             <div class="bg-white grid grid-cols-4 gap-5 mt-6 mb-4">
 
                 <div>
-                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:<span
-                            class="text-red-600">*</span></label>
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('date_time') }}:</label>
                     <input type="text" id="interview_datetime"
                         class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm datetimepicker-input"
                         name="date_time"
-                        value="{{ old('date_time', $isEditMode ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d H:i') : '') }}"
+                        value="{{ old('date_time', $isEditMode && !empty($interview->date_time) ? \Carbon\Carbon::parse($interview->date_time)->format('Y-m-d H:i') : '') }}"
                         placeholder="{{ __db('select_date_time') }}">
                     @error('date_time')
                         <div class="text-red-600 mt-1">{{ $message }}</div>
@@ -140,7 +139,7 @@
                             <option value="" selected disabled>{{ __db('select_member') }}</option>
                             @foreach ($toDelegationMembers as $member)
                                 <option value="{{ $member->id }}" @selected($oldToDelegateId == $member->id)>
-                                    {{ $member->value_en ?? $member->name_ar }}
+                                    {{ $member->getTranslation('name') }}
                                 </option>
                             @endforeach
                         @else
@@ -182,6 +181,15 @@
 
                     @error('status_id')
                         <div class="text-red-600">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-span-2">
+                    <label class="form-label block mb-1 text-gray-700 font-medium">{{ __db('note') }}:</label>
+                    <textarea name="comment" class="p-3 rounded-lg w-full border !border-[#d1d5db] text-sm resize-vertical" rows="4"
+                        placeholder="{{ __db('enter_comment') }}">{{ old('comment', $isEditMode ? $interview->comment : '') }}</textarea>
+                    @error('comment')
+                        <div class="text-red-600 mt-1">{{ $message }}</div>
                     @enderror
                 </div>
 
@@ -271,7 +279,6 @@
                     inline: false,
                     todayButton: true,
                     hours24: true,
-                    mask: true,
                 });
             }
         });

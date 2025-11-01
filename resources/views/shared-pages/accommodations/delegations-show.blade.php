@@ -683,10 +683,10 @@
                                     class="driver-row text-[12px] align-[middle] {{ $rowColor }}">
                                     @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                         <td class="text-center px-1 py-2 border border-gray-200">
-                                            @if($rowDriver->accommodation == 1)
+                                            @if ($rowDriver->accommodation == 1)
                                                 <input type="checkbox" class="assign-hotel-checkbox-driver"
-                                                data-driver-id="{{ $rowDriver->id }}"
-                                                class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
+                                                    data-driver-id="{{ $rowDriver->id }}"
+                                                    class="w-4 h-4 !accent-[#B68A35] !border-[#B68A35] !focus:ring-[#B68A35] rounded">
                                             @endif
                                         </td>
                                     @enddirectCanany
@@ -718,12 +718,14 @@
                                     </td>
                                     <td class="text-center px-1 border border-gray-200 py-3">
                                         @if (can(['assign_accommodations', 'hotel_assign_accommodations']) && $delegation->canAssignServices())
-                                            @if($rowDriver->accommodation == 1)
+                                            @if ($rowDriver->accommodation == 1)
                                                 @php
                                                     $optionsDriver = '';
                                                     if ($roomDriver) {
                                                         $hotelidDriver = $roomDriver->hotel_id;
-                                                        $roomTypesDriver = App\Models\AccommodationRoom::with('roomType')
+                                                        $roomTypesDriver = App\Models\AccommodationRoom::with(
+                                                            'roomType',
+                                                        )
                                                             ->where('accommodation_id', $hotelidDriver)
                                                             ->get();
                                                         foreach ($roomTypesDriver as $roomTypeDriver) {
@@ -756,10 +758,11 @@
 
                                     <td class="text-center px-1 border border-gray-200 py-3">
                                         @if (can(['assign_accommodations', 'hotel_assign_accommodations']) && $delegation->canAssignServices())
-                                            @if($rowDriver->accommodation == 1)
-                                                <input type="text" name="room_number_driver" id="room_number_driver"
-                                                class="room-number-input-driver w-[75px] p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
-                                                value="{{ $roomDriver?->room_number ?? '' }}">
+                                            @if ($rowDriver->accommodation == 1)
+                                                <input type="text" name="room_number_driver"
+                                                    id="room_number_driver"
+                                                    class="room-number-input-driver w-[75px] p-1 rounded-lg text-sm border border-neutral-300 text-neutral-600 focus:border-primary-600 focus:ring-0"
+                                                    value="{{ $roomDriver?->room_number ?? '' }}">
                                             @else
                                                 {{ $roomDriver?->room_number ?? '' }}
                                             @endif
@@ -770,7 +773,7 @@
 
                                     @directCanany(['assign_accommodations', 'hotel_assign_accommodations'])
                                         <td class="text-center px-1 py-3 border border-gray-200">
-                                            @if($rowDriver->accommodation == 1)
+                                            @if ($rowDriver->accommodation == 1)
                                                 <div class="flex items-center gap-1">
                                                     <a href="#" id="add-attachment-btn"
                                                         class="save-room-assignment-driver text-xs !bg-[#B68A35] w-xs text-center text-white rounded-lg py-1 px-2">
@@ -816,7 +819,8 @@
 
 
         <hr class="mx-6 border-neutral-200 h-10">
-        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }} ({{ $delegation->interviews->count() }})
+        <h2 class="font-semibold mb-0 !text-[22px]">{{ __db('interviews') }}
+            ({{ $delegation->interviews->count() }})
         </h2>
 
         @php
@@ -926,6 +930,12 @@
                     },
                 ],
                 ['label' => __db('status'), 'render' => fn($row) => e(ucfirst($row->status?->value))],
+                [
+                    'label' => __db('note'),
+                    'render' => function ($row) {
+                        return '<div class="break-words whitespace-normal max-w-xs">' . e($row?->comment) . '</div>';
+                    },
+                ],
             ];
             $data = $delegation->interviews ?? collect();
             $noDataMessage = __db('no_data_found');
