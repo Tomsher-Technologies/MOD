@@ -1856,8 +1856,8 @@ class DelegationController extends Controller
         $isEditMode = $delegate && $delegate->exists;
 
         $validator = Validator::make($request->all(), [
-            'title_en' => 'nullable|string|required_without:title_ar',
-            'title_ar' => 'nullable|string|required_without:title_en',
+            'title_en' => 'nullable|string',
+            'title_ar' => 'nullable|string',
             'name_en' => 'nullable|string|required_without:name_ar',
             'name_ar' => 'nullable|string|required_without:name_en',
             'designation_en' => 'nullable|string',
@@ -1885,8 +1885,6 @@ class DelegationController extends Controller
             'departure.status' => 'nullable|string|max:255',
             'departure.comment' => 'nullable|string',
         ], [
-            'title_en.required_without' => __db('either_english_title_or_arabic_title'),
-            'title_ar.required_without' => __db('either_english_title_or_arabic_title'),
             'name_en.required_without' => __db('either_english_name_or_arabic_name'),
             'name_ar.required_without' => __db('either_english_name_or_arabic_name'),
             'gender_id.required' => __db('gender_id_required'),

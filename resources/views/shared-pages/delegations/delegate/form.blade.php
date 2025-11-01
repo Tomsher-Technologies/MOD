@@ -38,7 +38,7 @@
             <div class="grid grid-cols-12 gap-5">
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title_ar') }} : <span class="text-red-600">*</span></label>
+                    <label class="form-label">{{ __db('title_ar') }} : </label>
                     <input type="text" name="title_ar" value="{{ old('title_ar', $delegate->title_ar) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
@@ -57,7 +57,7 @@
                 </div>
 
                 <div class="col-span-4">
-                    <label class="form-label">{{ __db('title_en') }} : <span class="text-red-600">*</span></label>
+                    <label class="form-label">{{ __db('title_en') }} : </label>
                     <input type="text" name="title_en" value="{{ old('title_en', $delegate->title_en) }}"
                         class="p-3 rounded-lg w-full border text-sm border-neutral-300">
                 </div>
