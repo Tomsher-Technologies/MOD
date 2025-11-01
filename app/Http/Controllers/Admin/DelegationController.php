@@ -1229,6 +1229,8 @@ class DelegationController extends Controller
                     $delegation->drivers->pluck('id')->toArray(),
                     ['status' => 0]
                 );
+                
+                $delegation->interviews()->delete();
 
                 $this->removeDelegationAllAccommodation($delegation);
             }
