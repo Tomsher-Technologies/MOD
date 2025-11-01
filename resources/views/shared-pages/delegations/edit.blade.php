@@ -743,9 +743,7 @@
                                 //     e($escort->getTranslation('title') . ' ' . $escort->getTranslation('name')) .
                                 //     '</a>';
 
-                                return '<span class="">' .
-                                    e($escort?->getTranslation('name')) .
-                                    '</span>';
+                                return '<span class="">' . e($escort?->getTranslation('name')) . '</span>';
                             },
                         ],
                         [
@@ -763,7 +761,12 @@
                             'key' => 'known_languages',
                             'render' => function ($escort) {
                                 $ids = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
-                                $names = \App\Models\DropdownOption::whereIn('id', $ids)->pluck('value')->toArray();
+                                $names = \App\Models\DropdownOption::whereIn('id', $ids)
+                                    ->get()
+                                    ->map(function ($option) {
+                                        return $option->value;
+                                    })
+                                    ->toArray();
                                 return e(implode(', ', $names));
                             },
                         ],
@@ -930,7 +933,14 @@
                             'render' => function ($driver) {
                                 $searchUrl = route('drivers.index', ['search' => $driver->name_en]);
 
-                                return '<span class="">' . e(getLangTitleSeperator($driver?->getTranslation('title'), $driver?->getTranslation('name'))) . '</span>';
+                                return '<span class="">' .
+                                    e(
+                                        getLangTitleSeperator(
+                                            $driver?->getTranslation('title'),
+                                            $driver?->getTranslation('name'),
+                                        ),
+                                    ) .
+                                    '</span>';
                             },
                         ],
                         [
@@ -1147,7 +1157,11 @@
                                                                 $row->interviewWithDelegation->id ?? '',
                                                             ) .
                                                             '" class="block !text-[#B68A35]">' .
-                                                            e(getLangTitleSeperator($delegate?->getTranslation('title'), $delegate?->getTranslation('name'))
+                                                            e(
+                                                                getLangTitleSeperator(
+                                                                    $delegate?->getTranslation('title'),
+                                                                    $delegate?->getTranslation('name'),
+                                                                ),
                                                             ) .
                                                             '</a>';
                                                     } elseif ($delegate instanceof \App\Models\OtherInterviewMember) {

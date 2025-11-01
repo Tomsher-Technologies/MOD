@@ -157,7 +157,12 @@
                             'key' => 'known_languages',
                             'render' => function ($escort) {
                                 $ids = $escort->spoken_languages ? explode(',', $escort->spoken_languages) : [];
-                                $names = \App\Models\DropdownOption::whereIn('id', $ids)->pluck('value')->toArray();
+                                $names = \App\Models\DropdownOption::whereIn('id', $ids)
+                                    ->get()
+                                    ->map(function ($option) {
+                                        return $option->value; 
+                                    })
+                                    ->toArray();
                                 return e(implode(', ', $names));
                             },
                         ],
@@ -285,7 +290,10 @@
                                             }
                                         } else {
                                             if (can(['assign_escorts', 'escort_edit_escorts'])) {
-                                                $assignUrl = route('delegations.index', ['escort_id' => $escort->id, 'assignment_mode' => 'escort']);
+                                                $assignUrl = route('delegations.index', [
+                                                    'escort_id' => $escort->id,
+                                                    'assignment_mode' => 'escort',
+                                                ]);
                                                 $output .=
                                                     '<a href="' .
                                                     $assignUrl .

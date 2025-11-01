@@ -285,7 +285,10 @@ class DelegationController extends Controller
             'toMembers.toDelegate',
             'toMembers.otherMember',
         ])->whereHas('delegation', function ($delegationQuery) use ($currentEventId) {
-            $delegationQuery->where('event_id', $currentEventId);
+            $delegationQuery->where('event_id', $currentEventId)
+                ->whereHas('invitationStatus', function ($q) {
+                    $q->whereIn('code', self::ASSIGNABLE_STATUS_CODES);
+                });
         });
 
         if ($search = $request->input('search')) {
@@ -1227,7 +1230,6 @@ class DelegationController extends Controller
                     ['status' => 0]
                 );
 
-                $delegation->interviews()->delete();
                 $this->removeDelegationAllAccommodation($delegation);
             }
 
@@ -2147,20 +2149,20 @@ class DelegationController extends Controller
             $hotelName = '';
             $roomType = '';
             $roomNumber = '';
-            
+
             if ($delegate->current_room_assignment_id) {
                 $oldAssignment = \App\Models\RoomAssignment::find($delegate->current_room_assignment_id);
-                
+
                 if ($oldAssignment) {
                     $hotel = \App\Models\Accommodation::find($oldAssignment->hotel_id);
                     $room = \App\Models\AccommodationRoom::find($oldAssignment->room_type_id);
-                    
+
                     $hotelName = $hotel ? $hotel->hotel_name : '';
                     $roomType = $room ? $room->room_type : '';
                     $roomNumber = $oldAssignment->room_number ?: '';
                 }
             }
-            
+
             $roomAssignmentInfo = '';
             if ($hotelName || $roomType || $roomNumber) {
                 $parts = [];

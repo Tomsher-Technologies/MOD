@@ -1008,3 +1008,16 @@
 -- ('admin', 252, 'hotel_export_hotel_accommodations', 'Export Hotel Accomodations', 'web', 1, NULL, NULL);
 
 -- ALTER TABLE `drivers` ADD `accommodation` TINYINT(1) NOT NULL DEFAULT '0' AFTER `delegation_id`;
+
+
+UPDATE `delegates` 
+SET 
+  `name_ar` = CASE WHEN `name_ar` = '---' THEN NULL ELSE `name_ar` END,
+  `name_en` = CASE WHEN `name_en` = '---' THEN NULL ELSE `name_en` END,
+  `title_ar` = CASE WHEN `title_ar` = '---' THEN NULL ELSE `title_ar` END,
+  `title_en` = CASE WHEN `title_en` = '---' THEN NULL ELSE `title_en` END
+WHERE 
+  `name_ar` = '---' 
+  OR `name_en` = '---' 
+  OR `title_ar` = '---' 
+  OR `title_en` = '---';

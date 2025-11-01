@@ -27,7 +27,7 @@
             : route('delegations.storeOrUpdateInterview', $delegation);
     @endphp
 
-    <x-back-btn :title="$title" 
+    <x-back-btn :title="$title"
         back-url="{{ Session::has('add_interview_last_url') ? Session::get('add_interview_last_url') : route('delegations.show', $delegation->id) }}" />
 
 
@@ -160,7 +160,7 @@
                         <option value="" selected disabled>{{ __db('select') }}</option>
                         @foreach ($otherMembers as $member)
                             <option value="{{ $member->id }}" @selected(old('other_member_id', $isEditMode ? $interview->other_member_id : '') == $member->id)>
-                                {{ $member->name_en ?? $member->name_ar }}
+                                {{ $member->getTranslation('name') }}
                             </option>
                         @endforeach
                     </select>
