@@ -65,6 +65,7 @@
                 <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
                     <thead>
                         <tr style="background:#d9d9d9; font-size: 13px">
+                            <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('note') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('mobile') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('escort') }}</th>
                             <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('date') }}</th>
@@ -84,6 +85,9 @@
                                         $escort = $member->delegate?->delegation?->escorts?->first();
                                     @endphp
                                     
+                                     <td style="padding:8px;border:2px solid #000;text-align: center;">
+                                        {{ $interview?->comment ?? '-' }}
+                                    </td>
                                     <td style="padding:8px;border:2px solid #000;text-align: center;">
                                         {{ $escort?->phone_number ?? '-' }}
                                     </td>

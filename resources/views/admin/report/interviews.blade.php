@@ -85,11 +85,11 @@
             <div style="font-family: Arial, sans-serif; display: flex; flex-direction: column; gap: 20px;">
 
                 @foreach ($interviews as $intervieweeName => $group)
-                   
-                    <table style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
+                    <table
+                        style="width: 100%; margin-top: 20px; font-weight: bold; font-size: 16px; border-collapse: collapse;">
                         <tr>
                             <td style="text-align: right; white-space: nowrap;">
-                               
+
                                 <span class="ltr" style="display:inline-block; width:100%;">
                                     <span style="">
                                         {{ $intervieweeName }}
@@ -103,6 +103,7 @@
                     <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
                         <thead>
                             <tr style="background:#d9d9d9; font-size: 13px">
+                                <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('note') }}
                                 <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('mobile') }}
                                 </th>
                                 <th style="padding: 8px; border: 2px solid #000; text-align: center;">{{ __db('escort') }}
@@ -131,14 +132,21 @@
                                         @endphp
 
                                         <td style="padding:8px;border:2px solid #000;">
+                                            {{ $interview?->comment ?? '-' }}
+                                        </td>
+
+                                        <td style="padding:8px;border:2px solid #000;">
                                             {{ $escort?->phone_number ?? '-' }}
                                         </td>
                                         <td style="padding:8px;border:2px solid #000;">
-                                           
+
                                             @if (getActiveLanguage() == 'en')
-                                                <span>{{ $escort?->military_number }}</span> - <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span>
+                                                <span>{{ $escort?->military_number }}</span> -
+                                                <span>{{ $escort?->internalRanking?->value . ' ' . $escort?->name }}</span>
                                             @else
-                                                <span>{{ $escort?->internalRanking?->value .' '. $escort?->name }}</span> - <span>{{ $escort?->military_number }}</span>
+                                                <span>{{ $escort?->internalRanking?->value . ' ' . $escort?->name }}</span>
+                                                -
+                                                <span>{{ $escort?->military_number }}</span>
                                             @endif
                                         </td>
                                         <td style="padding:8px;border:2px solid #000;">
