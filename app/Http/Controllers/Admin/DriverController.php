@@ -265,7 +265,7 @@ class DriverController extends Controller
 
         $isExistingDriver = Driver::where('event_id', $currentEventId)->where('military_number', $driverData['military_number'])->exists();
 
-        if ($isExistingDriver) {
+        if ($isExistingDriver && !empty($driverData['military_number'])) {
             return back()->withErrors([
                 'military_number' => __db('military_number_exists')
             ])->withInput();
@@ -358,7 +358,7 @@ class DriverController extends Controller
             })
             ->exists();
 
-        if ($isExistingDriver) {
+        if ($isExistingDriver && !empty($driverData['military_number'])) {
             return response()->json(['message' => __db('military_number_exists')], 409);
         };
 

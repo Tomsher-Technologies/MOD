@@ -259,7 +259,7 @@ class EscortController extends Controller
 
         $isExistingEscort = Escort::where('event_id', $currentEventId)->where('military_number', $escortData['military_number'])->exists();
 
-        if ($isExistingEscort) {
+        if ($isExistingEscort && !empty($escortData['military_number'])) {
             return back()->withErrors([
                 'military_number' => __db('military_number_exists')
             ])->withInput();
@@ -399,7 +399,7 @@ class EscortController extends Controller
             })
             ->exists();
 
-        if ($isExistingEscort) {
+        if ($isExistingEscort && !empty($escortData['military_number'])) {
             return response()->json(['message' => __db('military_number_exists')], 409);
         };
 
